@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HR Dashboard</title>
+  <style>
+    :root {
+      --ink: #1a1d1f;
+      --paper: #fafaf8;
+      --line: #e2e0db;
+      --go: #1f6f4f;
+      --warn: #b5460a;
+      --muted: #6b6862;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 24px 20px 60px; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .summary { display: flex; gap: 12px; margin-bottom: 20px; }
+    .stat { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px; text-align: center; }
+    .stat .n { font-size: 26px; font-weight: 700; }
+    .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    th, td { text-align: left; padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--line); }
+    th { background: #f3f1ec; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
+    tr:last-child td { border-bottom: none; }
+    .pill { font-size: 11px; padding: 3px 9px; border-radius: 999px; }
+    .pill.ok { background: #d8efe2; color: #16523a; }
+    .pill.flag { background: #fde2d3; color: var(--warn); }
+    .pill.late { background: #fef3c7; color: #92400e; }
+    .pill.absent { background: #fde2d3; color: var(--warn); }
+    .pill.leave { background: #e0e7ff; color: #3730a3; }
+    .pill.pending { background: #eceae5; color: var(--muted); }
+    .grid-cell { text-align: center; font-size: 11px; padding: 6px 4px; border-bottom: 1px solid var(--line); border-right: 1px solid #f0eee9; }
+    .grid-cell.P { background: #d8efe2; color: #16523a; }
+    .grid-cell.L { background: #fef3c7; color: #92400e; }
+    .grid-cell.A { background: #fde2d3; color: var(--warn); }
+    .grid-cell.V, .grid-cell.M { background: #e0e7ff; color: #3730a3; }
+    .grid-cell.N { background: #f7f6f3; color: var(--muted); }
+    .grid-header-cell { text-align: center; font-size: 11px; padding: 6px 4px; background: #f3f1ec; color: var(--muted); font-weight: 600; border-right: 1px solid #f0eee9; }
+    .clickable-row { cursor: pointer; }
+    .clickable-row:hover { background: #f7f6f3; }
+    .reason { font-size: 12px; color: var(--warn); }
+    .muted { color: var(--muted); font-size: 13px; }
+    button { padding: 8px 14px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 7px; cursor: pointer; }
+    .login-card { max-width: 360px; margin: 60px auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+    input { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line); border-radius: 7px; }
+    .btn-primary { width: 100%; margin-top: 14px; background: var(--go); color: #fff; border: none; padding: 12px; border-radius: 7px; font-weight: 600; cursor: pointer; }
+    .error { color: var(--warn); font-size: 13px; margin-top: 8px; }
+    .success { color: var(--go); font-size: 13px; margin-top: 8px; }
+    .hidden { display: none !important; }
+
+    .navbar { margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .nav-tabs { display: flex; gap: 4px; }
+    .nav-tab {
+      background: none; border: none; padding: 10px 16px; font-size: 14px;
+      color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+      margin-top: 0; width: auto; border-radius: 0;
+    }
+    .nav-tab.active { color: var(--go); border-bottom-color: var(--go); font-weight: 600; }
+
+    .card-section {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      padding: 20px; margin-bottom: 20px;
+    }
+    .card-section h2 { font-size: 15px; margin: 0 0 14px; }
+
+    .btn-secondary {
+      background: transparent; color: var(--ink); border: 1px solid var(--line);
+      width: 100%; padding: 12px; border-radius: 7px; font-weight: 600; cursor: pointer;
+    }
+
+    .row-action-btn {
+      font-size: 12px; padding: 5px 10px; border: 1px solid var(--line);
+      background: #fff; border-radius: 6px; cursor: pointer; width: auto; margin-top: 0;
+    }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+    }
+    .modal-box {
+      background: #fff; border-radius: 10px; padding: 24px; max-width: 360px; width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="login-screen" class="login-card">
+    <h1 style="font-size:18px;">HR Dashboard — Sign in</h1>
+    <label for="username">Username</label>
+    <input id="username" type="text" />
+    <label for="password">Password</label>
+    <input id="password" type="password" />
+    <button class="btn-primary" id="login-btn">Sign in</button>
+    <div class="error hidden" id="login-error"></div>
+  </div>
+
+  <div id="dash-screen" class="wrap hidden">
+    <div class="navbar">
+      <div class="nav-tabs">
+        <button class="nav-tab active" id="tab-checkins">Today's Check-ins</button>
+        <button class="nav-tab" id="tab-attendance">Attendance</button>
+        <button class="nav-tab" id="tab-monthly">Monthly Report</button>
+        <button class="nav-tab" id="tab-employees">Employees</button>
+        <button class="nav-tab" id="tab-account">My Account</button>
+      </div>
+    </div>
+
+    <!-- ===================== TODAY'S CHECK-INS ===================== -->
+    <div id="panel-checkins">
+      <h1>Today's check-ins</h1>
+      <div class="sub" id="date-label"></div>
+
+      <div class="summary">
+        <div class="stat"><div class="n" id="stat-total">0</div><div class="l">Total logs</div></div>
+        <div class="stat"><div class="n" id="stat-ok">0</div><div class="l">Normal</div></div>
+        <div class="stat"><div class="n" id="stat-flagged" style="color:var(--warn);">0</div><div class="l">Flagged</div></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Time</th><th>Employee</th><th>Type</th><th>Office</th><th>Status</th></tr>
+        </thead>
+        <tbody id="log-rows"></tbody>
+      </table>
+
+      <div class="muted" id="empty-msg" style="margin-top:14px;">No check-ins recorded yet today.</div>
+
+      <div style="margin-top:24px;">
+        <button id="refresh-btn">Refresh</button>
+      </div>
+    </div>
+
+    <!-- ===================== ATTENDANCE ===================== -->
+    <div id="panel-attendance" class="hidden">
+      <h1>Attendance</h1>
+      <div class="sub">Daily attendance status. Manual overrides (leave, etc.) always take priority over auto-detected status.</div>
+
+      <div class="card-section">
+        <label for="attendance-date">Date</label>
+        <input id="attendance-date" type="date" style="max-width:220px;" />
+        <button id="attendance-load-btn" style="margin-top:10px;width:auto;padding:10px 16px;">Load</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Employee</th><th>Status</th><th>Note</th><th>Action</th></tr>
+        </thead>
+        <tbody id="attendance-rows"></tbody>
+      </table>
+      <div class="muted" id="attendance-empty-msg" style="margin-top:14px;">No employees found.</div>
+    </div>
+
+    <!-- ===================== MONTHLY REPORT ===================== -->
+    <div id="panel-monthly" class="hidden">
+      <h1>Monthly Report</h1>
+      <div class="sub">Attendance summary for a full month. Click a row to see the day-by-day breakdown.</div>
+
+      <div class="card-section">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+          <div>
+            <label for="monthly-year">Year</label>
+            <input id="monthly-year" type="number" style="max-width:120px;" />
+          </div>
+          <div>
+            <label for="monthly-month">Month</label>
+            <select id="monthly-month" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <button id="monthly-load-btn" style="width:auto;padding:10px 16px;margin-top:0;">Load</button>
+          <button id="monthly-export-btn" style="width:auto;padding:10px 16px;margin-top:0;">Export CSV</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Employee</th><th>Present</th><th>Late</th><th>Absent</th><th>Leave</th><th></th></tr>
+        </thead>
+        <tbody id="monthly-summary-rows"></tbody>
+      </table>
+      <div class="muted" id="monthly-empty-msg" style="margin-top:14px;">No data for this month yet.</div>
+
+      <div class="card-section hidden" id="monthly-grid-section" style="margin-top:20px;overflow-x:auto;">
+        <h2 id="monthly-grid-title">Daily breakdown</h2>
+        <table id="monthly-grid-table" style="min-width:900px;"></table>
+      </div>
+    </div>
+
+    <!-- ===================== EMPLOYEES ===================== -->
+    <div id="panel-employees" class="hidden">
+      <h1>Employees</h1>
+      <div class="sub">Add new employees, or reset a forgotten password.</div>
+
+      <div class="card-section">
+        <h2>Add new employee</h2>
+        <label for="new-emp-name">Full name</label>
+        <input id="new-emp-name" type="text" placeholder="e.g. Somchai Jaidee" />
+        <label for="new-emp-username">Username</label>
+        <input id="new-emp-username" type="text" placeholder="e.g. somchai" autocapitalize="none" />
+        <label for="new-emp-password">Temporary password</label>
+        <input id="new-emp-password" type="text" placeholder="e.g. Welcome123!" />
+        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+          <input id="new-emp-admin" type="checkbox" style="width:auto;" />
+          <span style="font-size:13px;color:var(--ink);">Grant dashboard/admin access</span>
+        </label>
+        <button class="btn-primary" id="add-employee-btn">Add employee</button>
+        <div class="error hidden" id="add-employee-error"></div>
+        <div class="success hidden" id="add-employee-success"></div>
+      </div>
+
+      <div class="card-section">
+        <h2>Existing employees</h2>
+        <button id="refresh-employees-btn" style="margin-bottom:12px;">Refresh list</button>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Reset password</th></tr>
+          </thead>
+          <tbody id="employee-rows"></tbody>
+        </table>
+        <div class="muted" id="employees-empty-msg" style="margin-top:14px;">No employees yet.</div>
+      </div>
+    </div>
+
+    <!-- ===================== MY ACCOUNT ===================== -->
+    <div id="panel-account" class="hidden">
+      <h1>My Account</h1>
+      <div class="sub">Change your own dashboard password.</div>
+
+      <div class="card-section">
+        <label for="change-old-password">Current password</label>
+        <input id="change-old-password" type="password" />
+        <label for="change-new-password">New password</label>
+        <input id="change-new-password" type="password" />
+        <label for="change-new-password-confirm">Confirm new password</label>
+        <input id="change-new-password-confirm" type="password" />
+        <button class="btn-primary" id="change-password-btn">Change password</button>
+        <div class="error hidden" id="change-password-error"></div>
+        <div class="success hidden" id="change-password-success"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== RESET PASSWORD MODAL ===================== -->
+  <div id="reset-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h2 style="margin-top:0;">Reset password</h2>
+      <div class="sub" id="reset-modal-employee-name"></div>
+      <label for="reset-new-password">New temporary password</label>
+      <input id="reset-new-password" type="text" placeholder="e.g. Welcome123!" />
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn-secondary" id="reset-modal-cancel" style="margin-top:0;">Cancel</button>
+        <button class="btn-primary" id="reset-modal-confirm" style="margin-top:0;">Reset</button>
+      </div>
+      <div class="error hidden" id="reset-modal-error"></div>
+    </div>
+  </div>
+
+  <!-- ===================== ATTENDANCE OVERRIDE MODAL ===================== -->
+  <div id="override-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h2 style="margin-top:0;">Set attendance status</h2>
+      <div class="sub" id="override-modal-employee-name"></div>
+
+      <label for="override-status">Status</label>
+      <select id="override-status" style="width:100%;padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
+        <option value="PRESENT">Present</option>
+        <option value="ABSENT">Absent</option>
+        <option value="MEDICAL_LEAVE">Medical Leave</option>
+        <option value="VACATION_LEAVE">Vacation Leave</option>
+      </select>
+
+      <label for="override-start-date">From date</label>
+      <input id="override-start-date" type="date" />
+      <label for="override-end-date">To date</label>
+      <input id="override-end-date" type="date" />
+      <div class="muted" style="margin-top:6px;">Use the same date for both fields for a single day.</div>
+
+      <label for="override-note">Note (optional)</label>
+      <input id="override-note" type="text" placeholder="e.g. Doctor's appointment" />
+
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn-secondary" id="override-modal-cancel" style="margin-top:0;">Cancel</button>
+        <button class="btn-primary" id="override-modal-confirm" style="margin-top:0;">Save</button>
+      </div>
+      <div class="error hidden" id="override-modal-error"></div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================================
+    // CONFIG — paste your Cloudflare Worker URL here
+    // (looks like https://employee-checkin-api.YOURNAME.workers.dev)
+    // Must match the same URL used in index.html.
+    // =====================================================================
+    var WORKER_API_URL = 'https://employee-checkin-api.huahin.workers.dev';
+
+    var token = null;
+
+    function show(id) { document.getElementById(id).classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+    /**
+     * Hashes the password in the browser before sending — see index.html
+     * for the full explanation.
+     */
+    function clientHashPassword(password) {
+      var encoder = new TextEncoder();
+      var data = encoder.encode(password);
+      return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      });
+    }
+
+    /**
+     * Calls the Cloudflare Worker backend with a normal fetch() POST —
+     * see index.html for why this works reliably (the Worker sets
+     * Access-Control-Allow-Origin explicitly, unlike the old GAS backend).
+     */
+    function callApi(action, params) {
+      return fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: action, params: params || [] })
+      }).then(function(res) {
+        return res.json();
+      });
+    }
+
+    document.getElementById('login-btn').addEventListener('click', function() {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      hide('login-error');
+
+      clientHashPassword(password).then(function(hashedPassword) {
+        return callApi('login', [username, hashedPassword]);
+      }).then(function(res) {
+        if (res.ok) {
+          if (!res.isAdmin) {
+            document.getElementById('login-error').textContent = 'This account does not have dashboard access.';
+            show('login-error');
+            return;
+          }
+          token = res.token;
+          hide('login-screen');
+          show('dash-screen');
+          loadToday();
+        } else {
+          document.getElementById('login-error').textContent = res.error;
+          show('login-error');
+        }
+      }).catch(function(err) {
+        document.getElementById('login-error').textContent = 'Connection error: ' + err.message;
+        show('login-error');
+      });
+    });
+
+    function loadToday() {
+      callApi('dashboardGetToday', [token]).then(function(res) {
+        if (!res.ok) {
+          alert(res.error);
+          return;
+        }
+        document.getElementById('date-label').textContent = res.date;
+        document.getElementById('stat-total').textContent = res.totalLogs;
+        document.getElementById('stat-ok').textContent = res.okCount;
+        document.getElementById('stat-flagged').textContent = res.flaggedCount;
+
+        var tbody = document.getElementById('log-rows');
+        tbody.innerHTML = '';
+        if (res.rows.length === 0) {
+          show('empty-msg');
+        } else {
+          hide('empty-msg');
+          res.rows.forEach(function(row) {
+            var tr = document.createElement('tr');
+            var statusHtml = row.flagStatus === 'FLAGGED'
+              ? '<span class="pill flag">Flagged</span><div class="reason">' + row.flagReason + '</div>'
+              : '<span class="pill ok">OK</span>';
+            tr.innerHTML =
+              '<td>' + row.timestamp + '</td>' +
+              '<td>' + row.employeeName + '</td>' +
+              '<td>' + row.type + '</td>' +
+              '<td>' + row.officeName + '</td>' +
+              '<td>' + statusHtml + '</td>';
+            tbody.appendChild(tr);
+          });
+        }
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
+
+    document.getElementById('refresh-btn').addEventListener('click', loadToday);
+
+    // ===================== TAB SWITCHING =====================
+    var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', account: 'panel-account' };
+    var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', account: 'tab-account' };
+
+    function switchTab(name) {
+      Object.keys(panels).forEach(function(key) {
+        document.getElementById(panels[key]).classList.toggle('hidden', key !== name);
+        document.getElementById(tabs[key]).classList.toggle('active', key === name);
+      });
+      if (name === 'employees') loadEmployees();
+      if (name === 'attendance') {
+        if (!document.getElementById('attendance-date').value) {
+          document.getElementById('attendance-date').value = todayDateStringForInput();
+        }
+        loadAttendance();
+      }
+      if (name === 'monthly') {
+        if (!document.getElementById('monthly-year').value) {
+          var now = new Date();
+          document.getElementById('monthly-year').value = now.getFullYear();
+          document.getElementById('monthly-month').value = String(now.getMonth() + 1);
+        }
+        loadMonthlyReport();
+      }
+    }
+
+    document.getElementById('tab-checkins').addEventListener('click', function() { switchTab('checkins'); });
+    document.getElementById('tab-attendance').addEventListener('click', function() { switchTab('attendance'); });
+    document.getElementById('tab-monthly').addEventListener('click', function() { switchTab('monthly'); });
+    document.getElementById('tab-employees').addEventListener('click', function() { switchTab('employees'); });
+    document.getElementById('tab-account').addEventListener('click', function() { switchTab('account'); });
+
+    // ===================== ADD EMPLOYEE =====================
+    document.getElementById('add-employee-btn').addEventListener('click', function() {
+      var name = document.getElementById('new-emp-name').value.trim();
+      var username = document.getElementById('new-emp-username').value.trim();
+      var password = document.getElementById('new-emp-password').value;
+      var isAdmin = document.getElementById('new-emp-admin').checked;
+
+      hide('add-employee-error');
+      hide('add-employee-success');
+
+      if (!name || !username || !password) {
+        document.getElementById('add-employee-error').textContent = 'Fill in name, username, and a temporary password.';
+        show('add-employee-error');
+        return;
+      }
+      if (password.length < 6) {
+        document.getElementById('add-employee-error').textContent = 'Temporary password should be at least 6 characters.';
+        show('add-employee-error');
+        return;
+      }
+
+      var btn = document.getElementById('add-employee-btn');
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+
+      clientHashPassword(password).then(function(hashedPassword) {
+        return callApi('adminAddEmployee', [token, name, username, hashedPassword, isAdmin]);
+      }).then(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'Add employee';
+        if (res.ok) {
+          document.getElementById('add-employee-success').textContent =
+            'Added ' + name + '. Username: ' + username + '  Temporary password: ' + password +
+            '  — share these with the employee directly; they are not shown again.';
+          show('add-employee-success');
+          document.getElementById('new-emp-name').value = '';
+          document.getElementById('new-emp-username').value = '';
+          document.getElementById('new-emp-password').value = '';
+          document.getElementById('new-emp-admin').checked = false;
+          loadEmployees();
+        } else {
+          document.getElementById('add-employee-error').textContent = res.error;
+          show('add-employee-error');
+        }
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Add employee';
+        document.getElementById('add-employee-error').textContent = 'Connection error: ' + err.message;
+        show('add-employee-error');
+      });
+    });
+
+    // ===================== LIST EMPLOYEES =====================
+    function loadEmployees() {
+      callApi('adminListEmployees', [token]).then(function(res) {
+        if (!res.ok) {
+          alert(res.error);
+          return;
+        }
+        var tbody = document.getElementById('employee-rows');
+        tbody.innerHTML = '';
+        if (res.employees.length === 0) {
+          show('employees-empty-msg');
+        } else {
+          hide('employees-empty-msg');
+          res.employees.forEach(function(emp) {
+            var tr = document.createElement('tr');
+            var roleLabel = emp.isAdmin ? 'Admin' : 'Employee';
+            var statusLabel = emp.active
+              ? '<span class="pill ok">Active</span>'
+              : '<span class="pill flag">Deactivated</span>';
+            var tdAction = document.createElement('td');
+            var resetBtn = document.createElement('button');
+            resetBtn.className = 'row-action-btn';
+            resetBtn.textContent = 'Reset password';
+            resetBtn.addEventListener('click', function() {
+              openResetModal(emp.employeeId, emp.name);
+            });
+            tdAction.appendChild(resetBtn);
+
+            tr.innerHTML =
+              '<td>' + emp.name + '</td>' +
+              '<td>' + emp.username + '</td>' +
+              '<td>' + roleLabel + '</td>' +
+              '<td>' + statusLabel + '</td>';
+            tr.appendChild(tdAction);
+            tbody.appendChild(tr);
+          });
+        }
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
+
+    document.getElementById('refresh-employees-btn').addEventListener('click', loadEmployees);
+
+    // ===================== RESET PASSWORD MODAL =====================
+    var resetTargetEmployeeId = null;
+
+    function openResetModal(employeeId, employeeName) {
+      resetTargetEmployeeId = employeeId;
+      document.getElementById('reset-modal-employee-name').textContent = 'For: ' + employeeName;
+      document.getElementById('reset-new-password').value = '';
+      hide('reset-modal-error');
+      show('reset-modal');
+    }
+
+    function closeResetModal() {
+      hide('reset-modal');
+      resetTargetEmployeeId = null;
+    }
+
+    document.getElementById('reset-modal-cancel').addEventListener('click', closeResetModal);
+
+    document.getElementById('reset-modal-confirm').addEventListener('click', function() {
+      var newPassword = document.getElementById('reset-new-password').value;
+      hide('reset-modal-error');
+
+      if (!newPassword || newPassword.length < 6) {
+        document.getElementById('reset-modal-error').textContent = 'Enter a new password of at least 6 characters.';
+        show('reset-modal-error');
+        return;
+      }
+
+      var btn = document.getElementById('reset-modal-confirm');
+      btn.disabled = true;
+      btn.textContent = 'Resetting...';
+
+      clientHashPassword(newPassword).then(function(hashedPassword) {
+        return callApi('adminResetPassword', [token, resetTargetEmployeeId, hashedPassword]);
+      }).then(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'Reset';
+        if (res.ok) {
+          alert('Password reset. New temporary password: ' + newPassword + ' — share this with the employee directly.');
+          closeResetModal();
+        } else {
+          document.getElementById('reset-modal-error').textContent = res.error;
+          show('reset-modal-error');
+        }
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Reset';
+        document.getElementById('reset-modal-error').textContent = 'Connection error: ' + err.message;
+        show('reset-modal-error');
+      });
+    });
+
+    // ===================== CHANGE OWN PASSWORD =====================
+    document.getElementById('change-password-btn').addEventListener('click', function() {
+      var oldPassword = document.getElementById('change-old-password').value;
+      var newPassword = document.getElementById('change-new-password').value;
+      var confirmPassword = document.getElementById('change-new-password-confirm').value;
+
+      hide('change-password-error');
+      hide('change-password-success');
+
+      if (!oldPassword || !newPassword) {
+        document.getElementById('change-password-error').textContent = 'Fill in both your current and new password.';
+        show('change-password-error');
+        return;
+      }
+      if (newPassword.length < 6) {
+        document.getElementById('change-password-error').textContent = 'New password should be at least 6 characters.';
+        show('change-password-error');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        document.getElementById('change-password-error').textContent = 'New password and confirmation do not match.';
+        show('change-password-error');
+        return;
+      }
+
+      var btn = document.getElementById('change-password-btn');
+      btn.disabled = true;
+      btn.textContent = 'Changing...';
+
+      Promise.all([clientHashPassword(oldPassword), clientHashPassword(newPassword)]).then(function(hashes) {
+        return callApi('changeOwnPassword', [token, hashes[0], hashes[1]]);
+      }).then(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'Change password';
+        if (res.ok) {
+          document.getElementById('change-password-success').textContent = 'Password changed successfully.';
+          show('change-password-success');
+          document.getElementById('change-old-password').value = '';
+          document.getElementById('change-new-password').value = '';
+          document.getElementById('change-new-password-confirm').value = '';
+        } else {
+          document.getElementById('change-password-error').textContent = res.error;
+          show('change-password-error');
+        }
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Change password';
+        document.getElementById('change-password-error').textContent = 'Connection error: ' + err.message;
+        show('change-password-error');
+      });
+    });
+
+    // ===================== ATTENDANCE =====================
+
+    // Today's date as 'YYYY-MM-DD' in the BROWSER's local time, used only
+    // to pre-fill the date picker with a sensible default. The actual
+    // attendance status logic always uses Thailand time server-side,
+    // regardless of what timezone the admin's browser is in.
+    function todayDateStringForInput() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    var STATUS_LABELS = {
+      PRESENT: 'Present',
+      LATE: 'Late',
+      ABSENT: 'Absent',
+      NOT_YET_CHECKED_IN: 'Not yet checked in',
+      MEDICAL_LEAVE: 'Medical Leave',
+      VACATION_LEAVE: 'Vacation Leave',
+    };
+    var STATUS_PILL_CLASS = {
+      PRESENT: 'ok',
+      LATE: 'late',
+      ABSENT: 'absent',
+      NOT_YET_CHECKED_IN: 'pending',
+      MEDICAL_LEAVE: 'leave',
+      VACATION_LEAVE: 'leave',
+    };
+
+    document.getElementById('attendance-load-btn').addEventListener('click', loadAttendance);
+
+    function loadAttendance() {
+      var dateStr = document.getElementById('attendance-date').value;
+      if (!dateStr) return;
+
+      callApi('dashboardGetAttendance', [token, dateStr]).then(function(res) {
+        if (!res.ok) {
+          alert(res.error);
+          return;
+        }
+        var tbody = document.getElementById('attendance-rows');
+        tbody.innerHTML = '';
+        if (res.rows.length === 0) {
+          show('attendance-empty-msg');
+        } else {
+          hide('attendance-empty-msg');
+          res.rows.forEach(function(row) {
+            var tr = document.createElement('tr');
+            var pillClass = STATUS_PILL_CLASS[row.status] || 'pending';
+            var label = STATUS_LABELS[row.status] || row.status;
+
+            var tdAction = document.createElement('td');
+            var setBtn = document.createElement('button');
+            setBtn.className = 'row-action-btn';
+            setBtn.textContent = row.isOverride ? 'Edit' : 'Set status';
+            setBtn.addEventListener('click', function() {
+              openOverrideModal(row.employeeId, row.name, dateStr);
+            });
+            tdAction.appendChild(setBtn);
+
+            if (row.isOverride) {
+              var clearBtn = document.createElement('button');
+              clearBtn.className = 'row-action-btn';
+              clearBtn.style.marginLeft = '6px';
+              clearBtn.textContent = 'Clear';
+              clearBtn.addEventListener('click', function() {
+                clearOverride(row.employeeId, dateStr);
+              });
+              tdAction.appendChild(clearBtn);
+            }
+
+            tr.innerHTML =
+              '<td>' + row.name + '</td>' +
+              '<td><span class="pill ' + pillClass + '">' + label + '</span></td>' +
+              '<td class="muted">' + (row.note || '') + '</td>';
+            tr.appendChild(tdAction);
+            tbody.appendChild(tr);
+          });
+        }
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
+
+    // ===================== ATTENDANCE OVERRIDE MODAL =====================
+    var overrideTargetEmployeeId = null;
+
+    function openOverrideModal(employeeId, employeeName, dateStr) {
+      overrideTargetEmployeeId = employeeId;
+      document.getElementById('override-modal-employee-name').textContent = 'For: ' + employeeName;
+      document.getElementById('override-status').value = 'PRESENT';
+      document.getElementById('override-start-date').value = dateStr;
+      document.getElementById('override-end-date').value = dateStr;
+      document.getElementById('override-note').value = '';
+      hide('override-modal-error');
+      show('override-modal');
+    }
+
+    function closeOverrideModal() {
+      hide('override-modal');
+      overrideTargetEmployeeId = null;
+    }
+
+    document.getElementById('override-modal-cancel').addEventListener('click', closeOverrideModal);
+
+    document.getElementById('override-modal-confirm').addEventListener('click', function() {
+      var status = document.getElementById('override-status').value;
+      var startDate = document.getElementById('override-start-date').value;
+      var endDate = document.getElementById('override-end-date').value;
+      var note = document.getElementById('override-note').value.trim();
+
+      hide('override-modal-error');
+
+      if (!startDate || !endDate) {
+        document.getElementById('override-modal-error').textContent = 'Choose both a start and end date.';
+        show('override-modal-error');
+        return;
+      }
+      if (startDate > endDate) {
+        document.getElementById('override-modal-error').textContent = 'From date must be on or before the to date.';
+        show('override-modal-error');
+        return;
+      }
+
+      var btn = document.getElementById('override-modal-confirm');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      callApi('adminSetAttendanceOverride', [token, overrideTargetEmployeeId, startDate, endDate, status, note])
+        .then(function(res) {
+          btn.disabled = false;
+          btn.textContent = 'Save';
+          if (res.ok) {
+            closeOverrideModal();
+            loadAttendance();
+          } else {
+            document.getElementById('override-modal-error').textContent = res.error;
+            show('override-modal-error');
+          }
+        }).catch(function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Save';
+          document.getElementById('override-modal-error').textContent = 'Connection error: ' + err.message;
+          show('override-modal-error');
+        });
+    });
+
+    function clearOverride(employeeId, dateStr) {
+      if (!confirm('Clear the manual status for this date? It will go back to auto-detected status.')) return;
+      callApi('adminClearAttendanceOverride', [token, employeeId, dateStr]).then(function(res) {
+        if (res.ok) {
+          loadAttendance();
+        } else {
+          alert(res.error);
+        }
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
+
+    // ===================== MONTHLY REPORT =====================
+    var currentMonthlyData = null;
+    var expandedEmployeeId = null;
+
+    document.getElementById('monthly-load-btn').addEventListener('click', loadMonthlyReport);
+
+    function loadMonthlyReport() {
+      var year = parseInt(document.getElementById('monthly-year').value, 10);
+      var month = parseInt(document.getElementById('monthly-month').value, 10);
+      if (!year || !month) return;
+
+      expandedEmployeeId = null;
+      hide('monthly-grid-section');
+
+      var tbody = document.getElementById('monthly-summary-rows');
+      tbody.innerHTML = '<tr><td colspan="6" class="muted">Loading...</td></tr>';
+
+      callApi('dashboardGetMonthlyReport', [token, year, month]).then(function(res) {
+        if (!res.ok) {
+          alert(res.error);
+          return;
+        }
+        currentMonthlyData = res;
+        renderMonthlySummary(res);
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
+
+    function renderMonthlySummary(data) {
+      var tbody = document.getElementById('monthly-summary-rows');
+      tbody.innerHTML = '';
+
+      if (data.employees.length === 0) {
+        show('monthly-empty-msg');
+        return;
+      }
+      hide('monthly-empty-msg');
+
+      data.employees.forEach(function(emp) {
+        var tr = document.createElement('tr');
+        tr.className = 'clickable-row';
+        var leaveCount = emp.counts.MEDICAL_LEAVE + emp.counts.VACATION_LEAVE;
+        tr.innerHTML =
+          '<td>' + emp.name + '</td>' +
+          '<td>' + emp.counts.PRESENT + '</td>' +
+          '<td>' + emp.counts.LATE + '</td>' +
+          '<td>' + emp.counts.ABSENT + '</td>' +
+          '<td>' + leaveCount + '</td>' +
+          '<td class="muted">' + (expandedEmployeeId === emp.employeeId ? '▲ Hide' : '▼ Details') + '</td>';
+        tr.addEventListener('click', function() {
+          if (expandedEmployeeId === emp.employeeId) {
+            expandedEmployeeId = null;
+            hide('monthly-grid-section');
+          } else {
+            expandedEmployeeId = emp.employeeId;
+            renderMonthlyGrid(emp, currentMonthlyData);
+          }
+          renderMonthlySummary(currentMonthlyData);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    var STATUS_GRID_CODE = {
+      PRESENT: 'P',
+      LATE: 'L',
+      ABSENT: 'A',
+      NOT_YET_CHECKED_IN: 'N',
+      MEDICAL_LEAVE: 'M',
+      VACATION_LEAVE: 'V',
+    };
+
+    function renderMonthlyGrid(emp, data) {
+      document.getElementById('monthly-grid-title').textContent = 'Daily breakdown — ' + emp.name;
+      var table = document.getElementById('monthly-grid-table');
+      table.innerHTML = '';
+
+      var headerRow = document.createElement('tr');
+      emp.dailyStatuses.forEach(function(day) {
+        var th = document.createElement('th');
+        th.className = 'grid-header-cell';
+        th.textContent = day.date.slice(8, 10);
+        headerRow.appendChild(th);
+      });
+      table.appendChild(headerRow);
+
+      var statusRow = document.createElement('tr');
+      emp.dailyStatuses.forEach(function(day) {
+        var td = document.createElement('td');
+        if (day.status === null) {
+          td.className = 'grid-cell';
+          td.textContent = '';
+        } else {
+          var code = STATUS_GRID_CODE[day.status] || '?';
+          td.className = 'grid-cell ' + code;
+          td.textContent = code;
+          if (day.note) td.title = day.note;
+        }
+        statusRow.appendChild(td);
+      });
+      table.appendChild(statusRow);
+
+      show('monthly-grid-section');
+    }
+
+    document.getElementById('monthly-export-btn').addEventListener('click', function() {
+      if (!currentMonthlyData) {
+        alert('Load a month first.');
+        return;
+      }
+      exportMonthlyReportCsv(currentMonthlyData);
+    });
+
+    function csvEscape(value) {
+      var str = String(value === null || value === undefined ? '' : value);
+      if (str.indexOf(',') !== -1 || str.indexOf('"') !== -1 || str.indexOf('\n') !== -1) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    }
+
+    function exportMonthlyReportCsv(data) {
+      var lines = [];
+
+      // Header row: Name, Username, then one column per day of the month.
+      var headerCols = ['Name', 'Username'];
+      if (data.employees.length > 0) {
+        data.employees[0].dailyStatuses.forEach(function(day) {
+          headerCols.push(day.date);
+        });
+      }
+      headerCols.push('Present', 'Late', 'Absent', 'Medical Leave', 'Vacation Leave');
+      lines.push(headerCols.map(csvEscape).join(','));
+
+      data.employees.forEach(function(emp) {
+        var row = [emp.name, emp.username];
+        emp.dailyStatuses.forEach(function(day) {
+          row.push(day.status === null ? '' : (STATUS_GRID_CODE[day.status] || day.status));
+        });
+        row.push(emp.counts.PRESENT, emp.counts.LATE, emp.counts.ABSENT, emp.counts.MEDICAL_LEAVE, emp.counts.VACATION_LEAVE);
+        lines.push(row.map(csvEscape).join(','));
+      });
+
+      var csvContent = lines.join('\r\n');
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'attendance-' + data.year + '-' + String(data.month).padStart(2, '0') + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

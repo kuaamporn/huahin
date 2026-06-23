@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Check-In</title>
+  <style>
+    :root {
+      --ink: #1a1d1f;
+      --paper: #fafaf8;
+      --line: #e2e0db;
+      --go: #1f6f4f;
+      --go-dark: #16523a;
+      --warn: #b5460a;
+      --muted: #6b6862;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; padding: 24px 20px 60px; }
+    .brand {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    h1 { font-size: 24px; margin: 0 0 24px; font-weight: 700; }
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; margin-top: 14px; }
+    label:first-child { margin-top: 0; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+    input:focus { outline: 2px solid var(--go); outline-offset: 1px; }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 18px;
+    }
+    .btn-primary { background: var(--go); color: #fff; }
+    .btn-primary:active { background: var(--go-dark); }
+    .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); margin-top: 8px; }
+    .btn-out { background: var(--warn); color: #fff; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error { color: var(--warn); font-size: 14px; margin-top: 10px; }
+    .success { color: var(--go); font-size: 14px; margin-top: 10px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .hidden { display: none !important; }
+    #qr-reader { width: 100%; border-radius: 8px; overflow: hidden; }
+    .toplink { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .userbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+      <div class="brand">Employee Check-In</div>
+      <h1>Sign in</h1>
+      <div class="card">
+        <label for="username">Username</label>
+        <input id="username" type="text" autocomplete="username" />
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" />
+        <button class="btn-primary" id="login-btn">Sign in</button>
+        <div class="error hidden" id="login-error"></div>
+      </div>
+    </div>
+
+    <!-- MAIN SCREEN (after login) -->
+    <div id="main-screen" class="hidden">
+      <div class="userbar">
+        <div>
+          <div class="brand">Employee Check-In</div>
+          <h1 id="welcome-name" style="font-size:20px;margin:0;"></h1>
+        </div>
+        <a href="rooms.html" class="toplink" id="rooms-link">Room Availability</a>
+        <a href="#" class="toplink" id="logout-link">Sign out</a>
+      </div>
+
+      <div class="card">
+        <div class="muted" style="margin-bottom:12px;">Scan the QR code posted at your office to check in or out. Location services must be enabled — check-in is only accepted within range of the office.</div>
+
+        <button class="btn-primary" id="start-camera-btn">Tap to start camera</button>
+        <div class="error hidden" id="camera-error"></div>
+
+        <div id="qr-reader" class="hidden"></div>
+        <div id="qr-status" class="muted" style="margin-top:10px;"></div>
+        <button class="btn-secondary hidden" id="rescan-btn">Scan again</button>
+      </div>
+
+      <div class="card hidden" id="manual-entry-card">
+        <div class="muted" style="margin-bottom:10px;">Can't use the camera? Enter the office code shown below the QR poster instead.</div>
+        <input id="manual-office-code" type="text" placeholder="e.g. OFF1" autocapitalize="characters" />
+        <button class="btn-secondary" id="manual-submit-btn" style="margin-top:10px;">Use this code</button>
+      </div>
+
+      <div class="card hidden" id="confirm-card">
+        <div id="confirm-office" style="font-weight:600;margin-bottom:4px;"></div>
+        <div class="muted" id="confirm-loc" style="margin-bottom:14px;"></div>
+        <button class="btn-primary" id="checkin-btn">Check In</button>
+        <button class="btn-out" id="checkout-btn">Check Out</button>
+        <div class="error hidden" id="checkin-error"></div>
+        <div class="success hidden" id="checkin-success"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QR scanning library (lightweight, free, no API key needed) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    // =====================================================================
+    // CONFIG — paste your Cloudflare Worker URL here
+    // (looks like https://employee-checkin-api.YOURNAME.workers.dev)
+    // =====================================================================
+    var WORKER_API_URL = 'https://employee-checkin-api.huahin.workers.dev';
+
+    var sessionToken = null;
+    var currentEmployeeName = null;
+    var scannedOfficeId = null;
+    var lastKnownPosition = null;
+    var html5QrCode = null;
+
+    function show(id) { document.getElementById(id).classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function getDeviceId() {
+      // Simple persistent device fingerprint stored in localStorage.
+      // NOTE: this is a soft signal only, not a security boundary —
+      // true device attestation needs a native app (Play Integrity API).
+      var key = 'checkin_device_id';
+      var id = localStorage.getItem(key);
+      if (!id) {
+        id = 'dev-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem(key, id);
+      }
+      return id;
+    }
+
+    /**
+     * Hashes the password in the BROWSER before it's sent, using the
+     * Web Crypto API (built into every modern browser, no library
+     * needed). Even though the Cloudflare Worker accepts a normal POST
+     * body (not a URL query string), hashing client-side is still good
+     * practice: the raw password never leaves the device, and the
+     * server's own salted hash is applied on top of this value.
+     */
+    function clientHashPassword(password) {
+      var encoder = new TextEncoder();
+      var data = encoder.encode(password);
+      return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      });
+    }
+
+    /**
+     * Calls the Cloudflare Worker backend with a normal fetch() POST.
+     *
+     * WHY THIS WORKS (unlike the old Google Apps Script backend):
+     * The Worker explicitly sets Access-Control-Allow-Origin on every
+     * response (see corsHeaders() in worker.js), so the browser allows
+     * this page to read the response. No JSONP, no GET-with-query-string
+     * workaround needed — this is what a normal API call looks like.
+     */
+    function callApi(action, params) {
+      return fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: action, params: params || [] })
+      }).then(function(res) {
+        return res.json();
+      });
+    }
+
+    // ---------- LOGIN ----------
+    document.getElementById('login-btn').addEventListener('click', function() {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      hide('login-error');
+      if (!username || !password) {
+        document.getElementById('login-error').textContent = 'Enter your username and password.';
+        show('login-error');
+        return;
+      }
+      var btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+
+      clientHashPassword(password).then(function(hashedPassword) {
+        return callApi('login', [username, hashedPassword]);
+      }).then(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+        if (res.ok) {
+          sessionToken = res.token;
+          currentEmployeeName = res.name;
+          document.getElementById('welcome-name').textContent = 'Hi, ' + res.name;
+          hide('login-screen');
+          show('main-screen');
+          // Camera is started only when the user taps "Tap to start camera" —
+          // a direct user gesture, which is what browsers require to show
+          // the camera permission prompt reliably.
+        } else {
+          document.getElementById('login-error').textContent = res.error;
+          show('login-error');
+        }
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+        document.getElementById('login-error').textContent = 'Connection error: ' + err.message;
+        show('login-error');
+      });
+    });
+
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (html5QrCode) { try { html5QrCode.stop(); } catch (e) {} }
+      callApi('logout', [sessionToken]).catch(function() {});
+      sessionToken = null;
+      location.reload();
+    });
+
+    // ---------- CAMERA PERMISSION + QR SCANNING ----------
+    document.getElementById('start-camera-btn').addEventListener('click', requestCameraAndStart);
+
+    function requestCameraAndStart() {
+      hide('camera-error');
+      hide('manual-entry-card');
+      var btn = document.getElementById('start-camera-btn');
+      btn.disabled = true;
+      btn.textContent = 'Requesting camera access...';
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        btn.disabled = false;
+        btn.textContent = 'Tap to start camera';
+        showCameraError('This browser does not support camera access here. Use the manual code option below.');
+        show('manual-entry-card');
+        return;
+      }
+
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+          stream.getTracks().forEach(function(track) { track.stop(); });
+          btn.disabled = false;
+          hide('start-camera-btn');
+          startScanner();
+        })
+        .catch(function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Tap to start camera';
+          if (err.name === 'NotAllowedError') {
+            showCameraError(
+              'Camera permission was denied. Tap the lock/info icon next to the address bar, ' +
+              'open Site settings, set Camera to Allow, then reload this page and try again.'
+            );
+          } else if (err.name === 'NotFoundError') {
+            showCameraError('No camera was found on this device.');
+          } else if (err.name === 'NotReadableError') {
+            showCameraError('The camera is already in use by another app. Close other camera apps and try again.');
+          } else {
+            showCameraError('Camera error: ' + err.message + '. You can use the manual code option below instead.');
+          }
+          show('manual-entry-card');
+        });
+    }
+
+    function showCameraError(message) {
+      var el = document.getElementById('camera-error');
+      el.textContent = message;
+      show('camera-error');
+    }
+
+    function startScanner() {
+      hide('confirm-card');
+      show('qr-reader');
+      document.getElementById('qr-status').textContent = 'Point your camera at the office QR code.';
+      html5QrCode = new Html5Qrcode('qr-reader');
+      html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: 230 },
+        onScanSuccess,
+        function() { /* ignore per-frame scan errors */ }
+      ).catch(function(err) {
+        document.getElementById('qr-status').textContent = '';
+        hide('qr-reader');
+        showCameraError('Could not start the camera: ' + err + '. You can use the manual code option below instead.');
+        show('manual-entry-card');
+      });
+    }
+
+    function onScanSuccess(decodedText) {
+      var data;
+      try {
+        data = JSON.parse(decodedText);
+      } catch (e) {
+        document.getElementById('qr-status').textContent = 'That QR code is not a valid check-in code.';
+        return;
+      }
+      if (!data.officeId) {
+        document.getElementById('qr-status').textContent = 'That QR code is not a valid check-in code.';
+        return;
+      }
+      scannedOfficeId = data.officeId;
+
+      html5QrCode.stop().catch(function() {});
+      hide('qr-reader');
+      document.getElementById('qr-status').textContent = 'Code scanned. Getting your location...';
+      show('rescan-btn');
+      getLocationAndConfirm();
+    }
+
+    document.getElementById('rescan-btn').addEventListener('click', function() {
+      hide('rescan-btn');
+      hide('confirm-card');
+      startScanner();
+    });
+
+    // ---------- MANUAL OFFICE CODE FALLBACK ----------
+    document.getElementById('manual-submit-btn').addEventListener('click', function() {
+      var code = document.getElementById('manual-office-code').value.trim().toUpperCase();
+      if (!code) return;
+      scannedOfficeId = code;
+      hide('manual-entry-card');
+      document.getElementById('qr-status').textContent = 'Code entered. Getting your location...';
+      show('rescan-btn');
+      getLocationAndConfirm();
+    });
+
+    // ---------- GEOLOCATION ----------
+    function getLocationAndConfirm() {
+      if (!navigator.geolocation) {
+        document.getElementById('qr-status').textContent = 'Your browser does not support location services.';
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        lastKnownPosition = pos;
+        document.getElementById('qr-status').textContent = '';
+        document.getElementById('confirm-office').textContent = 'Ready to record your check-in/out.';
+        document.getElementById('confirm-loc').textContent =
+          'Location accuracy: ' + Math.round(pos.coords.accuracy) + 'm';
+        show('confirm-card');
+        hide('checkin-error');
+        hide('checkin-success');
+      }, function(err) {
+        document.getElementById('qr-status').textContent =
+          'Could not get your location (' + err.message + '). Enable location services and tap "Scan again".';
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    }
+
+    // ---------- CHECK IN / OUT ----------
+    function submitCheck(type) {
+      if (!lastKnownPosition) return;
+      hide('checkin-error');
+      hide('checkin-success');
+      var btn = type === 'IN' ? document.getElementById('checkin-btn') : document.getElementById('checkout-btn');
+      btn.disabled = true;
+      btn.textContent = 'Recording...';
+
+      callApi('checkIn', [
+        sessionToken,
+        type,
+        scannedOfficeId,
+        lastKnownPosition.coords.latitude,
+        lastKnownPosition.coords.longitude,
+        lastKnownPosition.coords.accuracy,
+        getDeviceId()
+      ]).then(function(res) {
+        btn.disabled = false;
+        btn.textContent = type === 'IN' ? 'Check In' : 'Check Out';
+        if (res.ok) {
+          var msg = 'Checked ' + (type === 'IN' ? 'in' : 'out') + ' at ' + res.officeName + '.';
+          if (res.flagged) {
+            msg += ' (Flagged for review: ' + res.reasons.join('; ') + ')';
+          }
+          document.getElementById('checkin-success').textContent = msg;
+          show('checkin-success');
+          hide('confirm-card');
+          setTimeout(function() {
+            hide('checkin-success');
+            startScanner();
+          }, 3500);
+        } else {
+          document.getElementById('checkin-error').textContent = res.error;
+          show('checkin-error');
+        }
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = type === 'IN' ? 'Check In' : 'Check Out';
+        document.getElementById('checkin-error').textContent = 'Connection error: ' + err.message;
+        show('checkin-error');
+      });
+    }
+
+    document.getElementById('checkin-btn').addEventListener('click', function() { submitCheck('IN'); });
+    document.getElementById('checkout-btn').addEventListener('click', function() { submitCheck('OUT'); });
+  </script>
+</body>
+</html>

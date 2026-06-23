@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Availability — The Precious / The Moment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0c0e14;--surface:#13161f;--panel:#181c28;--border:#252a3d;
+  --text:#e6eaf5;--muted:#626880;
+  --p:#4f8ef7;--p2:#7b5df0;--pn:#7ec8f7;
+  --m:#2ec4a0;--m2:#f0a030;--mn:#7effd4;
+  --tc:#c8a84b;--tb:#4f8ef7;--ta2:#2ec4a0;--ta1:#e07b3a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;display:flex;flex-direction:column;overflow:hidden}
+
+/* ---------- LOGIN SCREEN (identical pattern to index.html) ---------- */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 24px 48px rgba(0,0,0,.4)}
+.login-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1a2040,#252a3d);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px}
+.login-title{text-align:center;font-size:17px;font-weight:700;margin-bottom:4px}
+.login-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:28px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.fi{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:14px}
+.fi:focus{border-color:var(--p)}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,#3a6fd8,#4f8ef7);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-error{background:rgba(224,93,93,.08);border:1px solid rgba(224,93,93,.25);border-radius:8px;padding:10px 13px;font-size:12px;color:#e05d5d;margin-bottom:14px;display:none}
+.login-error.show{display:block}
+.login-footer{text-align:center;margin-top:20px;font-size:11px;color:#3a4060;line-height:1.6}
+.hidden{display:none !important}
+
+/* ---------- MAIN APP ---------- */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;padding:0 16px;gap:0;position:sticky;top:0;z-index:100;flex-shrink:0;min-height:52px}
+.prop-tabs{display:flex;align-items:stretch}
+.ptab{display:flex;align-items:center;gap:8px;padding:0 20px;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap;transition:all .15s}
+.ptab:hover{color:var(--text)}
+.ptab.active.precious{color:var(--pn);border-bottom-color:var(--p);background:rgba(79,142,247,.06)}
+.ptab.active.moment{color:var(--mn);border-bottom-color:var(--m);background:rgba(46,196,160,.06)}
+.ptab.active.combined{color:var(--text);border-bottom-color:#9966ff;background:rgba(153,102,255,.06)}
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.precious .pdot{background:var(--p)} .moment .pdot{background:var(--m)} .combined .pdot{background:#9966ff}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;padding-left:16px;border-left:1px solid var(--border)}
+.btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-p{background:var(--p);color:#fff} .btn-m{background:var(--m);color:#0c0e14}
+.btn-o{background:transparent;color:var(--text);border:1px solid var(--border)} .btn-o:hover{border-color:var(--p);color:var(--p)}
+.btn-red{background:rgba(224,93,93,.12);color:#e05d5d;border:1px solid rgba(224,93,93,.2)}
+.user-badge{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:12px}
+.user-name{font-weight:600}
+
+.statsbar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
+.sgroup{display:flex;border-right:1px solid var(--border)}
+.sglabel{writing-mode:vertical-lr;transform:rotate(180deg);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:6px 5px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
+.sglabel.p{color:var(--p)} .sglabel.m{color:var(--m)}
+.stat{padding:8px 16px;text-align:center;border-right:1px solid var(--border);min-width:90px}
+.sv{font-size:19px;font-weight:700;font-family:'DM Mono',monospace}
+.sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.green{color:#2dd47e}.amber{color:#f5a623}.blue{color:var(--p)}.teal{color:var(--m)}.red{color:#e05d5d}
+
+.controls{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
+.sbox{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 11px;flex:1;min-width:200px}
+.sbox input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%}
+.dpair{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 11px}
+.dpair input{background:none;border:none;outline:none;color:var(--text);font-size:12px;color-scheme:dark;cursor:pointer;width:104px}
+.dpair span{color:var(--muted);font-size:11px}
+.ftabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:3px}
+.ftab{padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted)}
+.ftab.active{background:var(--p);color:#fff}
+.ftab.active.mt{background:var(--m);color:#0c0e14}
+
+.avres{display:none;margin:0 14px;padding:10px 14px;border-radius:8px;border:1px solid;flex-wrap:wrap;gap:7px;align-items:center}
+.avres.show{display:flex}
+.avres.has{border-color:rgba(45,212,126,.3);background:rgba(45,212,126,.05)}
+.avres.no{border-color:rgba(224,93,93,.3);background:rgba(224,93,93,.05)}
+.av-title{font-weight:600;font-size:13px}
+.avres.has .av-title{color:#2dd47e} .avres.no .av-title{color:#e05d5d}
+.chip{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid}
+.chip.p{background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.3);color:var(--p)}
+.chip.m{background:rgba(46,196,160,.1);border-color:rgba(46,196,160,.3);color:var(--m)}
+
+.gwrap{flex:1;overflow:auto;position:relative}
+.gantt{min-width:max-content;border-collapse:collapse}
+.gantt thead th{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:2px solid var(--border)}
+.gantt td.rc,.gantt th.rc{position:sticky;left:0;z-index:15;background:var(--surface);border-right:2px solid var(--border)}
+.gantt thead th.rc{z-index:25}
+.gantt th{padding:0;font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;min-width:34px;text-align:center;border-right:1px solid var(--border)}
+.gantt th .dn{display:block;padding:4px 2px 1px;font-size:11px;font-weight:600}
+.gantt th .dd{display:block;padding:0 2px 3px;font-size:9px;text-transform:uppercase}
+.gantt th.tc{background:rgba(79,142,247,.1)!important} .gantt th.tc .dn{color:var(--p)}
+.rc{min-width:165px;max-width:165px;padding:0 10px}
+.rn{font-weight:600;font-size:12px} .rs{font-size:10px;color:var(--muted)}
+.gantt td{height:30px;border-right:1px solid rgba(37,42,61,.5);border-bottom:1px solid rgba(37,42,61,.4);padding:0;position:relative;background:var(--panel);cursor:pointer}
+.gantt td.tc{background:rgba(79,142,247,.04)!important}
+.gantt tr:hover td{filter:brightness(1.1)} .gantt tr:hover td.rc{filter:none}
+.ph td{background:var(--surface)!important;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;padding:6px 12px!important;border-bottom:2px solid!important}
+.ph.precious td{color:var(--pn);border-bottom-color:var(--p)!important}
+.ph.moment td{color:var(--mn);border-bottom-color:var(--m)!important}
+.fh td{background:rgba(24,28,40,.8)!important;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:4px 12px!important;border-bottom:1px solid var(--border)!important}
+.bar{position:absolute;top:3px;bottom:3px;left:1px;border-radius:4px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;cursor:pointer;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.bar:hover{filter:brightness(1.25);z-index:10}
+.bar.monthly{background:linear-gradient(90deg,#2a5ab5,#4f8ef7)}
+.bar.walkin{background:linear-gradient(90deg,#137a50,#2dd47e);color:#0c0e14;text-shadow:none}
+.bar.reserved{background:linear-gradient(90deg,#9a5e08,#f5a623);color:#0c0e14;text-shadow:none}
+.bar.commercial{background:linear-gradient(90deg,#5230a8,#9966ff)}
+
+.legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:7px 14px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;font-size:11px;color:var(--muted)}
+.leg{display:flex;align-items:center;gap:5px}
+.ld{width:10px;height:10px;border-radius:3px}
+.lsep{width:1px;height:14px;background:var(--border);margin:0 2px}
+
+.detail{position:fixed;right:0;top:0;bottom:0;width:320px;background:var(--panel);border-left:1px solid var(--border);z-index:200;padding:22px;transform:translateX(100%);transition:transform .22s ease;overflow-y:auto}
+.detail.open{transform:translateX(0)}
+.dclose{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer}
+.dbadge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:10px}
+.dbadge.precious{background:rgba(79,142,247,.15);color:var(--p)} .dbadge.moment{background:rgba(46,196,160,.15);color:var(--m)}
+.df{margin-bottom:11px} .df label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px} .df span{font-size:14px;font-weight:500}
+.dactions{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap}
+
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center}
+.mbg.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:24px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mtitle{font-size:16px;font-weight:700}
+.mx{width:28px;height:28px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer}
+.fg{margin-bottom:13px}
+.fs,.fta{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;color-scheme:dark}
+.fta{resize:vertical;min-height:65px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tbtn{padding:8px;border-radius:7px;border:1px solid var(--border);text-align:center;cursor:pointer;font-size:11px;font-weight:500;background:var(--bg);color:var(--muted)}
+.tbtn.sel{border-color:var(--p);background:rgba(79,142,247,.1);color:var(--p)}
+.pbox{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:11px 13px;margin-top:4px;display:none}
+.prow{display:flex;justify-content:space-between;padding:2px 0;font-size:12px}
+.prow.tot{border-top:1px solid var(--border);margin-top:6px;padding-top:8px;font-weight:700;font-size:14px}
+.cwarn{background:rgba(224,93,93,.08);border:1px solid rgba(224,93,93,.3);border-radius:7px;padding:9px 11px;font-size:12px;color:#e05d5d;margin-top:7px;display:none}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:500;z-index:999;transition:transform .3s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(45,212,126,.4);color:#2dd47e} .toast.err{border-color:rgba(224,93,93,.4);color:#e05d5d}
+
+.loading{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-icon">🏢</div>
+    <div class="login-title">Room Availability</div>
+    <div class="login-sub">The Precious · The Moment — Hua Hin</div>
+    <div class="login-error" id="login-error"></div>
+    <label class="fl">Username</label>
+    <input class="fi" type="text" id="username" autocomplete="username" autocapitalize="none">
+    <label class="fl">Password</label>
+    <input class="fi" type="password" id="password" autocomplete="current-password">
+    <button class="login-btn" id="login-btn">Sign in</button>
+    <div class="login-footer">Same login as the Employee Check-In system</div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP (hidden until login) ============ -->
+<div id="main-screen" class="hidden" style="display:flex;flex-direction:column;height:100vh">
+
+  <div class="topbar">
+    <div class="prop-tabs">
+      <div class="ptab active precious" onclick="setProp('precious',this)"><span class="pdot"></span>The Precious</div>
+      <div class="ptab moment" onclick="setProp('moment',this)"><span class="pdot"></span>The Moment</div>
+      <div class="ptab combined" onclick="setProp('combined',this)"><span class="pdot"></span>Combined</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-p" id="addBtn" onclick="openBook()">＋ New Booking</button>
+      <button class="btn btn-o" onclick="jumpToday()">Today</button>
+      <div class="user-badge"><span class="user-name" id="welcome-name"></span></div>
+      <button class="btn btn-red" id="logout-link">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="statsbar" id="statsbar"></div>
+
+  <div class="controls">
+    <div class="sbox"><span>🔍</span><input type="text" id="srch" placeholder="Search guest, room…" oninput="applyFilters()"></div>
+    <div class="dpair"><span>📅</span><input type="date" id="fIn" onchange="checkAvail()"><span>→</span><input type="date" id="fOut" onchange="checkAvail()"></div>
+    <div class="ftabs" id="ftabs"></div>
+  </div>
+
+  <div class="avres" id="avres"><div class="av-title" id="avtitle"></div><div id="avchips"></div></div>
+
+  <div class="gwrap" id="gwrap"><table class="gantt" id="gtbl"></table></div>
+
+  <div class="legend">
+    <div class="leg"><div class="ld" style="background:var(--p)"></div>The Precious</div>
+    <div class="leg"><div class="ld" style="background:var(--m)"></div>The Moment</div>
+    <div class="lsep"></div>
+    <div class="leg"><div class="ld" style="background:#4f8ef7"></div>Monthly</div>
+    <div class="leg"><div class="ld" style="background:#2dd47e"></div>Walk-in</div>
+    <div class="leg"><div class="ld" style="background:#f5a623"></div>Reserved</div>
+    <div class="leg"><div class="ld" style="background:#9966ff"></div>Commercial</div>
+  </div>
+</div>
+
+<div class="detail" id="detailPanel"><button class="dclose" onclick="closeDetail()">✕</button><div id="detailContent"></div></div>
+
+<div class="mbg" id="mbg" onclick="closeMod(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mhdr"><div class="mtitle">New Booking</div><button class="mx" onclick="closeMod()">✕</button></div>
+    <div class="fg"><label class="fl">Property</label><select class="fs" id="mProp" onchange="updateRooms()">
+      <option value="precious">The Precious</option><option value="moment">The Moment</option>
+    </select></div>
+    <div class="fg"><label class="fl">Guest / Tenant</label><input class="fi" type="text" id="mGuest" placeholder="Full name…"></div>
+    <div class="fg"><label class="fl">Room</label><select class="fs" id="mRoom"></select></div>
+    <div class="fg"><label class="fl">Booking Type</label>
+      <div class="tbtns">
+        <div class="tbtn sel" onclick="selType('monthly',this)">📅 Monthly</div>
+        <div class="tbtn" onclick="selType('walkin',this)">🚶 Walk-in</div>
+        <div class="tbtn" onclick="selType('reserved',this)">📌 Reserved</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Check-in</label><input class="fi" type="date" id="mIn" onchange="calcP()"></div>
+      <div class="fg"><label class="fl">Check-out</label><input class="fi" type="date" id="mOut" onchange="calcP()"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Rate (฿)</label><input class="fi" type="number" id="mRate" oninput="calcP()"></div>
+      <div class="fg"><label class="fl">Deposit (฿)</label><input class="fi" type="number" id="mDep"></div>
+    </div>
+    <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="mNotes"></textarea></div>
+    <div class="pbox" id="pbox">
+      <div class="prow"><span>Duration</span><span id="pDur">—</span></div>
+      <div class="prow"><span>Rate</span><span id="pRate">—</span></div>
+      <div class="prow"><span>Deposit</span><span id="pDep">—</span></div>
+      <div class="prow tot"><span>Total Due Now</span><span id="pTot">—</span></div>
+    </div>
+    <div class="cwarn" id="cwarn"></div>
+    <div style="display:flex;gap:9px;margin-top:16px">
+      <button class="btn btn-o" style="flex:1" onclick="closeMod()">Cancel</button>
+      <button class="btn btn-m" style="flex:2" id="saveBtn" onclick="saveBook()">✓ Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================================
+// SAME PATTERN AS index.html / dashboard.html — same Worker, same
+// callApi() shape, same client-side password hashing. Paste your
+// deployed Worker URL below (same value as in index.html/dashboard.html).
+// =====================================================================
+var WORKER_API_URL = 'https://employee-checkin-api.huahin.workers.dev';
+
+var sessionToken = null;
+var currentEmployeeName = null;
+
+function clientHashPassword(password) {
+  var encoder = new TextEncoder();
+  var data = encoder.encode(password);
+  return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
+    var hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  });
+}
+
+function callApi(action, params) {
+  return fetch(WORKER_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: action, params: params || [] })
+  }).then(function(res) { return res.json(); });
+}
+
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+
+// ---------- LOGIN ----------
+document.getElementById('login-btn').addEventListener('click', function() {
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value;
+  hide('login-error');
+  if (!username || !password) {
+    document.getElementById('login-error').textContent = 'Enter your username and password.';
+    show('login-error');
+    return;
+  }
+  var btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+
+  clientHashPassword(password).then(function(hashedPassword) {
+    return callApi('login', [username, hashedPassword]);
+  }).then(function(res) {
+    btn.disabled = false; btn.textContent = 'Sign in';
+    if (res.ok) {
+      sessionToken = res.token;
+      currentEmployeeName = res.name;
+      document.getElementById('welcome-name').textContent = res.name;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-screen').classList.remove('hidden');
+      bootApp();
+    } else {
+      document.getElementById('login-error').textContent = res.error;
+      show('login-error');
+    }
+  }).catch(function(err) {
+    btn.disabled = false; btn.textContent = 'Sign in';
+    document.getElementById('login-error').textContent = 'Connection error: ' + err.message;
+    show('login-error');
+  });
+});
+
+document.getElementById('logout-link').addEventListener('click', function() {
+  callApi('logout', [sessionToken]).catch(function() {});
+  sessionToken = null;
+  location.reload();
+});
+
+// =====================================================================
+// ROOM APP — once logged in
+// =====================================================================
+var ROOMS = [];
+var bookings = [];
+var activeProp = 'precious';
+var activeFloor = 'all';
+var searchQ = '';
+var selBT = 'monthly';
+
+var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+var WIN_S = new Date(TODAY); WIN_S.setDate(WIN_S.getDate()-14);
+var WIN_E = new Date(TODAY); WIN_E.setDate(WIN_E.getDate()+150);
+
+function dk(d){ return (d instanceof Date ? d : new Date(d)).toISOString().slice(0,10); }
+function pd(s){ var d=new Date(s); d.setHours(0,0,0,0); return d; }
+function dd(a,b){ return Math.round((pd(b)-pd(a))/86400000); }
+function buildDates(){ var out=[],d=new Date(WIN_S); while(d<=WIN_E){out.push(new Date(d));d.setDate(d.getDate()+1);} return out; }
+
+var TYPE_META = {
+  Deluxe:{label:'Deluxe',color:'#c8a84b'},Penthouse:{label:'Penthouse',color:'#e8c060'},
+  Standard:{label:'Standard',color:'#4f8ef7'},Corner:{label:'Corner',color:'#7b5df0'},
+  Commercial:{label:'Commercial',color:'#9966ff'},
+  C:{label:'Type C Deluxe',color:'#c8a84b'},B:{label:'Type B 1-Bed',color:'#4f8ef7'},
+  A2:{label:'Type A.2 Studio/Mo',color:'#2ec4a0'},A1:{label:'Type A.1 Studio/Day',color:'#e07b3a'}
+};
+function tc(t){ return (TYPE_META[t]||{color:'#555'}).color; }
+function tl(t){ return (TYPE_META[t]||{label:t}).label; }
+
+function bootApp() {
+  var outD = new Date(TODAY); outD.setDate(outD.getDate()+7);
+  document.getElementById('fIn').value = dk(TODAY);
+  document.getElementById('fOut').value = dk(outD);
+
+  Promise.all([
+    callApi('roomsList', ['combined']),
+    callApi('bookingsList', ['combined'])
+  ]).then(function(results) {
+    var roomsRes = results[0], bookingsRes = results[1];
+    if (roomsRes.ok) ROOMS = roomsRes.rooms;
+    if (bookingsRes.ok) bookings = bookingsRes.bookings;
+    renderFloorTabs();
+    loadStats();
+    render();
+  }).catch(function(err) {
+    showToast('Could not load data: ' + err.message, 'err');
+  });
+}
+
+function loadStats() {
+  var props = activeProp === 'combined' ? ['precious','moment'] : [activeProp];
+  Promise.all(props.map(function(p){ return callApi('roomsGetStats',[p]); })).then(function(results){
+    var html = '';
+    props.forEach(function(p, i){
+      var s = results[i].ok ? results[i].stats : {vacant:'-',occupied:'-',checkinToday:'-',checkoutToday:'-',occupancyPct:'-'};
+      var label = p==='precious' ? 'The Precious' : 'The Moment';
+      var cls = p==='precious' ? 'p' : 'm';
+      html += '<div class="sgroup"><div class="sglabel '+cls+'">'+label+'</div>'+
+        '<div class="stat"><div class="sv green">'+s.vacant+'</div><div class="sl">Vacant</div></div>'+
+        '<div class="stat"><div class="sv blue">'+s.occupied+'</div><div class="sl">Occupied</div></div>'+
+        '<div class="stat"><div class="sv amber">'+s.checkinToday+'</div><div class="sl">Check-in</div></div>'+
+        '<div class="stat"><div class="sv red">'+s.checkoutToday+'</div><div class="sl">Check-out</div></div>'+
+        '<div class="stat"><div class="sv '+(cls==='p'?'blue':'teal')+'">'+s.occupancyPct+'%</div><div class="sl">Occupancy</div></div></div>';
+    });
+    document.getElementById('statsbar').innerHTML = html;
+  });
+}
+
+function renderFloorTabs(){
+  var rooms = activeProp==='combined' ? ROOMS : ROOMS.filter(function(r){ return r.propertyId===activeProp; });
+  var floors = [];
+  rooms.forEach(function(r){ if(floors.indexOf(r.floor)===-1) floors.push(r.floor); });
+  floors.sort(function(a,b){return a-b;});
+  var isM = activeProp==='moment';
+  var html = '<div class="ftab active" onclick="setFloor(\'all\',this)">All</div>';
+  floors.forEach(function(f){
+    var lbl = (f===1&&isM) ? 'G Floor' : (f===8?'PH':'Floor '+f);
+    html += '<div class="ftab '+(isM?'mt':'')+'" onclick="setFloor(\''+f+'\',this)">'+lbl+'</div>';
+  });
+  html += '<div class="ftab '+(isM?'mt':'')+'" onclick="setFloor(\'vacant\',this)">Vacant</div>';
+  document.getElementById('ftabs').innerHTML = html;
+}
+
+function isOcc(rid, date){
+  var ds = dk(date);
+  return bookings.some(function(b){ return b.roomId===rid && (b.checkinDate||'').slice(0,10)<=ds && (b.checkoutDate||'').slice(0,10)>ds; });
+}
+
+function render(){
+  var dates = buildDates();
+  var todayStr = dk(TODAY);
+  var rooms = activeProp==='combined' ? ROOMS.slice() : ROOMS.filter(function(r){ return r.propertyId===activeProp; });
+
+  if(activeFloor!=='all' && activeFloor!=='vacant') rooms = rooms.filter(function(r){ return String(r.floor)===String(activeFloor); });
+  if(activeFloor==='vacant') rooms = rooms.filter(function(r){ return !isOcc(r.roomId, TODAY); });
+  if(searchQ){
+    var q = searchQ.toLowerCase();
+    rooms = rooms.filter(function(r){
+      if(r.roomId.toLowerCase().indexOf(q)>=0 || r.displayName.toLowerCase().indexOf(q)>=0 || tl(r.roomType).toLowerCase().indexOf(q)>=0) return true;
+      return bookings.some(function(b){ return b.roomId===r.roomId && (b.guestName||'').toLowerCase().indexOf(q)>=0; });
+    });
+  }
+
+  var oMap = {};
+  bookings.forEach(function(b){
+    var d = new Date(pd(b.checkinDate));
+    var end = pd(b.checkoutDate);
+    while(d<end){ var k=b.roomId+'_'+dk(d); if(!oMap[k]) oMap[k]=b; d.setDate(d.getDate()+1); }
+  });
+
+  var propOrder = activeProp==='combined' ? ['precious','moment'] : [activeProp];
+  rooms.sort(function(a,b){
+    if(a.propertyId!==b.propertyId) return propOrder.indexOf(a.propertyId)-propOrder.indexOf(b.propertyId);
+    if(a.floor!==b.floor) return a.floor-b.floor;
+    return a.roomId.localeCompare(b.roomId);
+  });
+
+  var html = '<thead><tr><th class="rc" rowspan="2"><div style="padding:8px;font-size:10px;color:var(--muted)">UNIT</div></th></tr><tr>';
+  dates.forEach(function(d){
+    var ds=dk(d), isT=ds===todayStr;
+    html += '<th class="'+(isT?'tc':'')+'" data-date="'+ds+'"><span class="dn">'+d.getDate()+'</span><span class="dd">'+['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]+'</span></th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  var rendered = {};
+  var lastProp='', lastFloor='';
+
+  rooms.forEach(function(room){
+    if(activeProp==='combined' && room.propertyId!==lastProp){
+      lastProp = room.propertyId; lastFloor='';
+      html += '<tr class="ph '+room.propertyId+'"><td class="rc" colspan="'+(dates.length+1)+'">'+(room.propertyId==='precious'?'🏢 The Precious':'🏙 The Moment')+'</td></tr>';
+    }
+    var fk = room.propertyId+'_'+room.floor;
+    if(fk!==lastFloor){
+      lastFloor = fk;
+      var fl = (room.floor===1&&room.propertyId==='moment') ? 'Ground Floor — Commercial' : (room.floor===8?'Floor 8 — Penthouse':'Floor '+room.floor);
+      html += '<tr class="fh"><td class="rc" colspan="'+(dates.length+1)+'">'+fl+'</td></tr>';
+    }
+
+    var tcolor = tc(room.roomType), tlabel = tl(room.roomType);
+    var rStr = room.rate>0 ? ('฿'+room.rate.toLocaleString()) : 'Rate TBD';
+    html += '<tr data-room="'+room.roomId+'">';
+    html += '<td class="rc" style="position:relative">'+
+      '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:'+tcolor+'"></div>'+
+      '<div class="rn"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(room.propertyId==='precious'?'var(--p)':'var(--m)')+';margin-right:5px"></span>'+room.displayName+'</div>'+
+      '<div class="rs">'+tlabel+' · '+rStr+'</div></td>';
+
+    dates.forEach(function(d){
+      var ds = dk(d), isT = ds===todayStr;
+      var b = oMap[room.roomId+'_'+ds];
+      if(b){
+        var cin=pd(b.checkinDate), cout=pd(b.checkoutDate);
+        var isFirst = ds===dk(new Date(Math.max(cin.getTime(), WIN_S.getTime())));
+        if(isFirst && !rendered[b.bookingId]){
+          rendered[b.bookingId]=true;
+          var w = dd(d, new Date(Math.min(cout.getTime(), WIN_E.getTime())))*34-2;
+          var bt = b.bookingType==='commercial' ? 'commercial' : b.bookingType;
+          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="width:'+w+'px" onclick="showDetail(\''+b.bookingId+'\')">'+(b.guestName||'')+'</div></td>';
+        } else {
+          html += '<td class="'+(isT?'tc':'')+'"></td>';
+        }
+      } else {
+        html += '<td class="'+(isT?'tc':'')+'" onclick="openBook(\''+room.roomId+'\',\''+ds+'\',\''+room.propertyId+'\')" title="Book '+room.displayName+'"></td>';
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+  document.getElementById('gtbl').innerHTML = html;
+  scrollToday();
+}
+
+function scrollToday(){
+  var th = document.querySelector('th[data-date="'+dk(TODAY)+'"]');
+  if(th){ var w = document.getElementById('gwrap'); w.scrollLeft = th.offsetLeft - w.offsetWidth/2 + 17; }
+}
+
+function checkAvail(){
+  var ci = document.getElementById('fIn').value, co = document.getElementById('fOut').value;
+  if(!ci||!co) return;
+  var d1=pd(ci), d2=pd(co);
+  var el = document.getElementById('avres');
+  var rooms = (activeProp==='combined'?ROOMS:ROOMS.filter(function(r){return r.propertyId===activeProp;})).filter(function(r){return r.roomType!=='Commercial';})
+    .filter(function(r){ for(var d=new Date(d1); d<d2; d.setDate(d.getDate()+1)) if(isOcc(r.roomId,d)) return false; return true; });
+  var nights = dd(d1,d2);
+  el.className = 'avres show ' + (rooms.length?'has':'no');
+  document.getElementById('avtitle').textContent = rooms.length ? ('✓ '+rooms.length+' rooms available · '+nights+' night'+(nights>1?'s':'')) : ('✗ No rooms available '+ci+' → '+co);
+  document.getElementById('avchips').innerHTML = rooms.map(function(r){
+    return '<div class="chip '+r.propertyId+'" onclick="openBook(\''+r.roomId+'\',\''+ci+'\',\''+r.propertyId+'\')">'+r.displayName+(r.rate?' · ฿'+r.rate.toLocaleString():'')+'</div>';
+  }).join('');
+}
+
+function updateRooms(){
+  var p = document.getElementById('mProp').value;
+  var rooms = ROOMS.filter(function(r){ return r.propertyId===p; });
+  document.getElementById('mRoom').innerHTML = rooms.map(function(r){
+    return '<option value="'+r.roomId+'">'+r.displayName+' — '+tl(r.roomType)+(r.rate>0?(' · ฿'+r.rate.toLocaleString()):' (TBD)')+'</option>';
+  }).join('');
+}
+
+function openBook(rid, date, prop){
+  document.getElementById('mProp').value = (prop==='moment') ? 'moment' : 'precious';
+  updateRooms();
+  if(rid) document.getElementById('mRoom').value = rid;
+  var ci = date || dk(TODAY);
+  var coD = new Date(pd(ci)); coD.setMonth(coD.getMonth()+1);
+  document.getElementById('mIn').value = ci;
+  document.getElementById('mOut').value = dk(coD);
+  document.getElementById('mGuest').value = '';
+  document.getElementById('mNotes').value = '';
+  document.getElementById('mDep').value = '8000';
+  document.getElementById('mRate').value = '';
+  document.getElementById('cwarn').style.display = 'none';
+  selBT = 'monthly';
+  var btns = document.querySelectorAll('.tbtn');
+  btns.forEach(function(e,i){ e.classList.toggle('sel', i===0); });
+  calcP();
+  document.getElementById('mbg').classList.add('open');
+}
+
+function closeMod(e){ if(e && e.target!==e.currentTarget) return; document.getElementById('mbg').classList.remove('open'); }
+function selType(t, el){ selBT=t; document.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('sel');}); el.classList.add('sel'); calcP(); }
+
+function calcP(){
+  var ci=document.getElementById('mIn').value, co=document.getElementById('mOut').value;
+  var rate=parseFloat(document.getElementById('mRate').value)||0, dep=parseFloat(document.getElementById('mDep').value)||0;
+  var pb=document.getElementById('pbox');
+  if(!ci||!co||!rate){ pb.style.display='none'; return; }
+  pb.style.display='block';
+  var nights=dd(ci,co);
+  document.getElementById('pDur').textContent = selBT==='monthly' ? Math.round(nights/30)+' month(s)' : nights+' nights';
+  document.getElementById('pRate').textContent = '฿'+rate.toLocaleString();
+  document.getElementById('pDep').textContent = dep ? '฿'+dep.toLocaleString() : '—';
+  var total = selBT==='monthly' ? rate+dep : Math.round(nights*(rate/30))+dep;
+  document.getElementById('pTot').textContent = '฿'+total.toLocaleString();
+}
+
+function saveBook(){
+  var guest=document.getElementById('mGuest').value.trim();
+  var room=document.getElementById('mRoom').value;
+  var ci=document.getElementById('mIn').value, co=document.getElementById('mOut').value;
+  var rate=parseFloat(document.getElementById('mRate').value)||0, dep=parseFloat(document.getElementById('mDep').value)||0;
+  var notes=document.getElementById('mNotes').value.trim();
+  var prop=document.getElementById('mProp').value;
+  var cw=document.getElementById('cwarn');
+
+  if(!guest){ showToast('Please enter guest name','err'); return; }
+  if(!room){ showToast('Please select a room','err'); return; }
+  if(!ci||!co){ showToast('Please set dates','err'); return; }
+
+  var btn=document.getElementById('saveBtn');
+  btn.disabled=true; btn.textContent='Saving…';
+
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes]).then(function(res){
+    btn.disabled=false; btn.textContent='✓ Confirm Booking';
+    if(res.ok){
+      closeMod();
+      showToast('Booking saved: '+room+' for '+guest, 'ok');
+      bootApp(); // reload rooms+bookings+stats fresh from the Worker
+    } else {
+      cw.textContent = '⚠ ' + res.error;
+      cw.style.display = 'block';
+    }
+  }).catch(function(err){
+    btn.disabled=false; btn.textContent='✓ Confirm Booking';
+    cw.textContent = '⚠ Connection error: ' + err.message;
+    cw.style.display = 'block';
+  });
+}
+
+function showDetail(id){
+  var b = bookings.filter(function(x){return x.bookingId===id;})[0];
+  if(!b) return;
+  var r = ROOMS.filter(function(x){return x.roomId===b.roomId;})[0];
+  var nights = b.checkinDate && b.checkoutDate ? dd(b.checkinDate, b.checkoutDate) : 0;
+  document.getElementById('detailContent').innerHTML =
+    '<div class="dbadge '+b.propertyId+'">'+(b.propertyId==='precious'?'The Precious':'The Moment')+'</div>'+
+    '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+(b.guestName||'—')+'</h2>'+
+    '<div class="df"><label>Room</label><span>'+(r?r.displayName:b.roomId)+' — '+(r?tl(r.roomType):'')+'</span></div>'+
+    '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'—')+'</span></div>'+
+    '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'—')+'</span></div>'+
+    '<div class="df"><label>Duration</label><span>'+nights+' nights</span></div>'+
+    '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+'/mo':'TBD')+'</span></div>'+
+    '<div class="df"><label>Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
+    '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType||'—')+'</span></div>'+
+    (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+b.notes+'</span></div>':'')+
+    (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+b.createdByName+'</span></div>':'')+
+    '<div class="dactions">'+
+      '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">🗑 Cancel Booking</button>'+
+      '<button class="btn btn-p" onclick="closeDetail()">✓ Done</button></div>';
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closeDetail(){ document.getElementById('detailPanel').classList.remove('open'); }
+
+function delBook(id){
+  if(!confirm('Cancel this booking?')) return;
+  callApi('roomsCancelBooking', [sessionToken, id]).then(function(res){
+    if(res.ok){ closeDetail(); showToast('Booking cancelled','ok'); bootApp(); }
+    else showToast(res.error||'Could not cancel — owner permission required','err');
+  });
+}
+
+function setProp(p, el){
+  activeProp=p; activeFloor='all';
+  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  renderFloorTabs(); loadStats(); render();
+}
+function setFloor(f, el){
+  activeFloor=f;
+  document.querySelectorAll('.ftab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  render();
+}
+function applyFilters(){ searchQ = document.getElementById('srch').value.toLowerCase().trim(); render(); }
+function jumpToday(){ scrollToday(); }
+
+var toastTimer;
+function showToast(msg, type){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + (type||'ok');
+  clearTimeout(toastTimer);
+  requestAnimationFrame(function(){ t.classList.add('show'); });
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ closeMod(); closeDetail(); }
+});
+</script>
+</body>
+</html>
