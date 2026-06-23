@@ -167,7 +167,7 @@ until `roomsMarkCleaned` is called.
 |---|---|---|
 | `index.html` | Employee check-in | QR scan + geofence, link to rooms.html |
 | `rooms.html` | Gantt-style room availability board | Dark theme, booking CRUD, stats bar |
-| `dashboard.html` | HR attendance dashboard | Admin-only, today's logs + flagged history |
+| `dashboard.html` | HR attendance + finance + roles dashboard | Admin-only, today's logs, attendance, monthly report, employees, finance (revenue/expense), roles management |
 
 All use the same `callApi()` pattern and `clientHashPassword()` for login.
 
@@ -192,13 +192,14 @@ All use the same `callApi()` pattern and `clientHashPassword()` for login.
 9. **Created** GitHub repo `kuaamporn/huahin` with GitHub Pages enabled
 10. **Pushed** all three frontend files (index.html, rooms.html, dashboard.html)
 11. **Kept** old `checkin-db` as backup
+12. **Added Finance tab** to dashboard — monthly summary cards (revenue/expense/net), transaction list, add revenue/expense modal with correct param order, search filter, CSV export
+13. **Added Roles tab** to dashboard — list employees with roles, edit roles modal (grant/revoke via checkboxes)
+14. **Permission gating** — Finance tab visible only to owner/accountant/revenue/expense roles; Roles tab visible only to owner; add buttons gated per role; roles fetched after login via `adminListEmployeesWithRoles`
 
 ---
 
 ## What's NOT built yet (potential next steps)
 
-- **Finance UI** — `financeAddRevenue`, `financeAddExpense`, `financeGetMonthlySummary`, `financeListTransactions` actions exist in the worker but no frontend page calls them yet
-- **Admin panel UI** — employee management, role assignment (`adminGrantRole`/`adminRevokeRole`) have no frontend yet
 - **Room status board UI** — `roomsGetStatusGrid` and housekeeping actions exist but `rooms.html` only shows the Gantt booking view, not the 4-color status grid
 - **Housekeeping page** — `housekeepingGetTasks`, `roomsRequestCleaning`, `roomsMarkCleaned` are backend-ready but have no UI
 - **Move tenant UI** — `roomsMoveTenant` action works but no frontend flow for it
