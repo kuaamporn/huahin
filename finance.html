@@ -292,6 +292,8 @@
     var PREV_ITEMS = [];
     var EMPLOYEES = [];
     var CURRENT_ITEMS = [];
+    var TRANSACTIONS = [];
+    var editingTxnId = null;
 
     var WORKER_API_URL = 'https://employee-checkin-api.huahin.workers.dev';
 
@@ -651,6 +653,7 @@
         
         var tbody = document.getElementById('finance-table-body');
         var list = res.transactions || [];
+        TRANSACTIONS = list;
         if (!list.length) {
           tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
           return;
@@ -660,7 +663,7 @@
           var tr = document.createElement('tr');
           var dirLabel = t.direction === 'IN' ? '<span class="pill ok">Revenue</span>' : '<span class="pill flag">Expense</span>';
           var isOwner = HuaHinSession.hasRole('owner');
-          var canEdit = isOwner || !t.verified; // Owner can edit anything, others only if not verified
+          var canEdit = isOwner || !t.is_verified;
           
           var actionHtml = canEdit ? '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>' : '<span class="muted">Verified</span>';
 
@@ -685,6 +688,7 @@
 
     
     function openFinanceModal(mode) {
+      editingTxnId = null;
       financeModalMode = mode;
       document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? '+ Add Revenue' : '+ Add Expense';
       if (mode === 'revenue') {
@@ -775,10 +779,17 @@
       };
 
       var action = financeModalMode === 'revenue' ? 'financeAddRevenue' : 'financeAddExpense';
+      var params = [session.token, opts];
+
+      if (editingTxnId) {
+        action = 'financeEditTransaction';
+        params = [session.token, editingTxnId, opts];
+      }
+
       var btn = document.getElementById('finance-modal-save');
       btn.disabled = true; btn.textContent = 'Saving...';
 
-      callApi(action, [session.token, opts])
+      callApi(action, params)
         .then(function (res) {
           btn.disabled = false; btn.textContent = 'Save';
           if (res.ok) {
@@ -797,10 +808,71 @@
 
     
     function editTransaction(txnId) {
-       // Since the modal is built for adding, we would need to populate it.
-       // For this simple implementation, we might just alert if we haven't fully built the edit UI
-       // But the requirement says "owner can edit later even it already verified"
-       alert("Edit mode for transaction " + txnId + " is coming soon! Requires fetching full transaction details.");
+      var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
+      if (!t) {
+        alert('Transaction details not found locally.');
+        return;
+      }
+
+      editingTxnId = t.txn_id;
+      financeModalMode = t.direction === 'IN' ? 'revenue' : 'expense';
+
+      document.getElementById('finance-modal-title').textContent = financeModalMode === 'revenue' ? 'Edit Revenue' : 'Edit Expense';
+
+      if (financeModalMode === 'revenue') {
+        hide('fm-expense-extras');
+      } else {
+        show('fm-expense-extras');
+      }
+
+      document.getElementById('fm-property').value = t.property_id;
+
+      if (t.room_id) {
+        selectRoom(t.room_id, t.guest_or_vendor);
+      } else {
+        selectRoom('', t.guest_or_vendor);
+      }
+
+      document.getElementById('fm-guest').value = t.guest_or_vendor || '';
+      document.getElementById('fm-channel').value = t.payment_channel || 'cash';
+      document.getElementById('fm-ref').value = t.transfer_ref || '';
+      document.getElementById('fm-note').value = t.notes || '';
+      document.getElementById('fm-date').value = t.txn_date;
+
+      if (t.paid_by_employee_id) {
+        document.getElementById('fm-paid-by').value = t.paid_by_employee_id;
+      }
+
+      if (financeModalMode === 'expense') {
+        document.getElementById('fm-vat-type').value = t.vat_type || 'none';
+        document.getElementById('fm-wht-pct').value = String(t.wht_percent || 0);
+      }
+
+      CURRENT_ITEMS = (t.items || []).map(function(item) {
+        return {
+          description: item.description,
+          category: item.category,
+          units: item.units,
+          unit_price: item.unit_price,
+          amount: item.amount
+        };
+      });
+
+      if (CURRENT_ITEMS.length === 0) {
+        CURRENT_ITEMS.push({
+          description: t.notes || t.category || 'Legacy Transaction',
+          category: t.category,
+          units: '',
+          unit_price: '',
+          amount: t.amount
+        });
+      }
+
+      renderItems();
+
+      hide('finance-modal-error');
+      show('finance-modal');
+      loadRoomsAndBookingsCache();
     }
 
     function exportFinanceCsv() {
