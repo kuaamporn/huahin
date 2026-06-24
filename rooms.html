@@ -246,24 +246,9 @@ function callApi(action, params) {
 function show(id){ document.getElementById(id).classList.remove('hidden'); }
 function hide(id){ document.getElementById(id).classList.add('hidden'); }
 
-var session = HuaHinSession.requireRole('index.html', 'owner', 'frontdesk');
-var sessionToken = session ? session.token : null;
-var currentEmployeeName = session ? session.name : null;
-
-if (session) {
-  document.getElementById('welcome-name').textContent = currentEmployeeName;
-  document.getElementById('main-screen').classList.remove('hidden');
-  bootApp();
-}
-
-document.getElementById('logout-link').addEventListener('click', function() {
-  callApi('logout', [sessionToken]).catch(function() {});
-  HuaHinSession.clearSession();
-  window.location.href = 'index.html';
-});
-
 // =====================================================================
-// ROOM APP — once logged in
+// ROOM APP — variables and utility functions
+// (must be defined BEFORE bootApp() is called)
 // =====================================================================
 var ROOMS = [];
 var bookings = [];
@@ -290,6 +275,25 @@ var TYPE_META = {
 };
 function tc(t){ return (TYPE_META[t]||{color:'#555'}).color; }
 function tl(t){ return (TYPE_META[t]||{label:t}).label; }
+
+// =====================================================================
+// Session check + app boot
+// =====================================================================
+var session = HuaHinSession.requireRole('index.html', 'owner', 'frontdesk');
+var sessionToken = session ? session.token : null;
+var currentEmployeeName = session ? session.name : null;
+
+if (session) {
+  document.getElementById('welcome-name').textContent = currentEmployeeName;
+  document.getElementById('main-screen').classList.remove('hidden');
+  bootApp();
+}
+
+document.getElementById('logout-link').addEventListener('click', function() {
+  callApi('logout', [sessionToken]).catch(function() {});
+  HuaHinSession.clearSession();
+  window.location.href = 'index.html';
+});
 
 function bootApp() {
   var outD = new Date(TODAY); outD.setDate(outD.getDate()+7);
