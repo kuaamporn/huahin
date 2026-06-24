@@ -408,9 +408,11 @@ function render(){
   });
 
   var html = '<thead><tr><th class="rc" rowspan="2"><div style="padding:8px;font-size:10px;color:var(--muted)">UNIT</div></th></tr><tr>';
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   dates.forEach(function(d){
     var ds=dk(d), isT=ds===todayStr;
-    html += '<th class="'+(isT?'tc':'')+'" data-date="'+ds+'"><span class="dn">'+d.getDate()+'</span><span class="dd">'+['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]+'</span></th>';
+    var mon = months[d.getMonth()];
+    html += '<th class="'+(isT?'tc':'')+'" data-date="'+ds+'"><span class="dn">'+d.getDate()+' '+mon+'</span><span class="dd">'+['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]+'</span></th>';
   });
   html += '</tr></thead><tbody>';
 
@@ -432,7 +434,7 @@ function render(){
     var tcolor = tc(room.roomType), tlabel = tl(room.roomType);
     var rStr = room.rate>0 ? ('฿'+room.rate.toLocaleString()) : 'Rate TBD';
     html += '<tr data-room="'+room.roomId+'">';
-    html += '<td class="rc" style="position:relative">'+
+    html += '<td class="rc">'+
       '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:'+tcolor+'"></div>'+
       '<div class="rn"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(room.propertyId==='precious'?'var(--p)':'var(--m)')+';margin-right:5px"></span>'+room.displayName+'</div>'+
       '<div class="rs">'+tlabel+' · '+rStr+'</div></td>';
