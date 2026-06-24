@@ -96,8 +96,12 @@
           <div class="brand">Employee Check-In</div>
           <h1 id="welcome-name" style="font-size:20px;margin:0;"></h1>
         </div>
-        <a href="rooms.html" class="toplink" id="rooms-link">Room Availability</a>
-        <a href="#" class="toplink" id="logout-link">Sign out</a>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <a href="rooms.html" class="toplink hidden" id="rooms-link">Rooms</a>
+          <a href="finance.html" class="toplink hidden" id="finance-link">Finance</a>
+          <a href="dashboard.html" class="toplink hidden" id="dashboard-link">Dashboard</a>
+          <a href="#" class="toplink" id="logout-link">Sign out</a>
+        </div>
       </div>
 
       <div class="card">
@@ -130,6 +134,7 @@
   </div>
 
   <!-- QR scanning library (lightweight, free, no API key needed) -->
+  <script src="session.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
     // =====================================================================
@@ -146,6 +151,12 @@
 
     function show(id) { document.getElementById(id).classList.remove('hidden'); }
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function applyNavLinkVisibility() {
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) show('rooms-link');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('finance-link');
+      if (HuaHinSession.hasRole('owner')) show('dashboard-link');
+    }
 
     function getDeviceId() {
       // Simple persistent device fingerprint stored in localStorage.
@@ -219,11 +230,23 @@
           sessionToken = res.token;
           currentEmployeeName = res.name;
           document.getElementById('welcome-name').textContent = 'Hi, ' + res.name;
+
+          HuaHinSession.saveSessionPartial(res);
+          callApi('adminListEmployeesWithRoles', [sessionToken]).then(function(rolesRes) {
+            var myRoles = [];
+            if (rolesRes.ok) {
+              var me = rolesRes.employees.filter(function(e) { return e.employeeId === res.employeeId; })[0];
+              myRoles = (me && me.roles) ? me.roles : [];
+            }
+            HuaHinSession.updateSessionRoles(myRoles);
+            applyNavLinkVisibility();
+          }).catch(function() {
+            HuaHinSession.updateSessionRoles([]);
+            applyNavLinkVisibility();
+          });
+
           hide('login-screen');
           show('main-screen');
-          // Camera is started only when the user taps "Tap to start camera" —
-          // a direct user gesture, which is what browsers require to show
-          // the camera permission prompt reliably.
         } else {
           document.getElementById('login-error').textContent = res.error;
           show('login-error');
@@ -240,6 +263,7 @@
       e.preventDefault();
       if (html5QrCode) { try { html5QrCode.stop(); } catch (e) {} }
       callApi('logout', [sessionToken]).catch(function() {});
+      HuaHinSession.clearSession();
       sessionToken = null;
       location.reload();
     });

@@ -147,21 +147,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 </head>
 <body>
 
-<!-- ============ LOGIN SCREEN ============ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-icon">🏢</div>
-    <div class="login-title">Room Availability</div>
-    <div class="login-sub">The Precious · The Moment — Hua Hin</div>
-    <div class="login-error" id="login-error"></div>
-    <label class="fl">Username</label>
-    <input class="fi" type="text" id="username" autocomplete="username" autocapitalize="none">
-    <label class="fl">Password</label>
-    <input class="fi" type="password" id="password" autocomplete="current-password">
-    <button class="login-btn" id="login-btn">Sign in</button>
-    <div class="login-footer">Same login as the Employee Check-In system</div>
-  </div>
-</div>
 
 <!-- ============ MAIN APP (hidden until login) ============ -->
 <div id="main-screen" class="hidden" style="display:flex;flex-direction:column;height:100vh">
@@ -245,25 +230,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 <div class="toast" id="toast"></div>
 
+<script src="session.js"></script>
 <script>
 // =====================================================================
-// SAME PATTERN AS index.html / dashboard.html — same Worker, same
-// callApi() shape, same client-side password hashing. Paste your
-// deployed Worker URL below (same value as in index.html/dashboard.html).
-// =====================================================================
 var WORKER_API_URL = 'https://employee-checkin-api.huahin.workers.dev';
-
-var sessionToken = null;
-var currentEmployeeName = null;
-
-function clientHashPassword(password) {
-  var encoder = new TextEncoder();
-  var data = encoder.encode(password);
-  return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
-    var hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-  });
-}
 
 function callApi(action, params) {
   return fetch(WORKER_API_URL, {
@@ -276,45 +246,20 @@ function callApi(action, params) {
 function show(id){ document.getElementById(id).classList.remove('hidden'); }
 function hide(id){ document.getElementById(id).classList.add('hidden'); }
 
-// ---------- LOGIN ----------
-document.getElementById('login-btn').addEventListener('click', function() {
-  var username = document.getElementById('username').value.trim();
-  var password = document.getElementById('password').value;
-  hide('login-error');
-  if (!username || !password) {
-    document.getElementById('login-error').textContent = 'Enter your username and password.';
-    show('login-error');
-    return;
-  }
-  var btn = document.getElementById('login-btn');
-  btn.disabled = true; btn.textContent = 'Signing in...';
+var session = HuaHinSession.requireRole('index.html', 'owner', 'frontdesk');
+var sessionToken = session ? session.token : null;
+var currentEmployeeName = session ? session.name : null;
 
-  clientHashPassword(password).then(function(hashedPassword) {
-    return callApi('login', [username, hashedPassword]);
-  }).then(function(res) {
-    btn.disabled = false; btn.textContent = 'Sign in';
-    if (res.ok) {
-      sessionToken = res.token;
-      currentEmployeeName = res.name;
-      document.getElementById('welcome-name').textContent = res.name;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('main-screen').classList.remove('hidden');
-      bootApp();
-    } else {
-      document.getElementById('login-error').textContent = res.error;
-      show('login-error');
-    }
-  }).catch(function(err) {
-    btn.disabled = false; btn.textContent = 'Sign in';
-    document.getElementById('login-error').textContent = 'Connection error: ' + err.message;
-    show('login-error');
-  });
-});
+if (session) {
+  document.getElementById('welcome-name').textContent = currentEmployeeName;
+  document.getElementById('main-screen').classList.remove('hidden');
+  bootApp();
+}
 
 document.getElementById('logout-link').addEventListener('click', function() {
   callApi('logout', [sessionToken]).catch(function() {});
-  sessionToken = null;
-  location.reload();
+  HuaHinSession.clearSession();
+  window.location.href = 'index.html';
 });
 
 // =====================================================================
