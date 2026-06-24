@@ -222,8 +222,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="fg"><label class="fl">Check-out</label><input class="fi" type="date" id="mOut" onchange="calcP()"></div>
     </div>
     <div class="frow">
-      <div class="fg"><label class="fl">Rate (฿)</label><input class="fi" type="number" id="mRate" oninput="calcP()"></div>
-      <div class="fg"><label class="fl">Deposit (฿)</label><input class="fi" type="number" id="mDep"></div>
+      <div class="fg"><label class="fl">Rate (฿)</label><input class="fi" type="number" id="mRate" min="0" oninput="calcP()"></div>
+      <div class="fg"><label class="fl">Deposit (฿)</label><input class="fi" type="number" id="mDep" min="0" oninput="calcP()"></div>
     </div>
     <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="mNotes"></textarea></div>
     <div class="pbox" id="pbox">
@@ -511,10 +511,17 @@ function calcP(){
   if(!ci||!co||!rate){ pb.style.display='none'; return; }
   pb.style.display='block';
   var nights=dd(ci,co);
-  document.getElementById('pDur').textContent = selBT==='monthly' ? Math.round(nights/30)+' month(s)' : nights+' nights';
-  document.getElementById('pRate').textContent = '฿'+rate.toLocaleString();
+  var durText = selBT==='monthly' ? Math.round(nights/30)+' month(s)' : nights+' nights';
+  document.getElementById('pDur').textContent = durText;
+  var suffix = '';
+  if (selBT === 'monthly') { suffix = '/mo'; }
+  else if (selBT === 'Booking.com' || selBT === 'Expedia.com') { suffix = '/booking'; }
+  else { suffix = '/night'; }
+  document.getElementById('pRate').textContent = '฿'+rate.toLocaleString()+suffix;
   document.getElementById('pDep').textContent = dep ? '฿'+dep.toLocaleString() : '—';
-  var total = selBT==='monthly' ? rate+dep : (nights*rate)+dep;
+  var total = 0;
+  if (selBT === 'monthly' || selBT === 'Booking.com' || selBT === 'Expedia.com') { total = rate + dep; }
+  else { total = (nights * rate) + dep; }
   document.getElementById('pTot').textContent = '฿'+total.toLocaleString();
 }
 
@@ -530,6 +537,8 @@ function saveBook(){
   if(!guest){ showToast('Please enter guest name','err'); return; }
   if(!room){ showToast('Please select a room','err'); return; }
   if(!ci||!co){ showToast('Please set dates','err'); return; }
+  if(rate < 0){ showToast('Rate cannot be below 0','err'); return; }
+  if(dep < 0){ showToast('Deposit cannot be below 0','err'); return; }
 
   var btn=document.getElementById('saveBtn');
   btn.disabled=true; btn.textContent='Saving…';
@@ -563,7 +572,7 @@ function showDetail(id){
     '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'—')+'</span></div>'+
     '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'—')+'</span></div>'+
     '<div class="df"><label>Duration</label><span>'+nights+' nights</span></div>'+
-    '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':'/night'):'TBD')+'</span></div>'+
+    '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':(b.bookingType==='Booking.com'||b.bookingType==='Expedia.com'?'/booking':'/night')):'TBD')+'</span></div>'+
     '<div class="df"><label>Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
     '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType||'—')+'</span></div>'+
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+b.notes+'</span></div>':'')+
