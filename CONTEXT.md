@@ -19,6 +19,7 @@ properties in Hua Hin, Thailand: **The Precious** (86 rooms) and **The Moment**
 | GitHub repo | `kuaamporn/huahin` (public, GitHub Pages enabled) |
 | Check-in page | `https://kuaamporn.github.io/huahin/` |
 | Rooms board | `https://kuaamporn.github.io/huahin/rooms.html` |
+| Finance page | `https://kuaamporn.github.io/huahin/finance.html` |
 | HR dashboard | `https://kuaamporn.github.io/huahin/dashboard.html` |
 | Admin login | username: `admin` (password set via bootstrap-admin.js) |
 
@@ -163,13 +164,22 @@ until `roomsMarkCleaned` is called.
 
 ## Frontend pages
 
-| File | Purpose | Notes |
+| File | Purpose | Access (role-gated) |
 |---|---|---|
-| `index.html` | Employee check-in | QR scan + geofence, link to rooms.html |
-| `rooms.html` | Gantt-style room availability board | Dark theme, booking CRUD, stats bar |
-| `dashboard.html` | HR attendance + finance + roles dashboard | Admin-only, today's logs, attendance, monthly report, employees, finance (revenue/expense), roles management |
+| `index.html` | Login + employee check-in (QR scan + geofence) | Public (only page with login form) |
+| `session.js` | Shared sessionStorage helper — login once, session shared across all pages | Included by all pages |
+| `rooms.html` | Gantt-style room availability board (dark theme, booking CRUD, stats) | owner, frontdesk |
+| `finance.html` | Standalone finance page (revenue/expense entry, monthly summary, CSV export) | owner, accountant, revenue, expense |
+| `dashboard.html` | HR dashboard (attendance, monthly report, employees, roles management) | owner only |
 
-All use the same `callApi()` pattern and `clientHashPassword()` for login.
+### Session flow
+- Login happens **once** on `index.html` — session saved to `sessionStorage`
+- After login, roles are fetched via `adminListEmployeesWithRoles` and stored in session
+- Nav links (Rooms / Finance / Dashboard) appear based on user's roles
+- Other pages read the shared session — no second login prompt
+- Direct-navigating without session or without required role redirects to `index.html`
+- Session cleared on tab close (sessionStorage, not localStorage — intentional)
+- Sign out from any page clears session for all pages
 
 ---
 
@@ -195,6 +205,10 @@ All use the same `callApi()` pattern and `clientHashPassword()` for login.
 12. **Added Finance tab** to dashboard — monthly summary cards (revenue/expense/net), transaction list, add revenue/expense modal with correct param order, search filter, CSV export
 13. **Added Roles tab** to dashboard — list employees with roles, edit roles modal (grant/revoke via checkboxes)
 14. **Permission gating** — Finance tab visible only to owner/accountant/revenue/expense roles; Roles tab visible only to owner; add buttons gated per role; roles fetched after login via `adminListEmployeesWithRoles`
+15. **Shared session** — created `session.js` (sessionStorage-based), login happens once on `index.html`, session shared across all pages
+16. **Split Finance** into standalone `finance.html` (removed Finance tab from dashboard.html)
+17. **Removed duplicate login screens** from `rooms.html` and `dashboard.html` — both now use shared session with role gating (rooms: owner/frontdesk; dashboard: owner)
+18. **Role-gated nav links** on `index.html` — Rooms (owner/frontdesk), Finance (owner/accountant/revenue/expense), Dashboard (owner) — hidden by default, shown after roles are fetched
 
 ---
 
