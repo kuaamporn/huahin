@@ -212,6 +212,7 @@ until `roomsMarkCleaned` is called.
 19. **Fixed finance.html room field** — replaced free-text input with search-combo dropdown that only offers real room IDs from D1, preventing `FOREIGN KEY constraint failed` errors from mistyped room codes (e.g. "P110" vs real "P-110")
 20. **Fixed finance.html API params** — `roomsList`/`bookingsList` calls were passing `session.token` as first param but these actions take only propertyId (no token); removed the erroneous token param
 21. **Finance modal UX upgrade** — 2-column wider layout (640px), auto-fills guest name from active booking, "Walk-in / no room" option for transactions without a room on file
+22. **Fixed rooms.html RangeError** — `var TODAY` was hoisted but `undefined` when `bootApp()` ran synchronously after the session check; reordered all date variables and utility functions (`TODAY`, `WIN_S`, `WIN_E`, `dk()`, `pd()`, `dd()`, etc.) before the session check that calls `bootApp()`
 
 ---
 
