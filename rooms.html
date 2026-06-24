@@ -124,7 +124,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center}
 .mbg.open{display:flex}
-.modal{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:24px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:24px;width:600px;max-width:95vw;max-height:90vh;overflow-y:auto}
 .mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .mtitle{font-size:16px;font-weight:700}
 .mx{width:28px;height:28px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer}
@@ -201,11 +201,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 <div class="mbg" id="mbg" onclick="closeMod(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mtitle">New Booking</div><button class="mx" onclick="closeMod()">✕</button></div>
-    <div class="fg"><label class="fl">Property</label><select class="fs" id="mProp" onchange="updateRooms()">
-      <option value="precious">The Precious</option><option value="moment">The Moment</option>
-    </select></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Property</label><select class="fs" id="mProp" onchange="updateRooms()">
+        <option value="precious">The Precious</option><option value="moment">The Moment</option>
+      </select></div>
+      <div class="fg"><label class="fl">Room</label><select class="fs" id="mRoom"></select></div>
+    </div>
     <div class="fg"><label class="fl">Guest / Tenant</label><input class="fi" type="text" id="mGuest" placeholder="Full name…"></div>
-    <div class="fg"><label class="fl">Room</label><select class="fs" id="mRoom"></select></div>
     <div class="fg"><label class="fl">Booking Type</label>
       <div class="tbtns">
         <div class="tbtn sel" onclick="selType('monthly',this)">📅 Monthly</div>
@@ -512,7 +514,7 @@ function calcP(){
   document.getElementById('pDur').textContent = selBT==='monthly' ? Math.round(nights/30)+' month(s)' : nights+' nights';
   document.getElementById('pRate').textContent = '฿'+rate.toLocaleString();
   document.getElementById('pDep').textContent = dep ? '฿'+dep.toLocaleString() : '—';
-  var total = selBT==='monthly' ? rate+dep : Math.round(nights*(rate/30))+dep;
+  var total = selBT==='monthly' ? rate+dep : (nights*rate)+dep;
   document.getElementById('pTot').textContent = '฿'+total.toLocaleString();
 }
 
@@ -561,7 +563,7 @@ function showDetail(id){
     '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'—')+'</span></div>'+
     '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'—')+'</span></div>'+
     '<div class="df"><label>Duration</label><span>'+nights+' nights</span></div>'+
-    '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+'/mo':'TBD')+'</span></div>'+
+    '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':'/night'):'TBD')+'</span></div>'+
     '<div class="df"><label>Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
     '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType||'—')+'</span></div>'+
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+b.notes+'</span></div>':'')+
