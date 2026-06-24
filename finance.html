@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <title>Finance — HuaHin</title>
   <style>
+    /*
+      TODO(Claude Code): replace this whole <style> block with the actual
+      :root variables and component classes copy-pasted from dashboard.html
+      so finance.html visually matches the rest of the app exactly
+      (same --ink/--paper/--go/--warn/--muted palette, same .card-section,
+      .pill, button, table styles, modal-overlay/modal-box, etc). The
+      styles below are placeholders only so this file is self-contained
+      and testable in isolation before that swap happens.
+    */
     :root {
       --ink: #1a1d1f;
       --paper: #fafaf8;
@@ -44,7 +53,31 @@
     .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
     .actions-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
-    .modal-box { background: #fff; border-radius: 10px; padding: 24px; max-width: 360px; width: 100%; }
+    .modal-box { background: #fff; border-radius: 10px; padding: 18px 24px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-box h2 { margin: 0 0 4px; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+    .modal-grid .full { grid-column: 1 / -1; }
+    .modal-grid label { margin: 8px 0 5px; }
+    .modal-grid input, .modal-grid select { padding: 8px 11px; font-size: 14px; }
+    .modal-footer-row { display: flex; gap: 10px; margin-top: 14px; }
+
+    .room-combo { position: relative; }
+    .room-combo-results {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+      background: #fff; border: 1px solid var(--line); border-radius: 7px;
+      margin-top: 2px; max-height: 220px; overflow-y: auto;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .room-combo-results .opt { padding: 8px 11px; font-size: 13px; cursor: pointer; }
+    .room-combo-results .opt:hover, .room-combo-results .opt.active { background: #f3f1ec; }
+    .room-combo-results .opt .rid { font-weight: 600; }
+    .room-combo-results .opt .guest { color: var(--muted); font-size: 12px; margin-left: 6px; }
+    .room-combo-results .opt.walkin { color: var(--go); font-weight: 600; border-top: 1px solid var(--line); }
+    .room-pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px;
+      border: 1px solid var(--line); border-radius: 7px; font-size: 13px; background: #f7f6f3;
+    }
+    .room-pill .x { cursor: pointer; color: var(--muted); font-weight: 700; padding: 0 2px; }
   </style>
 </head>
 <body>
@@ -123,36 +156,75 @@
   <!-- ===================== FINANCE ADD MODAL ===================== -->
   <div id="finance-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;" id="finance-modal-title">+ Add Revenue</h2>
-      <label for="fm-property">Property</label>
-      <select id="fm-property">
-        <option value="precious">The Precious</option>
-        <option value="moment">The Moment</option>
-      </select>
-      <label for="fm-room">Room (optional)</label>
-      <input id="fm-room" type="text" placeholder="e.g. P-301 or leave blank" />
-      <label for="fm-category">Category</label>
-      <select id="fm-category"></select>
-      <label for="fm-guest">Guest / Vendor</label>
-      <input id="fm-guest" type="text" placeholder="Name (optional)" />
-      <label for="fm-amount">Amount (฿)</label>
-      <input id="fm-amount" type="number" min="1" step="1" />
-      <label for="fm-channel">Payment channel</label>
-      <select id="fm-channel">
-        <option value="cash">Cash</option>
-        <option value="kbank">KBank</option>
-        <option value="scb">SCB</option>
-        <option value="scb_sere">SCB Sere</option>
-      </select>
-      <label for="fm-ref">Transfer ref (optional)</label>
-      <input id="fm-ref" type="text" />
-      <label for="fm-note">Note (optional)</label>
-      <input id="fm-note" type="text" />
-      <label for="fm-date">Transaction date</label>
-      <input id="fm-date" type="date" />
-      <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="finance-modal-cancel" style="margin-top:0;">Cancel</button>
-        <button class="btn-primary" id="finance-modal-save" style="margin-top:0;">Save</button>
+      <h2 id="finance-modal-title">+ Add Revenue</h2>
+      <div class="modal-grid">
+
+        <div>
+          <label for="fm-property">Property</label>
+          <select id="fm-property">
+            <option value="precious">The Precious</option>
+            <option value="moment">The Moment</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="fm-room-search">Room</label>
+          <div class="room-combo">
+            <input id="fm-room-search" type="text" placeholder="Search room ID, e.g. P-110…" autocomplete="off" />
+            <div id="fm-room-results" class="room-combo-results hidden"></div>
+          </div>
+          <!-- Hidden field actually submitted; null when Walk-in is chosen -->
+          <input type="hidden" id="fm-room-id" value="" />
+          <div id="fm-room-selected" class="hidden" style="margin-top:6px;">
+            <span class="room-pill"><span id="fm-room-selected-label"></span><span class="x" id="fm-room-clear">✕</span></span>
+          </div>
+        </div>
+
+        <div>
+          <label for="fm-category">Category</label>
+          <select id="fm-category"></select>
+        </div>
+
+        <div>
+          <label for="fm-guest">Guest / Vendor</label>
+          <input id="fm-guest" type="text" placeholder="Auto-filled from room, or enter manually" />
+        </div>
+
+        <div>
+          <label for="fm-amount">Amount (฿)</label>
+          <input id="fm-amount" type="number" min="1" step="1" />
+        </div>
+
+        <div>
+          <label for="fm-channel">Payment channel</label>
+          <select id="fm-channel">
+            <option value="cash">Cash</option>
+            <option value="kbank">KBank</option>
+            <option value="scb">SCB</option>
+            <option value="scb_sere">SCB Sere</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="fm-ref">Transfer ref (optional)</label>
+          <input id="fm-ref" type="text" />
+        </div>
+
+        <div>
+          <label for="fm-date">Transaction date</label>
+          <input id="fm-date" type="date" />
+        </div>
+
+        <div class="full">
+          <label for="fm-note">Note (optional)</label>
+          <input id="fm-note" type="text" />
+        </div>
+
+      </div>
+
+      <div class="modal-footer-row">
+        <button class="btn-secondary" id="finance-modal-cancel">Cancel</button>
+        <button class="btn-primary" id="finance-modal-save">Save</button>
       </div>
       <div class="error hidden" id="finance-modal-error"></div>
     </div>
@@ -200,6 +272,7 @@
         if (canAddRevenue) show('btn-add-revenue');
         if (canAddExpense) show('btn-add-expense');
 
+        loadRoomsAndBookingsCache();
         initFinancePage();
       }
     }
@@ -248,7 +321,137 @@
         });
       });
 
+      document.getElementById('fm-property').addEventListener('change', function () {
+        clearSelectedRoom();
+        document.getElementById('fm-room-results').classList.add('hidden');
+      });
+
+      initRoomCombo();
       loadFinanceData();
+    }
+
+    // ---------------------------------------------------------------------
+    // ROOM SEARCH-COMBO
+    // Loads the same room + booking data rooms.html uses, so the dropdown
+    // only ever offers room_ids that genuinely exist in D1 — this is what
+    // prevents the "D1_ERROR: FOREIGN KEY constraint failed" that happened
+    // when a room code was typed by hand (e.g. "P110" instead of the real
+    // "P-110") into a free-text field.
+    // ---------------------------------------------------------------------
+    var ROOMS_CACHE = [];
+    var BOOKINGS_CACHE = [];
+    var roomComboActiveIndex = -1;
+
+    function loadRoomsAndBookingsCache() {
+      return Promise.all([
+        callApi('roomsList', ['combined']),
+        callApi('bookingsList', ['combined'])
+      ]).then(function (results) {
+        if (results[0] && results[0].ok) ROOMS_CACHE = results[0].rooms || [];
+        if (results[1] && results[1].ok) BOOKINGS_CACHE = results[1].bookings || [];
+      }).catch(function () {
+        // Non-fatal: room search-combo will just come up empty until
+        // retried (e.g. next time the modal is opened); finance page
+        // itself still works.
+      });
+    }
+
+    function todayStr() { return todayDateStringForInput(); }
+
+    function activeBookingForRoom(roomId) {
+      var ds = todayStr();
+      for (var i = 0; i < BOOKINGS_CACHE.length; i++) {
+        var b = BOOKINGS_CACHE[i];
+        if (b.roomId === roomId &&
+            (b.checkinDate || '').slice(0, 10) <= ds &&
+            (b.checkoutDate || '').slice(0, 10) > ds) {
+          return b;
+        }
+      }
+      return null;
+    }
+
+    function initRoomCombo() {
+      var input = document.getElementById('fm-room-search');
+      var results = document.getElementById('fm-room-results');
+
+      input.addEventListener('input', function () {
+        renderRoomComboResults(this.value.trim().toLowerCase());
+      });
+      input.addEventListener('focus', function () {
+        renderRoomComboResults(this.value.trim().toLowerCase());
+      });
+      document.addEventListener('click', function (e) {
+        if (!results.contains(e.target) && e.target !== input) {
+          results.classList.add('hidden');
+        }
+      });
+
+      document.getElementById('fm-room-clear').addEventListener('click', clearSelectedRoom);
+    }
+
+    function renderRoomComboResults(query) {
+      var results = document.getElementById('fm-room-results');
+      var property = document.getElementById('fm-property').value;
+
+      var pool = ROOMS_CACHE.filter(function (r) { return r.propertyId === property; });
+      if (query) {
+        pool = pool.filter(function (r) {
+          return r.roomId.toLowerCase().indexOf(query) >= 0 ||
+                 (r.displayName || '').toLowerCase().indexOf(query) >= 0;
+        });
+      }
+      pool = pool.slice(0, 30); // keep the dropdown short and fast to scan
+
+      var html = pool.map(function (r) {
+        var booking = activeBookingForRoom(r.roomId);
+        var guestHtml = booking ? '<span class="guest">' + escapeHtml(booking.guestName || '') + '</span>' : '<span class="guest">vacant</span>';
+        return '<div class="opt" data-room-id="' + escapeHtml(r.roomId) + '" data-guest="' + escapeHtml(booking ? (booking.guestName || '') : '') + '">' +
+          '<span class="rid">' + escapeHtml(r.displayName || r.roomId) + '</span>' + guestHtml +
+          '</div>';
+      }).join('');
+
+      html += '<div class="opt walkin" data-room-id="">Walk-in / no room (e.g. day-use, no booking on file)</div>';
+
+      results.innerHTML = html;
+      results.classList.remove('hidden');
+
+      results.querySelectorAll('.opt').forEach(function (el) {
+        el.addEventListener('click', function () {
+          selectRoom(this.dataset.roomId, this.dataset.guest);
+        });
+      });
+    }
+
+    function selectRoom(roomId, guestName) {
+      document.getElementById('fm-room-id').value = roomId || '';
+      document.getElementById('fm-room-search').value = '';
+      document.getElementById('fm-room-results').classList.add('hidden');
+
+      if (roomId) {
+        var room = ROOMS_CACHE.filter(function (r) { return r.roomId === roomId; })[0];
+        document.getElementById('fm-room-selected-label').textContent = room ? (room.displayName || roomId) : roomId;
+        document.getElementById('fm-room-selected').classList.remove('hidden');
+        // Auto-fill guest only if the field is currently empty, so we
+        // don't clobber something the person already typed.
+        var guestField = document.getElementById('fm-guest');
+        if (!guestField.value && guestName) guestField.value = guestName;
+      } else {
+        document.getElementById('fm-room-selected-label').textContent = 'Walk-in (no room)';
+        document.getElementById('fm-room-selected').classList.remove('hidden');
+      }
+    }
+
+    function clearSelectedRoom() {
+      document.getElementById('fm-room-id').value = '';
+      document.getElementById('fm-room-selected').classList.add('hidden');
+      document.getElementById('fm-room-search').value = '';
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = String(str == null ? '' : str);
+      return div.innerHTML;
     }
 
     function loadFinanceData() {
@@ -302,17 +505,21 @@
       }).join('');
       document.getElementById('fm-amount').value = '';
       document.getElementById('fm-guest').value = '';
-      document.getElementById('fm-room').value = '';
+      clearSelectedRoom();
       document.getElementById('fm-ref').value = '';
       document.getElementById('fm-note').value = '';
       document.getElementById('fm-date').value = todayDateStringForInput();
       hide('finance-modal-error');
       show('finance-modal');
+
+      // Refresh in the background so the combo reflects the latest
+      // bookings even if the page has been open a while.
+      loadRoomsAndBookingsCache();
     }
 
     function saveFinanceEntry() {
       var propertyId = document.getElementById('fm-property').value;
-      var roomId = document.getElementById('fm-room').value.trim() || null;
+      var roomId = document.getElementById('fm-room-id').value.trim() || null;
       var category = document.getElementById('fm-category').value;
       var guest = document.getElementById('fm-guest').value.trim() || null;
       var amount = Number(document.getElementById('fm-amount').value);
