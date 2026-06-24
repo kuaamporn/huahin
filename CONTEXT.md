@@ -213,6 +213,7 @@ until `roomsMarkCleaned` is called.
 20. **Fixed finance.html API params** — `roomsList`/`bookingsList` calls were passing `session.token` as first param but these actions take only propertyId (no token); removed the erroneous token param
 21. **Finance modal UX upgrade** — 2-column wider layout (640px), auto-fills guest name from active booking, "Walk-in / no room" option for transactions without a room on file
 22. **Fixed rooms.html RangeError** — `var TODAY` was hoisted but `undefined` when `bootApp()` ran synchronously after the session check; reordered all date variables and utility functions (`TODAY`, `WIN_S`, `WIN_E`, `dk()`, `pd()`, `dd()`, etc.) before the session check that calls `bootApp()`
+23. **Fixed Gantt table disappearing on date filter** — availability chips were stacking vertically (block-level divs), pushing Gantt table off screen; added `max-height: 120px` + `overflow-y: auto` on `.avres`, and flexbox wrap on `#avchips` so chips flow horizontally
 
 ---
 
