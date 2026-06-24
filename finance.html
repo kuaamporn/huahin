@@ -89,6 +89,26 @@
       border: 1px solid var(--line); border-radius: 7px; font-size: 13px; background: #f7f6f3;
     }
     .room-pill .x { cursor: pointer; color: var(--muted); font-weight: 700; padding: 0 2px; }
+    .mhdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+    .mtitle { font-size: 18px; font-weight: 700; margin: 0; color: var(--ink); }
+    .mx { background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+    .mx:hover { background: #eee; color: #333; }
+    .custom-select { position: relative; width: 100%; margin-top: 5px; }
+    .custom-select-trigger {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 11px; font-size: 14px; border: 1px solid var(--line);
+      border-radius: 8px; background: var(--paper); cursor: pointer; user-select: none; height: 38px;
+    }
+    .custom-select-trigger .arrow { font-size: 10px; color: var(--muted); margin-left: auto; }
+    .custom-select-options {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 200;
+      background: #fff; border: 1px solid var(--line); border-radius: 8px;
+      margin-top: 4px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); display: none; overflow: hidden;
+    }
+    .custom-select-options.open { display: block; }
+    .custom-select-option { display: flex; align-items: center; gap: 8px; padding: 10px 11px; font-size: 14px; cursor: pointer; }
+    .custom-select-option:hover { background: #f3f1ec; }
+    .channel-icon { height: 18px; width: 18px; object-fit: contain; vertical-align: middle; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -242,13 +262,17 @@
 
         <div>
           <label for="fm-channel">Payment channel</label>
-          <select id="fm-channel">
-            <option value="cash">💵 Cash</option>
-            <option value="kbank">🟩 KBank</option>
-            <option value="kbank_qr">🔲 KBank QR</option>
-            <option value="scb">🟪 SCB</option>
-            <option value="scb_qr">🔲 SCB QR</option>
-          </select>
+          <div class="custom-select" id="fm-channel-select">
+            <div class="custom-select-trigger" onclick="toggleCustomSelect('fm-channel-select')">💵 Cash <span class="arrow">▼</span></div>
+            <div class="custom-select-options">
+              <div class="custom-select-option" data-value="cash">💵 Cash</div>
+              <div class="custom-select-option" data-value="kbank"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"> KBank</div>
+              <div class="custom-select-option" data-value="kbank_qr"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> KBank QR</div>
+              <div class="custom-select-option" data-value="scb"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"> SCB</div>
+              <div class="custom-select-option" data-value="scb_qr"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> SCB QR</div>
+            </div>
+            <input type="hidden" id="fm-channel" value="cash" />
+          </div>
         </div>
 
         <div>
@@ -706,6 +730,23 @@
       editingTxnId = null;
       financeModalMode = mode;
       document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? '+ Add Revenue' : '+ Add Expense';
+      document.querySelector('label[for="fm-paid-by"]').textContent = mode === 'revenue' ? 'Received By' : 'Paid By';
+
+      var requiredRole = mode === 'revenue' ? 'revenue' : 'expense';
+      var filtered = EMPLOYEES.filter(function (e) {
+        return (e.roles && e.roles.indexOf('owner') >= 0) || (e.roles && e.roles.indexOf(requiredRole) >= 0);
+      });
+      var paidBySelect = document.getElementById('fm-paid-by');
+      paidBySelect.innerHTML = filtered.map(function(e) { return '<option value="'+e.employee_id+'">'+escapeHtml(e.name)+'</option>'; }).join('');
+      var s = HuaHinSession.getSession();
+      if (s && s.employeeId) {
+        var hasUser = filtered.some(function(e) { return e.employee_id === s.employeeId; });
+        if (hasUser) paidBySelect.value = s.employeeId;
+      }
+
+      document.getElementById('fm-channel').value = 'cash';
+      initCustomSelect('fm-channel-select');
+
       if (mode === 'revenue') {
         hide('fm-expense-extras');
         if(!REVENUE_CATS.includes('electricity')) REVENUE_CATS.push('electricity', 'water', 'utility');
@@ -850,6 +891,7 @@
 
       document.getElementById('fm-guest').value = t.guest_or_vendor || '';
       document.getElementById('fm-channel').value = t.payment_channel || 'cash';
+      initCustomSelect('fm-channel-select');
       document.getElementById('fm-ref').value = t.transfer_ref || '';
       document.getElementById('fm-note').value = t.notes || '';
       document.getElementById('fm-date').value = t.txn_date;
@@ -910,6 +952,38 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
+    function toggleCustomSelect(id) {
+      var select = document.getElementById(id);
+      var options = select.querySelector('.custom-select-options');
+      var isOpen = options.classList.contains('open');
+      document.querySelectorAll('.custom-select-options').forEach(function (opt) { opt.classList.remove('open'); });
+      if (!isOpen) options.classList.add('open');
+    }
+
+    function initCustomSelect(id, onChange) {
+      var select = document.getElementById(id);
+      var trigger = select.querySelector('.custom-select-trigger');
+      var optionsContainer = select.querySelector('.custom-select-options');
+      var input = select.querySelector('input[type="hidden"]');
+      var defaultOpt = optionsContainer.querySelector('[data-value="' + input.value + '"]');
+      if (defaultOpt) trigger.innerHTML = defaultOpt.innerHTML + ' <span class="arrow">▼</span>';
+      optionsContainer.querySelectorAll('.custom-select-option').forEach(function (opt) {
+        var newOpt = opt.cloneNode(true);
+        opt.parentNode.replaceChild(newOpt, opt);
+        newOpt.addEventListener('click', function (e) {
+          e.stopPropagation();
+          input.value = this.dataset.value;
+          trigger.innerHTML = this.innerHTML + ' <span class="arrow">▼</span>';
+          optionsContainer.classList.remove('open');
+          if (onChange) onChange(input.value);
+        });
+      });
+    }
+
+    window.addEventListener('click', function() {
+      document.querySelectorAll('.custom-select-options').forEach(function (opt) { opt.classList.remove('open'); });
+    });
+
     var approvingTxnId = null;
 
     function openApproveModal(txnId) {
@@ -918,14 +992,27 @@
       approvingTxnId = t.txn_id;
       document.getElementById('am-amount-display').textContent = formatTHB(t.net_amount || t.amount);
       document.getElementById('am-channel').value = 'cash';
+      initCustomSelect('am-channel-select');
       document.getElementById('am-ref').value = '';
+
+      var filtered = EMPLOYEES.filter(function (e) {
+        return (e.roles && e.roles.indexOf('owner') >= 0) || (e.roles && e.roles.indexOf('revenue') >= 0);
+      });
+      var receivedBySelect = document.getElementById('am-received-by');
+      receivedBySelect.innerHTML = filtered.map(function(e) { return '<option value="'+e.employee_id+'">'+escapeHtml(e.name)+'</option>'; }).join('');
+      var s = HuaHinSession.getSession();
+      if (s && s.employeeId) {
+        var hasUser = filtered.some(function(e) { return e.employee_id === s.employeeId; });
+        if (hasUser) receivedBySelect.value = s.employeeId;
+      }
+
       document.getElementById('approve-modal-error').classList.add('hidden');
-      document.getElementById('approve-modal-bg').classList.add('open');
+      document.getElementById('approve-modal-bg').classList.remove('hidden');
     }
 
     function closeApproveMod(e) {
       if (e && e.target !== e.currentTarget) return;
-      document.getElementById('approve-modal-bg').classList.remove('open');
+      document.getElementById('approve-modal-bg').classList.add('hidden');
       approvingTxnId = null;
     }
 
@@ -933,9 +1020,10 @@
       if (!approvingTxnId) return;
       var channel = document.getElementById('am-channel').value;
       var ref = document.getElementById('am-ref').value.trim();
+      var receivedBy = document.getElementById('am-received-by').value;
       var btn = document.getElementById('approveBtn');
       btn.disabled = true; btn.textContent = 'Approving...';
-      callApi('financeUpdateTransaction', [session.token, approvingTxnId, true, channel, ref]).then(function(res) {
+      callApi('financeUpdateTransaction', [session.token, approvingTxnId, true, channel, ref, receivedBy]).then(function(res) {
         btn.disabled = false; btn.textContent = 'Confirm Receipt';
         if (res.ok) {
           closeApproveMod();
@@ -954,8 +1042,8 @@
     }
   </script>
 
-  <div class="mbg" id="approve-modal-bg" onclick="closeApproveMod(event)">
-    <div class="modal" onclick="event.stopPropagation()" style="width:400px;max-width:90vw;">
+  <div class="modal-overlay hidden" id="approve-modal-bg" onclick="closeApproveMod(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="width:400px;max-width:90vw;">
       <div class="mhdr"><div class="mtitle">Confirm & Approve Revenue</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
       <div class="fg">
         <label class="fl">Amount Due</label>
@@ -963,11 +1051,21 @@
       </div>
       <div class="fg">
         <label class="fl">Payment Channel</label>
-        <select class="fs" id="am-channel">
-          <option value="cash">Cash</option>
-          <option value="transfer">Bank Transfer</option>
-          <option value="card">Credit Card</option>
-        </select>
+        <div class="custom-select" id="am-channel-select">
+          <div class="custom-select-trigger" onclick="toggleCustomSelect('am-channel-select')">💵 Cash <span class="arrow">▼</span></div>
+          <div class="custom-select-options">
+            <div class="custom-select-option" data-value="cash">💵 Cash</div>
+            <div class="custom-select-option" data-value="kbank"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"> KBank</div>
+            <div class="custom-select-option" data-value="kbank_qr"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> KBank QR</div>
+            <div class="custom-select-option" data-value="scb"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"> SCB</div>
+            <div class="custom-select-option" data-value="scb_qr"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> SCB QR</div>
+          </div>
+          <input type="hidden" id="am-channel" value="cash" />
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" for="am-received-by">Received By</label>
+        <select class="fs" id="am-received-by" style="width:100%;"></select>
       </div>
       <div class="fg">
         <label class="fl">Transfer Reference</label>
