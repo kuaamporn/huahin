@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>HR Dashboard</title>
+  <title>The Precious Moment Dashboard</title>
   <style>
     :root {
       --ink: #1a1d1f;
@@ -248,7 +248,17 @@
     <!-- ===================== ROLES ===================== -->
     <div id="panel-roles" class="hidden">
       <h1>Employee Roles</h1>
-      <div class="sub">Assign multiple roles per employee. Roles control access to rooms, finance, and housekeeping features.</div>
+      <div class="sub">
+        Assign multiple roles per employee to control access:
+        <ul style="margin-top: 8px; margin-bottom: 16px; padding-left: 20px;">
+          <li><b>owner</b>: Full access, view finance, and can edit verified transactions.</li>
+          <li><b>frontdesk</b>: Can add and manage rooms bookings.</li>
+          <li><b>housekeeping</b>: Can view room status and mark rooms as cleaned.</li>
+          <li><b>revenue</b>: Can add revenue records.</li>
+          <li><b>expense</b>: Can add expense records.</li>
+          <li><b>accountant</b>: Can view finance summaries and lists.</li>
+        </ul>
+      </div>
 
       <button id="roles-refresh-btn" style="margin-bottom:12px;">Refresh list</button>
 

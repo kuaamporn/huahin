@@ -160,7 +160,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     </div>
     <div class="topbar-right">
       <button class="btn btn-p" id="addBtn" onclick="openBook()">＋ New Booking</button>
+      <button class="btn btn-o" onclick="shiftTimeline(-30)">◀</button>
       <button class="btn btn-o" onclick="jumpToday()">Today</button>
+      <button class="btn btn-o" onclick="shiftTimeline(30)">▶</button>
       <div class="user-badge"><span class="user-name" id="welcome-name"></span></div>
       <button class="btn btn-red" id="logout-link">Sign Out</button>
     </div>
@@ -204,6 +206,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
         <div class="tbtn sel" onclick="selType('monthly',this)">📅 Monthly</div>
         <div class="tbtn" onclick="selType('walkin',this)">🚶 Walk-in</div>
         <div class="tbtn" onclick="selType('reserved',this)">📌 Reserved</div>
+        <div class="tbtn" onclick="selType('Booking.com',this)">🌐 Booking.com</div>
+        <div class="tbtn" onclick="selType('Expedia.com',this)">🌐 Expedia.com</div>
       </div>
     </div>
     <div class="frow">
@@ -259,8 +263,8 @@ var searchQ = '';
 var selBT = 'monthly';
 
 var TODAY = new Date(); TODAY.setHours(0,0,0,0);
-var WIN_S = new Date(TODAY); WIN_S.setDate(WIN_S.getDate()-14);
-var WIN_E = new Date(TODAY); WIN_E.setDate(WIN_E.getDate()+150);
+var WIN_S = new Date(TODAY); WIN_S.setDate(WIN_S.getDate()-60);
+var WIN_E = new Date(TODAY); WIN_E.setDate(WIN_E.getDate()+60);
 
 function dk(d){ return (d instanceof Date ? d : new Date(d)).toISOString().slice(0,10); }
 function pd(s){ var d=new Date(s); d.setHours(0,0,0,0); return d; }
@@ -584,7 +588,18 @@ function setFloor(f, el){
   render();
 }
 function applyFilters(){ searchQ = document.getElementById('srch').value.toLowerCase().trim(); render(); }
-function jumpToday(){ scrollToday(); }
+function shiftTimeline(days) {
+  WIN_S.setDate(WIN_S.getDate() + days);
+  WIN_E.setDate(WIN_E.getDate() + days);
+  render();
+  setTimeout(scrollToday, 10);
+}
+function jumpToday(){
+  WIN_S = new Date(TODAY); WIN_S.setDate(WIN_S.getDate()-60);
+  WIN_E = new Date(TODAY); WIN_E.setDate(WIN_E.getDate()+60);
+  render();
+  setTimeout(scrollToday, 10);
+}
 
 var toastTimer;
 function showToast(msg, type){
