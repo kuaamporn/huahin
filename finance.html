@@ -662,7 +662,7 @@
           var isOwner = HuaHinSession.hasRole('owner');
           var canEdit = isOwner || !t.verified; // Owner can edit anything, others only if not verified
           
-          var actionHtml = canEdit ? '<button class="row-action-btn" onclick="editTransaction(\''+t.transaction_id+'\')">Edit</button>' : '<span class="muted">Verified</span>';
+          var actionHtml = canEdit ? '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>' : '<span class="muted">Verified</span>';
 
           tr.innerHTML =
             '<td>' + (t.txn_date || '') + '</td>' +

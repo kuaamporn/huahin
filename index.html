@@ -158,6 +158,16 @@
       if (HuaHinSession.hasRole('owner')) show('dashboard-link');
     }
 
+    var session = HuaHinSession.getSession();
+    if (session && session.token) {
+      sessionToken = session.token;
+      currentEmployeeName = session.name;
+      document.getElementById('welcome-name').textContent = 'Hi, ' + session.name;
+      hide('login-screen');
+      show('main-screen');
+      applyNavLinkVisibility();
+    }
+
     function getDeviceId() {
       // Simple persistent device fingerprint stored in localStorage.
       // NOTE: this is a soft signal only, not a security boundary —
