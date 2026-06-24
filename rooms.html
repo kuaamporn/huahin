@@ -85,7 +85,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .chip.m{background:rgba(46,196,160,.1);border-color:rgba(46,196,160,.3);color:var(--m)}
 
 .gwrap{flex:1;overflow:auto;position:relative}
-.gantt{min-width:max-content;border-collapse:collapse}
+.gantt{min-width:max-content;border-collapse:separate;border-spacing:0}
 .gantt thead th{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:2px solid var(--border)}
 .gantt td.rc,.gantt th.rc{position:sticky;left:0;z-index:15;background:var(--surface);border-right:2px solid var(--border)}
 .gantt thead th.rc{z-index:25}
@@ -106,8 +106,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .bar:hover{filter:brightness(1.25);z-index:10}
 .bar.monthly{background:linear-gradient(90deg,#2a5ab5,#4f8ef7)}
 .bar.walkin{background:linear-gradient(90deg,#137a50,#2dd47e);color:#0c0e14;text-shadow:none}
-.bar.reserved{background:linear-gradient(90deg,#9a5e08,#f5a623);color:#0c0e14;text-shadow:none}
+.bar.reserved{background:linear-gradient(90deg,#b57007,#ffb834);color:#0c0e14;text-shadow:none}
 .bar.commercial{background:linear-gradient(90deg,#5230a8,#9966ff)}
+.bar.booking-com{background:linear-gradient(90deg,#0056b3,#00aaff);color:#fff}
+.bar.expedia-com{background:linear-gradient(90deg,#e0a900,#ffcc00);color:#0c0e14;text-shadow:none}
 
 .legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:7px 14px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;font-size:11px;color:var(--muted)}
 .leg{display:flex;align-items:center;gap:5px}
@@ -193,6 +195,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="leg"><div class="ld" style="background:#2dd47e"></div>Walk-in</div>
     <div class="leg"><div class="ld" style="background:#f5a623"></div>Reserved</div>
     <div class="leg"><div class="ld" style="background:#9966ff"></div>Commercial</div>
+    <div class="leg"><div class="ld" style="background:#00aaff"></div>Booking.com</div>
+    <div class="leg"><div class="ld" style="background:#ffcc00"></div>Expedia.com</div>
   </div>
 </div>
 
@@ -200,7 +204,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 <div class="mbg" id="mbg" onclick="closeMod(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="mhdr"><div class="mtitle">New Booking</div><button class="mx" onclick="closeMod()">✕</button></div>
+    <div class="mhdr"><div class="mtitle" id="mTitle">New Booking</div><button class="mx" onclick="closeMod()">✕</button></div>
     <div class="frow">
       <div class="fg"><label class="fl">Property</label><select class="fs" id="mProp" onchange="updateRooms()">
         <option value="precious">The Precious</option><option value="moment">The Moment</option>
@@ -273,7 +277,13 @@ var TODAY = new Date(); TODAY.setHours(0,0,0,0);
 var WIN_S = new Date(TODAY); WIN_S.setDate(WIN_S.getDate()-60);
 var WIN_E = new Date(TODAY); WIN_E.setDate(WIN_E.getDate()+60);
 
-function dk(d){ return (d instanceof Date ? d : new Date(d)).toISOString().slice(0,10); }
+function dk(d){
+  var date = d instanceof Date ? d : new Date(d);
+  var y = date.getFullYear();
+  var m = String(date.getMonth() + 1).padStart(2, '0');
+  var day = String(date.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
 function pd(s){ var d=new Date(s); d.setHours(0,0,0,0); return d; }
 function dd(a,b){ return Math.round((pd(b)-pd(a))/86400000); }
 function buildDates(){ var out=[],d=new Date(WIN_S); while(d<=WIN_E){out.push(new Date(d));d.setDate(d.getDate()+1);} return out; }
@@ -436,7 +446,7 @@ function render(){
         if(isFirst && !rendered[b.bookingId]){
           rendered[b.bookingId]=true;
           var w = dd(d, new Date(Math.min(cout.getTime(), WIN_E.getTime())))*34-2;
-          var bt = b.bookingType==='commercial' ? 'commercial' : b.bookingType;
+          var bt = (b.bookingType || '').replace(/\./g, '-').toLowerCase();
           html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="width:'+w+'px" onclick="showDetail(\''+b.bookingId+'\')">'+(b.guestName||'')+'</div></td>';
         } else {
           html += '<td class="'+(isT?'tc':'')+'"></td>';
@@ -498,6 +508,7 @@ function openBook(rid, date, prop){
   var btns = document.querySelectorAll('.tbtn');
   btns.forEach(function(e,i){ e.classList.toggle('sel', i===0); });
   calcP();
+  document.getElementById('mTitle').textContent = 'New Booking';
   document.getElementById('mbg').classList.add('open');
 }
 
@@ -579,11 +590,45 @@ function showDetail(id){
     (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+b.createdByName+'</span></div>':'')+
     '<div class="dactions">'+
       '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">🗑 Cancel Booking</button>'+
+      '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">➕ Extend Stay</button>'+
       '<button class="btn btn-p" onclick="closeDetail()">✓ Done</button></div>';
   document.getElementById('detailPanel').classList.add('open');
 }
 
 function closeDetail(){ document.getElementById('detailPanel').classList.remove('open'); }
+
+function extendBooking(id) {
+  var b = bookings.find(function(x) { return x.bookingId === id; });
+  if (!b) return;
+  closeDetail();
+  document.getElementById('mProp').value = b.propertyId;
+  updateRooms();
+  document.getElementById('mRoom').value = b.roomId;
+  document.getElementById('mGuest').value = b.guestName || '';
+  document.getElementById('mIn').value = b.checkoutDate ? b.checkoutDate.slice(0, 10) : dk(TODAY);
+  var coD = new Date(pd(document.getElementById('mIn').value));
+  if (b.bookingType === 'monthly') { coD.setMonth(coD.getMonth() + 1); }
+  else { coD.setDate(coD.getDate() + 1); }
+  document.getElementById('mOut').value = dk(coD);
+  document.getElementById('mRate').value = b.rate || '';
+  document.getElementById('mDep').value = '0';
+  document.getElementById('mNotes').value = 'Extension of ' + b.bookingId;
+  selBT = b.bookingType || 'monthly';
+  var btns = document.querySelectorAll('.tbtn');
+  btns.forEach(function(btn) {
+    var text = btn.textContent.toLowerCase();
+    var isSel = false;
+    if (selBT === 'monthly' && text.indexOf('monthly') >= 0) isSel = true;
+    else if (selBT === 'walkin' && text.indexOf('walk-in') >= 0) isSel = true;
+    else if (selBT === 'reserved' && text.indexOf('reserved') >= 0) isSel = true;
+    else if (selBT === 'Booking.com' && text.indexOf('booking.com') >= 0) isSel = true;
+    else if (selBT === 'Expedia.com' && text.indexOf('expedia.com') >= 0) isSel = true;
+    btn.classList.toggle('sel', isSel);
+  });
+  calcP();
+  document.getElementById('mTitle').textContent = 'Extend Booking (' + b.bookingId + ')';
+  document.getElementById('mbg').classList.add('open');
+}
 
 function delBook(id){
   if(!confirm('Cancel this booking?')) return;

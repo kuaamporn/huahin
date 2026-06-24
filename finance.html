@@ -661,11 +661,26 @@
         tbody.innerHTML = '';
         list.forEach(function (t) {
           var tr = document.createElement('tr');
-          var dirLabel = t.direction === 'IN' ? '<span class="pill ok">Revenue</span>' : '<span class="pill flag">Expense</span>';
+          var statusLabel = t.is_verified ? '' : ' <span class="pill warn" style="background:#b5460a;color:#fff;">Pending</span>';
+          var dirLabel = (t.direction === 'IN' ? '<span class="pill ok">Revenue</span>' : '<span class="pill flag">Expense</span>') + statusLabel;
           var isOwner = HuaHinSession.hasRole('owner');
+          var isRevenue = HuaHinSession.hasRole('revenue');
+          var isExpense = HuaHinSession.hasRole('expense');
+          var canApproveRevenue = (isOwner || isRevenue) && t.direction === 'IN' && !t.is_verified;
+          var canApproveExpense = (isOwner || isExpense) && t.direction === 'OUT' && !t.is_verified;
           var canEdit = isOwner || !t.is_verified;
-          
-          var actionHtml = canEdit ? '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>' : '<span class="muted">Verified</span>';
+
+          var actionHtml = '';
+          if (!t.is_verified) {
+            if (canApproveRevenue || canApproveExpense) {
+              actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\')">Approve</button>';
+            }
+            if (canEdit) {
+              actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+            }
+          } else {
+            actionHtml = '<span class="muted">Verified</span>';
+          }
 
           tr.innerHTML =
             '<td>' + (t.txn_date || '') + '</td>' +
@@ -895,6 +910,75 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
+    var approvingTxnId = null;
+
+    function openApproveModal(txnId) {
+      var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
+      if (!t) return;
+      approvingTxnId = t.txn_id;
+      document.getElementById('am-amount-display').textContent = formatTHB(t.net_amount || t.amount);
+      document.getElementById('am-channel').value = 'cash';
+      document.getElementById('am-ref').value = '';
+      document.getElementById('approve-modal-error').classList.add('hidden');
+      document.getElementById('approve-modal-bg').classList.add('open');
+    }
+
+    function closeApproveMod(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('approve-modal-bg').classList.remove('open');
+      approvingTxnId = null;
+    }
+
+    function submitApproval() {
+      if (!approvingTxnId) return;
+      var channel = document.getElementById('am-channel').value;
+      var ref = document.getElementById('am-ref').value.trim();
+      var btn = document.getElementById('approveBtn');
+      btn.disabled = true; btn.textContent = 'Approving...';
+      callApi('financeUpdateTransaction', [session.token, approvingTxnId, true, channel, ref]).then(function(res) {
+        btn.disabled = false; btn.textContent = 'Confirm Receipt';
+        if (res.ok) {
+          closeApproveMod();
+          loadFinanceData();
+        } else {
+          var errEl = document.getElementById('approve-modal-error');
+          errEl.textContent = res.error;
+          errEl.classList.remove('hidden');
+        }
+      }).catch(function(err) {
+        btn.disabled = false; btn.textContent = 'Confirm Receipt';
+        var errEl = document.getElementById('approve-modal-error');
+        errEl.textContent = 'Connection error: ' + err.message;
+        errEl.classList.remove('hidden');
+      });
+    }
   </script>
+
+  <div class="mbg" id="approve-modal-bg" onclick="closeApproveMod(event)">
+    <div class="modal" onclick="event.stopPropagation()" style="width:400px;max-width:90vw;">
+      <div class="mhdr"><div class="mtitle">Confirm & Approve Revenue</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
+      <div class="fg">
+        <label class="fl">Amount Due</label>
+        <div id="am-amount-display" style="font-size:20px;font-weight:700;color:var(--go);margin:8px 0;">฿0</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Payment Channel</label>
+        <select class="fs" id="am-channel">
+          <option value="cash">Cash</option>
+          <option value="transfer">Bank Transfer</option>
+          <option value="card">Credit Card</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Transfer Reference</label>
+        <input class="fi" type="text" id="am-ref" placeholder="e.g. Txn ID, bank reference…">
+      </div>
+      <div class="error hidden" id="approve-modal-error"></div>
+      <div style="display:flex;gap:9px;margin-top:16px">
+        <button class="btn-secondary" style="flex:1" onclick="closeApproveMod()">Cancel</button>
+        <button class="btn-primary" style="flex:2" id="approveBtn" onclick="submitApproval()">Confirm Receipt</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
