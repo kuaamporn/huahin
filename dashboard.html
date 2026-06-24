@@ -52,6 +52,12 @@
     .success { color: var(--go); font-size: 13px; margin-top: 8px; }
     .hidden { display: none !important; }
 
+    .dash-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .dash-topbar h1 { font-size: 18px; margin: 0; }
+    .dash-nav-links { display: flex; gap: 10px; align-items: center; }
+    .dash-nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; transition: all .15s; }
+    .dash-nav-links a:hover { color: var(--ink); background: var(--line); }
+    .dash-nav-links .signout { color: var(--warn); }
     .navbar { margin-bottom: 20px; border-bottom: 1px solid var(--line); }
     .nav-tabs { display: flex; gap: 4px; }
     .nav-tab {
@@ -89,6 +95,15 @@
 <body>
 
   <div id="dash-screen" class="wrap">
+    <div class="dash-topbar">
+      <h1>The Precious Moment Dashboard</h1>
+      <div class="dash-nav-links">
+        <a href="index.html">Check-in</a>
+        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
+        <a href="finance.html" id="link-finance" class="hidden">Finance</a>
+        <a href="#" id="logout-link" class="signout">Sign out</a>
+      </div>
+    </div>
     <div class="navbar">
       <div class="nav-tabs">
         <button class="nav-tab active" id="tab-checkins">Today's Check-ins</button>
@@ -362,9 +377,18 @@
     var currentUserRoles = _session ? (_session.roles || []) : [];
 
     if (_session) {
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) document.getElementById('link-finance').classList.remove('hidden');
       loadToday();
       applyRoleVisibility();
     }
+
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      callApi('logout', [token]).catch(function() {});
+      HuaHinSession.clearSession();
+      window.location.href = 'index.html';
+    });
 
     function loadToday() {
       callApi('dashboardGetToday', [token]).then(function(res) {
