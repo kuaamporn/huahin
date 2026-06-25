@@ -291,6 +291,11 @@ function dk(d){
 function pd(s){ var d=new Date(s); d.setHours(0,0,0,0); return d; }
 function dd(a,b){ return Math.round((pd(b)-pd(a))/86400000); }
 function buildDates(){ var out=[],d=new Date(WIN_S); while(d<=WIN_E){out.push(new Date(d));d.setDate(d.getDate()+1);} return out; }
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = String(str == null ? '' : str);
+  return div.innerHTML;
+}
 
 var TYPE_META = {
   Deluxe:{label:'Deluxe',color:'#c8a84b'},Penthouse:{label:'Penthouse',color:'#e8c060'},
@@ -453,7 +458,7 @@ function render(){
           rendered[b.bookingId]=true;
           var w = dd(d, new Date(Math.min(cout.getTime(), WIN_E.getTime())))*34-2;
           var bt = (b.bookingType || '').replace(/\./g, '-').toLowerCase();
-          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="width:'+w+'px" onclick="showDetail(\''+b.bookingId+'\')">'+(b.guestName||'')+'</div></td>';
+          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="width:'+w+'px" onclick="showDetail(\''+b.bookingId+'\')">'+escapeHtml(b.guestName||'')+'</div></td>';
         } else {
           html += '<td class="'+(isT?'tc':'')+'"></td>';
         }
@@ -604,7 +609,7 @@ function showDetail(id){
   var cardDepTotal = (b.cardDeposit || 0) * (b.cardDepositQty || 0);
   document.getElementById('detailContent').innerHTML =
     '<div class="dbadge '+b.propertyId+'">'+(b.propertyId==='precious'?'The Precious':'The Moment')+'</div>'+
-    '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+(b.guestName||'—')+'</h2>'+
+    '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+escapeHtml(b.guestName||'—')+'</h2>'+
     '<div class="df"><label>Room</label><span>'+(r?r.displayName:b.roomId)+' — '+(r?tl(r.roomType):'')+'</span></div>'+
     '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'—')+'</span></div>'+
     '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'—')+'</span></div>'+
@@ -613,8 +618,8 @@ function showDetail(id){
     '<div class="df"><label>Damage Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
     '<div class="df"><label>Card Deposit</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' card'+(b.cardDepositQty>1?'s':'')+' @ ฿'+b.cardDeposit+')':'—')+'</span></div>'+
     '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType||'—')+'</span></div>'+
-    (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+b.notes+'</span></div>':'')+
-    (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+b.createdByName+'</span></div>':'')+
+    (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.notes)+'</span></div>':'')+
+    (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.createdByName)+'</span></div>':'')+
     '<div class="dactions">'+
       '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">🗑 Cancel Booking</button>'+
       '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">➕ Extend Stay</button>'+
