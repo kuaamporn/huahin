@@ -151,7 +151,16 @@
         <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
           <span>📋</span> Active Tasks
         </h2>
-        <div id="tasks-list" class="muted">Loading tasks...</div>
+        <div style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex:1;">
+            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Today</h3>
+            <div id="tasks-list-today" class="muted">Loading...</div>
+          </div>
+          <div style="flex:1;">
+            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Tomorrow</h3>
+            <div id="tasks-list-tomorrow" class="muted"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -568,42 +577,55 @@
 
     function loadEmployeeTasks() {
       var container = document.getElementById('tasks-card');
-      var list = document.getElementById('tasks-list');
+      var listToday = document.getElementById('tasks-list-today');
+      var listTomorrow = document.getElementById('tasks-list-tomorrow');
       if (!sessionToken) return;
 
       callApi('employeeGetTasks', [sessionToken]).then(function(res) {
         if (res.ok) {
           var tasks = res.tasks || [];
+          var todayDate = res.today || new Date().toISOString().slice(0,10);
+
           if (tasks.length === 0) {
-            list.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks assigned to you today.</div>';
+            listToday.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
+            listTomorrow.innerHTML = '';
             container.classList.remove('hidden');
             return;
           }
 
-          var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
-          tasks.forEach(function(task) {
-            var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
-            var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
-            var confirmBtn = '';
+          var tasksToday = tasks.filter(function(t) { return !t.date || t.date <= todayDate; });
+          var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date > todayDate; });
 
-            if (task.type === 'housekeeping') {
-              confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
-            } else {
-              confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
-            }
+          function renderTasksList(taskList) {
+            if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;">None</div>';
+            var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+            taskList.forEach(function(task) {
+              var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
+              var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
+              var confirmBtn = '';
 
-            html += '<div style="border-left:3px solid '+badgeColor+';padding-left:12px;margin-bottom:4px;">' +
-              '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
-                '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
-              '</div>' +
-              '<div style="font-weight:600;font-size:14px;margin-top:4px;">'+escapeHtml(task.title)+'</div>' +
-              '<div class="muted" style="font-size:12px;margin-top:2px;">Description: '+escapeHtml(task.description)+'</div>' +
-              confirmBtn +
-            '</div>';
-          });
-          html += '</div>';
-          list.innerHTML = html;
+              if (task.type === 'housekeeping') {
+                confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
+              } else {
+                confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
+              }
+
+              html += '<div style="border-left:3px solid '+badgeColor+';padding-left:12px;margin-bottom:4px;">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                  '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
+                  '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
+                '</div>' +
+                '<div style="font-weight:600;font-size:14px;margin-top:4px;">'+escapeHtml(task.title)+'</div>' +
+                (task.description ? '<div class="muted" style="font-size:12px;margin-top:2px;">'+escapeHtml(task.description)+'</div>' : '') +
+                confirmBtn +
+              '</div>';
+            });
+            html += '</div>';
+            return html;
+          }
+
+          listToday.innerHTML = renderTasksList(tasksToday);
+          listTomorrow.innerHTML = renderTasksList(tasksTomorrow);
           container.classList.remove('hidden');
         } else {
           list.innerHTML = '<div class="error">Error loading tasks: ' + res.error + '</div>';
