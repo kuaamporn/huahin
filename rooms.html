@@ -227,7 +227,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     </div>
     <div class="frow">
       <div class="fg"><label class="fl">Rate (฿)</label><input class="fi" type="number" id="mRate" min="0" oninput="calcP()"></div>
-      <div class="fg"><label class="fl">Deposit (฿)</label><input class="fi" type="number" id="mDep" min="0" oninput="calcP()"></div>
+      <div class="fg"><label class="fl">Room Damage Deposit (฿)</label><input class="fi" type="number" id="mDep" min="0" oninput="calcP()"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Card Deposit Price (฿)</label><input class="fi" type="number" id="mCardDepPrice" min="0" value="500" oninput="calcP()"></div>
+      <div class="fg"><label class="fl">Card Deposit Qty</label><input class="fi" type="number" id="mCardDepQty" min="0" value="0" oninput="calcP()"></div>
     </div>
     <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="mNotes"></textarea></div>
     <div class="pbox" id="pbox">
@@ -504,6 +508,8 @@ function openBook(rid, date, prop){
   document.getElementById('mGuest').value = '';
   document.getElementById('mNotes').value = '';
   document.getElementById('mDep').value = '8000';
+  document.getElementById('mCardDepQty').value = '0';
+  document.getElementById('mCardDepPrice').value = '500';
   document.getElementById('mRate').value = '';
   document.getElementById('cwarn').style.display = 'none';
   selBT = 'monthly';
@@ -520,6 +526,7 @@ function selType(t, el){ selBT=t; document.querySelectorAll('.tbtn').forEach(fun
 function calcP(){
   var ci=document.getElementById('mIn').value, co=document.getElementById('mOut').value;
   var rate=parseFloat(document.getElementById('mRate').value)||0, dep=parseFloat(document.getElementById('mDep').value)||0;
+  var cardPrice=parseFloat(document.getElementById('mCardDepPrice').value)||0, cardQty=parseInt(document.getElementById('mCardDepQty').value)||0;
   var pb=document.getElementById('pbox');
   if(!ci||!co||!rate){ pb.style.display='none'; return; }
   pb.style.display='block';
@@ -531,10 +538,24 @@ function calcP(){
   else if (selBT === 'Booking.com' || selBT === 'Expedia.com') { suffix = '/booking'; }
   else { suffix = '/night'; }
   document.getElementById('pRate').textContent = '฿'+rate.toLocaleString()+suffix;
-  document.getElementById('pDep').textContent = dep ? '฿'+dep.toLocaleString() : '—';
+
+  var cardDepTotal = cardPrice * cardQty;
+  var totalDep = dep + cardDepTotal;
+  var depText = '';
+  if (dep > 0 && cardDepTotal > 0) {
+    depText = '฿' + dep.toLocaleString() + ' + ฿' + cardDepTotal.toLocaleString() + ' card';
+  } else if (dep > 0) {
+    depText = '฿' + dep.toLocaleString();
+  } else if (cardDepTotal > 0) {
+    depText = '฿' + cardDepTotal.toLocaleString() + ' card';
+  } else {
+    depText = '—';
+  }
+  document.getElementById('pDep').textContent = depText;
+
   var total = 0;
-  if (selBT === 'monthly' || selBT === 'Booking.com' || selBT === 'Expedia.com') { total = rate + dep; }
-  else { total = (nights * rate) + dep; }
+  if (selBT === 'monthly' || selBT === 'Booking.com' || selBT === 'Expedia.com') { total = rate + totalDep; }
+  else { total = (nights * rate) + totalDep; }
   document.getElementById('pTot').textContent = '฿'+total.toLocaleString();
 }
 
@@ -543,6 +564,7 @@ function saveBook(){
   var room=document.getElementById('mRoom').value;
   var ci=document.getElementById('mIn').value, co=document.getElementById('mOut').value;
   var rate=parseFloat(document.getElementById('mRate').value)||0, dep=parseFloat(document.getElementById('mDep').value)||0;
+  var cardPrice=parseFloat(document.getElementById('mCardDepPrice').value)||0, cardQty=parseInt(document.getElementById('mCardDepQty').value)||0;
   var notes=document.getElementById('mNotes').value.trim();
   var prop=document.getElementById('mProp').value;
   var cw=document.getElementById('cwarn');
@@ -552,11 +574,12 @@ function saveBook(){
   if(!ci||!co){ showToast('Please set dates','err'); return; }
   if(rate < 0){ showToast('Rate cannot be below 0','err'); return; }
   if(dep < 0){ showToast('Deposit cannot be below 0','err'); return; }
+  if(cardPrice < 0 || cardQty < 0){ showToast('Card deposit cannot be below 0','err'); return; }
 
   var btn=document.getElementById('saveBtn');
   btn.disabled=true; btn.textContent='Saving…';
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes]).then(function(res){
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty]).then(function(res){
     btn.disabled=false; btn.textContent='✓ Confirm Booking';
     if(res.ok){
       closeMod();
@@ -578,6 +601,7 @@ function showDetail(id){
   if(!b) return;
   var r = ROOMS.filter(function(x){return x.roomId===b.roomId;})[0];
   var nights = b.checkinDate && b.checkoutDate ? dd(b.checkinDate, b.checkoutDate) : 0;
+  var cardDepTotal = (b.cardDeposit || 0) * (b.cardDepositQty || 0);
   document.getElementById('detailContent').innerHTML =
     '<div class="dbadge '+b.propertyId+'">'+(b.propertyId==='precious'?'The Precious':'The Moment')+'</div>'+
     '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+(b.guestName||'—')+'</h2>'+
@@ -586,7 +610,8 @@ function showDetail(id){
     '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'—')+'</span></div>'+
     '<div class="df"><label>Duration</label><span>'+nights+' nights</span></div>'+
     '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':(b.bookingType==='Booking.com'||b.bookingType==='Expedia.com'?'/booking':'/night')):'TBD')+'</span></div>'+
-    '<div class="df"><label>Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
+    '<div class="df"><label>Damage Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
+    '<div class="df"><label>Card Deposit</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' card'+(b.cardDepositQty>1?'s':'')+' @ ฿'+b.cardDeposit+')':'—')+'</span></div>'+
     '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType||'—')+'</span></div>'+
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+b.notes+'</span></div>':'')+
     (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+b.createdByName+'</span></div>':'')+
@@ -614,6 +639,8 @@ function extendBooking(id) {
   document.getElementById('mOut').value = dk(coD);
   document.getElementById('mRate').value = b.rate || '';
   document.getElementById('mDep').value = '0';
+  document.getElementById('mCardDepQty').value = '0';
+  document.getElementById('mCardDepPrice').value = '500';
   document.getElementById('mNotes').value = 'Extension of ' + b.bookingId;
   selBT = b.bookingType || 'monthly';
   var btns = document.querySelectorAll('.tbtn');

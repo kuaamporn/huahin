@@ -685,25 +685,51 @@
         tbody.innerHTML = '';
         list.forEach(function (t) {
           var tr = document.createElement('tr');
-          var statusLabel = t.is_verified ? '' : ' <span class="pill warn" style="background:#b5460a;color:#fff;">Pending</span>';
+          
+          var statusLabel = '';
+          if (t.is_verified) {
+            statusLabel = ' <span class="pill ok" style="background:#157347;color:#fff;">Verified</span>';
+          } else if (t.is_approved) {
+            statusLabel = ' <span class="pill ok" style="background:#0b5ed7;color:#fff;">Approved</span>';
+          } else {
+            statusLabel = ' <span class="pill warn" style="background:#b5460a;color:#fff;">Pending Approval</span>';
+          }
+          
           var dirLabel = (t.direction === 'IN' ? '<span class="pill ok">Revenue</span>' : '<span class="pill flag">Expense</span>') + statusLabel;
           var isOwner = HuaHinSession.hasRole('owner');
           var isRevenue = HuaHinSession.hasRole('revenue');
           var isExpense = HuaHinSession.hasRole('expense');
-          var canApproveRevenue = (isOwner || isRevenue) && t.direction === 'IN' && !t.is_verified;
-          var canApproveExpense = (isOwner || isExpense) && t.direction === 'OUT' && !t.is_verified;
-          var canEdit = isOwner || !t.is_verified;
+          
+          var canApproveRevenue = (isOwner || isRevenue) && t.direction === 'IN' && !t.is_approved;
+          var canApproveExpense = (isOwner || isExpense) && t.direction === 'OUT' && !t.is_approved;
+          var canVerify = isOwner && t.is_approved && !t.is_verified;
+          var canEdit = isOwner || !t.is_approved;
 
           var actionHtml = '';
-          if (!t.is_verified) {
+          if (!t.is_approved) {
             if (canApproveRevenue || canApproveExpense) {
-              actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\')">Approve</button>';
+              actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">Approve</button>';
             }
-            if (canEdit) {
-              actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+          } else if (!t.is_verified) {
+            if (canVerify) {
+              actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">Verify</button>';
             }
-          } else {
-            actionHtml = '<span class="muted">Verified</span>';
+          }
+
+          if (canEdit && !t.is_verified) {
+            actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+          } else if (t.is_verified && isOwner) {
+            actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+          }
+
+          if (actionHtml === '') {
+            if (t.is_verified) {
+              actionHtml = '<span class="muted">Verified</span>';
+            } else if (t.is_approved) {
+              actionHtml = '<span class="muted">Approved</span>';
+            } else {
+              actionHtml = '<span class="muted">Pending</span>';
+            }
           }
 
           tr.innerHTML =
@@ -985,25 +1011,52 @@
     });
 
     var approvingTxnId = null;
+    var approvingActionType = 'approve';
 
-    function openApproveModal(txnId) {
+    function openApproveModal(txnId, actionType) {
       var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
       if (!t) return;
       approvingTxnId = t.txn_id;
-      document.getElementById('am-amount-display').textContent = formatTHB(t.net_amount || t.amount);
-      document.getElementById('am-channel').value = 'cash';
-      initCustomSelect('am-channel-select');
-      document.getElementById('am-ref').value = '';
+      approvingActionType = actionType || 'approve';
 
+      // Set title dynamically
+      var titleText = '';
+      if (approvingActionType === 'verify') {
+        titleText = 'Confirm & Verify Transaction';
+      } else {
+        titleText = t.direction === 'IN' ? 'Confirm & Approve Revenue' : 'Confirm & Approve Expense';
+      }
+      document.getElementById('am-title-display').textContent = titleText;
+
+      document.getElementById('am-amount-display').textContent = formatTHB(t.net_amount || t.amount);
+      
+      // Pre-fill payment channel & transfer ref if they exist
+      document.getElementById('am-channel').value = t.payment_channel || 'cash';
+      initCustomSelect('am-channel-select');
+      document.getElementById('am-ref').value = t.transfer_ref || '';
+
+      var requiredRole = t.direction === 'IN' ? 'revenue' : 'expense';
       var filtered = EMPLOYEES.filter(function (e) {
-        return (e.roles && e.roles.indexOf('owner') >= 0) || (e.roles && e.roles.indexOf('revenue') >= 0);
+        return (e.roles && e.roles.indexOf('owner') >= 0) || (e.roles && e.roles.indexOf(requiredRole) >= 0);
       });
       var receivedBySelect = document.getElementById('am-received-by');
       receivedBySelect.innerHTML = filtered.map(function(e) { return '<option value="'+e.employee_id+'">'+escapeHtml(e.name)+'</option>'; }).join('');
-      var s = HuaHinSession.getSession();
-      if (s && s.employeeId) {
-        var hasUser = filtered.some(function(e) { return e.employee_id === s.employeeId; });
-        if (hasUser) receivedBySelect.value = s.employeeId;
+      
+      if (t.paid_by_employee_id) {
+        receivedBySelect.value = t.paid_by_employee_id;
+      } else {
+        var s = HuaHinSession.getSession();
+        if (s && s.employeeId) {
+          var hasUser = filtered.some(function(e) { return e.employee_id === s.employeeId; });
+          if (hasUser) receivedBySelect.value = s.employeeId;
+        }
+      }
+
+      var confirmBtn = document.getElementById('approveBtn');
+      if (approvingActionType === 'verify') {
+        confirmBtn.textContent = 'Confirm & Verify';
+      } else {
+        confirmBtn.textContent = 'Confirm Receipt';
       }
 
       document.getElementById('approve-modal-error').classList.add('hidden');
@@ -1022,9 +1075,15 @@
       var ref = document.getElementById('am-ref').value.trim();
       var receivedBy = document.getElementById('am-received-by').value;
       var btn = document.getElementById('approveBtn');
-      btn.disabled = true; btn.textContent = 'Approving...';
-      callApi('financeUpdateTransaction', [session.token, approvingTxnId, true, channel, ref, receivedBy]).then(function(res) {
-        btn.disabled = false; btn.textContent = 'Confirm Receipt';
+      
+      var isApp = true;
+      var isVer = approvingActionType === 'verify';
+      var actionText = isVer ? 'Verifying...' : 'Approving...';
+      var defaultText = isVer ? 'Confirm & Verify' : 'Confirm Receipt';
+
+      btn.disabled = true; btn.textContent = actionText;
+      callApi('financeUpdateTransaction', [session.token, approvingTxnId, isApp, isVer, channel, ref, receivedBy]).then(function(res) {
+        btn.disabled = false; btn.textContent = defaultText;
         if (res.ok) {
           closeApproveMod();
           loadFinanceData();
@@ -1034,7 +1093,7 @@
           errEl.classList.remove('hidden');
         }
       }).catch(function(err) {
-        btn.disabled = false; btn.textContent = 'Confirm Receipt';
+        btn.disabled = false; btn.textContent = defaultText;
         var errEl = document.getElementById('approve-modal-error');
         errEl.textContent = 'Connection error: ' + err.message;
         errEl.classList.remove('hidden');
@@ -1044,7 +1103,7 @@
 
   <div class="modal-overlay hidden" id="approve-modal-bg" onclick="closeApproveMod(event)">
     <div class="modal-box" onclick="event.stopPropagation()" style="width:400px;max-width:90vw;">
-      <div class="mhdr"><div class="mtitle">Confirm & Approve Revenue</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
+      <div class="mhdr"><div class="mtitle" id="am-title-display">Confirm & Approve Revenue</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
       <div class="fg">
         <label class="fl">Amount Due</label>
         <div id="am-amount-display" style="font-size:20px;font-weight:700;color:var(--go);margin:8px 0;">฿0</div>
