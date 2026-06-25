@@ -175,10 +175,10 @@
 
       <table>
         <thead>
-          <tr><th>Date</th><th>Direction</th><th>Property</th><th>Category</th><th>Amount</th><th>Guest/Vendor</th><th>Note</th><th>Action</th></tr>
+          <tr><th style="width:40px;"></th><th>Date</th><th>Direction</th><th>Property</th><th>Category</th><th>Amount</th><th>Guest/Vendor</th><th>Note</th><th>Action</th></tr>
         </thead>
         <tbody id="finance-table-body">
-          <tr><td colspan="7" class="muted" style="text-align:center;padding:20px;">Select a month and click Load.</td></tr>
+          <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">Select a month and click Load.</td></tr>
         </tbody>
       </table>
     </div>
@@ -399,6 +399,15 @@
 
       document.getElementById('finance-search').addEventListener('input', function () {
         var q = this.value.trim().toLowerCase();
+        
+        // Remove expanded rows during search input to avoid decoupling/orphans
+        document.querySelectorAll('.items-expand-row').forEach(function(row) {
+          row.parentNode.removeChild(row);
+        });
+        document.querySelectorAll('.expand-toggle').forEach(function(el) {
+          el.textContent = '＋';
+        });
+
         var rows = document.querySelectorAll('#finance-table-body tr');
         rows.forEach(function (row) {
           row.style.display = row.textContent.toLowerCase().indexOf(q) >= 0 ? '' : 'none';
@@ -679,7 +688,7 @@
         var list = res.transactions || [];
         TRANSACTIONS = list;
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
           return;
         }
         tbody.innerHTML = '';
@@ -733,6 +742,7 @@
           }
 
           tr.innerHTML =
+            '<td style="text-align:center;cursor:pointer;font-weight:bold;color:var(--p);font-size:16px;" class="expand-toggle" onclick="toggleTxnItems(\''+t.txn_id+'\', this)">＋</td>' +
             '<td>' + (t.txn_date || '') + '</td>' +
             '<td>' + dirLabel + '</td>' +
             '<td>' + (t.property_id || '') + '</td>' +
@@ -961,9 +971,15 @@
     function exportFinanceCsv() {
       var rows = [['Date', 'Direction', 'Property', 'Category', 'Amount', 'Guest/Vendor', 'Note']];
       document.querySelectorAll('#finance-table-body tr').forEach(function (tr) {
+        if (tr.classList.contains('items-expand-row')) return;
         var cells = [];
-        tr.querySelectorAll('td').forEach(function (td) { cells.push(td.textContent); });
-        if (cells.length === 7) rows.push(cells);
+        var tdList = tr.querySelectorAll('td');
+        if (tdList.length >= 8) {
+          for (var i = 1; i <= 7; i++) {
+            cells.push(tdList[i].textContent.trim());
+          }
+          rows.push(cells);
+        }
       });
       var csv = rows.map(function (r) {
         return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',');
@@ -977,6 +993,62 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    function toggleTxnItems(txnId, el) {
+      var tr = el.parentNode;
+      var nextTr = tr.nextElementSibling;
+      if (nextTr && nextTr.classList.contains('items-expand-row')) {
+        if (nextTr.style.display === 'none') {
+          nextTr.style.display = '';
+          el.textContent = '－';
+        } else {
+          nextTr.style.display = 'none';
+          el.textContent = '＋';
+        }
+      } else {
+        var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
+        if (!t) return;
+        
+        var newTr = document.createElement('tr');
+        newTr.className = 'items-expand-row';
+        
+        var html = '<td colspan="9" style="background:#181c28;padding:12px 24px;border-bottom:1px solid var(--border);">';
+        if (!t.items || t.items.length === 0) {
+          html += '<div style="color:var(--muted);font-style:italic;">No items found for this transaction.</div>';
+        } else {
+          html += '<table style="width:100%;border-collapse:collapse;margin:4px 0;background:#13161f;border:1px solid var(--border);font-size:13px;">';
+          html += '<thead><tr style="border-bottom:1px solid var(--border);background:#1f2433;"><th style="padding:6px 12px;text-align:left;color:var(--muted);">Description</th><th style="padding:6px 12px;text-align:left;color:var(--muted);width:150px;">Category</th><th style="padding:6px 12px;text-align:right;color:var(--muted);width:80px;">Units</th><th style="padding:6px 12px;text-align:right;color:var(--muted);width:120px;">Price</th><th style="padding:6px 12px;text-align:right;color:var(--muted);width:120px;">Amount</th></tr></thead>';
+          html += '<tbody>';
+          t.items.forEach(function(item) {
+            var unitsText = item.units != null ? item.units : '—';
+            var priceText = item.unit_price != null ? formatTHB(item.unit_price) : '—';
+            html += '<tr style="border-bottom:1px solid var(--border);">';
+            html += '<td style="padding:6px 12px;text-align:left;color:#e6eaf5;">' + escapeHtml(item.description) + '</td>';
+            html += '<td style="padding:6px 12px;text-align:left;color:#e6eaf5;text-transform:capitalize;">' + escapeHtml(item.category || 'other') + '</td>';
+            html += '<td style="padding:6px 12px;text-align:right;color:#e6eaf5;">' + unitsText + '</td>';
+            html += '<td style="padding:6px 12px;text-align:right;color:#e6eaf5;">' + priceText + '</td>';
+            html += '<td style="padding:6px 12px;text-align:right;color:#e6eaf5;font-weight:600;">' + formatTHB(item.amount) + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        }
+        
+        if (t.vat_type && t.vat_type !== 'none' || t.wht_percent > 0) {
+          var details = [];
+          if (t.vat_type && t.vat_type !== 'none') {
+            details.push('VAT (' + (t.vat_type === 'include' ? 'Included' : 'Excluded') + '): ' + formatTHB(t.vat_amount));
+          }
+          if (t.wht_percent > 0) {
+            details.push('WHT (' + t.wht_percent + '%): -' + formatTHB(t.wht_amount));
+          }
+          html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;">' + details.join(' &nbsp;|&nbsp; ') + '</div>';
+        }
+
+        newTr.innerHTML = html;
+        tr.parentNode.insertBefore(newTr, nextTr);
+        el.textContent = '－';
+      }
     }
     function toggleCustomSelect(id) {
       var select = document.getElementById(id);
