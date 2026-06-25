@@ -156,6 +156,12 @@
         <div class="stat"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l">Revenue</div></div>
         <div class="stat"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l">Expense</div></div>
         <div class="stat"><div class="n" id="finance-net">฿0</div><div class="l">Net Profit</div></div>
+        <div class="stat" style="cursor:pointer;" id="btn-view-unrefunded">
+          <div class="n" id="finance-deposits" style="color:var(--muted);">฿0</div>
+          <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            Deposits Held <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
+          </div>
+        </div>
       </div>
 
       <div class="actions-row">
@@ -297,6 +303,26 @@
     </div>
   </div>
 
+  <!-- ===================== UNREFUNDED DEPOSITS MODAL ===================== -->
+  <div id="unrefunded-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="mhdr">
+        <h2 class="mtitle">Unrefunded Deposits</h2>
+        <button class="mx" id="unrefunded-modal-close">×</button>
+      </div>
+      <div style="max-height:60vh;overflow-y:auto;">
+        <table style="width:100%;">
+          <thead>
+            <tr><th>Date</th><th>Room</th><th>Guest</th><th>Amount</th><th>Action</th></tr>
+          </thead>
+          <tbody id="unrefunded-table-body">
+            <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <script src="session.js"></script>
   <script>
     // =====================================================================
@@ -388,6 +414,8 @@
       document.getElementById('finance-modal-cancel').addEventListener('click', function () { hide('finance-modal'); });
       document.getElementById('finance-modal-save').addEventListener('click', saveFinanceEntry);
       document.getElementById('finance-export-csv-btn').addEventListener('click', exportFinanceCsv);
+      document.getElementById('btn-view-unrefunded').addEventListener('click', openUnrefundedModal);
+      document.getElementById('unrefunded-modal-close').addEventListener('click', function () { hide('unrefunded-modal'); });
 
       document.getElementById('finance-search').addEventListener('input', function () {
         var q = this.value.trim().toLowerCase();
@@ -671,6 +699,7 @@
         document.getElementById('finance-revenue').textContent = formatTHB(res.totalRevenue);
         document.getElementById('finance-expense').textContent = formatTHB(res.totalExpense);
         document.getElementById('finance-net').textContent = formatTHB(res.netProfit);
+        document.getElementById('finance-deposits').textContent = formatTHB(res.depositsHeld);
       });
 
       callApi('financeListTransactions', [session.token, propertyId, billingMonth]).then(function (res) {
@@ -752,8 +781,8 @@
     }
 
     var financeModalMode = 'revenue';
-    var REVENUE_CATS = ['rent', 'walkin', 'deposit', 'fitness', 'breakfast', 'other'];
-    var EXPENSE_CATS = ['utility', 'repair', 'cleaning', 'supplies', 'salaries', 'other'];
+    var REVENUE_CATS = ['rent', 'walkin', 'deposit', 'damage_fee', 'fitness', 'breakfast', 'other'];
+    var EXPENSE_CATS = ['utility', 'repair', 'cleaning', 'supplies', 'salaries', 'deposit_return', 'other'];
 
     
     function openFinanceModal(mode) {
@@ -960,6 +989,42 @@
       hide('finance-modal-error');
       show('finance-modal');
       loadRoomsAndBookingsCache();
+    }
+
+    function openUnrefundedModal() {
+      var propertyId = document.getElementById('finance-property').value;
+      show('unrefunded-modal');
+      var tbody = document.getElementById('unrefunded-table-body');
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>';
+
+      callApi('financeGetUnrefundedDeposits', [session.token, propertyId]).then(function(res) {
+        if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="error">'+escapeHtml(res.error)+'</td></tr>'; return; }
+        var list = res.deposits || [];
+        if (!list.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">No unrefunded deposits for this property.</td></tr>';
+          return;
+        }
+        var html = '';
+        list.forEach(function(d) {
+          html += '<tr>' +
+            '<td>'+escapeHtml(d.txn_date)+'</td>' +
+            '<td>'+escapeHtml(d.room_id || '-')+'</td>' +
+            '<td>'+escapeHtml(d.guest_or_vendor || '-')+'</td>' +
+            '<td><b>'+formatTHB(d.net_amount || d.amount)+'</b></td>' +
+            '<td><button class="btn-secondary" style="padding:4px 8px;font-size:11px;" onclick="markDepositRefunded(\''+d.txn_id+'\')">Mark Refunded</button></td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function markDepositRefunded(txnId) {
+      if (!confirm('Mark this deposit as refunded? Ensure you also add an Expense transaction for the cash returned.')) return;
+      callApi('financeMarkDepositRefunded', [session.token, txnId]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        openUnrefundedModal();
+        loadFinanceData();
+      });
     }
 
     function exportFinanceCsv() {
