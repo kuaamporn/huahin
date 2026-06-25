@@ -6,7 +6,7 @@
   <style>
     /*
       TODO(Claude Code): replace this whole <style> block with the actual
-      :root variables and component classes copy-pasted from dashboard.html
+      :root variables and component classes copy-pasted from hr.html
       so finance.html visually matches the rest of the app exactly
       (same --ink/--paper/--go/--warn/--muted palette, same .card-section,
       .pill, button, table styles, modal-overlay/modal-box, etc). The
@@ -122,7 +122,7 @@
       <div class="toplinks">
         <a href="index.html" id="link-checkin">Check-in</a>
         <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
+        <a href="hr.html" id="link-dashboard" class="hidden">HR</a>
         <a href="#" id="logout-link">Sign out</a>
       </div>
     </div>
@@ -308,7 +308,7 @@
   <script src="session.js"></script>
   <script>
     // =====================================================================
-    // CONFIG — must match the Worker URL used in index.html/rooms.html/dashboard.html
+    // CONFIG — must match the Worker URL used in index.html/rooms.html/hr.html
     // =====================================================================
     
     var SETTINGS = {};
@@ -697,14 +697,16 @@
           
           var statusLabel = '';
           if (t.is_verified) {
-            statusLabel = ' <span class="pill ok" style="background:#157347;color:#fff;">Verified</span>';
+            statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">Verified</span>';
           } else if (t.is_approved) {
-            statusLabel = ' <span class="pill ok" style="background:#0b5ed7;color:#fff;">Approved</span>';
+            statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">Approved</span>';
           } else {
-            statusLabel = ' <span class="pill warn" style="background:#b5460a;color:#fff;">Pending Approval</span>';
+            statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">Pending Approval</span>';
           }
           
-          var dirLabel = (t.direction === 'IN' ? '<span class="pill ok">Revenue</span>' : '<span class="pill flag">Expense</span>') + statusLabel;
+          var dirLabel = '<div style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">' + 
+            (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">Revenue</span>' : '<span class="pill flag" style="white-space:nowrap;">Expense</span>') + 
+            statusLabel + '</div>';
           var isOwner = HuaHinSession.hasRole('owner');
           var isRevenue = HuaHinSession.hasRole('revenue');
           var isExpense = HuaHinSession.hasRole('expense');
@@ -742,15 +744,15 @@
           }
 
           tr.innerHTML =
-            '<td style="text-align:center;cursor:pointer;font-weight:bold;color:var(--p);font-size:16px;" class="expand-toggle" onclick="toggleTxnItems(\''+t.txn_id+'\', this)">＋</td>' +
-            '<td>' + (t.txn_date || '') + '</td>' +
-            '<td>' + dirLabel + '</td>' +
+            '<td style="text-align:center;cursor:pointer;font-weight:bold;color:var(--go);font-size:16px;white-space:nowrap;" class="expand-toggle" onclick="toggleTxnItems(\''+t.txn_id+'\', this)">＋</td>' +
+            '<td style="white-space:nowrap;">' + (t.txn_date || '') + '</td>' +
+            '<td style="white-space:nowrap;">' + dirLabel + '</td>' +
             '<td>' + (t.property_id || '') + '</td>' +
             '<td>' + (t.category || 'Multiple') + '</td>' +
-            '<td>' + formatTHB(t.net_amount || t.amount) + '</td>' +
+            '<td style="white-space:nowrap;font-weight:600;">' + formatTHB(t.net_amount || t.amount) + '</td>' +
             '<td>' + (t.guest_or_vendor || '') + '</td>' +
             '<td>' + (t.notes || '') + '</td>' +
-            '<td>' + actionHtml + '</td>';
+            '<td style="white-space:nowrap;">' + actionHtml + '</td>';
           tbody.appendChild(tr);
         });
 
@@ -1013,22 +1015,22 @@
         var newTr = document.createElement('tr');
         newTr.className = 'items-expand-row';
         
-        var html = '<td colspan="9" style="background:#181c28;padding:12px 24px;border-bottom:1px solid var(--border);">';
+        var html = '<td colspan="9" style="background:#fcfbf9;padding:12px 24px;border-bottom:1px solid var(--line);">';
         if (!t.items || t.items.length === 0) {
-          html += '<div style="color:var(--muted);font-style:italic;">No items found for this transaction.</div>';
+          html += '<div style="color:var(--muted);font-style:italic;font-size:12px;">No items found for this transaction.</div>';
         } else {
-          html += '<table style="width:100%;border-collapse:collapse;margin:4px 0;background:#13161f;border:1px solid var(--border);font-size:13px;">';
-          html += '<thead><tr style="border-bottom:1px solid var(--border);background:#1f2433;"><th style="padding:6px 12px;text-align:left;color:var(--muted);">Description</th><th style="padding:6px 12px;text-align:left;color:var(--muted);width:150px;">Category</th><th style="padding:6px 12px;text-align:right;color:var(--muted);width:80px;">Units</th><th style="padding:6px 12px;text-align:right;color:var(--muted);width:120px;">Price</th><th style="padding:6px 12px;text-align:right;color:var(--muted);width:120px;">Amount</th></tr></thead>';
+          html += '<table style="width:100%;border-collapse:collapse;margin:4px 0;background:#ffffff;border:1px solid var(--line);font-size:13px;border-radius:6px;overflow:hidden;">';
+          html += '<thead><tr style="border-bottom:1px solid var(--line);background:#f3f1ec;"><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;background:#f3f1ec;">Description</th><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:150px;background:#f3f1ec;">Category</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:80px;background:#f3f1ec;">Units</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">Price</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">Amount</th></tr></thead>';
           html += '<tbody>';
           t.items.forEach(function(item) {
             var unitsText = item.units != null ? item.units : '—';
             var priceText = item.unit_price != null ? formatTHB(item.unit_price) : '—';
-            html += '<tr style="border-bottom:1px solid var(--border);">';
-            html += '<td style="padding:6px 12px;text-align:left;color:#e6eaf5;">' + escapeHtml(item.description) + '</td>';
-            html += '<td style="padding:6px 12px;text-align:left;color:#e6eaf5;text-transform:capitalize;">' + escapeHtml(item.category || 'other') + '</td>';
-            html += '<td style="padding:6px 12px;text-align:right;color:#e6eaf5;">' + unitsText + '</td>';
-            html += '<td style="padding:6px 12px;text-align:right;color:#e6eaf5;">' + priceText + '</td>';
-            html += '<td style="padding:6px 12px;text-align:right;color:#e6eaf5;font-weight:600;">' + formatTHB(item.amount) + '</td>';
+            html += '<tr style="border-bottom:1px solid var(--line);">';
+            html += '<td style="padding:8px 12px;text-align:left;color:var(--ink);">' + escapeHtml(item.description) + '</td>';
+            html += '<td style="padding:8px 12px;text-align:left;color:var(--ink);text-transform:capitalize;">' + escapeHtml(item.category || 'other') + '</td>';
+            html += '<td style="padding:8px 12px;text-align:right;color:var(--ink);">' + unitsText + '</td>';
+            html += '<td style="padding:8px 12px;text-align:right;color:var(--ink);">' + priceText + '</td>';
+            html += '<td style="padding:8px 12px;text-align:right;color:var(--ink);font-weight:600;">' + formatTHB(item.amount) + '</td>';
             html += '</tr>';
           });
           html += '</tbody></table>';
