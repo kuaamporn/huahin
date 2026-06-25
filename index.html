@@ -135,6 +135,14 @@
         <div class="error hidden" id="checkin-error"></div>
         <div class="success hidden" id="checkin-success"></div>
       </div>
+
+      <!-- TASK LIST CARD -->
+      <div class="card hidden" id="tasks-card">
+        <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
+          <span>📋</span> Active Tasks
+        </h2>
+        <div id="tasks-list" class="muted">Loading tasks...</div>
+      </div>
     </div>
 
   </div>
@@ -172,6 +180,7 @@
       hide('login-screen');
       show('main-screen');
       applyNavLinkVisibility();
+      loadEmployeeTasks();
     }
 
     function getDeviceId() {
@@ -256,9 +265,11 @@
             }
             HuaHinSession.updateSessionRoles(myRoles);
             applyNavLinkVisibility();
+            loadEmployeeTasks();
           }).catch(function() {
             HuaHinSession.updateSessionRoles([]);
             applyNavLinkVisibility();
+            loadEmployeeTasks();
           });
 
           hide('login-screen');
@@ -457,6 +468,77 @@
 
     document.getElementById('checkin-btn').addEventListener('click', function() { submitCheck('IN'); });
     document.getElementById('checkout-btn').addEventListener('click', function() { submitCheck('OUT'); });
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = String(str == null ? '' : str);
+      return div.innerHTML;
+    }
+
+    function loadEmployeeTasks() {
+      var container = document.getElementById('tasks-card');
+      var list = document.getElementById('tasks-list');
+      if (!sessionToken) return;
+
+      callApi('employeeGetTasks', [sessionToken]).then(function(res) {
+        if (res.ok) {
+          var tasks = res.tasks || [];
+          if (tasks.length === 0) {
+            list.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks assigned to you today.</div>';
+            container.classList.remove('hidden');
+            return;
+          }
+
+          var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+          tasks.forEach(function(task) {
+            var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
+            var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
+            var confirmBtn = '';
+
+            if (task.type === 'housekeeping') {
+              confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
+            } else {
+              confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
+            }
+
+            html += '<div style="border-left:3px solid '+badgeColor+';padding-left:12px;margin-bottom:4px;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
+                '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
+              '</div>' +
+              '<div style="font-weight:600;font-size:14px;margin-top:4px;">'+escapeHtml(task.title)+'</div>' +
+              '<div class="muted" style="font-size:12px;margin-top:2px;">Description: '+escapeHtml(task.description)+'</div>' +
+              confirmBtn +
+            '</div>';
+          });
+          html += '</div>';
+          list.innerHTML = html;
+          container.classList.remove('hidden');
+        } else {
+          list.innerHTML = '<div class="error">Error loading tasks: ' + res.error + '</div>';
+          container.classList.remove('hidden');
+        }
+      }).catch(function(err) {
+        list.innerHTML = '<div class="error">Connection error: ' + err.message + '</div>';
+        container.classList.remove('hidden');
+      });
+    }
+
+    function completeTask(type, roomId, dateStr) {
+      if (!confirm('Mark this task as completed?')) return;
+      var apiName = type === 'housekeeping' ? 'roomsMarkCleaned' : 'roomsResolveMaintenance';
+      var params = type === 'housekeeping' ? [sessionToken, roomId, dateStr] : [sessionToken, roomId];
+
+      callApi(apiName, params).then(function(res) {
+        if (res.ok) {
+          loadEmployeeTasks();
+        } else {
+          alert('Error: ' + res.error);
+        }
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
   </script>
 </body>
 </html>

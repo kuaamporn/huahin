@@ -112,6 +112,11 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .bar.commercial{background:linear-gradient(90deg,#6D28D9,#8B5CF6)}
 .bar.booking-com{background:linear-gradient(90deg,#003580,#0071C2);color:#fff}
 .bar.expedia-com{background:linear-gradient(90deg,#C89200,#FBAF00);color:#1a1a1a;text-shadow:none}
+.ov-bar{position:absolute;top:3px;bottom:3px;left:1px;right:1px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;color:#fff}
+.ov-bar.closed{background:#475569;border:1px solid #334155}
+.ov-bar.maintenance{background:#D97706;border:1px solid #B45309}
+.closed-cell{background:#F1F5F9!important;cursor:not-allowed!important}
+.maintenance-cell{background:#FEF3C7!important;cursor:not-allowed!important}
 
 .legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:7px 14px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;font-size:11px;color:var(--muted)}
 .leg{display:flex;align-items:center;gap:5px}
@@ -207,12 +212,20 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 <div class="mbg" id="mbg" onclick="closeMod(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mtitle" id="mTitle">New Booking</div><button class="mx" onclick="closeMod()">✕</button></div>
+    <div class="fg"><label class="fl">Action Type</label>
+      <select class="fs" id="mAction" onchange="toggleModalAction()">
+        <option value="book">🎫 New Booking</option>
+        <option value="maintenance">🔧 Maintenance / Repair</option>
+        <option value="close">🚫 Close Room (Out of Service)</option>
+      </select>
+    </div>
     <div class="frow">
       <div class="fg"><label class="fl">Property</label><select class="fs" id="mProp" onchange="updateRooms()">
         <option value="precious">The Precious</option><option value="moment">The Moment</option>
       </select></div>
       <div class="fg"><label class="fl">Room</label><select class="fs" id="mRoom"></select></div>
     </div>
+    <div id="booking-fields">
     <div class="fg"><label class="fl">Guest / Tenant</label><input class="fi" type="text" id="mGuest" placeholder="Full name…"></div>
     <div class="fg"><label class="fl">Booking Type</label>
       <div class="tbtns">
@@ -241,6 +254,10 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <div class="prow"><span>Rate</span><span id="pRate">—</span></div>
       <div class="prow"><span>Deposit</span><span id="pDep">—</span></div>
       <div class="prow tot"><span>Total Due Now</span><span id="pTot">—</span></div>
+    </div>
+    </div>
+    <div id="override-fields" class="hidden">
+      <div class="fg"><label class="fl">Reason</label><input class="fi" type="text" id="mReason" placeholder="e.g. AC Repair, Leak fixing, Painting…"></div>
     </div>
     <div class="cwarn" id="cwarn"></div>
     <div style="display:flex;gap:9px;margin-top:16px">
@@ -274,6 +291,7 @@ function hide(id){ document.getElementById(id).classList.add('hidden'); }
 // =====================================================================
 var ROOMS = [];
 var bookings = [];
+var overrides = [];
 var activeProp = 'precious';
 var activeFloor = 'all';
 var searchQ = '';
@@ -337,11 +355,13 @@ function bootApp() {
 
   Promise.all([
     callApi('roomsList', ['combined']),
-    callApi('bookingsList', ['combined'])
+    callApi('bookingsList', ['combined']),
+    callApi('roomsListOverrides', [sessionToken])
   ]).then(function(results) {
-    var roomsRes = results[0], bookingsRes = results[1];
+    var roomsRes = results[0], bookingsRes = results[1], overridesRes = results[2];
     if (roomsRes.ok) ROOMS = roomsRes.rooms;
     if (bookingsRes.ok) bookings = bookingsRes.bookings;
+    if (overridesRes.ok) overrides = overridesRes.overrides || [];
     renderFloorTabs();
     loadStats();
     render();
@@ -411,6 +431,18 @@ function render(){
     while(d<end){ var k=b.roomId+'_'+dk(d); if(!oMap[k]) oMap[k]=b; d.setDate(d.getDate()+1); }
   });
 
+  var ovMap = {};
+  overrides.forEach(function(ov){
+    if (ov.active && (ov.override_type === 'CLOSED' || ov.override_type === 'MAINTENANCE')) {
+      var startD = new Date(ov.created_at.slice(0,10));
+      var d = new Date(startD < WIN_S ? WIN_S : startD);
+      while (d <= WIN_E) {
+        ovMap[ov.room_id + '_' + dk(d)] = ov;
+        d.setDate(d.getDate() + 1);
+      }
+    }
+  });
+
   var propOrder = activeProp==='combined' ? ['precious','moment'] : [activeProp];
   rooms.sort(function(a,b){
     if(a.propertyId!==b.propertyId) return propOrder.indexOf(a.propertyId)-propOrder.indexOf(b.propertyId);
@@ -453,6 +485,7 @@ function render(){
     dates.forEach(function(d){
       var ds = dk(d), isT = ds===todayStr;
       var b = oMap[room.roomId+'_'+ds];
+      var ov = ovMap[room.roomId+'_'+ds];
       if(b){
         var cin=pd(b.checkinDate), cout=pd(b.checkoutDate);
         var isFirst = ds===dk(new Date(Math.max(cin.getTime(), WIN_S.getTime())));
@@ -464,6 +497,10 @@ function render(){
         } else {
           html += '<td class="'+(isT?'tc':'')+'"></td>';
         }
+      } else if (ov) {
+        var ovText = ov.override_type === 'CLOSED' ? 'Closed' : 'Maintenance';
+        var ovClass = ov.override_type === 'CLOSED' ? 'closed' : 'maintenance';
+        html += '<td class="'+(isT?'tc':'')+' '+ovClass+'-cell" title="Room '+room.displayName+' is '+ovText+': '+(ov.reason||'')+'" onclick="showOverrideDetail(\''+room.roomId+'\', \''+ov.override_type+'\', \''+escapeHtml(ov.reason || '')+'\')"><div class="ov-bar '+ovClass+'">'+ovText+'</div></td>';
       } else {
         html += '<td class="'+(isT?'tc':'')+'" onclick="openBook(\''+room.roomId+'\',\''+ds+'\',\''+room.propertyId+'\')" title="Book '+room.displayName+'"></td>';
       }
@@ -505,6 +542,9 @@ function updateRooms(){
 }
 
 function openBook(rid, date, prop){
+  document.getElementById('mAction').value = 'book';
+  document.getElementById('mReason').value = '';
+  toggleModalAction();
   document.getElementById('mProp').value = (prop==='moment') ? 'moment' : 'precious';
   updateRooms();
   if(rid) document.getElementById('mRoom').value = rid;
@@ -567,6 +607,7 @@ function calcP(){
 }
 
 function saveBook(){
+  var act=document.getElementById('mAction').value;
   var guest=document.getElementById('mGuest').value.trim();
   var room=document.getElementById('mRoom').value;
   var ci=document.getElementById('mIn').value, co=document.getElementById('mOut').value;
@@ -576,8 +617,33 @@ function saveBook(){
   var prop=document.getElementById('mProp').value;
   var cw=document.getElementById('cwarn');
 
-  if(!guest){ showToast('Please enter guest name','err'); return; }
   if(!room){ showToast('Please select a room','err'); return; }
+
+  if (act !== 'book') {
+    var reason = document.getElementById('mReason').value.trim();
+    if (!reason) { showToast('Please enter reason', 'err'); return; }
+    var btn = document.getElementById('saveBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    var apiName = act === 'close' ? 'roomsClose' : 'roomsStartMaintenance';
+    callApi(apiName, [sessionToken, room, reason]).then(function(res){
+      btn.disabled = false; toggleModalAction();
+      if (res.ok) {
+        closeMod();
+        showToast('Room blocked successfully', 'ok');
+        bootApp();
+      } else {
+        cw.textContent = '⚠ ' + res.error;
+        cw.style.display = 'block';
+      }
+    }).catch(function(err){
+      btn.disabled = false; toggleModalAction();
+      cw.textContent = '⚠ Connection error: ' + err.message;
+      cw.style.display = 'block';
+    });
+    return;
+  }
+
+  if(!guest){ showToast('Please enter guest name','err'); return; }
   if(!ci||!co){ showToast('Please set dates','err'); return; }
   if(rate < 0){ showToast('Rate cannot be below 0','err'); return; }
   if(dep < 0){ showToast('Deposit cannot be below 0','err'); return; }
@@ -707,6 +773,53 @@ function showToast(msg, type){
   clearTimeout(toastTimer);
   requestAnimationFrame(function(){ t.classList.add('show'); });
   toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+function toggleModalAction() {
+  var act = document.getElementById('mAction').value;
+  var bFields = document.getElementById('booking-fields');
+  var oFields = document.getElementById('override-fields');
+  var btn = document.getElementById('saveBtn');
+  var cw = document.getElementById('cwarn');
+  cw.style.display = 'none';
+
+  if (act === 'book') {
+    bFields.classList.remove('hidden');
+    oFields.classList.add('hidden');
+    btn.textContent = '✓ Confirm Booking';
+  } else {
+    bFields.classList.add('hidden');
+    oFields.classList.remove('hidden');
+    btn.textContent = act === 'close' ? '🚫 Close Room' : '🔧 Start Maintenance';
+  }
+}
+
+function showOverrideDetail(roomId, type, reason) {
+  var label = type === 'CLOSED' ? 'Closed Room' : 'Maintenance / Repair';
+  var btnText = type === 'CLOSED' ? '🔓 Reopen Room' : '🔧 Mark Maintenance Done';
+
+  document.getElementById('detailContent').innerHTML =
+    '<div class="dbadge warn">'+label+'</div>'+
+    '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">Room '+roomId+'</h2>'+
+    '<div class="df"><label>Status</label><span style="text-transform:uppercase;font-weight:600">'+type+'</span></div>'+
+    '<div class="df"><label>Reason</label><span>'+escapeHtml(reason || '—')+'</span></div>'+
+    '<div class="dactions" style="margin-top:20px">'+
+      '<button class="btn btn-red" onclick="resolveOverride(\''+roomId+'\')">'+btnText+'</button>'+
+      '<button class="btn btn-p" onclick="closeDetail()">✓ Done</button></div>';
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function resolveOverride(roomId) {
+  if (!confirm('Resolve this room override status?')) return;
+  callApi('roomsResolveMaintenance', [sessionToken, roomId]).then(function(res){
+    if (res.ok) {
+      closeDetail();
+      showToast('Room resolved successfully', 'ok');
+      bootApp();
+    } else {
+      showToast(res.error || 'Failed to resolve room status', 'err');
+    }
+  });
 }
 
 document.addEventListener('keydown', function(e){
