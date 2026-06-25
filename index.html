@@ -110,15 +110,25 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="muted" style="margin-bottom:12px;">Scan the QR code posted at your office to check in or out. Location services must be enabled — check-in is only accepted within range of the office.</div>
+      <div class="card" id="camera-card">
+        <div id="today-status" style="font-weight:bold; font-size:15px; margin-bottom:12px; text-align:center;">Loading status...</div>
+        
+        <div id="camera-section" class="hidden">
+          <div class="muted" style="margin-bottom:12px;">Scan the QR code posted at your office to check in or out. Location services must be enabled — check-in is only accepted within range of the office.</div>
 
-        <button class="btn-primary" id="start-camera-btn">Tap to start camera</button>
-        <div class="error hidden" id="camera-error"></div>
+          <button class="btn-primary" id="start-camera-btn">Tap to start camera</button>
+          <div class="error hidden" id="camera-error"></div>
 
-        <div id="qr-reader" class="hidden"></div>
-        <div id="qr-status" class="muted" style="margin-top:10px;"></div>
-        <button class="btn-secondary hidden" id="rescan-btn">Scan again</button>
+          <div id="qr-reader" class="hidden"></div>
+          <div id="qr-status" class="muted" style="margin-top:10px;"></div>
+          <button class="btn-secondary hidden" id="rescan-btn">Scan again</button>
+        </div>
+        
+        <div id="quick-checkout-section" class="hidden">
+          <button class="btn-out" id="quick-checkout-btn" style="margin-top:0;">Check Out Now</button>
+          <div class="error hidden" id="quick-checkout-error"></div>
+          <div class="success hidden" id="quick-checkout-success"></div>
+        </div>
       </div>
 
       <div class="card hidden" id="manual-entry-card">
@@ -181,6 +191,7 @@
       show('main-screen');
       applyNavLinkVisibility();
       loadEmployeeTasks();
+      loadTodayStatus();
     }
 
     function getDeviceId() {
@@ -266,8 +277,12 @@
             HuaHinSession.updateSessionRoles(myRoles);
             applyNavLinkVisibility();
             loadEmployeeTasks();
+            loadTodayStatus();
           }).catch(function() {
             HuaHinSession.updateSessionRoles([]);
+            applyNavLinkVisibility();
+            loadEmployeeTasks();
+            loadTodayStatus();
             applyNavLinkVisibility();
             loadEmployeeTasks();
           });

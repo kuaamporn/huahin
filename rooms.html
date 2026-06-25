@@ -217,6 +217,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
         <option value="book">🎫 New Booking</option>
         <option value="maintenance">🔧 Maintenance / Repair</option>
         <option value="close">🚫 Close Room (Out of Service)</option>
+        <option value="cleaning">🧹 Request Cleaning</option>
       </select>
     </div>
     <div class="frow">
@@ -624,12 +625,20 @@ function saveBook(){
     if (!reason) { showToast('Please enter reason', 'err'); return; }
     var btn = document.getElementById('saveBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
-    var apiName = act === 'close' ? 'roomsClose' : 'roomsStartMaintenance';
-    callApi(apiName, [sessionToken, room, reason]).then(function(res){
+    
+    var p;
+    if (act === 'cleaning') {
+      p = callApi('roomsRequestCleaning', [sessionToken, room, dk(TODAY), reason]);
+    } else {
+      var apiName = act === 'close' ? 'roomsClose' : 'roomsStartMaintenance';
+      p = callApi(apiName, [sessionToken, room, reason]);
+    }
+
+    p.then(function(res){
       btn.disabled = false; toggleModalAction();
       if (res.ok) {
         closeMod();
-        showToast('Room blocked successfully', 'ok');
+        showToast(act === 'cleaning' ? 'Cleaning requested successfully' : 'Room blocked successfully', 'ok');
         bootApp();
       } else {
         cw.textContent = '⚠ ' + res.error;
@@ -790,7 +799,7 @@ function toggleModalAction() {
   } else {
     bFields.classList.add('hidden');
     oFields.classList.remove('hidden');
-    btn.textContent = act === 'close' ? '🚫 Close Room' : '🔧 Start Maintenance';
+    btn.textContent = act === 'close' ? '🚫 Close Room' : (act === 'cleaning' ? '🧹 Request Cleaning' : '🔧 Start Maintenance');
   }
 }
 
