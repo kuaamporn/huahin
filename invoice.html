@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice</title>
+  <style>
+    body { font-family: sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; }
+    .a4-paper { background: #fff; max-width: 21cm; margin: 0 auto; padding: 2cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+    .title { font-size: 28px; font-weight: bold; }
+    .meta { text-align: right; font-size: 14px; line-height: 1.5; }
+    .bill-to { margin-bottom: 30px; }
+    .bill-to p { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th, td { border-bottom: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background: #f9f9f9; font-weight: bold; }
+    .right { text-align: right; }
+    .total-row { font-size: 18px; font-weight: bold; }
+    .footer { text-align: center; color: #555; font-size: 12px; margin-top: 50px; border-top: 1px solid #ddd; padding-top: 20px; }
+    .warning { text-align: center; color: red; font-weight: bold; margin-top: 20px; font-size: 14px; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .a4-paper { box-shadow: none; margin: 0; min-height: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="a4-paper">
+    <div style="text-align:right; margin-bottom: 20px;" class="no-print">
+      <button onclick="window.print()" style="padding:10px 20px; background:#0F766E; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">Print A4</button>
+    </div>
+
+    <div class="header">
+      <div>
+        <div class="title" id="inv-property">The Precious Moment</div>
+        <div>Hua Hin, Thailand</div>
+      </div>
+      <div class="meta">
+        <div><strong>INVOICE</strong></div>
+        <div id="inv-date">Date: </div>
+        <div id="inv-txn">Ref: </div>
+      </div>
+    </div>
+
+    <div class="bill-to">
+      <strong>Bill To:</strong>
+      <p id="inv-guest"></p>
+      <p>Room: <span id="inv-room" style="font-weight:bold;"></span></p>
+      <p>Billing Month: <span id="inv-month"></span></p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="right">Qty/Units</th>
+          <th class="right">Unit Price</th>
+          <th class="right">Total (THB)</th>
+        </tr>
+      </thead>
+      <tbody id="inv-items">
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="3" class="right">GRAND TOTAL:</td>
+          <td class="right" id="inv-total">฿0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="warning">
+      * Please make payment within the 5th of the month to avoid late fees. *<br>
+      <span style="font-size:12px;font-weight:normal;color:#000;">(If paying after the 5th, a late fee will be added to your balance)</span>
+    </div>
+
+    <div class="footer">
+      Thank you for staying with us.
+    </div>
+  </div>
+
+  <script src="session.js"></script>
+  <script>
+    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+
+    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    window.onload = function() {
+      if (!HuaHinSession.requireSession()) return;
+      var urlParams = new URLSearchParams(window.location.search);
+      var txnId = urlParams.get('id');
+      if (!txnId) { alert('No transaction ID provided.'); return; }
+
+      fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'financeGetTransaction', params: [HuaHinSession.getToken(), txnId] })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (!data.ok) { alert(data.error); return; }
+
+        var t = data.transaction;
+        document.getElementById('inv-property').textContent = t.property_id === 'precious' ? 'The Precious' : 'The Moment';
+        document.getElementById('inv-date').textContent = 'Date: ' + t.txn_date;
+        document.getElementById('inv-txn').textContent = 'Ref: ' + t.txn_id;
+        document.getElementById('inv-guest').textContent = t.guest_or_vendor || '-';
+        document.getElementById('inv-room').textContent = t.room_name || '-';
+        document.getElementById('inv-month').textContent = t.billing_month;
+        document.getElementById('inv-total').textContent = '฿' + t.amount.toLocaleString();
+
+        var tbody = document.getElementById('inv-items');
+        t.items.forEach(function(i) {
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td>' + escapeHtml(i.description) + '</td>' +
+            '<td class="right">' + (i.units || 1) + '</td>' +
+            '<td class="right">' + i.unit_price + '</td>' +
+            '<td class="right">' + i.amount.toLocaleString() + '</td>';
+          tbody.appendChild(tr);
+        });
+      });
+    };
+  </script>
+</body>
+</html>

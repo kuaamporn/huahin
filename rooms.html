@@ -177,6 +177,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <a href="index.html" class="nav-link">Check-in</a>
       <a href="finance.html" class="nav-link hidden" id="link-finance">Finance</a>
       <a href="hr.html" class="nav-link hidden" id="link-dashboard">HR</a>
+      <a href="billing.html" class="nav-link hidden" id="link-billing">Billing</a>
       <div class="user-badge"><span class="user-name" id="welcome-name"></span></div>
       <button class="btn btn-red" id="logout-link">Sign Out</button>
     </div>
@@ -339,6 +340,7 @@ if (session) {
   document.getElementById('welcome-name').textContent = currentEmployeeName;
   document.getElementById('main-screen').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) document.getElementById('link-finance').classList.remove('hidden');
+  if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner')) document.getElementById('link-dashboard').classList.remove('hidden');
   bootApp();
 }

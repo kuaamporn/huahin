@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>The Precious Moment Billing</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+    :root {
+      --ink: #0F172A; --paper: #F8FAFC; --line: #E2E8F0; --go: #0F766E; --warn: #DC2626; --muted: #64748B;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
+    h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
+    .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .toplinks { display: flex; gap: 16px; }
+    .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .toplinks a:hover { color: var(--go); }
+    .card-section { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .toolbar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    select, input[type="text"], input[type="number"], input[type="month"] { padding: 8px 10px; font-size: 14px; border: 1px solid var(--line); border-radius: 6px; }
+    .btn-primary { background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .hidden { display: none !important; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 16px; }
+    th, td { text-align: left; padding: 10px; font-size: 13px; border-bottom: 1px solid var(--line); }
+    th { background: #F1F5F9; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    .grid-input { width: 70px; padding: 6px; text-align: right; }
+    .text-right { text-align: right; }
+    .total-col { font-weight: bold; color: var(--go); }
+    .err-msg { color: var(--warn); font-size: 13px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>The Precious Moment Billing</h1>
+        <div class="sub">Batch generation of monthly invoices.</div>
+      </div>
+      <div class="toplinks">
+        <a href="index.html" id="link-checkin">Check-in</a>
+        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
+        <a href="hr.html" id="link-dashboard" class="hidden">HR</a>
+        <a href="finance.html" id="link-finance" class="hidden">Finance</a>
+        <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">Billing</a>
+        <a href="#" id="logout-link">Sign out</a>
+      </div>
+    </div>
+
+    <div id="access-denied" class="card-section hidden">
+      <div style="color:var(--warn);">You don't have permission to view Billing.</div>
+    </div>
+
+    <div id="main-content" class="card-section">
+      <div class="toolbar">
+        <div>
+          <label>Property</label>
+          <select id="sel-property">
+            <option value="precious">The Precious</option>
+            <option value="moment">The Moment</option>
+          </select>
+        </div>
+        <div>
+          <label>Billing Month (e.g. 2025-12)</label>
+          <input type="month" id="sel-month" />
+        </div>
+        <button id="btn-load" class="btn-primary" style="background:var(--ink);">Load Active Rooms</button>
+        <button id="btn-generate" class="btn-primary" style="margin-left:auto;" disabled>Generate Invoices</button>
+      </div>
+      <div id="err-display" class="err-msg"></div>
+
+      <div style="overflow-x: auto;">
+        <table id="billing-table">
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Guest</th>
+              <th class="text-right">Rent</th>
+              <th class="text-right">Prev Elec</th>
+              <th class="text-right">Curr Elec</th>
+              <th class="text-right">Elec (฿8)</th>
+              <th class="text-right">Prev Water</th>
+              <th class="text-right">Curr Water</th>
+              <th class="text-right">Water (฿22)</th>
+              <th class="text-right">Extra (+/-)</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody id="billing-body">
+            <tr><td colspan="11" style="text-align:center; color:var(--muted);">Select property and month, then click Load.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="session.js"></script>
+  <script>
+    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+    var loadedRooms = [];
+
+    function show(id) { document.getElementById(id).classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id).classList.add('hidden'); }
+    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    document.getElementById('logout-link').onclick = function(e) { e.preventDefault(); HuaHinSession.logout(); };
+
+    window.onload = function() {
+      if (!HuaHinSession.requireSession()) return;
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
+      if (HuaHinSession.hasRole('owner')) show('link-dashboard');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('link-finance');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
+
+      if (!HuaHinSession.hasRole('owner', 'accountant', 'revenue')) {
+        hide('main-content');
+        show('access-denied');
+        return;
+      }
+
+      var d = new Date();
+      document.getElementById('sel-month').value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    };
+
+    function apiCall(action, params) {
+      return fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: action, params: params })
+      }).then(function(res) { return res.json(); });
+    }
+
+    document.getElementById('btn-load').onclick = function() {
+      var errEl = document.getElementById('err-display');
+      errEl.textContent = 'Loading...';
+      errEl.style.color = 'var(--ink)';
+      document.getElementById('btn-generate').disabled = true;
+
+      var prop = document.getElementById('sel-property').value;
+      var mo = document.getElementById('sel-month').value;
+      if (!mo) { errEl.style.color = 'var(--warn)'; errEl.textContent = 'Select a month.'; return; }
+
+      var token = HuaHinSession.getToken();
+      apiCall('billingGetActiveRooms', [token, prop, mo]).then(function(res) {
+        if (!res.ok) { errEl.style.color = 'var(--warn)'; errEl.textContent = res.error; return; }
+
+        errEl.textContent = '';
+        loadedRooms = res.rooms;
+        renderTable();
+        if (loadedRooms.length > 0) document.getElementById('btn-generate').disabled = false;
+      });
+    };
+
+    function renderTable() {
+      var tbody = document.getElementById('billing-body');
+      tbody.innerHTML = '';
+      if (loadedRooms.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">No active monthly bookings found.</td></tr>';
+        return;
+      }
+
+      loadedRooms.forEach(function(r, idx) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + escapeHtml(r.room_name) + '</td>' +
+          '<td>' + escapeHtml(r.guest_name) + '</td>' +
+          '<td class="text-right">฿' + r.rent + '</td>' +
+          '<td class="text-right"><input type="number" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" class="grid-input" id="curr_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right" id="amt_e_' + idx + '">฿0</td>' +
+          '<td class="text-right"><input type="number" class="grid-input" id="prev_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" class="grid-input" id="curr_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right" id="amt_w_' + idx + '">฿0</td>' +
+          '<td class="text-right"><input type="number" class="grid-input" id="add_' + idx + '" value="0" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right total-col" id="tot_' + idx + '">฿' + r.rent + '</td>';
+        tbody.appendChild(tr);
+        calcRow(idx);
+      });
+    }
+
+    function calcRow(idx) {
+      var r = loadedRooms[idx];
+      var prevE = parseFloat(document.getElementById('prev_e_' + idx).value) || 0;
+      var currE = parseFloat(document.getElementById('curr_e_' + idx).value) || 0;
+      var eUnits = currE - prevE; if (eUnits < 0) eUnits = 0;
+      var eAmt = eUnits * 8;
+      document.getElementById('amt_e_' + idx).textContent = '฿' + eAmt;
+
+      var prevW = parseFloat(document.getElementById('prev_w_' + idx).value) || 0;
+      var currW = parseFloat(document.getElementById('curr_w_' + idx).value) || 0;
+      var wUnits = currW - prevW; if (wUnits < 0) wUnits = 0;
+      var wAmt = wUnits * 22;
+      document.getElementById('amt_w_' + idx).textContent = '฿' + wAmt;
+
+      var add = parseFloat(document.getElementById('add_' + idx).value) || 0;
+      var total = r.rent + eAmt + wAmt + add;
+      document.getElementById('tot_' + idx).textContent = '฿' + total;
+
+      r.currentElec = currE; r.currentWater = currW;
+      r.prevElecCalc = prevE; r.prevWaterCalc = prevW;
+      r.elecUnits = eUnits; r.elecAmt = eAmt;
+      r.waterUnits = wUnits; r.waterAmt = wAmt;
+      r.additionsAmt = add; r.totalAmount = total;
+    }
+
+    document.getElementById('btn-generate').onclick = function() {
+      if (!confirm('Are you sure you want to generate Pending Invoices for all rooms listed?')) return;
+      document.getElementById('btn-generate').disabled = true;
+      var errEl = document.getElementById('err-display');
+      errEl.style.color = 'var(--ink)';
+      errEl.textContent = 'Generating...';
+
+      var prop = document.getElementById('sel-property').value;
+      var mo = document.getElementById('sel-month').value;
+      var token = HuaHinSession.getToken();
+
+      var payload = loadedRooms.map(function(r) {
+        return {
+          roomId: r.room_id, guestName: r.guest_name, rent: r.rent,
+          prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt,
+          prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt,
+          additionsAmt: r.additionsAmt, totalAmount: r.totalAmount
+        };
+      });
+
+      apiCall('billingGenerateInvoices', [token, prop, mo, payload]).then(function(res) {
+        if (!res.ok) {
+          errEl.style.color = 'var(--warn)';
+          errEl.textContent = res.error;
+          document.getElementById('btn-generate').disabled = false;
+          return;
+        }
+
+        errEl.style.color = 'var(--go)';
+        errEl.textContent = 'Success! Generated ' + res.count + ' invoices. You can view them in the Finance ledger.';
+      });
+    };
+  </script>
+</body>
+</html>

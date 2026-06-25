@@ -115,6 +115,7 @@
         <a href="index.html" id="link-checkin">Check-in</a>
         <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
         <a href="hr.html" id="link-dashboard" class="hidden">HR</a>
+        <a href="billing.html" id="link-billing" class="hidden">Billing</a>
         <a href="#" id="logout-link">Sign out</a>
       </div>
     </div>
@@ -296,6 +297,7 @@
       </div>
 
       <div class="modal-footer-row">
+        <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);">🖨️ Print Invoice</button>
         <button class="btn-secondary" id="finance-modal-cancel">Cancel</button>
         <button class="btn-primary" id="finance-modal-save">Save</button>
       </div>
@@ -405,6 +407,7 @@
 
         // Reveal nav links the user has access to, alongside this page's own content.
         if (HuaHinSession.hasRole('owner')) show('link-dashboard');
+        if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
 
         var canAddRevenue = HuaHinSession.hasRole('owner', 'revenue');
@@ -861,8 +864,9 @@
       
       CURRENT_ITEMS = [];
       addItemLine();
-      
+
       hide('finance-modal-error');
+      document.getElementById('fm-print-btn').classList.add('hidden');
       show('finance-modal');
       loadRoomsAndBookingsCache();
     }
@@ -1025,6 +1029,9 @@
       renderItems();
 
       hide('finance-modal-error');
+      var printBtn = document.getElementById('fm-print-btn');
+      printBtn.classList.remove('hidden');
+      printBtn.onclick = function(e) { e.preventDefault(); window.open('invoice.html?id=' + t.txn_id, '_blank'); };
       show('finance-modal');
       loadRoomsAndBookingsCache();
     }
