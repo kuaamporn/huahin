@@ -1010,7 +1010,7 @@
             '<td>'+escapeHtml(d.txn_date)+'</td>' +
             '<td>'+escapeHtml(d.room_id || '-')+'</td>' +
             '<td>'+escapeHtml(d.guest_or_vendor || '-')+'</td>' +
-            '<td><b>'+formatTHB(d.net_amount || d.amount)+'</b></td>' +
+            '<td><b>'+formatTHB(d.deposit_amount)+'</b></td>' +
             '<td><button class="btn-secondary" style="padding:4px 8px;font-size:11px;" onclick="markDepositRefunded(\''+d.txn_id+'\')">Mark Refunded</button></td>' +
             '</tr>';
         });
