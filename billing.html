@@ -130,7 +130,16 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: action, params: params })
-      }).then(function(res) { return res.json(); });
+      })
+      .then(function(res) {
+        if (!res.ok && (!res.headers.get('content-type') || res.headers.get('content-type').indexOf('application/json') === -1)) {
+           return { ok: false, error: 'Server Error: ' + res.status };
+        }
+        return res.json();
+      })
+      .catch(function(err) {
+        return { ok: false, error: 'Network/Parsing Error: ' + err.message };
+      });
     }
 
     document.getElementById('btn-load').onclick = function() {
