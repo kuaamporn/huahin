@@ -20,7 +20,7 @@ properties in Hua Hin, Thailand: **The Precious** (86 rooms) and **The Moment**
 | Check-in page | `https://kuaamporn.github.io/huahin/` |
 | Rooms board | `https://kuaamporn.github.io/huahin/rooms.html` |
 | Finance page | `https://kuaamporn.github.io/huahin/finance.html` |
-| HR dashboard | `https://kuaamporn.github.io/huahin/dashboard.html` |
+| HR dashboard | `https://kuaamporn.github.io/huahin/hr.html` |
 | Admin login | username: `admin` (password set via bootstrap-admin.js) |
 
 ---
@@ -170,12 +170,12 @@ until `roomsMarkCleaned` is called.
 | `session.js` | Shared sessionStorage helper — login once, session shared across all pages | Included by all pages |
 | `rooms.html` | Gantt-style room availability board (dark theme, booking CRUD, stats) | owner, frontdesk |
 | `finance.html` | Standalone finance page (revenue/expense entry, monthly summary, CSV export) | owner, accountant, revenue, expense |
-| `dashboard.html` | HR dashboard (attendance, monthly report, employees, roles management) | owner only |
+| `hr.html` | HR dashboard (attendance, monthly report, employees, roles management) | owner only |
 
 ### Session flow
 - Login happens **once** on `index.html` — session saved to `sessionStorage`
 - After login, roles are fetched via `adminListEmployeesWithRoles` and stored in session
-- Nav links (Rooms / Finance / Dashboard) appear based on user's roles
+- Nav links (Rooms / Finance / HR) appear based on user's roles
 - Other pages read the shared session — no second login prompt
 - Direct-navigating without session or without required role redirects to `index.html`
 - Session cleared on tab close (sessionStorage, not localStorage — intentional)
@@ -200,15 +200,15 @@ until `roomsMarkCleaned` is called.
 7. **Updated** `wrangler.toml` to point to `huahin-db`
 8. **Deployed** merged worker to `https://employee-checkin-api.huahin.workers.dev`
 9. **Created** GitHub repo `kuaamporn/huahin` with GitHub Pages enabled
-10. **Pushed** all three frontend files (index.html, rooms.html, dashboard.html)
+10. **Pushed** all three frontend files (index.html, rooms.html, hr.html)
 11. **Kept** old `checkin-db` as backup
 12. **Added Finance tab** to dashboard — monthly summary cards (revenue/expense/net), transaction list, add revenue/expense modal with correct param order, search filter, CSV export
 13. **Added Roles tab** to dashboard — list employees with roles, edit roles modal (grant/revoke via checkboxes)
 14. **Permission gating** — Finance tab visible only to owner/accountant/revenue/expense roles; Roles tab visible only to owner; add buttons gated per role; roles fetched after login via `adminListEmployeesWithRoles`
 15. **Shared session** — created `session.js` (sessionStorage-based), login happens once on `index.html`, session shared across all pages
-16. **Split Finance** into standalone `finance.html` (removed Finance tab from dashboard.html)
-17. **Removed duplicate login screens** from `rooms.html` and `dashboard.html` — both now use shared session with role gating (rooms: owner/frontdesk; dashboard: owner)
-18. **Role-gated nav links** on `index.html` — Rooms (owner/frontdesk), Finance (owner/accountant/revenue/expense), Dashboard (owner) — hidden by default, shown after roles are fetched
+16. **Split Finance** into standalone `finance.html` (removed Finance tab from hr.html)
+17. **Removed duplicate login screens** from `rooms.html` and `hr.html` — both now use shared session with role gating (rooms: owner/frontdesk; hr: owner)
+18. **Role-gated nav links** on `index.html` — Rooms (owner/frontdesk), Finance (owner/accountant/revenue/expense), HR (owner) — hidden by default, shown after roles are fetched
 19. **Fixed finance.html room field** — replaced free-text input with search-combo dropdown that only offers real room IDs from D1, preventing `FOREIGN KEY constraint failed` errors from mistyped room codes (e.g. "P110" vs real "P-110")
 20. **Fixed finance.html API params** — `roomsList`/`bookingsList` calls were passing `session.token` as first param but these actions take only propertyId (no token); removed the erroneous token param
 21. **Finance modal UX upgrade** — 2-column wider layout (640px), auto-fills guest name from active booking, "Walk-in / no room" option for transactions without a room on file
