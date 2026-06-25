@@ -4,39 +4,31 @@
   <meta charset="UTF-8">
   <title>The Precious Moment Finance</title>
   <style>
-    /*
-      TODO(Claude Code): replace this whole <style> block with the actual
-      :root variables and component classes copy-pasted from hr.html
-      so finance.html visually matches the rest of the app exactly
-      (same --ink/--paper/--go/--warn/--muted palette, same .card-section,
-      .pill, button, table styles, modal-overlay/modal-box, etc). The
-      styles below are placeholders only so this file is self-contained
-      and testable in isolation before that swap happens.
-    */
+    @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     :root {
-      --ink: #1a1d1f;
-      --paper: #fafaf8;
-      --line: #e2e0db;
-      --go: #1f6f4f;
-      --warn: #b5460a;
-      --muted: #6b6862;
+      --ink: #0F172A;
+      --paper: #F8FAFC;
+      --line: #E2E8F0;
+      --go: #0F766E;
+      --warn: #DC2626;
+      --muted: #64748B;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
+    body { margin: 0; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
     .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
-    h1 { font-size: 22px; margin: 0 0 4px; }
+    h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
     .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .toplinks { display: flex; gap: 16px; }
     .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; }
     .toplinks a:hover { color: var(--go); }
     .summary { display: flex; gap: 12px; margin-bottom: 20px; }
-    .stat { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px; text-align: center; }
+    .stat { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
     .stat .n { font-size: 26px; font-weight: 700; }
     .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
     table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     th, td { text-align: left; padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--line); }
-    th { background: #f3f1ec; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
+    th { background: #F1F5F9; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
     tr:last-child td { border-bottom: none; }
     .pill { font-size: 11px; padding: 3px 9px; border-radius: 999px; }
     .pill.ok { background: #d8efe2; color: #16523a; }
@@ -45,11 +37,11 @@
     button { padding: 8px 14px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 7px; cursor: pointer; }
     label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
     input, select { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line); border-radius: 7px; }
-    .btn-primary { background: var(--go); color: #fff; border: none; padding: 12px; border-radius: 7px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
     .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); padding: 12px; border-radius: 7px; font-weight: 600; cursor: pointer; }
     .error { color: var(--warn); font-size: 13px; margin-top: 8px; }
     .hidden { display: none !important; }
-    .card-section { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    .card-section { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
     .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
     .actions-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
     .modal-overlay {
@@ -57,7 +49,7 @@
       display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100;
     }
     .modal-box {
-      background: #fff; border-radius: 10px; padding: 24px; max-width: 680px; width: 100%;
+      background: #fff; border-radius: 16px; padding: 24px; max-width: 680px; width: 100%; box-shadow: 0 24px 48px rgba(0,0,0,.12);
       max-height: 90vh; overflow-y: auto;
     }
     .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap: 10px; align-items: end; margin-bottom: 10px; }
@@ -90,7 +82,7 @@
     }
     .room-pill .x { cursor: pointer; color: var(--muted); font-weight: 700; padding: 0 2px; }
     .mhdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
-    .mtitle { font-size: 18px; font-weight: 700; margin: 0; color: var(--ink); }
+    .mtitle { font-size: 18px; font-weight: 700; margin: 0; color: var(--ink); font-family: 'Lexend', sans-serif; }
     .mx { background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
     .mx:hover { background: #eee; color: #333; }
     .custom-select { position: relative; width: 100%; margin-top: 5px; }
