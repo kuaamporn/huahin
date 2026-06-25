@@ -490,6 +490,82 @@
       return div.innerHTML;
     }
 
+    var currentOfficeId = null;
+
+    function loadTodayStatus() {
+      callApi('employeeGetTodayStatus', [sessionToken]).then(function(res) {
+        if (res.ok) {
+          var statusEl = document.getElementById('today-status');
+          if (res.checkedIn) {
+            var timeStr = new Date(res.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            statusEl.innerHTML = '<span style="color:var(--go);">✅ Checked in today at ' + timeStr + '</span>';
+            hide('camera-section');
+            show('quick-checkout-section');
+            currentOfficeId = res.officeId;
+          } else {
+            statusEl.innerHTML = '<span style="color:var(--warn);">You are not checked in today.</span>';
+            show('camera-section');
+            hide('quick-checkout-section');
+          }
+        } else {
+          document.getElementById('today-status').textContent = 'Could not load status.';
+        }
+      }).catch(function() {});
+    }
+
+    document.getElementById('quick-checkout-btn').addEventListener('click', function() {
+      if (!currentOfficeId) {
+        document.getElementById('quick-checkout-error').textContent = 'No office ID found. Please check out by scanning the QR code.';
+        show('quick-checkout-error');
+        return;
+      }
+
+      var btn = document.getElementById('quick-checkout-btn');
+      btn.disabled = true;
+      btn.textContent = 'Locating...';
+      hide('quick-checkout-error');
+      hide('quick-checkout-success');
+
+      if (!navigator.geolocation) {
+        btn.disabled = false;
+        btn.textContent = 'Check Out Now';
+        document.getElementById('quick-checkout-error').textContent = 'Location not supported by this browser.';
+        show('quick-checkout-error');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        var lat = pos.coords.latitude;
+        var lng = pos.coords.longitude;
+        var acc = pos.coords.accuracy;
+        var dev = getDeviceId();
+
+        btn.textContent = 'Checking out...';
+        callApi('checkIn', [sessionToken, 'OUT', lat, lng, acc, currentOfficeId, dev]).then(function(res) {
+          btn.disabled = false;
+          btn.textContent = 'Check Out Now';
+          if (res.ok) {
+            document.getElementById('quick-checkout-success').textContent = 'Checked out successfully at ' + res.officeName;
+            show('quick-checkout-success');
+            loadTodayStatus();
+          } else {
+            document.getElementById('quick-checkout-error').textContent = res.error || 'Failed to check out.';
+            show('quick-checkout-error');
+          }
+        }).catch(function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Check Out Now';
+          document.getElementById('quick-checkout-error').textContent = 'Connection error: ' + err.message;
+          show('quick-checkout-error');
+        });
+      }, function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Check Out Now';
+        document.getElementById('quick-checkout-error').textContent = 'Could not get your location (' + err.message + '). Enable location services and try again.';
+        show('quick-checkout-error');
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    });
+
     function loadEmployeeTasks() {
       var container = document.getElementById('tasks-card');
       var list = document.getElementById('tasks-list');
