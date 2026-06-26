@@ -40,6 +40,8 @@
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
+    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
     window.onload = async function() {
       if (!HuaHinSession.requireSession()) return;
       var urlParams = new URLSearchParams(window.location.search);
@@ -75,7 +77,7 @@
             var item = t.items[j];
             itemsHtml +=
               '<tr>' +
-              '<td>' + item.description + '</td>' +
+              '<td>' + escapeHtml(item.description) + '</td>' +
               '<td class="right">' + (item.units || 1) + '</td>' +
               '<td class="right">' + item.unit_price + '</td>' +
               '<td class="right">' + item.amount.toLocaleString() + '</td>' +
@@ -90,15 +92,15 @@
             '<div class="a4-paper ' + pageBreakClass + '">' +
             '<div class="header">' +
             '<div><div class="title">' + propertyName + '</div><div>Hua Hin, Thailand</div></div>' +
-            '<div class="meta"><div><strong>INVOICE</strong></div><div>Date: ' + t.txn_date + '</div><div>Ref: ' + t.txn_id + '</div></div>' +
+            '<div class="meta"><div><strong>INVOICE</strong></div><div>Date: ' + escapeHtml(t.txn_date) + '</div><div>Ref: ' + escapeHtml(t.txn_id) + '</div></div>' +
             '</div>' +
             '<div class="bill-to"><strong>Bill To:</strong>' +
-            '<p>' + (t.guest_or_vendor || '-') + '</p>' +
-            '<p>Room: <span style="font-weight:bold;">' + (t.room_name || '-') + '</span></p>' +
-            '<p>Billing Month: <span>' + t.billing_month + '</span></p></div>' +
+            '<p>' + escapeHtml(t.guest_or_vendor || '-') + '</p>' +
+            '<p>Room: <span style="font-weight:bold;">' + escapeHtml(t.room_name || '-') + '</span></p>' +
+            '<p>Billing Month: <span>' + escapeHtml(t.billing_month) + '</span></p></div>' +
             '<table><thead><tr><th>Description</th><th class="right">Qty/Units</th><th class="right">Unit Price</th><th class="right">Total (THB)</th></tr></thead>' +
             '<tbody>' + itemsHtml + '</tbody>' +
-            '<tfoot><tr class="total-row"><td colspan="3" class="right">GRAND TOTAL:</td><td class="right">' + t.amount.toLocaleString() + '</td></tr></tfoot></table>' +
+            '<tfoot><tr class="total-row"><td colspan="3" class="right">GRAND TOTAL:</td><td class="right">฿' + t.amount.toLocaleString() + '</td></tr></tfoot></table>' +
             '<div class="warning">* Please make payment within the 5th of the month to avoid late fees. *<br>' +
             '<span style="font-size:12px;font-weight:normal;color:#000;">(If paying after the 5th, a late fee will be added to your balance)</span></div>' +
             '<div class="footer">Thank you for staying with us.</div></div>';
