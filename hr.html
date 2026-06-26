@@ -6,23 +6,24 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     :root {
-      --ink: #0F172A;
-      --paper: #F8FAFC;
-      --line: #E2E8F0;
+      --ink: #1D1D1F;
+      --paper: #F5F5F7;
+      --line: #E5E5EA;
       --go: #0F766E;
       --warn: #DC2626;
-      --muted: #64748B;
+      --muted: #86868B;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
     .wrap { max-width: 760px; margin: 0 auto; padding: 24px 20px 60px; }
     h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .summary { display: flex; gap: 12px; margin-bottom: 20px; }
-    .stat { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .stat:hover { transform: scale(1.02); box-shadow: 0 8px 16px rgba(0,0,0,.05); }
     .stat .n { font-size: 26px; font-weight: 700; }
     .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
     th, td { text-align: left; padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--line); }
     th { background: #F1F5F9; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
     tr:last-child td { border-bottom: none; }
@@ -44,11 +45,11 @@
     .clickable-row:hover { background: #F1F5F9; }
     .reason { font-size: 12px; color: var(--warn); }
     .muted { color: var(--muted); font-size: 13px; }
-    button { padding: 8px 14px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 7px; cursor: pointer; }
-    .login-card { max-width: 360px; margin: 60px auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+    button { padding: 8px 14px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 12px; cursor: pointer; }
+    .login-card { max-width: 360px; margin: 60px auto; background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
     label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
-    input { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line); border-radius: 7px; }
-    .btn-primary { width: 100%; margin-top: 14px; background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+    input { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line); border-radius: 12px; }
+    .btn-primary { width: 100%; margin-top: 14px; background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
     .error { color: var(--warn); font-size: 13px; margin-top: 8px; }
     .success { color: var(--go); font-size: 13px; margin-top: 8px; }
     .hidden { display: none !important; }
@@ -69,9 +70,10 @@
     .nav-tab.active { color: var(--go); border-bottom-color: var(--go); font-weight: 600; font-family: 'Lexend', sans-serif; }
 
     .card-section {
-      background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
-      padding: 20px; margin-bottom: 20px;
+      background: #fff; border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 24px; margin-bottom: 24px;
     }
+    .card-section:hover { box-shadow: 0 8px 16px rgba(0,0,0,.05); }
     .card-section h2 { font-size: 15px; margin: 0 0 14px; font-family: 'Lexend', sans-serif; }
 
     .btn-secondary {
