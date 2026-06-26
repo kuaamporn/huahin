@@ -91,10 +91,12 @@
       var txnId = urlParams.get('id');
       if (!txnId) { alert('No transaction ID provided.'); return; }
 
+      var session = HuaHinSession.getSession();
+      var token = session ? session.token : null;
       fetch(WORKER_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'financeGetTransaction', params: [HuaHinSession.getToken(), txnId] })
+        body: JSON.stringify({ action: 'financeGetTransaction', params: [token, txnId] })
       }).then(function(res) { return res.json(); }).then(function(data) {
         if (!data.ok) { alert(data.error); return; }
 
@@ -117,6 +119,8 @@
             '<td class="right">' + i.amount.toLocaleString() + '</td>';
           tbody.appendChild(tr);
         });
+      }).catch(function(err) {
+        alert("Failed to load invoice data: " + err.message);
       });
     };
   </script>
