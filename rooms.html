@@ -107,6 +107,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .bar{position:absolute;top:3px;bottom:3px;left:1px;border-radius:4px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;cursor:pointer;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .bar:hover{filter:brightness(1.1);z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .bar.monthly{background:linear-gradient(90deg,#2563EB,#3B82F6)}
+.bar.monthly-draft{background:repeating-linear-gradient(45deg, #93C5FD, #93C5FD 10px, #BFDBFE 10px, #BFDBFE 20px); border: 1px dashed #2563EB; color: #1E3A8A; opacity: 0.8;}
 .bar.walkin{background:linear-gradient(90deg,#15803D,#22C55E);color:#fff}
 .bar.reserved{background:linear-gradient(90deg,#B45309,#F59E0B);color:#fff}
 .bar.commercial{background:linear-gradient(90deg,#6D28D9,#8B5CF6)}
@@ -696,7 +697,7 @@ function showDetail(id){
     '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':(b.bookingType==='Booking.com'||b.bookingType==='Expedia.com'?'/booking':'/night')):'TBD')+'</span></div>'+
     '<div class="df"><label>Damage Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
     '<div class="df"><label>Card Deposit</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' card'+(b.cardDepositQty>1?'s':'')+' @ ฿'+b.cardDeposit+')':'—')+'</span></div>'+
-    '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType||'—')+'</span></div>'+
+    '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType==='monthly-draft'?'Monthly (Draft)':(b.bookingType||'—'))+'</span></div>'+
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.notes)+'</span></div>':'')+
     (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.createdByName)+'</span></div>':'')+
     '<div class="dactions">'+

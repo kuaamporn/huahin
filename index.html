@@ -157,7 +157,12 @@
         <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
           <span>📋</span> Active Tasks
         </h2>
-        <div style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="flex:1;">
+            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--warn);">Remaining / Overdue</h3>
+            <div id="tasks-list-remaining" class="muted"></div>
+          </div>
+          <div style="display:flex; gap:16px; align-items:flex-start;">
           <div style="flex:1;">
             <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Today</h3>
             <div id="tasks-list-today" class="muted">Loading...</div>
@@ -165,6 +170,7 @@
           <div style="flex:1;">
             <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Tomorrow</h3>
             <div id="tasks-list-tomorrow" class="muted"></div>
+          </div>
           </div>
         </div>
       </div>
@@ -584,6 +590,7 @@
 
     function loadEmployeeTasks() {
       var container = document.getElementById('tasks-card');
+      var listRemaining = document.getElementById('tasks-list-remaining');
       var listToday = document.getElementById('tasks-list-today');
       var listTomorrow = document.getElementById('tasks-list-tomorrow');
       if (!sessionToken) return;
@@ -594,13 +601,15 @@
           var todayDate = res.today || new Date().toISOString().slice(0,10);
 
           if (tasks.length === 0) {
+            listRemaining.innerHTML = '';
             listToday.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
             listTomorrow.innerHTML = '';
             container.classList.remove('hidden');
             return;
           }
 
-          var tasksToday = tasks.filter(function(t) { return !t.date || t.date <= todayDate; });
+          var tasksRemaining = tasks.filter(function(t) { return t.date && t.date < todayDate; });
+          var tasksToday = tasks.filter(function(t) { return !t.date || t.date === todayDate; });
           var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date > todayDate; });
 
           function renderTasksList(taskList) {
@@ -631,6 +640,7 @@
             return html;
           }
 
+          listRemaining.innerHTML = renderTasksList(tasksRemaining);
           listToday.innerHTML = renderTasksList(tasksToday);
           listTomorrow.innerHTML = renderTasksList(tasksTomorrow);
           container.classList.remove('hidden');
