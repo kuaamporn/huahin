@@ -79,20 +79,46 @@
               <th>Room</th>
               <th>Guest</th>
               <th class="text-right">Rent</th>
-              <th class="text-right">Prev Elec</th>
-              <th class="text-right">Curr Elec</th>
-              <th class="text-right">Elec (฿8)</th>
-              <th class="text-right">Prev Water</th>
-              <th class="text-right">Curr Water</th>
-              <th class="text-right">Water (฿22)</th>
-              <th class="text-right">Extra (+/-)</th>
+              <th class="text-right">Prev E.</th>
+              <th class="text-right">Curr E.</th>
+              <th class="text-right">E. Rate</th>
+              <th class="text-right">E. Amt</th>
+              <th class="text-right">Prev W.</th>
+              <th class="text-right">Curr W.</th>
+              <th class="text-right">W. Rate</th>
+              <th class="text-right">W. Amt</th>
+              <th class="text-right">Extras</th>
               <th class="text-right">Total</th>
             </tr>
           </thead>
           <tbody id="billing-body">
-            <tr><td colspan="11" style="text-align:center; color:var(--muted);">Select property and month, then click Load.</td></tr>
+            <tr><td colspan="13" style="text-align:center; color:var(--muted);">Select property and month, then click Load.</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="extra-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
+    <div style="background:#fff; padding:20px; border-radius:12px; width:650px; max-width:90%; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <h2 style="margin-top:0; font-family:'Lexend', sans-serif;">Extra Items for <span id="em-roomname"></span></h2>
+      <table style="width:100%; margin-bottom:15px; background:none; border:none; box-shadow:none;">
+        <thead>
+          <tr>
+            <th style="background:none;">Description</th>
+            <th style="background:none;">Category</th>
+            <th style="background:none;">Units</th>
+            <th style="background:none;">Unit Price</th>
+            <th style="background:none;">Total</th>
+            <th style="background:none;"></th>
+          </tr>
+        </thead>
+        <tbody id="em-tbody"></tbody>
+      </table>
+      <button onclick="emAddRow()" class="btn-primary" style="background:var(--muted); padding:6px 12px; font-size:12px; margin-bottom:15px;">+ Add Item</button>
+      <div style="text-align:right;">
+        <button onclick="closeExtraModal()" class="btn-primary" style="background:none; color:var(--muted); border:1px solid var(--muted); margin-right:10px;">Cancel</button>
+        <button onclick="saveExtraModal()" class="btn-primary">Save Extras</button>
       </div>
     </div>
   </div>
@@ -168,23 +194,26 @@
       var tbody = document.getElementById('billing-body');
       tbody.innerHTML = '';
       if (loadedRooms.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">No active monthly bookings found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;">No active monthly bookings found.</td></tr>';
         return;
       }
 
       loadedRooms.forEach(function(r, idx) {
+        r.extraItems = r.extraItems || [];
         var tr = document.createElement('tr');
         tr.innerHTML =
           '<td>' + escapeHtml(r.room_name) + '</td>' +
           '<td>' + escapeHtml(r.guest_name) + '</td>' +
           '<td class="text-right">฿' + r.rent + '</td>' +
-          '<td class="text-right"><input type="number" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
-          '<td class="text-right"><input type="number" class="grid-input" id="curr_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" min="0" style="width:50px" class="grid-input" id="erate_' + idx + '" value="8" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
           '<td class="text-right" id="amt_e_' + idx + '">฿0</td>' +
-          '<td class="text-right"><input type="number" class="grid-input" id="prev_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
-          '<td class="text-right"><input type="number" class="grid-input" id="curr_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><input type="number" min="0" style="width:50px" class="grid-input" id="wrate_' + idx + '" value="22" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
           '<td class="text-right" id="amt_w_' + idx + '">฿0</td>' +
-          '<td class="text-right"><input type="number" class="grid-input" id="add_' + idx + '" value="0" oninput="calcRow(' + idx + ')"></td>' +
+          '<td class="text-right"><div style="margin-bottom:4px; font-weight:bold;" id="add_tot_' + idx + '">฿0</div><button onclick="openExtraModal(' + idx + ')" style="font-size:11px; padding:3px 6px; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:4px;">Edit</button></td>' +
           '<td class="text-right total-col" id="tot_' + idx + '">฿' + r.rent + '</td>';
         tbody.appendChild(tr);
         calcRow(idx);
@@ -195,28 +224,93 @@
       var r = loadedRooms[idx];
       var prevE = parseFloat(document.getElementById('prev_e_' + idx).value) || 0;
       var currE = parseFloat(document.getElementById('curr_e_' + idx).value) || 0;
+      var eRate = parseFloat(document.getElementById('erate_' + idx).value) || 0;
       var eUnits = currE - prevE; if (eUnits < 0) eUnits = 0;
-      var eAmt = eUnits * 8;
+      var eAmt = eUnits * eRate;
       document.getElementById('amt_e_' + idx).textContent = '฿' + eAmt;
 
       var prevW = parseFloat(document.getElementById('prev_w_' + idx).value) || 0;
       var currW = parseFloat(document.getElementById('curr_w_' + idx).value) || 0;
+      var wRate = parseFloat(document.getElementById('wrate_' + idx).value) || 0;
       var wUnits = currW - prevW; if (wUnits < 0) wUnits = 0;
-      var wAmt = wUnits * 22;
+      var wAmt = wUnits * wRate;
       document.getElementById('amt_w_' + idx).textContent = '฿' + wAmt;
 
-      var add = parseFloat(document.getElementById('add_' + idx).value) || 0;
+      var add = 0;
+      if (r.extraItems && r.extraItems.length > 0) {
+        for (var i = 0; i < r.extraItems.length; i++) { add += (parseFloat(r.extraItems[i].amount) || 0); }
+      }
+      document.getElementById('add_tot_' + idx).textContent = '฿' + add;
+
       var total = r.rent + eAmt + wAmt + add;
       document.getElementById('tot_' + idx).textContent = '฿' + total;
 
       r.currentElec = currE; r.currentWater = currW;
       r.prevElecCalc = prevE; r.prevWaterCalc = prevW;
-      r.elecUnits = eUnits; r.elecAmt = eAmt;
-      r.waterUnits = wUnits; r.waterAmt = wAmt;
+      r.elecUnits = eUnits; r.elecAmt = eAmt; r.elecRate = eRate;
+      r.waterUnits = wUnits; r.waterAmt = wAmt; r.waterRate = wRate;
       r.additionsAmt = add; r.totalAmount = total;
     }
 
-    document.getElementById('btn-generate').onclick = function() {
+    var emCurrentIdx = -1;
+    function openExtraModal(idx) {
+      emCurrentIdx = idx;
+      var r = loadedRooms[idx];
+      document.getElementById('em-roomname').textContent = r.room_name;
+      var tbody = document.getElementById('em-tbody');
+      tbody.innerHTML = '';
+      if (r.extraItems && r.extraItems.length > 0) {
+        for (var i = 0; i < r.extraItems.length; i++) { emAddRow(r.extraItems[i]); }
+      } else {
+        emAddRow();
+      }
+      document.getElementById('extra-modal').classList.remove('hidden');
+    }
+
+    function emAddRow(item) {
+      item = item || {};
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="padding:4px;"><input type="text" style="width:100%" class="em-desc" value="' + (item.description || '') + '" placeholder="e.g. Cleaning"></td>' +
+        '<td style="padding:4px;"><select class="em-cat"><option value="other"' + (item.category==='other'?' selected':'') + '>Other</option><option value="rent"' + (item.category==='rent'?' selected':'') + '>Rent/Fee</option><option value="utility"' + (item.category==='utility'?' selected':'') + '>Utility</option></select></td>' +
+        '<td style="padding:4px;"><input type="number" min="1" style="width:55px" class="em-units" value="' + (item.units || 1) + '" oninput="if(this.value<0)this.value=0; emCalcRow(this)"></td>' +
+        '<td style="padding:4px;"><input type="number" min="0" style="width:80px" class="em-price" value="' + (item.unitPrice || 0) + '" oninput="if(this.value<0)this.value=0; emCalcRow(this)"></td>' +
+        '<td style="padding:4px;"><input type="number" min="0" style="width:80px" class="em-amount" value="' + (item.amount || 0) + '" readonly></td>' +
+        '<td style="padding:4px;"><button onclick="this.closest(\'tr\').remove()" style="color:var(--warn); background:none; border:none; cursor:pointer; font-weight:bold;">X</button></td>';
+      document.getElementById('em-tbody').appendChild(tr);
+    }
+
+    function emCalcRow(el) {
+      var tr = el.closest('tr');
+      var units = parseFloat(tr.querySelector('.em-units').value) || 0;
+      var price = parseFloat(tr.querySelector('.em-price').value) || 0;
+      tr.querySelector('.em-amount').value = units * price;
+    }
+
+    function closeExtraModal() {
+      document.getElementById('extra-modal').classList.add('hidden');
+    }
+
+    function saveExtraModal() {
+      var items = [];
+      var rows = document.querySelectorAll('#em-tbody tr');
+      for (var i = 0; i < rows.length; i++) {
+        var tr = rows[i];
+        var desc = tr.querySelector('.em-desc').value.trim();
+        var cat = tr.querySelector('.em-cat').value;
+        var units = parseFloat(tr.querySelector('.em-units').value) || 1;
+        var price = parseFloat(tr.querySelector('.em-price').value) || 0;
+        var amount = parseFloat(tr.querySelector('.em-amount').value) || 0;
+        if (desc || amount > 0) {
+          items.push({ description: desc || 'Extra', category: cat, units: units, unitPrice: price, amount: amount });
+        }
+      }
+      loadedRooms[emCurrentIdx].extraItems = items;
+      closeExtraModal();
+      calcRow(emCurrentIdx);
+    }
+
+    document.getElementById('btn-generate').onclick = async function() {
       if (!confirm('Are you sure you want to generate Pending Invoices for all rooms listed?')) return;
       document.getElementById('btn-generate').disabled = true;
       var errEl = document.getElementById('err-display');
@@ -231,23 +325,22 @@
       var payload = loadedRooms.map(function(r) {
         return {
           roomId: r.room_id, guestName: r.guest_name, rent: r.rent,
-          prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt,
-          prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt,
-          additionsAmt: r.additionsAmt, totalAmount: r.totalAmount
+          prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt, elecRate: r.elecRate,
+          prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt, waterRate: r.waterRate,
+          additionsAmt: r.additionsAmt, extraItems: r.extraItems, totalAmount: r.totalAmount
         };
       });
 
-      apiCall('billingGenerateInvoices', [token, prop, mo, payload]).then(function(res) {
-        if (!res.ok) {
-          errEl.style.color = 'var(--warn)';
-          errEl.textContent = res.error;
-          document.getElementById('btn-generate').disabled = false;
-          return;
-        }
+      var res = await apiCall('billingGenerateInvoices', [token, prop, mo, payload]);
+      if (!res.ok) {
+        errEl.style.color = 'var(--warn)';
+        errEl.textContent = res.error;
+        document.getElementById('btn-generate').disabled = false;
+        return;
+      }
 
-        errEl.style.color = 'var(--go)';
-        errEl.textContent = 'Success! Generated ' + res.count + ' invoices. You can view them in the Finance ledger.';
-      });
+      errEl.style.color = 'var(--go)';
+      errEl.innerHTML = 'Success! Generated ' + res.count + ' invoices. <button onclick="window.open(\'batch-invoice.html?ids=' + res.txnIds.join(',') + '\', \'_blank\')" class="btn-primary" style="margin-left: 15px; padding: 6px 12px; font-size: 13px; background: #0284C7; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Batch Print</button>';
     };
   </script>
 </body>

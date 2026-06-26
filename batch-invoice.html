@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Batch Invoices</title>
+  <style>
+    body { font-family: sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; }
+    .a4-paper { background: #fff; max-width: 21cm; margin: 0 auto; padding: 2cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative;}
+    .page-break { page-break-after: always; }
+    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+    .title { font-size: 28px; font-weight: bold; }
+    .meta { text-align: right; font-size: 14px; line-height: 1.5; }
+    .bill-to { margin-bottom: 30px; }
+    .bill-to p { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th, td { border-bottom: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background: #f9f9f9; font-weight: bold; }
+    .right { text-align: right; }
+    .total-row { font-size: 18px; font-weight: bold; }
+    .footer { text-align: center; color: #555; font-size: 12px; margin-top: 50px; border-top: 1px solid #ddd; padding-top: 20px; }
+    .warning { text-align: center; color: red; font-weight: bold; margin-top: 20px; font-size: 14px; }
+    .print-btn-container { text-align: center; margin-bottom: 20px; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .a4-paper { box-shadow: none; margin: 0; min-height: 0; padding: 1cm; margin-bottom: 0;}
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-btn-container no-print">
+    <button onclick="window.print()" style="padding:15px 30px; font-size:18px; background:#0F766E; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Print All Invoices</button>
+  </div>
+
+  <div id="invoices-container">
+    <div style="text-align:center; padding: 50px;">Loading invoices...</div>
+  </div>
+
+  <script src="session.js"></script>
+  <script>
+    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+
+    window.onload = async function() {
+      if (!HuaHinSession.requireSession()) return;
+      var urlParams = new URLSearchParams(window.location.search);
+      var idsStr = urlParams.get('ids');
+      if (!idsStr) { document.getElementById('invoices-container').innerHTML = '<div style="text-align:center; color:red;">No transaction IDs provided.</div>'; return; }
+
+      var txnIds = idsStr.split(',').filter(function(id) { return id.trim(); });
+      var container = document.getElementById('invoices-container');
+      container.innerHTML = '';
+
+      var session = HuaHinSession.getSession();
+      var token = session ? session.token : null;
+
+      for (var i = 0; i < txnIds.length; i++) {
+        var txnId = txnIds[i];
+
+        try {
+          var res = await fetch(WORKER_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'financeGetTransaction', params: [token, txnId] })
+          });
+          var data = await res.json();
+          if (!data.ok) {
+            console.error(data.error);
+            continue;
+          }
+
+          var t = data.transaction;
+
+          var itemsHtml = '';
+          for (var j = 0; j < t.items.length; j++) {
+            var item = t.items[j];
+            itemsHtml +=
+              '<tr>' +
+              '<td>' + item.description + '</td>' +
+              '<td class="right">' + (item.units || 1) + '</td>' +
+              '<td class="right">' + item.unit_price + '</td>' +
+              '<td class="right">' + item.amount.toLocaleString() + '</td>' +
+              '</tr>';
+          }
+
+          var isLast = (i === txnIds.length - 1);
+          var pageBreakClass = isLast ? '' : 'page-break';
+          var propertyName = t.property_id === 'precious' ? 'The Precious Moment' : 'The Moment';
+
+          var invoiceHtml =
+            '<div class="a4-paper ' + pageBreakClass + '">' +
+            '<div class="header">' +
+            '<div><div class="title">' + propertyName + '</div><div>Hua Hin, Thailand</div></div>' +
+            '<div class="meta"><div><strong>INVOICE</strong></div><div>Date: ' + t.txn_date + '</div><div>Ref: ' + t.txn_id + '</div></div>' +
+            '</div>' +
+            '<div class="bill-to"><strong>Bill To:</strong>' +
+            '<p>' + (t.guest_or_vendor || '-') + '</p>' +
+            '<p>Room: <span style="font-weight:bold;">' + (t.room_name || '-') + '</span></p>' +
+            '<p>Billing Month: <span>' + t.billing_month + '</span></p></div>' +
+            '<table><thead><tr><th>Description</th><th class="right">Qty/Units</th><th class="right">Unit Price</th><th class="right">Total (THB)</th></tr></thead>' +
+            '<tbody>' + itemsHtml + '</tbody>' +
+            '<tfoot><tr class="total-row"><td colspan="3" class="right">GRAND TOTAL:</td><td class="right">' + t.amount.toLocaleString() + '</td></tr></tfoot></table>' +
+            '<div class="warning">* Please make payment within the 5th of the month to avoid late fees. *<br>' +
+            '<span style="font-size:12px;font-weight:normal;color:#000;">(If paying after the 5th, a late fee will be added to your balance)</span></div>' +
+            '<div class="footer">Thank you for staying with us.</div></div>';
+
+          container.insertAdjacentHTML('beforeend', invoiceHtml);
+        } catch(e) {
+          console.error(e);
+        }
+      }
+
+      if (container.innerHTML === '') {
+        container.innerHTML = '<div style="text-align:center; color:red;">Failed to load invoices.</div>';
+      }
+    };
+  </script>
+</body>
+</html>
