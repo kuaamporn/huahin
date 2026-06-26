@@ -262,13 +262,13 @@
         <div>
           <label for="fm-channel">Payment channel</label>
           <div class="custom-select" id="fm-channel-select">
-            <div class="custom-select-trigger" onclick="toggleCustomSelect('fm-channel-select')">💵 Cash <span class="arrow">▼</span></div>
+            <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('fm-channel-select')">💵 Cash <span class="arrow">▼</span></div>
             <div class="custom-select-options">
               <div class="custom-select-option" data-value="cash">💵 Cash</div>
-              <div class="custom-select-option" data-value="kbank"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"> KBank</div>
-              <div class="custom-select-option" data-value="kbank_qr"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> KBank QR</div>
-              <div class="custom-select-option" data-value="scb"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"> SCB</div>
-              <div class="custom-select-option" data-value="scb_qr"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> SCB QR</div>
+              <div class="custom-select-option" data-value="kb">💳 KB</div>
+              <div class="custom-select-option" data-value="scb">💳 SCB</div>
+              <div class="custom-select-option" data-value="maemanee">📱 Mae Manee</div>
+              <div class="custom-select-option" data-value="kshop">📱 Kshop</div>
             </div>
             <input type="hidden" id="fm-channel" value="cash" />
           </div>
@@ -1375,13 +1375,13 @@
       <div class="fg">
         <label class="fl">Payment Channel</label>
         <div class="custom-select" id="am-channel-select">
-          <div class="custom-select-trigger" onclick="toggleCustomSelect('am-channel-select')">💵 Cash <span class="arrow">▼</span></div>
+          <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('am-channel-select')">💵 Cash <span class="arrow">▼</span></div>
           <div class="custom-select-options">
             <div class="custom-select-option" data-value="cash">💵 Cash</div>
-            <div class="custom-select-option" data-value="kbank"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"> KBank</div>
-            <div class="custom-select-option" data-value="kbank_qr"><img src="kbank.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> KBank QR</div>
-            <div class="custom-select-option" data-value="scb"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"> SCB</div>
-            <div class="custom-select-option" data-value="scb_qr"><img src="scb.png" class="channel-icon" onerror="this.style.display='none'"><img src="qr.png" class="channel-icon" onerror="this.style.display='none'"> SCB QR</div>
+            <div class="custom-select-option" data-value="kb">💳 KB</div>
+            <div class="custom-select-option" data-value="scb">💳 SCB</div>
+            <div class="custom-select-option" data-value="maemanee">📱 Mae Manee</div>
+            <div class="custom-select-option" data-value="kshop">📱 Kshop</div>
           </div>
           <input type="hidden" id="am-channel" value="cash" />
         </div>

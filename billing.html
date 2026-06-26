@@ -248,9 +248,11 @@
             '<td class="text-right" id="amt_w_' + idx + '">฿0</td>' +
             '<td class="text-right"><div style="margin-bottom:4px; font-weight:bold;" id="add_tot_' + idx + '">฿0</div><button onclick="openExtraModal(' + idx + ')" style="font-size:11px; padding:3px 6px; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:4px;">Edit</button></td>' +
             '<td class="text-right total-col" id="tot_' + idx + '">฿' + r.rent + '</td>';
-          calcRow(idx);
         }
         tbody.appendChild(tr);
+        if (!r.pending_txn_id) {
+          calcRow(idx);
+        }
       });
       if (hasNonPending) document.getElementById('btn-generate').disabled = false;
     }
