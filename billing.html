@@ -152,7 +152,8 @@
       var mo = document.getElementById('sel-month').value;
       if (!mo) { errEl.style.color = 'var(--warn)'; errEl.textContent = 'Select a month.'; return; }
 
-      var token = HuaHinSession.getToken();
+      var session = HuaHinSession.getSession();
+      var token = session ? session.token : null;
       apiCall('billingGetActiveRooms', [token, prop, mo]).then(function(res) {
         if (!res.ok) { errEl.style.color = 'var(--warn)'; errEl.textContent = res.error; return; }
 
@@ -224,7 +225,8 @@
 
       var prop = document.getElementById('sel-property').value;
       var mo = document.getElementById('sel-month').value;
-      var token = HuaHinSession.getToken();
+      var session = HuaHinSession.getSession();
+      var token = session ? session.token : null;
 
       var payload = loadedRooms.map(function(r) {
         return {
