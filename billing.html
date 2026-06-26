@@ -151,9 +151,9 @@
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
     function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-    document.getElementById('logout-link').onclick = function(e) { e.preventDefault(); HuaHinSession.logout(); };
-
     window.onload = function() {
+      document.getElementById('logout-link').addEventListener('click', function(e) { e.preventDefault(); HuaHinSession.logout(); });
+
       if (!HuaHinSession.requireSession()) return;
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
       if (HuaHinSession.hasRole('owner')) show('link-dashboard');
@@ -310,7 +310,7 @@
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td style="padding:4px;"><input type="text" style="width:100%" class="em-desc" value="" placeholder="e.g. Cleaning"></td>' +
-        '<td style="padding:4px;"><select class="em-cat"><option value="other"' + (item.category==='other'?' selected':'') + '>Other</option><option value="rent"' + (item.category==='rent'?' selected':'') + '>Rent/Fee</option><option value="utility"' + (item.category==='utility'?' selected':'') + '>Utility</option></select></td>' +
+        '<td style="padding:4px;"><select class="em-cat"><option value="other"' + (item.category==='other'?' selected':'') + '>Other</option><option value="rent"' + (item.category==='rent'?' selected':'') + '>Rent/Fee</option><option value="utility"' + (item.category==='utility'?' selected':'') + '>Utility</option><option value="cleaning"' + (item.category==='cleaning'?' selected':'') + '>Cleaning</option></select></td>' +
         '<td style="padding:4px;"><input type="number" min="1" style="width:55px" class="em-units" value="' + (item.units || 1) + '" oninput="if(this.value<0)this.value=0; emCalcRow(this)"></td>' +
         '<td style="padding:4px;"><input type="number" min="0" style="width:80px" class="em-price" value="' + (item.unitPrice || 0) + '" oninput="if(this.value<0)this.value=0; emCalcRow(this)"></td>' +
         '<td style="padding:4px;"><input type="number" min="0" style="width:80px" class="em-amount" value="' + (item.amount || 0) + '" readonly></td>' +
@@ -403,7 +403,7 @@
       if (!confirm('Are you sure you want to delete this pending invoice?')) return;
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
-      apiCall('billingDeleteInvoice', [token, txnId]).then(function(res) {
+      apiCall('financeDeleteTransaction', [token, txnId]).then(function(res) {
         if (!res.ok) { alert(res.error); return; }
         document.getElementById('btn-load').click();
       });

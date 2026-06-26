@@ -267,10 +267,10 @@
             <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('fm-channel-select')">💵 Cash <span class="arrow">▼</span></div>
             <div class="custom-select-options">
               <div class="custom-select-option" data-value="cash">💵 Cash</div>
-              <div class="custom-select-option" data-value="kb">💳 KB</div>
-              <div class="custom-select-option" data-value="scb">💳 SCB</div>
-              <div class="custom-select-option" data-value="maemanee">📱 Mae Manee</div>
-              <div class="custom-select-option" data-value="kshop">📱 Kshop</div>
+              <div class="custom-select-option" data-value="kb">🟢 KB</div>
+              <div class="custom-select-option" data-value="scb">🟣 SCB</div>
+              <div class="custom-select-option" data-value="maemanee">🟪 Mae Manee</div>
+              <div class="custom-select-option" data-value="kshop">🟩 Kshop</div>
             </div>
             <input type="hidden" id="fm-channel" value="cash" />
           </div>
@@ -797,6 +797,10 @@
             actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
           }
 
+          if (isOwner) {
+            actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">Delete</button>';
+          }
+
           if (actionHtml === '') {
             if (t.is_verified) {
               actionHtml = '<span class="muted">Verified</span>';
@@ -820,6 +824,14 @@
           tbody.appendChild(tr);
         });
 
+      });
+    }
+
+    function deleteTransaction(txnId) {
+      if (!confirm("Are you sure you want to delete this transaction? This cannot be undone.")) return;
+      callApi('financeDeleteTransaction', [session.token, txnId]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        loadFinanceData();
       });
     }
 
