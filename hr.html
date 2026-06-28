@@ -105,6 +105,7 @@
         <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
         <a href="finance.html" id="link-finance" class="hidden">Finance</a>
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
+        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
         <a href="#" id="logout-link" class="signout">Sign out</a>
       </div>
     </div>
@@ -386,6 +387,7 @@
       if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) document.getElementById('link-finance').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner')) document.getElementById('link-dashboard').classList.remove('hidden');
       loadToday();
       applyRoleVisibility();
     }

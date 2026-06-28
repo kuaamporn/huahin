@@ -110,7 +110,8 @@
         <div style="display:flex;gap:14px;align-items:center;">
           <a href="rooms.html" class="toplink hidden" id="rooms-link">Rooms</a>
           <a href="finance.html" class="toplink hidden" id="finance-link">Finance</a>
-          <a href="hr.html" class="toplink hidden" id="dashboard-link">HR</a>
+          <a href="dashboard.html" class="toplink hidden" id="dashboard-link">Dashboard</a>
+          <a href="hr.html" class="toplink hidden" id="hr-link">HR</a>
           <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
           <a href="#" class="toplink" id="logout-link">Sign out</a>
         </div>
@@ -200,7 +201,10 @@
     function applyNavLinkVisibility() {
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('rooms-link');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('finance-link');
-      if (HuaHinSession.hasRole('owner')) show('dashboard-link');
+      if (HuaHinSession.hasRole('owner')) {
+        show('dashboard-link');
+        show('hr-link');
+      }
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('billing-link');
     }
 

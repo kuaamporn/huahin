@@ -116,7 +116,8 @@
       <div class="toplinks">
         <a href="index.html" id="link-checkin">Check-in</a>
         <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
-        <a href="hr.html" id="link-dashboard" class="hidden">HR</a>
+        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
+        <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
         <a href="#" id="logout-link">Sign out</a>
       </div>
@@ -487,7 +488,10 @@
         var token = session.token;
 
         // Reveal nav links the user has access to, alongside this page's own content.
-        if (HuaHinSession.hasRole('owner')) show('link-dashboard');
+        if (HuaHinSession.hasRole('owner')) {
+          show('link-dashboard');
+          show('link-hr');
+        }
         if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
 

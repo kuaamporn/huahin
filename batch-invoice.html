@@ -4,25 +4,39 @@
   <meta charset="UTF-8">
   <title>Batch Invoices</title>
   <style>
-    body { font-family: sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; }
-    .a4-paper { background: #fff; max-width: 21cm; margin: 0 auto; padding: 2cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative;}
-    .page-break { page-break-after: always; }
-    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
-    .title { font-size: 28px; font-weight: bold; }
-    .meta { text-align: right; font-size: 14px; line-height: 1.5; }
-    .bill-to { margin-bottom: 30px; }
-    .bill-to p { margin: 5px 0; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-    th, td { border-bottom: 1px solid #ddd; padding: 12px; text-align: left; }
-    th { background: #f9f9f9; font-weight: bold; }
-    .right { text-align: right; }
-    .total-row { font-size: 18px; font-weight: bold; }
-    .footer { text-align: center; color: #555; font-size: 12px; margin-top: 50px; border-top: 1px solid #ddd; padding-top: 20px; }
-    .warning { text-align: center; color: red; font-weight: bold; margin-top: 20px; font-size: 14px; }
+    body { font-family: 'Tahoma', sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; font-size: 11px; }
     .print-btn-container { text-align: center; margin-bottom: 20px; }
+
+    .a4-page {
+      width: 21cm; min-height: 29.7cm; margin: 0 auto 30px; background: #fff;
+      padding: 0.5cm; display: flex; flex-direction: column; gap: 0.5cm;
+      page-break-after: always; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .slip {
+      border: 2px solid #000;
+      height: 9.1cm;
+      display: flex; flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .slip-header { display: flex; padding: 4px; border-bottom: 2px solid #000; font-weight: bold; font-size: 13px; }
+    .slip-remark { display: flex; border-bottom: 2px solid #000; }
+    .slip-meta { display: flex; border-bottom: 2px solid #000; }
+    .slip-items { flex: 1; display: flex; flex-direction: column; border-bottom: 2px solid #000; }
+    .items-head { display: flex; border-bottom: 2px solid #000; background: #f0f0f0; }
+    .items-body { flex: 1; display: flex; flex-direction: column; }
+    .item-row { display: flex; }
+    .item-row div { padding: 4px; }
+    .slip-footer { display: flex; height: 2cm; }
+    .bank-info { flex: 1; padding: 4px; font-size: 10px; line-height: 1.4; border-right: 2px solid #000; }
+    .sig-box { width: 35%; display: flex; flex-direction: column; }
+    .grand-total { display: flex; border-bottom: 2px solid #000; }
+    .sig-space { flex: 1; text-align: center; padding-top: 25px; }
+
     @media print {
       body { background: #fff; padding: 0; }
-      .a4-paper { box-shadow: none; margin: 0; min-height: 0; padding: 1cm; margin-bottom: 0;}
+      .a4-page { box-shadow: none; margin: 0; }
       .no-print { display: none; }
     }
   </style>
@@ -55,6 +69,9 @@
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
 
+      var currentA4Page = null;
+      var slipsCount = 0;
+
       for (var i = 0; i < txnIds.length; i++) {
         var txnId = txnIds[i];
 
@@ -76,36 +93,77 @@
           for (var j = 0; j < t.items.length; j++) {
             var item = t.items[j];
             itemsHtml +=
-              '<tr>' +
-              '<td>' + escapeHtml(item.description) + '</td>' +
-              '<td class="right">' + (item.units || 1) + '</td>' +
-              '<td class="right">' + item.unit_price + '</td>' +
-              '<td class="right">' + item.amount.toLocaleString() + '</td>' +
-              '</tr>';
+              '<div class="item-row">' +
+              '<div style="flex:1; border-right: 2px solid #000;">' + escapeHtml(item.description) + '</div>' +
+              '<div style="width:20%; border-right: 2px solid #000; text-align: center;">' + (item.units || 1) + '</div>' +
+              '<div style="width:25%; text-align: right;">' + item.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
+              '</div>';
+          }
+          itemsHtml +=
+            '<div class="item-row" style="flex:1;">' +
+            '<div style="flex:1; border-right: 2px solid #000;"></div>' +
+            '<div style="width:20%; border-right: 2px solid #000;"></div>' +
+            '<div style="width:25%;"></div>' +
+            '</div>';
+
+          var propertyName = t.property_id === 'precious' ? 'The Precious' : 'The Moment';
+
+          var slipHtml =
+            '<div class="slip">' +
+              '<div class="slip-header">' +
+                '<div style="flex:1;">' + propertyName + '</div>' +
+                '<div>Invoice</div>' +
+              '</div>' +
+              '<div class="slip-remark">' +
+                '<div style="flex:1; border-right: 2px solid #000; padding: 4px; font-size: 9px; line-height: 1.2;">' +
+                  'Remark : *rent and utility charges are to be paid by the 5th day of every month. 150 Baht per day will be charged in case of payment delays until payment is received' +
+                '</div>' +
+                '<div style="width: 30%; display: flex;">' +
+                  '<div style="flex:1; border-right: 2px solid #000; padding: 4px; display: flex; align-items: center; justify-content: center;">Issue month</div>' +
+                  '<div style="flex:1; padding: 4px; display: flex; align-items: center; justify-content: center;">' + escapeHtml(t.billing_month || '') + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="slip-meta">' +
+                '<div style="width:10%; padding: 4px; border-right: 1px solid #000;">Name</div>' +
+                '<div style="width:40%; padding: 4px; border-right: 2px solid #000; text-align: center;">' + escapeHtml(t.guest_or_vendor || '-') + '</div>' +
+                '<div style="width:12%; padding: 4px; border-right: 1px solid #000;">Issue date</div>' +
+                '<div style="width:15%; padding: 4px; border-right: 2px solid #000; text-align: center;">' + escapeHtml(t.txn_date) + '</div>' +
+                '<div style="width:13%; padding: 4px; border-right: 1px solid #000;">Room</div>' +
+                '<div style="width:10%; padding: 4px; text-align: center; font-weight: bold;">' + escapeHtml(t.room_name || '-') + '</div>' +
+              '</div>' +
+              '<div class="slip-items">' +
+                '<div class="items-head">' +
+                  '<div style="flex:1; padding: 4px; text-align: center; border-right: 2px solid #000;">Description</div>' +
+                  '<div style="width:20%; padding: 4px; text-align: center; border-right: 2px solid #000;">Units</div>' +
+                  '<div style="width:25%; padding: 4px; text-align: center;">Amount</div>' +
+                '</div>' +
+                '<div class="items-body">' + itemsHtml + '</div>' +
+              '</div>' +
+              '<div class="slip-footer">' +
+                '<div class="bank-info">' +
+                  'Bank Transfer: Account name Krittapong Uaamporn<br>' +
+                  'Bank Account No: 002-1-36419-3<br>' +
+                  'Bank: Kasikorn Bank, Branch: Hua Hin Market Village' +
+                '</div>' +
+                '<div class="sig-box">' +
+                  '<div class="grand-total">' +
+                    '<div style="flex:1; padding: 4px; border-right: 2px solid #000; font-weight: bold;">Grand Total</div>' +
+                    '<div style="flex:1; padding: 4px; text-align: right; font-weight: bold;">' + t.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
+                  '</div>' +
+                  '<div class="sig-space">Approved by</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+
+          if (slipsCount % 3 === 0) {
+            currentA4Page = document.createElement('div');
+            currentA4Page.className = 'a4-page';
+            container.appendChild(currentA4Page);
           }
 
-          var isLast = (i === txnIds.length - 1);
-          var pageBreakClass = isLast ? '' : 'page-break';
-          var propertyName = t.property_id === 'precious' ? 'The Precious Moment' : 'The Moment';
+          currentA4Page.insertAdjacentHTML('beforeend', slipHtml);
+          slipsCount++;
 
-          var invoiceHtml =
-            '<div class="a4-paper ' + pageBreakClass + '">' +
-            '<div class="header">' +
-            '<div><div class="title">' + propertyName + '</div><div>Hua Hin, Thailand</div></div>' +
-            '<div class="meta"><div><strong>INVOICE</strong></div><div>Date: ' + escapeHtml(t.txn_date) + '</div><div>Ref: ' + escapeHtml(t.txn_id) + '</div></div>' +
-            '</div>' +
-            '<div class="bill-to"><strong>Bill To:</strong>' +
-            '<p>' + escapeHtml(t.guest_or_vendor || '-') + '</p>' +
-            '<p>Room: <span style="font-weight:bold;">' + escapeHtml(t.room_name || '-') + '</span></p>' +
-            '<p>Billing Month: <span>' + escapeHtml(t.billing_month) + '</span></p></div>' +
-            '<table><thead><tr><th>Description</th><th class="right">Qty/Units</th><th class="right">Unit Price</th><th class="right">Total (THB)</th></tr></thead>' +
-            '<tbody>' + itemsHtml + '</tbody>' +
-            '<tfoot><tr class="total-row"><td colspan="3" class="right">GRAND TOTAL:</td><td class="right">฿' + t.amount.toLocaleString() + '</td></tr></tfoot></table>' +
-            '<div class="warning">* Please make payment within the 5th of the month to avoid late fees. *<br>' +
-            '<span style="font-size:12px;font-weight:normal;color:#000;">(If paying after the 5th, a late fee will be added to your balance)</span></div>' +
-            '<div class="footer">Thank you for staying with us.</div></div>';
-
-          container.insertAdjacentHTML('beforeend', invoiceHtml);
         } catch(e) {
           console.error(e);
         }
