@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>The Precious Moment HR</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
@@ -93,6 +94,12 @@
     .modal-box {
       background: #fff; border-radius: 16px; padding: 24px; max-width: 360px; width: 100%; box-shadow: 0 24px 48px rgba(0,0,0,.12);
     }
+
+    @media (max-width: 768px) {
+      .dash-topbar { flex-direction: column; align-items: stretch; gap: 12px; }
+      .dash-nav-links { flex-wrap: wrap; }
+      .nav-tabs { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
@@ -131,12 +138,14 @@
         <div class="stat"><div class="n" id="stat-flagged" style="color:var(--warn);">0</div><div class="l">Flagged</div></div>
       </div>
 
+      <div style="overflow-x: auto;">
       <table>
         <thead>
           <tr><th>Time</th><th>Employee</th><th>Type</th><th>Office</th><th>Status</th></tr>
         </thead>
         <tbody id="log-rows"></tbody>
       </table>
+      </div>
 
       <div class="muted" id="empty-msg" style="margin-top:14px;">No check-ins recorded yet today.</div>
 
@@ -156,12 +165,14 @@
         <button id="attendance-load-btn" style="margin-top:10px;width:auto;padding:10px 16px;">Load</button>
       </div>
 
+      <div style="overflow-x: auto;">
       <table>
         <thead>
           <tr><th>Employee</th><th>Status</th><th>Note</th><th>Action</th></tr>
         </thead>
         <tbody id="attendance-rows"></tbody>
       </table>
+      </div>
       <div class="muted" id="attendance-empty-msg" style="margin-top:14px;">No employees found.</div>
     </div>
 
@@ -198,12 +209,14 @@
         </div>
       </div>
 
+      <div style="overflow-x: auto;">
       <table>
         <thead>
           <tr><th>Employee</th><th>Present</th><th>Late</th><th>Absent</th><th>Leave</th><th></th></tr>
         </thead>
         <tbody id="monthly-summary-rows"></tbody>
       </table>
+      </div>
       <div class="muted" id="monthly-empty-msg" style="margin-top:14px;">No data for this month yet.</div>
 
       <div class="card-section hidden" id="monthly-grid-section" style="margin-top:20px;overflow-x:auto;">
@@ -237,12 +250,14 @@
       <div class="card-section">
         <h2>Existing employees</h2>
         <button id="refresh-employees-btn" style="margin-bottom:12px;">Refresh list</button>
+        <div style="overflow-x: auto;">
         <table>
           <thead>
             <tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Reset password</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
+        </div>
         <div class="muted" id="employees-empty-msg" style="margin-top:14px;">No employees yet.</div>
       </div>
     </div>
@@ -283,6 +298,7 @@
 
       <button id="roles-refresh-btn" style="margin-bottom:12px;">Refresh list</button>
 
+      <div style="overflow-x: auto;">
       <table>
         <thead>
           <tr><th>Name</th><th>Username</th><th>Roles</th><th>Action</th></tr>
@@ -291,6 +307,7 @@
           <tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">No employees loaded yet.</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 

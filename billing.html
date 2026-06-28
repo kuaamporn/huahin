@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>The Precious Moment Billing</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
@@ -32,6 +33,12 @@
     .text-right { text-align: right; }
     .total-col { font-weight: bold; color: var(--go); }
     .err-msg { color: var(--warn); font-size: 13px; margin-top: 10px; }
+
+    @media (max-width: 768px) {
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .topbar { flex-direction: column; align-items: stretch; gap: 12px; }
+      .toplinks { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>

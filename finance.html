@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>The Precious Moment Finance</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
@@ -103,6 +104,13 @@
     .custom-select-option { display: flex; align-items: center; gap: 8px; padding: 10px 11px; font-size: 14px; cursor: pointer; }
     .custom-select-option:hover { background: #f3f1ec; }
     .channel-icon { height: 18px; width: 18px; object-fit: contain; vertical-align: middle; border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .actions-row { flex-direction: column; align-items: stretch; }
+      .actions-row input { max-width: 100% !important; }
+      .modal-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -177,6 +185,7 @@
         <button id="finance-export-csv-btn" style="margin-left:auto;">Export CSV</button>
       </div>
 
+      <div style="overflow-x: auto;">
       <table>
         <thead>
           <tr><th style="width:40px;"></th><th>Date</th><th>Direction</th><th>Property</th><th>Category</th><th>Amount</th><th>Guest/Vendor</th><th>Note</th><th>Action</th></tr>
@@ -185,6 +194,7 @@
           <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">Select a month and click Load.</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 
