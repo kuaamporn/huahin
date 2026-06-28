@@ -11,7 +11,7 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
 
     .dash-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
     .dash-topbar h1 { font-size: 22px; margin: 0; font-family: 'Lexend', sans-serif; }
@@ -31,18 +31,22 @@
     .stat-card.exp .val { color: var(--warn); }
     .stat-card.net .val { color: #2563EB; }
 
-    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; }
+    .charts-row { display: flex; gap: 24px; margin-bottom: 24px; }
     .chart-box { background: #fff; padding: 24px; border-radius: 24px; border: 1px solid var(--line); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
     .chart-box h2 { margin: 0 0 20px; font-size: 18px; font-family: 'Lexend', sans-serif; text-align: center; }
+    .chart-trend { flex: 2; }
+    .chart-receipt { flex: 1; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 8px 12px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--line); }
-    th { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; }
     td.amt { text-align: right; font-weight: 600; }
-    .cat-color { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+    tr.subtotal td { font-weight: 700; background: #F8FAFC; }
+    tr.subtotal.rev td { color: var(--go); }
+    tr.subtotal.exp td { color: var(--warn); }
 
     @media (max-width: 768px) {
-      .charts-grid { grid-template-columns: 1fr; }
+      .charts-row { flex-direction: column; }
       .dash-topbar { flex-direction: column; align-items: stretch; gap: 12px; }
       .dash-nav-links { flex-wrap: wrap; }
       .controls { flex-direction: column; align-items: stretch; }
@@ -66,38 +70,42 @@
 
     <div class="controls">
       <select id="propSelect" onchange="loadData()">
+        <option value="both">Both Properties</option>
         <option value="precious">The Precious</option>
         <option value="moment">The Moment</option>
       </select>
-      <input type="month" id="monthSelect" onchange="loadData()">
+      <select id="yearSelect" onchange="loadData()"></select>
     </div>
 
     <div class="summary-cards">
       <div class="stat-card rev">
         <div class="val" id="valRev">0</div>
-        <div class="lbl">Total Revenue</div>
+        <div class="lbl">Year Revenue</div>
       </div>
       <div class="stat-card exp">
         <div class="val" id="valExp">0</div>
-        <div class="lbl">Total Expense</div>
+        <div class="lbl">Year Expense</div>
       </div>
       <div class="stat-card net">
         <div class="val" id="valNet">0</div>
-        <div class="lbl">Net Profit</div>
+        <div class="lbl">Year Net Profit</div>
       </div>
     </div>
 
-    <div class="charts-grid">
-      <div class="chart-box">
-        <h2>Revenue Breakdown</h2>
-        <canvas id="revChart"></canvas>
-        <div id="revTable"></div>
+    <div class="charts-row">
+      <div class="chart-box chart-trend">
+        <h2>Profitability Trend</h2>
+        <canvas id="trendChart"></canvas>
       </div>
-      <div class="chart-box">
-        <h2>Expense Breakdown</h2>
-        <canvas id="expChart"></canvas>
-        <div id="expTable"></div>
+      <div class="chart-box chart-receipt">
+        <h2>Revenue Quality</h2>
+        <canvas id="receiptChart"></canvas>
       </div>
+    </div>
+
+    <div class="chart-box" style="overflow-x:auto;">
+      <h2>Yearly Matrix</h2>
+      <div id="matrixTableContainer"></div>
     </div>
   </div>
 
@@ -115,61 +123,186 @@
       HuaHinSession.logout();
     });
 
-    var today = new Date();
-    document.getElementById('monthSelect').value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2, '0');
+    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-    var REV_COLORS = ['#059669', '#10B981', '#34D399', '#6EE7B7', '#A7F3D0', '#047857'];
-    var EXP_COLORS = ['#DC2626', '#EF4444', '#F87171', '#FCA5A5', '#FECACA', '#B91C1C', '#991B1B', '#7F1D1D'];
+    (function populateYears() {
+      var sel = document.getElementById('yearSelect');
+      var cur = new Date().getFullYear();
+      for (var y = cur; y >= cur - 3; y--) {
+        var opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        sel.appendChild(opt);
+      }
+    })();
+
+    var trendChartObj = null;
+    var receiptChartObj = null;
 
     function loadData() {
       var prop = document.getElementById('propSelect').value;
-      var month = document.getElementById('monthSelect').value;
-      if (!month) return;
+      var year = document.getElementById('yearSelect').value;
+      if (!year) return;
 
       fetch(WORKER_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'dashboardGetStats', params: [sessionToken, prop, month] })
+        body: JSON.stringify({ action: 'dashboardGetYearlyStats', params: [sessionToken, prop, year] })
       }).then(function(r) { return r.json(); }).then(function(res) {
         if (!res.ok) return alert(res.error);
+        processData(res, year);
+      }).catch(function(err) { alert('Network error: ' + err.message); });
+    }
 
-        document.getElementById('valRev').textContent = res.totalRevenue.toLocaleString();
-        document.getElementById('valExp').textContent = res.totalExpense.toLocaleString();
-        document.getElementById('valNet').textContent = res.netProfit.toLocaleString();
+    function processData(res, year) {
+      var revPerMonth = new Array(12).fill(0);
+      var expPerMonth = new Array(12).fill(0);
+      var receiptedRev = 0;
+      var unreceiptedRev = 0;
+      var revCategories = {};
+      var expCategories = {};
+      var receiptedByMonth = new Array(12).fill(0);
+      var unreceiptedByMonth = new Array(12).fill(0);
 
-        drawChart('revChart', 'revTable', res.revenueByCategory, REV_COLORS);
-        drawChart('expChart', 'expTable', res.expenseByCategory, EXP_COLORS);
+      (res.revenue || []).forEach(function(row) {
+        var m = parseInt(row.billing_month.split('-')[1], 10) - 1;
+        revPerMonth[m] += row.total;
+        if (!revCategories[row.category]) revCategories[row.category] = new Array(12).fill(0);
+        revCategories[row.category][m] += row.total;
+        if (row.is_receipted) {
+          receiptedRev += row.total;
+          receiptedByMonth[m] += row.total;
+        } else {
+          unreceiptedRev += row.total;
+          unreceiptedByMonth[m] += row.total;
+        }
+      });
+
+      (res.expense || []).forEach(function(row) {
+        var m = parseInt(row.billing_month.split('-')[1], 10) - 1;
+        expPerMonth[m] += row.total;
+        if (!expCategories[row.category]) expCategories[row.category] = new Array(12).fill(0);
+        expCategories[row.category][m] += row.total;
+      });
+
+      var totalRev = revPerMonth.reduce(function(a, b) { return a + b; }, 0);
+      var totalExp = expPerMonth.reduce(function(a, b) { return a + b; }, 0);
+
+      document.getElementById('valRev').textContent = totalRev.toLocaleString();
+      document.getElementById('valExp').textContent = totalExp.toLocaleString();
+      document.getElementById('valNet').textContent = (totalRev - totalExp).toLocaleString();
+
+      drawTrendChart(revPerMonth, expPerMonth);
+      drawReceiptChart(receiptedRev, unreceiptedRev);
+      drawMatrix(revCategories, expCategories, revPerMonth, expPerMonth, receiptedByMonth, unreceiptedByMonth);
+    }
+
+    function drawTrendChart(revPerMonth, expPerMonth) {
+      var netPerMonth = revPerMonth.map(function(r, i) { return r - expPerMonth[i]; });
+      var ctx = document.getElementById('trendChart').getContext('2d');
+
+      if (trendChartObj) trendChartObj.destroy();
+
+      trendChartObj = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: MONTHS,
+          datasets: [
+            { label: 'Revenue', data: revPerMonth, backgroundColor: 'rgba(5,150,105,0.7)', borderRadius: 4, order: 2 },
+            { label: 'Expense', data: expPerMonth, backgroundColor: 'rgba(220,38,38,0.7)', borderRadius: 4, order: 2 },
+            { label: 'Net Profit', data: netPerMonth, type: 'line', borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#2563EB', borderWidth: 2, order: 1 }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } } },
+          scales: {
+            y: { beginAtZero: true, ticks: { callback: function(v) { return v >= 1000 ? (v/1000) + 'k' : v; } } }
+          }
+        }
       });
     }
 
-    function drawChart(canvasId, tableId, dataArray, colors) {
-      var ctx = document.getElementById(canvasId).getContext('2d');
-      var tableDiv = document.getElementById(tableId);
+    function drawReceiptChart(receipted, unreceipted) {
+      var ctx = document.getElementById('receiptChart').getContext('2d');
+      if (receiptChartObj) receiptChartObj.destroy();
 
-      var labels = dataArray.map(function(d) { return d.category; });
-      var data = dataArray.map(function(d) { return d.total; });
-
-      if (window[canvasId + 'Obj']) {
-        window[canvasId + 'Obj'].destroy();
-      }
-
-      window[canvasId + 'Obj'] = new Chart(ctx, {
+      receiptChartObj = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels,
-          datasets: [{ data: data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+          labels: ['Receipted Revenue', 'Unreceipted Revenue'],
+          datasets: [{
+            data: [receipted, unreceipted],
+            backgroundColor: ['#059669', '#FCA5A5'],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } }, cutout: '65%' }
+        options: {
+          responsive: true,
+          cutout: '65%',
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } }
+          }
+        }
+      });
+    }
+
+    function drawMatrix(revCats, expCats, revTotals, expTotals, receiptedByMonth, unreceiptedByMonth) {
+      var html = '<table><thead><tr><th>Category</th>';
+      MONTHS.forEach(function(m) { html += '<th style="text-align:right">' + m + '</th>'; });
+      html += '<th style="text-align:right">Year Total</th></tr></thead><tbody>';
+
+      var revKeys = Object.keys(revCats).sort();
+      revKeys.forEach(function(cat) {
+        var row = revCats[cat];
+        var total = row.reduce(function(a, b) { return a + b; }, 0);
+        html += '<tr><td style="text-transform:capitalize">📥 ' + escapeHtml(cat) + '</td>';
+        row.forEach(function(v) { html += '<td class="amt">' + (v ? v.toLocaleString() : '-') + '</td>'; });
+        html += '<td class="amt">' + total.toLocaleString() + '</td></tr>';
       });
 
-      var html = '<table><thead><tr><th>Category</th><th style="text-align:right">Amount</th></tr></thead><tbody>';
-      dataArray.forEach(function(row, i) {
-        var color = colors[i % colors.length];
-        html += '<tr><td><span class="cat-color" style="background:'+color+'"></span> <span style="text-transform:capitalize">'+row.category+'</span></td>';
-        html += '<td class="amt">'+row.total.toLocaleString()+'</td></tr>';
+      html += '<tr class="subtotal rev"><td>Revenue Total</td>';
+      revTotals.forEach(function(v) { html += '<td class="amt">' + (v ? v.toLocaleString() : '-') + '</td>'; });
+      html += '<td class="amt">' + revTotals.reduce(function(a,b){return a+b;},0).toLocaleString() + '</td></tr>';
+
+      html += '<tr><td style="color:var(--go)">✅ Receipted</td>';
+      receiptedByMonth.forEach(function(v) { html += '<td class="amt" style="color:var(--go)">' + (v ? v.toLocaleString() : '-') + '</td>'; });
+      html += '<td class="amt" style="color:var(--go)">' + receiptedByMonth.reduce(function(a,b){return a+b;},0).toLocaleString() + '</td></tr>';
+
+      html += '<tr><td style="color:var(--warn)">⚠️ Unreceipted</td>';
+      unreceiptedByMonth.forEach(function(v) { html += '<td class="amt" style="color:var(--warn)">' + (v ? v.toLocaleString() : '-') + '</td>'; });
+      html += '<td class="amt" style="color:var(--warn)">' + unreceiptedByMonth.reduce(function(a,b){return a+b;},0).toLocaleString() + '</td></tr>';
+
+      html += '<tr><td colspan="14" style="height:8px;border:none;"></td></tr>';
+
+      var expKeys = Object.keys(expCats).sort();
+      expKeys.forEach(function(cat) {
+        var row = expCats[cat];
+        var total = row.reduce(function(a, b) { return a + b; }, 0);
+        html += '<tr><td style="text-transform:capitalize">📤 ' + escapeHtml(cat) + '</td>';
+        row.forEach(function(v) { html += '<td class="amt">' + (v ? v.toLocaleString() : '-') + '</td>'; });
+        html += '<td class="amt">' + total.toLocaleString() + '</td></tr>';
       });
+
+      html += '<tr class="subtotal exp"><td>Expense Total</td>';
+      expTotals.forEach(function(v) { html += '<td class="amt">' + (v ? v.toLocaleString() : '-') + '</td>'; });
+      html += '<td class="amt">' + expTotals.reduce(function(a,b){return a+b;},0).toLocaleString() + '</td></tr>';
+
+      var netTotals = revTotals.map(function(r, i) { return r - expTotals[i]; });
+      html += '<tr style="font-weight:700;"><td style="color:#2563EB">Net Profit</td>';
+      netTotals.forEach(function(v) { html += '<td class="amt" style="color:' + (v >= 0 ? '#2563EB' : 'var(--warn)') + '">' + v.toLocaleString() + '</td>'; });
+      var yearNet = netTotals.reduce(function(a,b){return a+b;},0);
+      html += '<td class="amt" style="color:' + (yearNet >= 0 ? '#2563EB' : 'var(--warn)') + '">' + yearNet.toLocaleString() + '</td></tr>';
+
       html += '</tbody></table>';
-      tableDiv.innerHTML = html;
+      document.getElementById('matrixTableContainer').innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
     }
 
     if (session) loadData();

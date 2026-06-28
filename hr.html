@@ -289,7 +289,7 @@
           <li><b>owner</b>: Full access, view finance, and can edit verified transactions.</li>
           <li><b>frontdesk</b>: Can add and manage rooms bookings.</li>
           <li><b>technician</b>: Can view room status and resolve maintenance tasks.</li>
-          <li><b>housekeeping</b>: Can view room status and mark rooms as cleaned.</li>
+          <li><b>housekeeping</b> / <b>housekeeping_precious</b> / <b>housekeeping_moment</b>: Can view room status and mark rooms as cleaned. (All, Precious only, or Moment only).</li>
           <li><b>revenue</b>: Can add revenue records.</li>
           <li><b>expense</b>: Can add expense records.</li>
           <li><b>accountant</b>: Can view finance summaries and lists.</li>
@@ -365,7 +365,9 @@
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="owner" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Owner</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="frontdesk" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Front Desk</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="technician" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Technician</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping (All)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_precious" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping (Precious)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_moment" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping (Moment)</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="revenue" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Revenue</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="expense" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Expense</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="accountant" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Accountant</span></label>
@@ -1081,7 +1083,7 @@
         if (cb.checked) checkedRoles.push(cb.value);
       });
 
-      var allRoles = ['owner', 'frontdesk', 'technician', 'housekeeping', 'revenue', 'expense', 'accountant'];
+      var allRoles = ['owner', 'frontdesk', 'technician', 'housekeeping', 'housekeeping_precious', 'housekeeping_moment', 'revenue', 'expense', 'accountant'];
       var btn = document.getElementById('roles-modal-save');
       btn.disabled = true; btn.textContent = 'Saving...';
 
