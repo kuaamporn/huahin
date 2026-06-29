@@ -403,6 +403,15 @@
       });
     }
 
+    function clientHashPassword(password) {
+      var encoder = new TextEncoder();
+      var data = encoder.encode(password);
+      return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      });
+    }
+
     var _session = HuaHinSession.requireRole('index.html', 'owner');
     var token = _session ? _session.token : null;
     var currentEmployeeId = _session ? _session.employeeId : null;

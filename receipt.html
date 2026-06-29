@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; font-size: 14px; line-height: 1.5; }
+    .a4-paper { background: #fff; max-width: 21cm; margin: 0 auto; padding: 2cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); box-sizing: border-box; display: flex; flex-direction: column; }
+    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+    .title { font-size: 24px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+    .meta { text-align: right; font-size: 14px; line-height: 1.6; }
+    .meta div { margin-bottom: 2px; }
+    .company-details { font-size: 13px; color: #333; margin-top: 5px; line-height: 1.4; }
+    .grid-info { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 40px; }
+    .bill-to, .payment-info { flex: 1; }
+    .section-title { font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; font-size: 12px; color: #555; }
+    p { margin: 4px 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th, td { border-bottom: 1px solid #ddd; padding: 12px 10px; text-align: left; }
+    th { background: #f9f9f9; font-weight: bold; border-top: 1px solid #000; border-bottom: 2px solid #000; font-size: 13px; text-transform: uppercase; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .total-row { font-size: 16px; font-weight: bold; }
+    .total-row td { border-bottom: 2px solid #000; border-top: 1px solid #000; padding-top: 15px; padding-bottom: 15px; }
+    .signature-area { margin-top: auto; display: flex; justify-content: space-between; gap: 50px; padding-top: 50px; }
+    .sig-box { flex: 1; text-align: center; }
+    .sig-line { border-bottom: 1px solid #000; margin-bottom: 8px; height: 50px; }
+    .footer { text-align: center; color: #777; font-size: 12px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .a4-paper { box-shadow: none; margin: 0; min-height: 0; padding: 1.5cm; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="a4-paper">
+    <div style="text-align:right; margin-bottom: 20px;" class="no-print">
+      <button onclick="window.print()" style="padding:10px 20px; background:#0F766E; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">Print Receipt</button>
+    </div>
+
+    <div class="header">
+      <div>
+        <div class="title" id="rc-property">The Precious Moment</div>
+        <div class="company-details">
+          Hua Hin, Prachuap Khiri Khan, Thailand<br>
+          Tax ID: 002-1-36419-3 (Kasikorn Bank Account Ref)
+        </div>
+      </div>
+      <div class="meta">
+        <div style="font-size: 20px; font-weight: bold; color: #0F766E;">RECEIPT / TAX INVOICE</div>
+        <div><strong>Receipt No:</strong> <span id="rc-no" style="font-family: monospace; font-weight: bold;"></span></div>
+        <div><strong>Date:</strong> <span id="rc-date"></span></div>
+        <div><strong>Ref Invoice:</strong> <span id="rc-txn" style="font-family: monospace;"></span></div>
+      </div>
+    </div>
+
+    <div class="grid-info">
+      <div class="bill-to">
+        <div class="section-title">Received From (Customer)</div>
+        <p><strong>Name:</strong> <span id="rc-guest"></span></p>
+        <p><strong>Room:</strong> <span id="rc-room" style="font-weight:bold;"></span></p>
+        <p id="rc-phone-container" class="hidden"><strong>Phone:</strong> <span id="rc-phone"></span></p>
+        <p id="rc-address-container" class="hidden"><strong>Address:</strong> <span id="rc-address"></span></p>
+        <p id="rc-tax-container" class="hidden"><strong>Tax ID:</strong> <span id="rc-tax"></span></p>
+      </div>
+      <div class="payment-info">
+        <div class="section-title">Payment Method Info</div>
+        <p><strong>Channel:</strong> <span id="rc-channel" style="text-transform: uppercase;"></span></p>
+        <p id="rc-ref-container" class="hidden"><strong>Ref/Memo:</strong> <span id="rc-ref"></span></p>
+        <p><strong>Billing Month:</strong> <span id="rc-month"></span></p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="right" style="width: 15%;">Qty/Units</th>
+          <th class="right" style="width: 20%;">Unit Price</th>
+          <th class="right" style="width: 25%;">Total (THB)</th>
+        </tr>
+      </thead>
+      <tbody id="rc-items">
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="3" class="right">GRAND TOTAL:</td>
+          <td class="right" id="rc-total">฿0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="signature-area">
+      <div class="sig-box">
+        <div class="sig-line"></div>
+        <div>Customer Signature</div>
+        <div style="font-size: 11px; color: #777; margin-top: 4px;">Received By</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-line"></div>
+        <div>Authorized Representative</div>
+        <div style="font-size: 11px; color: #777; margin-top: 4px;">For The Precious Moment</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Thank you for your payment. This is a computer-generated receipt.
+    </div>
+  </div>
+
+  <script src="session.js"></script>
+  <script>
+    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+
+    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    window.onload = function() {
+      if (!HuaHinSession.requireSession()) return;
+      var urlParams = new URLSearchParams(window.location.search);
+      var receiptNo = urlParams.get('receipt_no');
+      if (!receiptNo) { alert('No receipt number provided.'); return; }
+
+      var session = HuaHinSession.getSession();
+      var token = session ? session.token : null;
+
+      fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'financeGetReceipt', params: [token, receiptNo] })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (!data.ok) { alert(data.error); return; }
+
+        var r = data.receipt;
+        var t = data.transaction;
+        var c = data.customer;
+
+        document.getElementById('rc-property').textContent = t.property_id === 'precious' ? 'The Precious' : 'The Moment';
+        document.getElementById('rc-no').textContent = r.receipt_no;
+        document.getElementById('rc-date').textContent = r.receipt_date;
+        document.getElementById('rc-txn').textContent = t.txn_id;
+        document.getElementById('rc-guest').textContent = t.guest_or_vendor || '-';
+        document.getElementById('rc-room').textContent = t.room_name || '-';
+        document.getElementById('rc-month').textContent = t.billing_month || '-';
+        document.getElementById('rc-channel').textContent = t.payment_channel || 'cash';
+
+        if (t.transfer_ref) {
+          document.getElementById('rc-ref').textContent = t.transfer_ref;
+          document.getElementById('rc-ref-container').classList.remove('hidden');
+        }
+
+        if (c) {
+          if (c.phone) {
+            document.getElementById('rc-phone').textContent = c.phone;
+            document.getElementById('rc-phone-container').classList.remove('hidden');
+          }
+          if (c.address) {
+            document.getElementById('rc-address').textContent = c.address;
+            document.getElementById('rc-address-container').classList.remove('hidden');
+          }
+          if (c.id_card) {
+            document.getElementById('rc-tax').textContent = c.id_card;
+            document.getElementById('rc-tax-container').classList.remove('hidden');
+          }
+        }
+
+        var amount = r.amount || t.net_amount || t.amount;
+        document.getElementById('rc-total').textContent = '฿' + amount.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+        var tbody = document.getElementById('rc-items');
+        tbody.innerHTML = '';
+        t.items.forEach(function(item) {
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td>' + escapeHtml(item.description) + '</td>' +
+            '<td class="right">' + (item.units || 1) + '</td>' +
+            '<td class="right">' + item.unit_price.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td class="right">' + item.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>';
+          tbody.appendChild(tr);
+        });
+      }).catch(function(err) {
+        alert("Failed to load receipt data: " + err.message);
+      });
+    };
+  </script>
+</body>
+</html>

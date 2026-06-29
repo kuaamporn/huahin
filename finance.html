@@ -320,8 +320,29 @@
 
       </div>
 
+      <div id="fm-receipt-gen-section" class="hidden" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">Receipt Generation</h4>
+        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 120px;">
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">Receipt Type</label>
+            <select id="fm-receipt-type" style="width: 100%; padding: 6px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;">
+              <option value="RR">RR (Rent/Monthly)</option>
+              <option value="RD">RD (Daily/Walk-in)</option>
+              <option value="RA">RA (Deposit)</option>
+            </select>
+          </div>
+          <div style="flex: 1; min-width: 120px;">
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">Receipt Date</label>
+            <input type="date" id="fm-receipt-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
+          </div>
+          <button id="fm-generate-receipt-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate Receipt</button>
+        </div>
+        <div id="fm-receipt-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
+      </div>
+
       <div class="modal-footer-row">
         <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);">🖨️ Print Invoice</button>
+        <button id="fm-print-receipt-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0284C7; color:#0284C7;">🖨️ Print Receipt</button>
         <button class="btn-secondary" id="finance-modal-cancel">Cancel</button>
         <button class="btn-primary" id="finance-modal-save">Save</button>
       </div>
@@ -988,7 +1009,7 @@
     }
 
     var financeModalMode = 'revenue';
-    var REVENUE_CATS = ['rent', 'walkin', 'deposit', 'damage_fee', 'fitness', 'breakfast', 'other'];
+    var REVENUE_CATS = ['rent', 'walkin', 'deposit', 'monthly rent', 'monthly deposit', 'daily rent', 'daily deposit', 'BK rent', 'BK deposit', 'EXP rent', 'EXP deposit', 'damage_fee', 'fitness', 'breakfast', 'other'];
     var EXPENSE_CATS = ['utility', 'repair', 'cleaning', 'supplies', 'salaries', 'deposit_return', 'other'];
 
     
@@ -1033,6 +1054,9 @@
 
       hide('finance-modal-error');
       document.getElementById('fm-print-btn').classList.add('hidden');
+      document.getElementById('fm-print-receipt-btn').classList.add('hidden');
+      document.getElementById('fm-receipt-gen-section').classList.add('hidden');
+      document.getElementById('fm-receipt-error').classList.add('hidden');
       show('finance-modal');
       loadRoomsAndBookingsCache();
     }
@@ -1198,6 +1222,80 @@
       var printBtn = document.getElementById('fm-print-btn');
       printBtn.classList.remove('hidden');
       printBtn.onclick = function(e) { e.preventDefault(); window.open('invoice.html?id=' + t.txn_id, '_blank'); };
+
+      var printReceiptBtn = document.getElementById('fm-print-receipt-btn');
+      var receiptGenSection = document.getElementById('fm-receipt-gen-section');
+      printReceiptBtn.classList.add('hidden');
+      receiptGenSection.classList.add('hidden');
+      document.getElementById('fm-receipt-error').classList.add('hidden');
+
+      if (t.direction === 'IN') {
+        if (t.receipt_no) {
+          printReceiptBtn.classList.remove('hidden');
+          printReceiptBtn.onclick = function(e) {
+            e.preventDefault();
+            window.open('receipt.html?receipt_no=' + encodeURIComponent(t.receipt_no), '_blank');
+          };
+        } else {
+          receiptGenSection.classList.remove('hidden');
+          document.getElementById('fm-receipt-date').value = t.txn_date || todayDateStringForInput();
+
+          var typeSelect = document.getElementById('fm-receipt-type');
+          var cat = t.category || '';
+          if (cat.indexOf('deposit') >= 0) {
+            typeSelect.value = 'RA';
+          } else if (cat === 'daily rent' || cat === 'walkin') {
+            typeSelect.value = 'RD';
+          } else {
+            typeSelect.value = 'RR';
+          }
+
+          document.getElementById('fm-generate-receipt-btn').onclick = function(e) {
+            e.preventDefault();
+            var type = typeSelect.value;
+            var date = document.getElementById('fm-receipt-date').value;
+            var errorEl = document.getElementById('fm-receipt-error');
+            errorEl.classList.add('hidden');
+
+            if (!date) {
+              errorEl.textContent = 'Please select a receipt date.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            var genBtn = document.getElementById('fm-generate-receipt-btn');
+            genBtn.disabled = true;
+            genBtn.textContent = 'Generating...';
+
+            callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date]).then(function(res) {
+              genBtn.disabled = false;
+              genBtn.textContent = 'Generate Receipt';
+              if (res.ok) {
+                alert('Receipt generated successfully: ' + res.receipt_no);
+                callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
+                  if (txnRes.ok) {
+                    var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
+                    if (localIdx >= 0) {
+                      TRANSACTIONS[localIdx] = txnRes.transaction;
+                    }
+                    editTransaction(t.txn_id);
+                  }
+                  loadFinanceData();
+                });
+              } else {
+                errorEl.textContent = res.error;
+                errorEl.classList.remove('hidden');
+              }
+            }).catch(function(err) {
+              genBtn.disabled = false;
+              genBtn.textContent = 'Generate Receipt';
+              errorEl.textContent = 'Connection error: ' + err.message;
+              errorEl.classList.remove('hidden');
+            });
+          };
+        }
+      }
+
       show('finance-modal');
       loadRoomsAndBookingsCache();
     }

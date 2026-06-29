@@ -85,6 +85,7 @@
         </div>
         <button id="btn-load" class="btn-primary" style="background:var(--ink);">Load Active Rooms</button>
         <button id="btn-generate" class="btn-primary" style="margin-left:auto;" disabled>Generate Invoices</button>
+        <button id="btn-print-selected" class="btn-primary" style="margin-left:12px; background:#0284C7;" disabled>Print Selected</button>
       </div>
       <div id="err-display" class="err-msg"></div>
 
@@ -244,7 +245,7 @@
         var tr = document.createElement('tr');
         if (r.pending_txn_id) {
           tr.innerHTML =
-            '<td></td>' +
+            '<td><input type="checkbox" class="chk-pending" data-txn-id="' + r.pending_txn_id + '" checked onchange="updatePrintBtn()" /></td>' +
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td colspan="12">' +
               '<div style="padding:10px; background:#fff8e1; border:1px solid #ffe082; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">' +
@@ -278,21 +279,36 @@
           calcRow(idx);
         }
       });
-      if (hasNonPending) {
+      var hasPending = loadedRooms.some(function(r) { return r.pending_txn_id; });
+      if (hasNonPending || hasPending) {
         document.getElementById('chk-all').checked = true;
         updateGenerateBtn();
+        updatePrintBtn();
       }
     }
 
     window.toggleAllRooms = function(checked) {
-      var cbs = document.querySelectorAll('.chk-room');
+      var cbs = document.querySelectorAll('.chk-room, .chk-pending');
       cbs.forEach(function(cb) { cb.checked = checked; });
       updateGenerateBtn();
+      updatePrintBtn();
     };
 
     window.updateGenerateBtn = function() {
       var checkedCount = document.querySelectorAll('.chk-room:checked').length;
       document.getElementById('btn-generate').disabled = (checkedCount === 0);
+    };
+
+    window.updatePrintBtn = function() {
+      var checkedCount = document.querySelectorAll('.chk-pending:checked').length;
+      document.getElementById('btn-print-selected').disabled = (checkedCount === 0);
+    };
+
+    document.getElementById('btn-print-selected').onclick = function() {
+      var checkedBoxes = document.querySelectorAll('.chk-pending:checked');
+      if (checkedBoxes.length === 0) return;
+      var txnIds = Array.from(checkedBoxes).map(function(cb) { return cb.getAttribute('data-txn-id'); });
+      window.open('batch-invoice.html?ids=' + txnIds.join(','), '_blank');
     };
 
     function calcRow(idx) {
