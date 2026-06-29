@@ -3,118 +3,458 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Receipt</title>
+  <title>Receipt Printout</title>
   <style>
-    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; font-size: 14px; line-height: 1.5; }
-    .a4-paper { background: #fff; max-width: 21cm; margin: 0 auto; padding: 2cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); box-sizing: border-box; display: flex; flex-direction: column; }
-    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
-    .title { font-size: 24px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-    .meta { text-align: right; font-size: 14px; line-height: 1.6; }
-    .meta div { margin-bottom: 2px; }
-    .company-details { font-size: 13px; color: #333; margin-top: 5px; line-height: 1.4; }
-    .grid-info { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 40px; }
-    .bill-to, .payment-info { flex: 1; }
-    .section-title { font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; font-size: 12px; color: #555; }
-    p { margin: 4px 0; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-    th, td { border-bottom: 1px solid #ddd; padding: 12px 10px; text-align: left; }
-    th { background: #f9f9f9; font-weight: bold; border-top: 1px solid #000; border-bottom: 2px solid #000; font-size: 13px; text-transform: uppercase; }
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: #e5e5e5;
+      margin: 0;
+      padding: 20px;
+      color: #000;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .a4-paper {
+      background: #fff;
+      width: 21cm;
+      height: 29.7cm;
+      margin: 0 auto 30px auto;
+      padding: 1.5cm 1.5cm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      page-break-after: always;
+    }
+
+    .a4-paper:last-of-type {
+      page-break-after: avoid;
+    }
+
+    .company-header {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    .company-name-th { font-size: 16px; font-weight: bold; }
+    .company-name-en { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+    .company-address { font-size: 12px; color: #333; line-height: 1.3; }
+
+    .receipt-title-bar {
+      border-top: 1.5px solid #000;
+      border-bottom: 1.5px solid #000;
+      padding: 5px 0;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .meta-grid {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .meta-left {
+      flex: 1.5;
+      padding-right: 20px;
+    }
+
+    .meta-right {
+      flex: 1;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .meta-row {
+      display: flex;
+      margin-bottom: 4px;
+    }
+
+    .meta-label {
+      font-weight: bold;
+      width: 170px;
+      text-align: left;
+    }
+
+    .meta-value {
+      flex: 1;
+      text-align: left;
+    }
+
+    .table-container {
+      flex: 1;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+      padding: 8px 5px;
+      font-weight: bold;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    td {
+      padding: 6px 5px;
+      font-size: 13px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .border-bottom-dot {
+      border-bottom: 1px dashed #ccc;
+    }
+
     .right { text-align: right; }
     .center { text-align: center; }
-    .total-row { font-size: 16px; font-weight: bold; }
-    .total-row td { border-bottom: 2px solid #000; border-top: 1px solid #000; padding-top: 15px; padding-bottom: 15px; }
-    .signature-area { margin-top: auto; display: flex; justify-content: space-between; gap: 50px; padding-top: 50px; }
-    .sig-box { flex: 1; text-align: center; }
-    .sig-line { border-bottom: 1px solid #000; margin-bottom: 8px; height: 50px; }
-    .footer { text-align: center; color: #777; font-size: 12px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px; }
+
+    .summary-section {
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+      padding: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 25px;
+    }
+
+    .baht-text-box {
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    .total-box {
+      font-weight: bold;
+      display: flex;
+      gap: 15px;
+      font-size: 14px;
+    }
+
+    .double-underline {
+      border-bottom: 3px double #000;
+      padding-bottom: 2px;
+    }
+
+    .remark-section {
+      font-size: 12px;
+      margin-bottom: 35px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 10px;
+    }
+
+    .signature-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 100px;
+      margin-top: auto;
+      padding-bottom: 20px;
+    }
+
+    .sig-col {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .sig-line {
+      border-bottom: 1px dashed #000;
+      margin-bottom: 8px;
+      height: 45px;
+    }
+
+    .no-print-bar {
+      max-width: 21cm;
+      margin: 0 auto 15px auto;
+      text-align: right;
+    }
+
+    .btn-print {
+      padding: 10px 20px;
+      background: #0F766E;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+
     @media print {
       body { background: #fff; padding: 0; }
-      .a4-paper { box-shadow: none; margin: 0; min-height: 0; padding: 1.5cm; }
-      .no-print { display: none; }
+      .a4-paper { box-shadow: none; margin: 0; padding: 1.5cm 1.5cm; width: auto; height: auto; }
+      .no-print-bar { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="a4-paper">
-    <div style="text-align:right; margin-bottom: 20px;" class="no-print">
-      <button onclick="window.print()" style="padding:10px 20px; background:#0F766E; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">Print Receipt</button>
-    </div>
 
-    <div class="header">
-      <div>
-        <div class="title" id="rc-property">The Precious Moment</div>
-        <div class="company-details">
-          Hua Hin, Prachuap Khiri Khan, Thailand<br>
-          Tax ID: 002-1-36419-3 (Kasikorn Bank Account Ref)
-        </div>
-      </div>
-      <div class="meta">
-        <div style="font-size: 20px; font-weight: bold; color: #0F766E;">RECEIPT / TAX INVOICE</div>
-        <div><strong>Receipt No:</strong> <span id="rc-no" style="font-family: monospace; font-weight: bold;"></span></div>
-        <div><strong>Date:</strong> <span id="rc-date"></span></div>
-        <div><strong>Ref Invoice:</strong> <span id="rc-txn" style="font-family: monospace;"></span></div>
-      </div>
-    </div>
-
-    <div class="grid-info">
-      <div class="bill-to">
-        <div class="section-title">Received From (Customer)</div>
-        <p><strong>Name:</strong> <span id="rc-guest"></span></p>
-        <p><strong>Room:</strong> <span id="rc-room" style="font-weight:bold;"></span></p>
-        <p id="rc-phone-container" class="hidden"><strong>Phone:</strong> <span id="rc-phone"></span></p>
-        <p id="rc-address-container" class="hidden"><strong>Address:</strong> <span id="rc-address"></span></p>
-        <p id="rc-tax-container" class="hidden"><strong>Tax ID:</strong> <span id="rc-tax"></span></p>
-      </div>
-      <div class="payment-info">
-        <div class="section-title">Payment Method Info</div>
-        <p><strong>Channel:</strong> <span id="rc-channel" style="text-transform: uppercase;"></span></p>
-        <p id="rc-ref-container" class="hidden"><strong>Ref/Memo:</strong> <span id="rc-ref"></span></p>
-        <p><strong>Billing Month:</strong> <span id="rc-month"></span></p>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th class="right" style="width: 15%;">Qty/Units</th>
-          <th class="right" style="width: 20%;">Unit Price</th>
-          <th class="right" style="width: 25%;">Total (THB)</th>
-        </tr>
-      </thead>
-      <tbody id="rc-items">
-      </tbody>
-      <tfoot>
-        <tr class="total-row">
-          <td colspan="3" class="right">GRAND TOTAL:</td>
-          <td class="right" id="rc-total">฿0.00</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div class="signature-area">
-      <div class="sig-box">
-        <div class="sig-line"></div>
-        <div>Customer Signature</div>
-        <div style="font-size: 11px; color: #777; margin-top: 4px;">Received By</div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-line"></div>
-        <div>Authorized Representative</div>
-        <div style="font-size: 11px; color: #777; margin-top: 4px;">For The Precious Moment</div>
-      </div>
-    </div>
-
-    <div class="footer">
-      Thank you for your payment. This is a computer-generated receipt.
-    </div>
+  <div class="no-print-bar">
+    <button class="btn-print" onclick="window.print()">Print Receipt / พิมพ์ใบเสร็จ</button>
   </div>
+
+  <div id="receipt-container"></div>
 
   <script src="session.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
-    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function escapeHtml(s) {
+      if (!s) return '';
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function formatBE(dateStr) {
+      if (!dateStr) return '-';
+      var p = dateStr.split('-');
+      if (p.length !== 3) return dateStr;
+      var y = parseInt(p[0]) + 543;
+      var m = parseInt(p[1]);
+      var d = parseInt(p[2]);
+      return d + '/' + m + '/' + y;
+    }
+
+    function bahtText(num) {
+      if (!num || isNaN(num)) return 'ศูนย์บาทถ้วน';
+      num = Math.round(num * 100) / 100;
+      var parts = num.toString().split('.');
+      var baht = parts[0];
+      var satang = parts.length > 1 ? parts[1] : null;
+
+      var numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+      var positions = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+
+      function convertSection(section) {
+        var text = '';
+        var len = section.length;
+        for (var i = 0; i < len; i++) {
+          var digit = parseInt(section.charAt(i));
+          var pos = len - i - 1;
+          if (digit !== 0) {
+            if (pos === 1 && digit === 2) text += 'ยี่';
+            else if (pos === 1 && digit === 1) text += '';
+            else if (pos === 0 && digit === 1 && len > 1) text += 'เอ็ด';
+            else text += numbers[digit];
+            text += positions[pos];
+          }
+        }
+        return text;
+      }
+
+      var text = '';
+      if (baht.length > 6) {
+        var million = baht.substring(0, baht.length - 6);
+        var sub = baht.substring(baht.length - 6);
+        text += convertSection(million) + 'ล้าน' + convertSection(sub);
+      } else {
+        text += convertSection(baht);
+      }
+
+      if (text === '') text = 'ศูนย์';
+      text += 'บาท';
+
+      if (!satang || parseInt(satang) === 0) {
+        text += 'ถ้วน';
+      } else {
+        if (satang.length === 1) satang += '0';
+        text += convertSection(satang) + 'สตางค์';
+      }
+      return text;
+    }
+
+    var EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var TH_MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+
+    function getPreviousMonthName(billingMonthStr) {
+      if (!billingMonthStr || billingMonthStr.split('-').length !== 2) return '';
+      var parts = billingMonthStr.split('-');
+      var y = parseInt(parts[0]);
+      var m = parseInt(parts[1]) - 1;
+      var d = new Date(y, m - 1, 1);
+      return TH_MONTHS[d.getMonth()];
+    }
+
+    function renderReceiptHtml(title, r, t, c, b, settings) {
+      var compNameTh = settings.company_name_th || 'บริษัท เดอะ ซีรีน จำกัด ( สำนักงานใหญ่ )';
+      var compNameEn = settings.company_name_en || 'The Serene Company Limited (Head Office)';
+      var compAddressTh = settings.company_address_th || 'เลขที่ 21/234  ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จังหวัดประจวบคีรีขันธ์ 77110';
+      var compAddressEn = settings.company_address_en || '21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110';
+      var compTaxId = settings.company_tax_id || '0-7755-55000-56-5';
+      var compTel = settings.company_tel || '094-567-4488, 094-249-1188';
+
+      var formattedReceiptDate = formatBE(r.receipt_date);
+      var roomDisp = t.room_name || '-';
+
+      var rowsHtml = '';
+      var itemIndex = 1;
+
+      t.items.forEach(function(item) {
+        var description = escapeHtml(item.description);
+        var subRowsHtml = '';
+        var unitLabel = 'รายการ';
+
+        if (item.category === 'rent' || item.category === 'monthly rent' || item.category === 'daily rent' || item.category === 'BK rent' || item.category === 'EXP rent') {
+          description = 'ค่าเช่าห้อง/room rent';
+          var isMonthly = t.category === 'monthly rent' || t.category === 'rent' || (b && b.booking_type === 'monthly');
+          unitLabel = isMonthly ? 'เดือน' : 'วัน';
+
+          if (b) {
+            if (isMonthly) {
+              subRowsHtml += '<div style="font-size:11px; margin-top:2px; color:#555;">Move-in: ' + formatBE(b.checkin_date) + '</div>';
+              subRowsHtml += '<div style="font-size:11px; color:#555;">Move-out: ' + formatBE(b.checkout_date) + ' (ก่อนเที่ยง)</div>';
+            } else {
+              subRowsHtml += '<div style="font-size:11px; margin-top:2px; color:#555;">Check-in ' + formatBE(b.checkin_date) + '</div>';
+              subRowsHtml += '<div style="font-size:11px; color:#555;">Check-out ' + formatBE(b.checkout_date) + '</div>';
+            }
+          }
+        } else if (item.category === 'utility' || item.description.toLowerCase().indexOf('electric') !== -1) {
+          var prevMonth = getPreviousMonthName(t.billing_month);
+          description = 'ค่าไฟฟ้า/Electric Supply เดือน ' + prevMonth;
+          unitLabel = 'หน่วย';
+        } else if (item.category === 'utility' || item.description.toLowerCase().indexOf('water') !== -1) {
+          var prevMonth = getPreviousMonthName(t.billing_month);
+          description = 'ค่าน้ำ/Water Supply เดือน ' + prevMonth;
+          unitLabel = 'หน่วย';
+        } else if (item.description.toLowerCase().indexOf('card') !== -1) {
+          description = 'เงินประกันบัตร / Card Deposit';
+          unitLabel = 'ใบ';
+        } else if (item.description.toLowerCase().indexOf('deposit') !== -1) {
+          description = 'เงินประกัน / Room Deposit';
+          unitLabel = 'รายการ';
+        }
+
+        rowsHtml +=
+          '<tr>' +
+            '<td class="border-bottom-dot">' + itemIndex + '</td>' +
+            '<td class="border-bottom-dot">' +
+              '<div>' + description + '</div>' +
+              subRowsHtml +
+            '</td>' +
+            '<td class="border-bottom-dot right">' + (item.units || 1) + '</td>' +
+            '<td class="border-bottom-dot center">' + unitLabel + '</td>' +
+            '<td class="border-bottom-dot right">' + item.unit_price.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td class="border-bottom-dot right">' + item.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+          '</tr>';
+
+        itemIndex++;
+      });
+
+      for (var k = itemIndex; k <= 5; k++) {
+        rowsHtml +=
+          '<tr>' +
+            '<td>&nbsp;</td>' +
+            '<td>&nbsp;</td>' +
+            '<td>&nbsp;</td>' +
+            '<td>&nbsp;</td>' +
+            '<td>&nbsp;</td>' +
+            '<td>&nbsp;</td>' +
+          '</tr>';
+      }
+
+      var totalVal = r.amount || t.net_amount || t.amount;
+      var totalTextThai = bahtText(totalVal);
+
+      return [
+        '<div class="a4-paper">',
+        '  <div class="company-header">',
+        '    <div class="company-name-th">' + escapeHtml(compNameTh) + '</div>',
+        '    <div class="company-name-en">' + escapeHtml(compNameEn) + '</div>',
+        '    <div class="company-address">' + escapeHtml(compAddressTh) + '</div>',
+        '    <div class="company-address">' + escapeHtml(compAddressEn) + '</div>',
+        '    <div class="company-address" style="margin-top:4px; font-weight:bold;">',
+        '      เลขประจำตัวผู้เสียภาษี/ Tax No. ' + escapeHtml(compTaxId) + ' &nbsp;&nbsp;&nbsp;&nbsp; โทร./ Tel. ' + escapeHtml(compTel),
+        '    </div>',
+        '  </div>',
+        '',
+        '  <div class="receipt-title-bar">' + title + '</div>',
+        '',
+        '  <div class="meta-grid">',
+        '    <div class="meta-left">',
+        '      <div class="meta-row">',
+        '        <div class="meta-label">ได้รับเงินจาก Name :</div>',
+        '        <div class="meta-value" style="font-weight:bold;">' + escapeHtml(t.guest_or_vendor) + '</div>',
+        '      </div>',
+        '      <div class="meta-row">',
+        '        <div class="meta-label">ที่อยู่ Address :</div>',
+        '        <div class="meta-value">' + escapeHtml(c ? c.address : '') + '</div>',
+        '      </div>',
+        '      <div class="meta-row">',
+        '        <div class="meta-label">เลขประจำตัวผู้เสียภาษี Tax No:</div>',
+        '        <div class="meta-value" style="font-family:monospace; letter-spacing:1.5px;">' + (c && c.id_card ? escapeHtml(c.id_card) : '-') + '</div>',
+        '      </div>',
+        '    </div>',
+        '    <div class="meta-right">',
+        '      <div class="meta-row">',
+        '        <div class="meta-label" style="width:100px;">เลขที่/No.</div>',
+        '        <div class="meta-value" style="font-weight:bold; font-family:monospace;">' + escapeHtml(r.receipt_no) + '</div>',
+        '      </div>',
+        '      <div class="meta-row">',
+        '        <div class="meta-label" style="width:100px;">วันที่/Date</div>',
+        '        <div class="meta-value">' + formattedReceiptDate + '</div>',
+        '      </div>',
+        '    </div>',
+        '  </div>',
+        '',
+        '  <div style="font-size:13px; margin-bottom:8px;">ตามรายการดังต่อไปนี้ As followed:</div>',
+        '',
+        '  <div class="table-container">',
+        '    <table>',
+        '      <thead>',
+        '        <tr>',
+        '          <th style="width:6%;">No.</th>',
+        '          <th style="width:50%;">รายการ<br>Description</th>',
+        '          <th style="width:10%; text-align:right;">ปริมาณ<br>Quantity</th>',
+        '          <th style="width:8%; text-align:center;">หน่วย<br>Unit</th>',
+        '          <th style="width:12%; text-align:right;">ราคา<br>Price</th>',
+        '          <th style="width:14%; text-align:right;">จำนวนเงิน<br>Amount</th>',
+        '        </tr>',
+        '      </thead>',
+        '      <tbody>' + rowsHtml + '</tbody>',
+        '    </table>',
+        '  </div>',
+        '',
+        '  <div class="remark-section">',
+        '    <strong>หมายเหตุ / Remark:</strong> Room ' + escapeHtml(roomDisp) + (t.notes ? (' - ' + escapeHtml(t.notes)) : ''),
+        '  </div>',
+        '',
+        '  <div class="summary-section">',
+        '    <div class="baht-text-box">(' + totalTextThai + ')</div>',
+        '    <div class="total-box">',
+        '      <div>รวม / Total:</div>',
+        '      <div class="double-underline">' + totalVal.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>',
+        '    </div>',
+        '  </div>',
+        '',
+        '  <div class="signature-grid">',
+        '    <div class="sig-col">',
+        '      <div class="sig-line"></div>',
+        '      <div>ผู้รับเงิน / Collector</div>',
+        '    </div>',
+        '    <div class="sig-col">',
+        '      <div class="sig-line"></div>',
+        '      <div>ผู้จัดการ / Manager</div>',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('\n');
+    }
 
     window.onload = function() {
       if (!HuaHinSession.requireSession()) return;
@@ -129,58 +469,29 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'financeGetReceipt', params: [token, receiptNo] })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (!data.ok) { alert(data.error); return; }
+      }).then(function(res) {
+        return res.json();
+      }).then(function(data) {
+        if (!data.ok) {
+          alert(data.error);
+          return;
+        }
 
         var r = data.receipt;
         var t = data.transaction;
         var c = data.customer;
+        var b = data.booking;
+        var settings = data.settings || {};
 
-        document.getElementById('rc-property').textContent = t.property_id === 'precious' ? 'The Precious' : 'The Moment';
-        document.getElementById('rc-no').textContent = r.receipt_no;
-        document.getElementById('rc-date').textContent = r.receipt_date;
-        document.getElementById('rc-txn').textContent = t.txn_id;
-        document.getElementById('rc-guest').textContent = t.guest_or_vendor || '-';
-        document.getElementById('rc-room').textContent = t.room_name || '-';
-        document.getElementById('rc-month').textContent = t.billing_month || '-';
-        document.getElementById('rc-channel').textContent = t.payment_channel || 'cash';
+        var container = document.getElementById('receipt-container');
 
-        if (t.transfer_ref) {
-          document.getElementById('rc-ref').textContent = t.transfer_ref;
-          document.getElementById('rc-ref-container').classList.remove('hidden');
-        }
+        var originalHtml = renderReceiptHtml('ใบเสร็จรับเงิน / Original Receipt', r, t, c, b, settings);
+        var copyHtml = renderReceiptHtml('สำเนาใบเสร็จรับเงิน / Copy Receipt', r, t, c, b, settings);
 
-        if (c) {
-          if (c.phone) {
-            document.getElementById('rc-phone').textContent = c.phone;
-            document.getElementById('rc-phone-container').classList.remove('hidden');
-          }
-          if (c.address) {
-            document.getElementById('rc-address').textContent = c.address;
-            document.getElementById('rc-address-container').classList.remove('hidden');
-          }
-          if (c.id_card) {
-            document.getElementById('rc-tax').textContent = c.id_card;
-            document.getElementById('rc-tax-container').classList.remove('hidden');
-          }
-        }
+        container.innerHTML = originalHtml + copyHtml;
 
-        var amount = r.amount || t.net_amount || t.amount;
-        document.getElementById('rc-total').textContent = '฿' + amount.toLocaleString(undefined, {minimumFractionDigits: 2});
-
-        var tbody = document.getElementById('rc-items');
-        tbody.innerHTML = '';
-        t.items.forEach(function(item) {
-          var tr = document.createElement('tr');
-          tr.innerHTML =
-            '<td>' + escapeHtml(item.description) + '</td>' +
-            '<td class="right">' + (item.units || 1) + '</td>' +
-            '<td class="right">' + item.unit_price.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
-            '<td class="right">' + item.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>';
-          tbody.appendChild(tr);
-        });
       }).catch(function(err) {
-        alert("Failed to load receipt data: " + err.message);
+        alert("Failed to load receipt details: " + err.message);
       });
     };
   </script>
