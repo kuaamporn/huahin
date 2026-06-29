@@ -62,7 +62,7 @@
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="finance.html" id="link-finance" class="hidden">Finance</a>
         <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">Billing</a>
-        <a href="report.html" id="link-report" class="hidden">HK Report</a>
+        <a href="hk-report.html" id="link-report" class="hidden">HK Report</a>
       </div>
     </div>
 
@@ -261,7 +261,7 @@
             '<td><input type="checkbox" class="chk-room" data-idx="' + idx + '" checked onchange="updateGenerateBtn()" /></td>' +
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td>' + escapeHtml(r.guest_name) + '</td>' +
-            '<td class="text-right">฿' + r.rent + '</td>' +
+            '<td class="text-right"><input type="number" min="0" class="grid-input" id="rent_' + idx + '" value="' + r.rent + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" style="width:50px" class="grid-input" id="erate_' + idx + '" value="8" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
@@ -297,6 +297,7 @@
 
     function calcRow(idx) {
       var r = loadedRooms[idx];
+      var rent = parseFloat(document.getElementById('rent_' + idx).value) || 0;
       var prevE = parseFloat(document.getElementById('prev_e_' + idx).value) || 0;
       var currE = parseFloat(document.getElementById('curr_e_' + idx).value) || 0;
       var eRate = parseFloat(document.getElementById('erate_' + idx).value) || 0;
@@ -317,9 +318,10 @@
       }
       document.getElementById('add_tot_' + idx).textContent = '฿' + add;
 
-      var total = r.rent + eAmt + wAmt + add;
+      var total = rent + eAmt + wAmt + add;
       document.getElementById('tot_' + idx).textContent = '฿' + total;
 
+      r.rent = rent;
       r.currentElec = currE; r.currentWater = currW;
       r.prevElecCalc = prevE; r.prevWaterCalc = prevW;
       r.elecUnits = eUnits; r.elecAmt = eAmt; r.elecRate = eRate;

@@ -1,201 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>The Precious Moment System</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
-    :root {
-      --ink: #1D1D1F;
-      --paper: #F5F5F7;
-      --line: #E5E5EA;
-      --go: #0F766E;
-      --go-dark: #0E6B63;
-      --warn: #DC2626;
-      --muted: #86868B;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--paper);
-      color: var(--ink);
-      min-height: 100vh;
-    }
-    .wrap { max-width: 480px; margin: 0 auto; padding: 24px 20px 60px; }
-    .brand {
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 4px;
-      font-family: 'Lexend', sans-serif;
-    }
-    h1 { font-size: 24px; margin: 0 0 24px; font-weight: 700; font-family: 'Lexend', sans-serif; }
-    .card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02), 0 1px 3px rgba(0,0,0,0.04);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
-    }
-    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; margin-top: 14px; }
-    label:first-child { margin-top: 0; }
-    input {
-      width: 100%;
-      padding: 12px 14px;
-      font-size: 16px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--paper);
-      font-family: 'Source Sans 3', sans-serif;
-    }
-    input:focus { outline: 2px solid var(--go); outline-offset: 1px; }
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-top: 18px;
-      font-family: 'Source Sans 3', sans-serif;
-    }
-    .btn-primary { background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; }
-    .btn-primary:active { background: var(--go-dark); }
-    .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); margin-top: 8px; }
-    .btn-out { background: var(--warn); color: #fff; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .error { color: var(--warn); font-size: 14px; margin-top: 10px; }
-    .success { color: var(--go); font-size: 14px; margin-top: 10px; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .hidden { display: none !important; }
-    #qr-reader { width: 100%; border-radius: 8px; overflow: hidden; }
-    .toplink { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; white-space: nowrap; }
-    .toplink:hover { color: var(--go); }
-    .userbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
-    .userbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-    .userbar-nav { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
-    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
-    .btn-signout:hover { background: rgba(220,38,38,0.12); }
-  </style>
-</head>
-<body>
-  <div class="wrap">
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen">
-      <div class="brand">The Precious Moment System</div>
-      <h1>Sign in</h1>
-      <div class="card">
-        <label for="username">Username</label>
-        <input id="username" type="text" autocomplete="username" />
-        <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="current-password" />
-        <button class="btn-primary" id="login-btn">Sign in</button>
-        <div class="error hidden" id="login-error"></div>
-      </div>
-    </div>
-
-    <!-- MAIN SCREEN (after login) -->
-    <div id="main-screen" class="hidden">
-      <div class="userbar">
-        <div class="userbar-header">
-          <div>
-            <div class="brand">The Precious Moment System</div>
-            <h1 id="welcome-name" style="font-size:20px;margin:0;"></h1>
-          </div>
-          <a href="#" class="btn-signout" id="logout-link">Sign out</a>
-        </div>
-        <div class="userbar-nav">
-          <a href="rooms.html" class="toplink hidden" id="rooms-link">Rooms</a>
-          <a href="finance.html" class="toplink hidden" id="finance-link">Finance</a>
-          <a href="dashboard.html" class="toplink hidden" id="dashboard-link">Dashboard</a>
-          <a href="hr.html" class="toplink hidden" id="hr-link">HR</a>
-          <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
-          <a href="hk-report.html" class="toplink hidden" id="report-link">HK Report</a>
-        </div>
-      </div>
-
-      <div class="card" id="camera-card">
-        <div id="today-status" style="font-weight:bold; font-size:15px; margin-bottom:12px; text-align:center;">Loading status...</div>
-        
-        <div id="camera-section" class="hidden">
-          <div class="muted" style="margin-bottom:12px;">Scan the QR code posted at your office to check in or out. Location services must be enabled — check-in is only accepted within range of the office.</div>
-
-          <button class="btn-primary" id="start-camera-btn">Tap to start camera</button>
-          <div class="error hidden" id="camera-error"></div>
-
-          <div id="qr-reader" class="hidden"></div>
-          <div id="qr-status" class="muted" style="margin-top:10px;"></div>
-          <button class="btn-secondary hidden" id="rescan-btn">Scan again</button>
-        </div>
-        
-        <div id="quick-checkout-section" class="hidden">
-          <button class="btn-out" id="quick-checkout-btn" style="margin-top:0;">Check Out Now</button>
-          <div class="error hidden" id="quick-checkout-error"></div>
-          <div class="success hidden" id="quick-checkout-success"></div>
-        </div>
-      </div>
-
-      <div class="card hidden" id="manual-entry-card">
-        <div class="muted" style="margin-bottom:10px;">Can't use the camera? Enter the office code shown below the QR poster instead.</div>
-        <input id="manual-office-code" type="text" placeholder="e.g. OFF1" autocapitalize="characters" />
-        <button class="btn-secondary" id="manual-submit-btn" style="margin-top:10px;">Use this code</button>
-      </div>
-
-      <div class="card hidden" id="confirm-card">
-        <div id="confirm-office" style="font-weight:600;margin-bottom:4px;"></div>
-        <div class="muted" id="confirm-loc" style="margin-bottom:14px;"></div>
-        <button class="btn-primary" id="checkin-btn">Check In</button>
-        <button class="btn-out" id="checkout-btn">Check Out</button>
-        <div class="error hidden" id="checkin-error"></div>
-        <div class="success hidden" id="checkin-success"></div>
-      </div>
-
-      <!-- TASK LIST CARD -->
-      <div class="card hidden" id="tasks-card">
-        <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
-          <span>📋</span> Active Tasks
-        </h2>
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--warn);">Remaining / Overdue</h3>
-            <div id="tasks-list-remaining" class="muted"></div>
-          </div>
-          <div style="display:flex; gap:16px; align-items:flex-start;">
-          <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Today</h3>
-            <div id="tasks-list-today" class="muted">Loading...</div>
-          </div>
-          <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Tomorrow</h3>
-            <div id="tasks-list-tomorrow" class="muted"></div>
-          </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- QR scanning library (lightweight, free, no API key needed) -->
-  <script src="session.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-  <script>
     // =====================================================================
     // CONFIG — paste your Cloudflare Worker URL here
-    // (looks like https://huahin-api.YOURNAME.workers.dev)
+    // (looks like https://employee-checkin-api.YOURNAME.workers.dev)
     // =====================================================================
-    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+    var WORKER_API_URL = 'https://employee-checkin-api.huahin.workers.dev';
 
     var sessionToken = null;
     var currentEmployeeName = null;
@@ -209,14 +17,7 @@
     function applyNavLinkVisibility() {
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('rooms-link');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('finance-link');
-      if (HuaHinSession.hasRole('owner')) {
-        show('dashboard-link');
-        show('hr-link');
-      }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('billing-link');
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
-        show('report-link');
-      }
+      if (HuaHinSession.hasRole('owner')) show('dashboard-link');
     }
 
     var session = HuaHinSession.getSession();
@@ -605,61 +406,42 @@
 
     function loadEmployeeTasks() {
       var container = document.getElementById('tasks-card');
-      var listRemaining = document.getElementById('tasks-list-remaining');
-      var listToday = document.getElementById('tasks-list-today');
-      var listTomorrow = document.getElementById('tasks-list-tomorrow');
+      var list = document.getElementById('tasks-list');
       if (!sessionToken) return;
 
       callApi('employeeGetTasks', [sessionToken]).then(function(res) {
         if (res.ok) {
           var tasks = res.tasks || [];
-          var todayDate = res.today || new Date().toISOString().slice(0,10);
-
           if (tasks.length === 0) {
-            listRemaining.innerHTML = '';
-            listToday.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
-            listTomorrow.innerHTML = '';
+            list.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks assigned to you today.</div>';
             container.classList.remove('hidden');
             return;
           }
 
-          var tasksRemaining = tasks.filter(function(t) { return t.date && t.date < todayDate; });
-          var tasksToday = tasks.filter(function(t) { return !t.date || t.date === todayDate; });
-          var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date > todayDate; });
+          var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+          tasks.forEach(function(task) {
+            var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
+            var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
+            var confirmBtn = '';
 
-          function renderTasksList(taskList) {
-            if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;">None</div>';
-            var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
-            taskList.forEach(function(task) {
-              var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
-              var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
-              var confirmBtn = '';
+            if (task.type === 'housekeeping') {
+              confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
+            } else {
+              confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
+            }
 
-              if (task.type === 'housekeeping') {
-                confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
-              } else {
-                confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
-              }
-
-              html += '<div style="border-left:3px solid '+badgeColor+';padding-left:12px;margin-bottom:4px;">' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                  '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
-                  '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
-                '</div>' +
-                '<div style="font-weight:600;font-size:14px;margin-top:4px;display:flex;align-items:center;">'+escapeHtml(task.title)+
-                  (task.date ? '<span style="font-size:11px; color:#b45309; background:#fef3c7; padding:2px 6px; border-radius:4px; margin-left:8px; font-weight:normal;">' + escapeHtml(task.date) + '</span>' : '') +
-                '</div>' +
-                (task.description ? '<div class="muted" style="font-size:12px;margin-top:2px;">'+escapeHtml(task.description)+'</div>' : '') +
-                confirmBtn +
-              '</div>';
-            });
-            html += '</div>';
-            return html;
-          }
-
-          listRemaining.innerHTML = renderTasksList(tasksRemaining);
-          listToday.innerHTML = renderTasksList(tasksToday);
-          listTomorrow.innerHTML = renderTasksList(tasksTomorrow);
+            html += '<div style="border-left:3px solid '+badgeColor+';padding-left:12px;margin-bottom:4px;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
+                '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
+              '</div>' +
+              '<div style="font-weight:600;font-size:14px;margin-top:4px;">'+escapeHtml(task.title)+'</div>' +
+              '<div class="muted" style="font-size:12px;margin-top:2px;">Description: '+escapeHtml(task.description)+'</div>' +
+              confirmBtn +
+            '</div>';
+          });
+          html += '</div>';
+          list.innerHTML = html;
           container.classList.remove('hidden');
         } else {
           list.innerHTML = '<div class="error">Error loading tasks: ' + res.error + '</div>';
@@ -686,6 +468,4 @@
         alert('Connection error: ' + err.message);
       });
     }
-  </script>
-</body>
-</html>
+  
