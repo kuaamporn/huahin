@@ -272,10 +272,13 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <div class="tbtns">
         <div class="tbtn sel" onclick="selType('monthly',this)">📅 Monthly</div>
         <div class="tbtn" onclick="selType('walkin',this)">🚶 Walk-in</div>
-        <div class="tbtn" onclick="selType('reserved',this)">📌 Reserved</div>
         <div class="tbtn" onclick="selType('Booking.com',this)">🌐 Booking.com</div>
         <div class="tbtn" onclick="selType('Expedia.com',this)">🌐 Expedia.com</div>
       </div>
+    </div>
+    <div class="fg" style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
+      <input type="checkbox" id="mReservation" style="width:18px; height:18px;" onchange="calcP()" />
+      <label for="mReservation" style="font-weight: 500; font-size: 13px; color: var(--ink);">Reservation (Pending Check-in)</label>
     </div>
     <div class="frow">
       <div class="fg"><label class="fl">Check-in</label><input class="fi" type="date" id="mIn" onchange="calcP()"></div>
@@ -602,6 +605,7 @@ function openBook(rid, date, prop){
   document.getElementById('mOut').value = dk(coD);
   document.getElementById('mGuest').value = '';
   document.getElementById('mNotes').value = '';
+  document.getElementById('mReservation').checked = false;
   document.getElementById('mDep').value = '8000';
   document.getElementById('mCardDepQty').value = '0';
   document.getElementById('mCardDepPrice').value = '500';
@@ -708,7 +712,9 @@ function saveBook(){
   var btn=document.getElementById('saveBtn');
   btn.disabled=true; btn.textContent='Saving…';
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty]).then(function(res){
+  var isRes = document.getElementById('mReservation').checked;
+
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes]).then(function(res){
     btn.disabled=false; btn.textContent='✓ Confirm Booking';
     if(res.ok){
       closeMod();
@@ -745,9 +751,10 @@ function showDetail(id){
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.notes)+'</span></div>':'')+
     (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.createdByName)+'</span></div>':'')+
     '<div class="dactions" style="flex-wrap:wrap;gap:8px 12px;">'+
-      '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">🗑 Cancel Booking</button>'+
+      (b.status === 'CONFIRMED' ? '<button class="btn btn-p" onclick="checkInGuest(\''+b.bookingId+'\')">🛎️ Check In Guest</button>' : '')+
+      '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">' + (b.status === 'CONFIRMED' ? '🗑 Cancel Reservation' : '🗑 Cancel Booking') + '</button>'+
       '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">➕ Extend Stay</button>'+
-      ((b.bookingType==='monthly'||b.bookingType==='monthly-draft') ?
+      ((b.status === 'CHECKED_IN' && (b.bookingType==='monthly'||b.bookingType==='monthly-draft')) ?
         '<button class="btn btn-o" onclick="doMoveTenant(\''+b.bookingId+'\',\''+b.roomId+'\')">📦 Move Room</button>'+
         '<button class="btn btn-o" onclick="doEarlyMoveOut(\''+b.bookingId+'\',\''+b.roomId+'\')" style="color:var(--warn);border-color:var(--warn);">🚪 Early Move-out</button>'
         : '') +
@@ -792,10 +799,39 @@ function extendBooking(id) {
   document.getElementById('mbg').classList.add('open');
 }
 
+function checkInGuest(id) {
+  if(!confirm('Check in guest and recognize transaction as revenue now?')) return;
+  callApi('roomsCheckInGuest', [sessionToken, id]).then(function(res){
+    if(res.ok){ closeDetail(); showToast('Guest checked in successfully!','ok'); bootApp(); }
+    else showToast(res.error||'Could not check in guest','err');
+  });
+}
+
 function delBook(id){
-  if(!confirm('Cancel this booking?')) return;
-  callApi('roomsCancelBooking', [sessionToken, id]).then(function(res){
-    if(res.ok){ closeDetail(); showToast('Booking cancelled','ok'); bootApp(); }
+  var b = bookings.find(function(x) { return x.bookingId === id; });
+  if (!b) return;
+
+  if (b.status === 'CONFIRMED') {
+    document.getElementById('mrCancelBookingId').value = id;
+    document.getElementById('cancelResBg').classList.remove('hidden');
+  } else {
+    if(!confirm('Cancel this active booking?')) return;
+    callApi('roomsCancelBooking', [sessionToken, id, true]).then(function(res){
+      if(res.ok){ closeDetail(); showToast('Booking cancelled','ok'); bootApp(); }
+      else showToast(res.error||'Could not cancel — owner permission required','err');
+    });
+  }
+}
+
+function closeCancelRes() {
+  document.getElementById('cancelResBg').classList.add('hidden');
+}
+
+function confirmCancelRes(refund) {
+  var id = document.getElementById('mrCancelBookingId').value;
+  closeCancelRes();
+  callApi('roomsCancelBooking', [sessionToken, id, refund]).then(function(res){
+    if(res.ok){ closeDetail(); showToast('Reservation cancelled','ok'); bootApp(); }
     else showToast(res.error||'Could not cancel — owner permission required','err');
   });
 }
@@ -960,6 +996,28 @@ async function doEarlyMoveOut(bookingId, roomId) {
       <div style="display:flex; gap:10px; justify-content:flex-end;">
         <button class="btn btn-o" onclick="closeMoveRoom()">Cancel</button>
         <button class="btn btn-m" onclick="confirmMoveRoom()">✓ Move Room</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="cancelResBg" onclick="closeCancelRes()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:450px; max-width:90%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div class="mtitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;">Cancel Reservation</div>
+        <button class="mx" onclick="closeCancelRes()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="mrCancelBookingId">
+      <p style="font-size:14px; color:#333; margin-bottom:20px; text-align:left;">Choose how to handle the reservation deposit/payment in the ledger:</p>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+        <button class="btn btn-o" onclick="confirmCancelRes(true)" style="width:100%; text-align:left; display:flex; align-items:center; gap:8px;">
+          <span>🟢</span> Refund Deposit (Delete Transaction)
+        </button>
+        <button class="btn btn-m" onclick="confirmCancelRes(false)" style="width:100%; text-align:left; display:flex; align-items:center; gap:8px; background:var(--warn); border-color:var(--warn); color:#fff;">
+          <span>🔴</span> Forfeit Deposit (Keep as Revenue)
+        </button>
+      </div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn btn-o" onclick="closeCancelRes()" style="padding:8px 16px;">Abort</button>
       </div>
     </div>
   </div>

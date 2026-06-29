@@ -180,8 +180,12 @@
         <div class="stat" style="cursor:pointer;" id="btn-view-unrefunded">
           <div class="n" id="finance-deposits" style="color:var(--muted);">฿0</div>
           <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            Deposits Held <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
+            Deposit <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
           </div>
+        </div>
+        <div class="stat">
+          <div class="n" id="finance-reservations" style="color:#0284c7;">฿0</div>
+          <div class="l">Reservation</div>
         </div>
       </div>
 
@@ -916,6 +920,7 @@
         document.getElementById('finance-expense').textContent = formatTHB(res.totalExpense);
         document.getElementById('finance-net').textContent = formatTHB(res.netProfit);
         document.getElementById('finance-deposits').textContent = formatTHB(res.depositsHeld);
+        document.getElementById('finance-reservations').textContent = formatTHB(res.reservationsTotal || 0);
       });
 
       callApi('financeListTransactions', [session.token, propertyId, billingMonth]).then(function (res) {
