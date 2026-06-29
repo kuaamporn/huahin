@@ -13,12 +13,13 @@
     body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
 
-    .dash-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
-    .dash-topbar h1 { font-size: 22px; margin: 0; font-family: 'Lexend', sans-serif; }
-    .dash-nav-links { display: flex; gap: 10px; align-items: center; }
-    .dash-nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 6px; }
+    .dash-topbar { display: flex; flex-direction: column; gap: 12px; padding: 12px 0; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .topbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .dash-nav-links { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+    .dash-nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 6px; white-space: nowrap; transition: all 0.15s; }
     .dash-nav-links a:hover { color: var(--ink); background: var(--line); }
-    .dash-nav-links .signout { color: var(--warn); }
+    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .btn-signout:hover { background: rgba(220,38,38,0.12); }
 
     .controls { display: flex; gap: 12px; margin-bottom: 24px; }
     select, input { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 15px; background: #fff; }
@@ -46,9 +47,11 @@
     tr.subtotal.exp td { color: var(--warn); }
 
     @media (max-width: 768px) {
+      .topbar-header { flex-direction: row; justify-content: space-between; align-items: center; }
+      .dash-topbar h1 { font-size: 18px; }
+      .dash-nav-links { gap: 6px 10px; }
+      .dash-nav-links a { padding: 4px 8px; font-size: 12px; }
       .charts-row { flex-direction: column; }
-      .dash-topbar { flex-direction: column; align-items: stretch; gap: 12px; }
-      .dash-nav-links { flex-wrap: wrap; }
       .controls { flex-direction: column; align-items: stretch; }
     }
   </style>
@@ -57,14 +60,17 @@
 <body>
   <div class="wrap">
     <div class="dash-topbar">
-      <h1>Dashboard</h1>
+      <div class="topbar-header">
+        <h1>Dashboard</h1>
+        <a href="javascript:void(0)" id="logout-link" class="btn-signout signout">Sign out</a>
+      </div>
       <div class="dash-nav-links">
         <a href="index.html">Check-in</a>
         <a href="rooms.html">Rooms</a>
         <a href="finance.html">Finance</a>
         <a href="billing.html">Billing</a>
         <a href="hr.html">HR</a>
-        <a href="javascript:void(0)" class="signout" id="logout-link">Sign out</a>
+        <a href="report.html" id="link-report" class="hidden">HK Report</a>
       </div>
     </div>
 
@@ -117,6 +123,9 @@
     if (!HuaHinSession.hasRole('owner')) { window.location.href = 'index.html'; }
     var session = HuaHinSession.getSession();
     var sessionToken = session ? session.token : null;
+    if (HuaHinSession.hasRole('owner', 'frontdesk')) {
+      document.getElementById('link-report').classList.remove('hidden');
+    }
 
     document.getElementById('logout-link').addEventListener('click', function() {
       fetch(WORKER_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout', params: [sessionToken] }) });

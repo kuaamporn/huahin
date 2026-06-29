@@ -35,25 +35,33 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .hidden{display:none !important}
 
 /* ---------- MAIN APP ---------- */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;padding:0 16px;gap:0;position:sticky;top:0;z-index:100;flex-shrink:0;min-height:52px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.prop-tabs{display:flex;align-items:stretch}
-.ptab{display:flex;align-items:center;gap:8px;padding:0 20px;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap;transition:all .15s;font-family:'Lexend',sans-serif}
-.ptab:hover{color:var(--text)}
-.ptab.active.precious{color:var(--pn);border-bottom-color:var(--p);background:rgba(59,130,246,.05)}
-.ptab.active.moment{color:var(--mn);border-bottom-color:var(--m);background:rgba(13,148,136,.05)}
-.ptab.active.combined{color:var(--text);border-bottom-color:#7C3AED;background:rgba(124,58,237,.05)}
-.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.precious .pdot{background:var(--p)} .moment .pdot{background:var(--m)} .combined .pdot{background:#7C3AED}
-.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;padding-left:16px;border-left:1px solid var(--border)}
-.btn{padding:7px 14px;border-radius:12px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Source Sans 3',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px}
-.btn-p{background:var(--primary);color:#fff} .btn-p:hover{background:#0E6B63}
-.btn-m{background:var(--primary-light);color:#fff} .btn-m:hover{background:#0F9D8F}
-.btn-o{background:transparent;color:var(--text);border:1px solid var(--border)} .btn-o:hover{border-color:var(--primary);color:var(--primary)}
-.btn-red{background:rgba(220,38,38,.08);color:#DC2626;border:1px solid rgba(220,38,38,.2)} .btn-red:hover{background:rgba(220,38,38,.12)}
-.user-badge{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px}
-.user-name{font-weight:600}
-.nav-link{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;transition:all .15s}
-.nav-link:hover{color:var(--primary);background:rgba(15,118,110,.06)}
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; z-index: 100; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.topbar-main { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1px solid var(--border); }
+.topbar-brand-section { display: flex; align-items: center; gap: 20px; }
+.topbar-brand { font-size: 18px; font-weight: 700; font-family: 'Lexend', sans-serif; margin: 0; white-space: nowrap; }
+.topbar-links { display: flex; align-items: center; gap: 10px; }
+.nav-link { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; transition: all .15s; white-space: nowrap; }
+.nav-link:hover { color: var(--primary); background: rgba(15,118,110,.06); }
+.topbar-user-section { display: flex; align-items: center; gap: 10px; }
+.user-badge { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; white-space: nowrap; }
+.user-name { font-weight: 600; }
+.btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.btn-signout:hover { background: rgba(220,38,38,0.12); }
+.topbar-sub { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; }
+.prop-tabs { display: flex; align-items: stretch; }
+.ptab { display: flex; align-items: center; gap: 8px; padding: 12px 20px; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; font-size: 13px; color: var(--muted); white-space: nowrap; transition: all .15s; font-family: 'Lexend', sans-serif; }
+.ptab:hover { color: var(--text); }
+.ptab.active.precious { color: var(--pn); border-bottom-color: var(--p); background: rgba(59,130,246,.05); }
+.ptab.active.moment { color: var(--mn); border-bottom-color: var(--m); background: rgba(13,148,136,.05); }
+.ptab.active.combined { color: var(--text); border-bottom-color: #7C3AED; background: rgba(124,58,237,.05); }
+.pdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.precious .pdot { background: var(--p); } .moment .pdot { background: var(--m); } .combined .pdot { background: #7C3AED; }
+.board-controls { display: flex; align-items: center; gap: 12px; }
+.timeline-nav { display: flex; align-items: center; gap: 4px; }
+.btn { padding: 7px 14px; border-radius: 12px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Source Sans 3', sans-serif; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+.btn-p { background: var(--primary); color: #fff; } .btn-p:hover { background: #0E6B63; }
+.btn-m { background: var(--primary-light); color: #fff; } .btn-m:hover { background: #0F9D8F; }
+.btn-o { background: transparent; color: var(--text); border: 1px solid var(--border); } .btn-o:hover { border-color: var(--primary); color: var(--primary); }
 
 .statsbar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
 .sgroup{display:flex;border-right:1px solid var(--border)}
@@ -156,12 +164,20 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 .loading{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 ::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px}
-@media (max-width:800px){
-  .topbar-right{padding-left:10px}
-  .ptab{padding:0 12px}
-  .tbtns{grid-template-columns:1fr 1fr}
-  .tbtn-icon{font-size:18px}
-  .frow{grid-template-columns:1fr}
+@media (max-width: 800px) {
+  .topbar-main { flex-direction: column; align-items: stretch; padding: 8px 12px; gap: 8px; }
+  .topbar-brand-section { flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
+  .topbar-links { flex-wrap: wrap; gap: 6px 10px; width: 100%; }
+  .topbar-user-section { width: 100%; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 6px; }
+  .topbar-sub { flex-direction: column; align-items: stretch; padding: 4px 12px 8px; gap: 8px; }
+  .prop-tabs { justify-content: center; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .ptab { padding: 8px 12px; font-size: 12px; }
+  .board-controls { justify-content: space-between; width: 100%; }
+  .timeline-nav { gap: 2px; }
+  .btn { padding: 6px 10px; font-size: 11px; }
+  .tbtns { grid-template-columns: 1fr 1fr; }
+  .tbtn-icon { font-size: 18px; }
+  .frow { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -172,23 +188,37 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 <div id="main-screen" class="hidden" style="display:flex;flex-direction:column;height:100vh">
 
   <div class="topbar">
-    <div class="prop-tabs">
-      <div class="ptab active precious" onclick="setProp('precious',this)"><span class="pdot"></span>The Precious</div>
-      <div class="ptab moment" onclick="setProp('moment',this)"><span class="pdot"></span>The Moment</div>
-      <div class="ptab combined" onclick="setProp('combined',this)"><span class="pdot"></span>Combined</div>
+    <div class="topbar-main">
+      <div class="topbar-brand-section">
+        <h1 class="topbar-brand">Room Board</h1>
+        <div class="topbar-links">
+          <a href="index.html" class="nav-link">Check-in</a>
+          <a href="finance.html" class="nav-link hidden" id="link-finance">Finance</a>
+          <a href="dashboard.html" class="nav-link hidden" id="link-dashboard">Dashboard</a>
+          <a href="hr.html" class="nav-link hidden" id="link-hr">HR</a>
+          <a href="billing.html" class="nav-link hidden" id="link-billing">Billing</a>
+          <a href="report.html" class="nav-link hidden" id="link-report">HK Report</a>
+        </div>
+      </div>
+      <div class="topbar-user-section">
+        <div class="user-badge"><span class="user-name" id="welcome-name"></span></div>
+        <button class="btn-signout" id="logout-link">Sign Out</button>
+      </div>
     </div>
-    <div class="topbar-right">
-      <button class="btn btn-p" id="addBtn" onclick="openBook()">＋ New Booking</button>
-      <button class="btn btn-o" onclick="shiftTimeline(-30)">◀</button>
-      <button class="btn btn-o" onclick="jumpToday()">Today</button>
-      <button class="btn btn-o" onclick="shiftTimeline(30)">▶</button>
-      <a href="index.html" class="nav-link">Check-in</a>
-      <a href="finance.html" class="nav-link hidden" id="link-finance">Finance</a>
-      <a href="dashboard.html" class="nav-link hidden" id="link-dashboard">Dashboard</a>
-      <a href="hr.html" class="nav-link hidden" id="link-hr">HR</a>
-      <a href="billing.html" class="nav-link hidden" id="link-billing">Billing</a>
-      <div class="user-badge"><span class="user-name" id="welcome-name"></span></div>
-      <button class="btn btn-red" id="logout-link">Sign Out</button>
+    <div class="topbar-sub">
+      <div class="prop-tabs">
+        <div class="ptab active precious" onclick="setProp('precious',this)"><span class="pdot"></span>The Precious</div>
+        <div class="ptab moment" onclick="setProp('moment',this)"><span class="pdot"></span>The Moment</div>
+        <div class="ptab combined" onclick="setProp('combined',this)"><span class="pdot"></span>Combined</div>
+      </div>
+      <div class="board-controls">
+        <button class="btn btn-p" id="addBtn" onclick="openBook()">＋ New Booking</button>
+        <div class="timeline-nav">
+          <button class="btn btn-o" onclick="shiftTimeline(-30)">◀</button>
+          <button class="btn btn-o" onclick="jumpToday()">Today</button>
+          <button class="btn btn-o" onclick="shiftTimeline(30)">▶</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -353,6 +383,9 @@ if (session) {
   if (HuaHinSession.hasRole('owner')) {
     document.getElementById('link-dashboard').classList.remove('hidden');
     document.getElementById('link-hr').classList.remove('hidden');
+  }
+  if (HuaHinSession.hasRole('owner', 'frontdesk')) {
+    document.getElementById('link-report').classList.remove('hidden');
   }
   bootApp();
 }

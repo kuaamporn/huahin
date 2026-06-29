@@ -79,9 +79,13 @@
     .muted { color: var(--muted); font-size: 13px; }
     .hidden { display: none !important; }
     #qr-reader { width: 100%; border-radius: 8px; overflow: hidden; }
-    .toplink { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .toplink { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; white-space: nowrap; }
     .toplink:hover { color: var(--go); }
-    .userbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .userbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .userbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .userbar-nav { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .btn-signout:hover { background: rgba(220,38,38,0.12); }
   </style>
 </head>
 <body>
@@ -104,17 +108,20 @@
     <!-- MAIN SCREEN (after login) -->
     <div id="main-screen" class="hidden">
       <div class="userbar">
-        <div>
-          <div class="brand">The Precious Moment System</div>
-          <h1 id="welcome-name" style="font-size:20px;margin:0;"></h1>
+        <div class="userbar-header">
+          <div>
+            <div class="brand">The Precious Moment System</div>
+            <h1 id="welcome-name" style="font-size:20px;margin:0;"></h1>
+          </div>
+          <a href="#" class="btn-signout" id="logout-link">Sign out</a>
         </div>
-        <div style="display:flex;gap:14px;align-items:center;">
+        <div class="userbar-nav">
           <a href="rooms.html" class="toplink hidden" id="rooms-link">Rooms</a>
           <a href="finance.html" class="toplink hidden" id="finance-link">Finance</a>
           <a href="dashboard.html" class="toplink hidden" id="dashboard-link">Dashboard</a>
           <a href="hr.html" class="toplink hidden" id="hr-link">HR</a>
           <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
-          <a href="#" class="toplink" id="logout-link">Sign out</a>
+          <a href="report.html" class="toplink hidden" id="report-link">HK Report</a>
         </div>
       </div>
 
@@ -207,6 +214,9 @@
         show('hr-link');
       }
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('billing-link');
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
+        show('report-link');
+      }
     }
 
     var session = HuaHinSession.getSession();

@@ -55,12 +55,13 @@
     .success { color: var(--go); font-size: 13px; margin-top: 8px; }
     .hidden { display: none !important; }
 
-    .dash-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
-    .dash-topbar h1 { font-size: 18px; margin: 0; }
-    .dash-nav-links { display: flex; gap: 10px; align-items: center; }
-    .dash-nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; transition: all .15s; }
+    .dash-topbar { display: flex; flex-direction: column; gap: 12px; padding: 12px 0; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .topbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .dash-nav-links { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+    .dash-nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; transition: all .15s; white-space: nowrap; }
     .dash-nav-links a:hover { color: var(--ink); background: var(--line); }
-    .dash-nav-links .signout { color: var(--warn); }
+    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .btn-signout:hover { background: rgba(220,38,38,0.12); }
     .navbar { margin-bottom: 20px; border-bottom: 1px solid var(--line); }
     .nav-tabs { display: flex; gap: 4px; }
     .nav-tab {
@@ -96,8 +97,10 @@
     }
 
     @media (max-width: 768px) {
-      .dash-topbar { flex-direction: column; align-items: stretch; gap: 12px; }
-      .dash-nav-links { flex-wrap: wrap; }
+      .topbar-header { flex-direction: row; justify-content: space-between; align-items: center; }
+      .dash-topbar h1 { font-size: 18px; }
+      .dash-nav-links { gap: 6px 10px; }
+      .dash-nav-links a { padding: 4px 8px; font-size: 12px; }
       .nav-tabs { flex-wrap: wrap; }
     }
   </style>
@@ -106,14 +109,17 @@
 
   <div id="dash-screen" class="wrap">
     <div class="dash-topbar">
-      <h1>The Precious Moment HR</h1>
+      <div class="topbar-header">
+        <h1>The Precious Moment HR</h1>
+        <a href="#" id="logout-link" class="btn-signout signout">Sign out</a>
+      </div>
       <div class="dash-nav-links">
         <a href="index.html">Check-in</a>
         <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
         <a href="finance.html" id="link-finance" class="hidden">Finance</a>
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
         <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
-        <a href="#" id="logout-link" class="signout">Sign out</a>
+        <a href="report.html" id="link-report" class="hidden">HK Report</a>
       </div>
     </div>
     <div class="navbar">
@@ -407,6 +413,9 @@
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) document.getElementById('link-finance').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner')) document.getElementById('link-dashboard').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
+        document.getElementById('link-report').classList.remove('hidden');
+      }
       loadToday();
       applyRoleVisibility();
     }

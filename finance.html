@@ -19,10 +19,13 @@
     .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
     h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .toplinks { display: flex; gap: 16px; }
-    .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .topbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .topbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .toplinks { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+    .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; white-space: nowrap; }
     .toplinks a:hover { color: var(--go); }
+    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .btn-signout:hover { background: rgba(220,38,38,0.12); }
     .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .stat { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .stat:hover { transform: scale(1.02); box-shadow: 0 8px 16px rgba(0,0,0,.05); }
@@ -106,6 +109,9 @@
     .channel-icon { height: 18px; width: 18px; object-fit: contain; vertical-align: middle; border-radius: 3px; }
 
     @media (max-width: 768px) {
+      .topbar-header { flex-direction: row; justify-content: space-between; align-items: center; }
+      .topbar h1 { font-size: 18px; }
+      .toplinks { gap: 6px 12px; }
       .toolbar { flex-direction: column; align-items: stretch; }
       .actions-row { flex-direction: column; align-items: stretch; }
       .actions-row input { max-width: 100% !important; }
@@ -117,9 +123,12 @@
 
   <div class="wrap">
     <div class="topbar">
-      <div>
-        <h1>The Precious Moment Finance</h1>
-        <div class="sub">Revenue and expense tracking per property.</div>
+      <div class="topbar-header">
+        <div>
+          <h1>The Precious Moment Finance</h1>
+          <div class="sub" style="margin-bottom:0;">Revenue and expense tracking per property.</div>
+        </div>
+        <a href="#" class="btn-signout" id="logout-link">Sign out</a>
       </div>
       <div class="toplinks">
         <a href="index.html" id="link-checkin">Check-in</a>
@@ -127,7 +136,7 @@
         <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
-        <a href="#" id="logout-link">Sign out</a>
+        <a href="report.html" id="link-report" class="hidden">HK Report</a>
       </div>
     </div>
 
@@ -504,6 +513,9 @@
         }
         if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
+        if (HuaHinSession.hasRole('owner', 'frontdesk')) {
+          document.getElementById('link-report').classList.remove('hidden');
+        }
 
         var canAddRevenue = HuaHinSession.hasRole('owner', 'revenue');
         var canAddExpense = HuaHinSession.hasRole('owner', 'expense');

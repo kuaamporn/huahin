@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Housekeeping Report — The Precious / The Moment</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+    :root {
+      --ink: #1D1D1F;
+      --paper: #F5F5F7;
+      --line: #E5E5EA;
+      --go: #0F766E;
+      --warn: #DC2626;
+      --muted: #86868B;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
+    h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
+    .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+    .topbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .topbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .toplinks { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+    .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .toplinks a:hover { color: var(--go); }
+    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .btn-signout:hover { background: rgba(220,38,38,0.12); }
+
+    .card-section { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); }
+    .toolbar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .tool-group { display: flex; flex-direction: column; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    select, input[type="date"], input[type="text"] { padding: 8px 10px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; outline: none; background: #fff; }
+    select:focus, input:focus { border-color: var(--go); }
+    .btn-primary { background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+    .btn-primary:hover { background: #0E6B63; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .kpi-val { font-size: 28px; font-weight: 700; font-family: 'Lexend', sans-serif; color: var(--ink); margin-bottom: 4px; }
+    .kpi-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .kpi-card.remaining .kpi-val { color: var(--warn); }
+    .kpi-card.completed .kpi-val { color: var(--go); }
+    .kpi-card.rate .kpi-val { color: #2563EB; }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    th, td { text-align: left; padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--line); }
+    th { background: #F1F5F9; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+
+    .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; text-transform: uppercase; display: inline-block; }
+    .status-badge.cleaned { background: #d8efe2; color: #16523a; }
+    .status-badge.overdue { background: #fde2d3; color: var(--warn); }
+    .status-badge.pending { background: #fef3c7; color: #b45309; }
+
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .error { color: var(--warn); }
+
+    @media (max-width: 768px) {
+      .topbar-header { flex-direction: row; justify-content: space-between; align-items: center; }
+      .topbar h1 { font-size: 18px; }
+      .toplinks { gap: 6px 12px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="topbar-header">
+        <div>
+          <h1>Housekeeping Report</h1>
+          <div class="sub" style="margin-bottom:0;">KPI and task list compliance tracker.</div>
+        </div>
+        <a href="#" class="btn-signout" id="logout-link">Sign out</a>
+      </div>
+      <div class="toplinks">
+        <a href="index.html" id="link-checkin">Check-in</a>
+        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
+        <a href="finance.html" id="link-finance" class="hidden">Finance</a>
+        <a href="billing.html" id="link-billing" class="hidden">Billing</a>
+        <a href="hr.html" id="link-hr" class="hidden">HR</a>
+        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
+        <a href="report.html" id="link-report" class="hidden" style="color:var(--go);font-weight:600;">HK Report</a>
+      </div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="kpi-card total">
+        <div class="kpi-val" id="kpi-total">0</div>
+        <div class="kpi-lbl">Total Tasks Scheduled</div>
+      </div>
+      <div class="kpi-card remaining">
+        <div class="kpi-val" id="kpi-remaining">0</div>
+        <div class="kpi-lbl">Remaining / Overdue</div>
+      </div>
+      <div class="kpi-card completed">
+        <div class="kpi-val" id="kpi-completed">0</div>
+        <div class="kpi-lbl">Completed (Cleaned)</div>
+      </div>
+      <div class="kpi-card rate">
+        <div class="kpi-val" id="kpi-rate">0%</div>
+        <div class="kpi-lbl">Completion Rate</div>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <div class="toolbar">
+        <div class="tool-group">
+          <label>Property</label>
+          <select id="filter-property" onchange="applyFilters()">
+            <option value="all">All Properties</option>
+            <option value="precious">The Precious</option>
+            <option value="moment">The Moment</option>
+          </select>
+        </div>
+        <div class="tool-group">
+          <label>Status</label>
+          <select id="filter-status" onchange="applyFilters()">
+            <option value="all">All Statuses</option>
+            <option value="CLEANED">Cleaned</option>
+            <option value="remaining">Remaining (Pending / Overdue)</option>
+          </select>
+        </div>
+        <div class="tool-group">
+          <label>Start Date</label>
+          <input type="date" id="filter-start-date" onchange="loadReport()" />
+        </div>
+        <div class="tool-group">
+          <label>End Date</label>
+          <input type="date" id="filter-end-date" onchange="loadReport()" />
+        </div>
+        <div class="tool-group" style="flex:1;min-width:180px;">
+          <label>Search</label>
+          <input type="text" id="filter-search" placeholder="Search guest, room..." oninput="applyFilters()" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Room</th>
+              <th>Property</th>
+              <th>Guest Name</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Cleaned At</th>
+              <th>Cleaned By</th>
+            </tr>
+          </thead>
+          <tbody id="report-table-body">
+            <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading report data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="session.js"></script>
+  <script>
+    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+
+    function callApi(action, params) {
+      return fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: action, params: params || [] })
+      }).then(function(res) { return res.json(); });
+    }
+
+    var session = HuaHinSession.requireRole('index.html', 'owner', 'frontdesk');
+    var sessionToken = session ? session.token : null;
+
+    if (session) {
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) document.getElementById('link-finance').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner')) {
+        document.getElementById('link-dashboard').classList.remove('hidden');
+        document.getElementById('link-hr').classList.remove('hidden');
+      }
+      document.getElementById('link-report').classList.remove('hidden');
+    }
+
+    document.getElementById('logout-link').addEventListener('click', function() {
+      callApi('logout', [sessionToken]).catch(function() {});
+      HuaHinSession.clearSession();
+      window.location.href = 'index.html';
+    });
+
+    function getThaiDateString(d) {
+      var date = d ? new Date(d) : new Date();
+      var utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+      var thaiDate = new Date(utc + (3600000 * 7));
+      return thaiDate.toISOString().slice(0, 10);
+    }
+
+    function formatThaiDateTime(utcString) {
+      if (!utcString) return '—';
+      var parts = utcString.split(/[- :]/);
+      if (parts.length < 6) return utcString;
+
+      var date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5]));
+      var dateStr = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      var timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      return dateStr + ' ' + timeStr;
+    }
+
+    var todayStr = getThaiDateString();
+    var defaultStart = new Date();
+    defaultStart.setDate(defaultStart.getDate() - 7);
+    var startStr = getThaiDateString(defaultStart);
+
+    document.getElementById('filter-start-date').value = startStr;
+    document.getElementById('filter-end-date').value = todayStr;
+
+    var ALL_TASKS = [];
+
+    function loadReport() {
+      var propId = document.getElementById('filter-property').value;
+      var prop = propId === 'all' ? null : propId;
+      var sDate = document.getElementById('filter-start-date').value;
+      var eDate = document.getElementById('filter-end-date').value;
+
+      var tbody = document.getElementById('report-table-body');
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading report data...</td></tr>';
+
+      callApi('housekeepingGetReport', [sessionToken, prop, sDate, eDate]).then(function(res) {
+        if (res.ok) {
+          ALL_TASKS = res.tasks || [];
+          applyFilters();
+        } else {
+          tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Error: ' + res.error + '</td></tr>';
+        }
+      }).catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Connection error: ' + err.message + '</td></tr>';
+      });
+    }
+
+    function applyFilters() {
+      var prop = document.getElementById('filter-property').value;
+      var status = document.getElementById('filter-status').value;
+      var query = document.getElementById('filter-search').value.toLowerCase().trim();
+
+      var filtered = ALL_TASKS.filter(function(t) {
+        if (prop !== 'all' && t.propertyId !== prop) return false;
+
+        if (status === 'CLEANED' && t.status !== 'CLEANED') return false;
+        if (status === 'remaining' && t.status === 'CLEANED') return false;
+
+        if (query) {
+          var matchRoom = t.displayName.toLowerCase().indexOf(query) >= 0;
+          var matchGuest = (t.guestName || '').toLowerCase().indexOf(query) >= 0;
+          var matchBy = (t.cleanedBy || '').toLowerCase().indexOf(query) >= 0;
+          return matchRoom || matchGuest || matchBy;
+        }
+
+        return true;
+      });
+
+      var total = filtered.length;
+      var completed = filtered.filter(function(t) { return t.status === 'CLEANED'; }).length;
+      var remaining = total - completed;
+      var rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-remaining').textContent = remaining;
+      document.getElementById('kpi-completed').textContent = completed;
+      document.getElementById('kpi-rate').textContent = rate + '%';
+
+      renderTable(filtered);
+    }
+
+    function renderTable(list) {
+      var tbody = document.getElementById('report-table-body');
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No housekeeping tasks found matching filters.</td></tr>';
+        return;
+      }
+
+      var html = '';
+      list.forEach(function(t) {
+        var statusBadge = '';
+        if (t.status === 'CLEANED') {
+          statusBadge = '<span class="status-badge cleaned">Cleaned</span>';
+        } else if (t.status === 'OVERDUE') {
+          statusBadge = '<span class="status-badge overdue">Overdue</span>';
+        } else {
+          statusBadge = '<span class="status-badge pending">Pending</span>';
+        }
+
+        var propName = t.propertyId === 'precious' ? 'The Precious' : 'The Moment';
+
+        html += '<tr>' +
+          '<td>' + t.taskDate + '</td>' +
+          '<td><strong>Room ' + t.displayName + '</strong></td>' +
+          '<td>' + propName + '</td>' +
+          '<td>' + (t.guestName || '—') + '</td>' +
+          '<td>' + (t.type === 'daily' ? 'Daily Rent' : 'Monthly Request') + '</td>' +
+          '<td>' + t.description + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td>' + formatThaiDateTime(t.cleanedAt) + '</td>' +
+          '<td>' + (t.cleanedBy || '—') + '</td>' +
+        '</tr>';
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>

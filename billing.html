@@ -14,10 +14,13 @@
     .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
     h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .toplinks { display: flex; gap: 16px; }
-    .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .topbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .topbar-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .toplinks { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+    .toplinks a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; white-space: nowrap; }
     .toplinks a:hover { color: var(--go); }
+    .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .btn-signout:hover { background: rgba(220,38,38,0.12); }
     .card-section { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .card-section:hover { box-shadow: 0 8px 16px rgba(0,0,0,.05); }
     .toolbar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
@@ -35,18 +38,22 @@
     .err-msg { color: var(--warn); font-size: 13px; margin-top: 10px; }
 
     @media (max-width: 768px) {
+      .topbar-header { flex-direction: row; justify-content: space-between; align-items: center; }
+      .topbar h1 { font-size: 18px; }
+      .toplinks { gap: 6px 12px; }
       .toolbar { flex-direction: column; align-items: stretch; }
-      .topbar { flex-direction: column; align-items: stretch; gap: 12px; }
-      .toplinks { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div>
-        <h1>The Precious Moment Billing</h1>
-        <div class="sub">Batch generation of monthly invoices.</div>
+      <div class="topbar-header">
+        <div>
+          <h1>The Precious Moment Billing</h1>
+          <div class="sub" style="margin-bottom:0;">Batch generation of monthly invoices.</div>
+        </div>
+        <a href="#" class="btn-signout" id="logout-link">Sign out</a>
       </div>
       <div class="toplinks">
         <a href="index.html" id="link-checkin">Check-in</a>
@@ -55,7 +62,7 @@
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="finance.html" id="link-finance" class="hidden">Finance</a>
         <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">Billing</a>
-        <a href="#" id="logout-link">Sign out</a>
+        <a href="report.html" id="link-report" class="hidden">HK Report</a>
       </div>
     </div>
 
@@ -170,6 +177,9 @@
         show('link-hr');
       }
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('link-finance');
+      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
+        document.getElementById('link-report').classList.remove('hidden');
+      }
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
 
       if (!HuaHinSession.hasRole('owner', 'accountant', 'revenue')) {
