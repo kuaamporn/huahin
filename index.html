@@ -87,9 +87,8 @@
     .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
     .btn-signout:hover { background: rgba(220,38,38,0.12); }
 
-    .task-tabs { display: flex; gap: 4px; background: var(--paper); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
-    .task-tab { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
-    .task-tab.active { background: var(--go); color: #fff; }
+    .acc-header { transition: opacity 0.15s; }
+    .acc-header:active { opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -170,32 +169,75 @@
         <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
           <span>📋</span> Active Tasks
         </h2>
-        <div style="display:flex;flex-direction:column;">
-          <!-- Collapsible Overdue Section -->
-          <div id="overdue-section" class="hidden" style="margin-bottom: 16px;">
-            <div id="overdue-header" onclick="toggleOverdueTasks()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.15); border-radius: 12px; transition: background 0.2s;">
-              <div style="font-weight:600; color:var(--warn); display:flex; align-items:center; gap:6px; font-size:13px;">
-                <span>⚠️</span> Remaining / Overdue (<span id="overdue-count">0</span>)
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Overdue Accordion -->
+          <div id="acc-remaining" class="hidden">
+            <div class="acc-header" onclick="toggleAccordion('remaining')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.15); border-radius: 12px;">
+              <div style="font-weight:600; color:var(--warn); display:flex; align-items:center; gap:6px; font-size:13.5px;">
+                <span>⚠️</span> Remaining / Overdue
               </div>
-              <span id="overdue-toggle-icon" style="color:var(--warn); font-size:11px;">▼</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="acc-badge" id="badge-remaining" style="background:var(--warn); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
+                <span class="acc-icon" id="icon-remaining" style="color:var(--warn); font-size:11px;">▼</span>
+              </div>
             </div>
-            <div id="tasks-list-remaining" class="muted" style="margin-top: 12px; display:flex; flex-direction:column; gap:12px; max-height:250px; overflow-y:auto; padding: 2px;"></div>
+            <div class="acc-content" id="content-remaining" style="margin-top: 10px; display:flex; flex-direction:column; gap:12px; max-height:250px; overflow-y:auto; padding: 2px;"></div>
           </div>
 
-          <!-- Segmented Tabs for 4 Days -->
-          <div class="task-tabs">
-            <div class="task-tab active" onclick="switchTaskTab('today')" id="tab-today">Today</div>
-            <div class="task-tab" onclick="switchTaskTab('tomorrow')" id="tab-tomorrow">Tomorrow</div>
-            <div class="task-tab" onclick="switchTaskTab('dayafter')" id="tab-dayafter">Day After</div>
-            <div class="task-tab" onclick="switchTaskTab('dayafterplus')" id="tab-dayafterplus">Upcoming</div>
+          <!-- Today Accordion -->
+          <div id="acc-today">
+            <div class="acc-header" onclick="toggleAccordion('today')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15); border-radius: 12px;">
+              <div style="font-weight:600; color:var(--go); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-today">
+                <span>📅</span> Today
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="acc-badge" id="badge-today" style="background:var(--go); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
+                <span class="acc-icon" id="icon-today" style="color:var(--go); font-size:11px;">▼</span>
+              </div>
+            </div>
+            <div class="acc-content" id="content-today" style="margin-top: 10px; display:flex; flex-direction:column; gap:12px; padding: 2px;"></div>
           </div>
 
-          <!-- Task Lists -->
-          <div id="tasks-content">
-            <div id="tasks-list-today" class="muted">Loading...</div>
-            <div id="tasks-list-tomorrow" class="muted hidden"></div>
-            <div id="tasks-list-dayafter" class="muted hidden"></div>
-            <div id="tasks-list-dayafterplus" class="muted hidden"></div>
+          <!-- Tomorrow Accordion -->
+          <div id="acc-tomorrow">
+            <div class="acc-header" onclick="toggleAccordion('tomorrow')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: #FAF9F6; border: 1px solid var(--line); border-radius: 12px;">
+              <div style="font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-tomorrow">
+                <span>📅</span> Tomorrow
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="acc-badge" id="badge-tomorrow" style="background:var(--muted); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
+                <span class="acc-icon" id="icon-tomorrow" style="color:var(--muted); font-size:11px;">▶</span>
+              </div>
+            </div>
+            <div class="acc-content hidden" id="content-tomorrow" style="margin-top: 10px; display:flex; flex-direction:column; gap:12px; padding: 2px;"></div>
+          </div>
+
+          <!-- Day After Accordion -->
+          <div id="acc-dayafter">
+            <div class="acc-header" onclick="toggleAccordion('dayafter')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: #FAF9F6; border: 1px solid var(--line); border-radius: 12px;">
+              <div style="font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-dayafter">
+                <span>📅</span> Day After
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="acc-badge" id="badge-dayafter" style="background:var(--muted); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
+                <span class="acc-icon" id="icon-dayafter" style="color:var(--muted); font-size:11px;">▶</span>
+              </div>
+            </div>
+            <div class="acc-content hidden" id="content-dayafter" style="margin-top: 10px; display:flex; flex-direction:column; gap:12px; padding: 2px;"></div>
+          </div>
+
+          <!-- Day After Plus Accordion -->
+          <div id="acc-dayafterplus">
+            <div class="acc-header" onclick="toggleAccordion('dayafterplus')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: #FAF9F6; border: 1px solid var(--line); border-radius: 12px;">
+              <div style="font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-dayafterplus">
+                <span>📅</span> Day After + 1
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="acc-badge" id="badge-dayafterplus" style="background:var(--muted); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
+                <span class="acc-icon" id="icon-dayafterplus" style="color:var(--muted); font-size:11px;">▶</span>
+              </div>
+            </div>
+            <div class="acc-content hidden" id="content-dayafterplus" style="margin-top: 10px; display:flex; flex-direction:column; gap:12px; padding: 2px;"></div>
           </div>
         </div>
       </div>
@@ -618,9 +660,6 @@
 
     function loadEmployeeTasks() {
       var container = document.getElementById('tasks-card');
-      var listRemaining = document.getElementById('tasks-list-remaining');
-      var listToday = document.getElementById('tasks-list-today');
-      var listTomorrow = document.getElementById('tasks-list-tomorrow');
       if (!sessionToken) return;
 
       callApi('employeeGetTasks', [sessionToken]).then(function(res) {
@@ -651,17 +690,21 @@
           var d3 = new Date(d0); d3.setDate(d3.getDate() + 3);
           var dayAfterPlusStr = getIsoString(d3);
 
-          document.getElementById('tab-today').textContent = 'Today (' + formatDateLabelShort(d0) + ')';
-          document.getElementById('tab-tomorrow').textContent = 'Tom (' + formatDateLabelShort(d1) + ')';
-          document.getElementById('tab-dayafter').textContent = formatDateLabelShort(d2);
-          document.getElementById('tab-dayafterplus').textContent = formatDateLabelShort(d3);
+          document.getElementById('header-today').innerHTML = '<span>📅</span> Today (' + formatDateLabelShort(d0) + ')';
+          document.getElementById('header-tomorrow').innerHTML = '<span>📅</span> Tomorrow (' + formatDateLabelShort(d1) + ')';
+          document.getElementById('header-dayafter').innerHTML = '<span>📅</span> ' + formatDateLabelShort(d2);
+          document.getElementById('header-dayafterplus').innerHTML = '<span>📅</span> ' + formatDateLabelShort(d3);
 
           if (tasks.length === 0) {
-            hide('overdue-section');
-            document.getElementById('tasks-list-today').innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
-            document.getElementById('tasks-list-tomorrow').innerHTML = '';
-            document.getElementById('tasks-list-dayafter').innerHTML = '';
-            document.getElementById('tasks-list-dayafterplus').innerHTML = '';
+            document.getElementById('acc-remaining').classList.add('hidden');
+            document.getElementById('badge-today').textContent = '0';
+            document.getElementById('content-today').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">No active tasks.</div>';
+            document.getElementById('badge-tomorrow').textContent = '0';
+            document.getElementById('content-tomorrow').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">None</div>';
+            document.getElementById('badge-dayafter').textContent = '0';
+            document.getElementById('content-dayafter').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">None</div>';
+            document.getElementById('badge-dayafterplus').textContent = '0';
+            document.getElementById('content-dayafterplus').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">None</div>';
             container.classList.remove('hidden');
             return;
           }
@@ -703,17 +746,21 @@
           }
 
           if (tasksRemaining.length === 0) {
-            hide('overdue-section');
+            document.getElementById('acc-remaining').classList.add('hidden');
           } else {
-            show('overdue-section');
-            document.getElementById('overdue-count').textContent = tasksRemaining.length;
-            document.getElementById('tasks-list-remaining').innerHTML = renderTasksList(tasksRemaining);
+            document.getElementById('acc-remaining').classList.remove('hidden');
+            document.getElementById('badge-remaining').textContent = tasksRemaining.length;
+            document.getElementById('content-remaining').innerHTML = renderTasksList(tasksRemaining);
           }
 
-          document.getElementById('tasks-list-today').innerHTML = renderTasksList(tasksToday);
-          document.getElementById('tasks-list-tomorrow').innerHTML = renderTasksList(tasksTomorrow);
-          document.getElementById('tasks-list-dayafter').innerHTML = renderTasksList(tasksDayAfter);
-          document.getElementById('tasks-list-dayafterplus').innerHTML = renderTasksList(tasksDayAfterPlus);
+          document.getElementById('badge-today').textContent = tasksToday.length;
+          document.getElementById('content-today').innerHTML = renderTasksList(tasksToday);
+          document.getElementById('badge-tomorrow').textContent = tasksTomorrow.length;
+          document.getElementById('content-tomorrow').innerHTML = renderTasksList(tasksTomorrow);
+          document.getElementById('badge-dayafter').textContent = tasksDayAfter.length;
+          document.getElementById('content-dayafter').innerHTML = renderTasksList(tasksDayAfter);
+          document.getElementById('badge-dayafterplus').textContent = tasksDayAfterPlus.length;
+          document.getElementById('content-dayafterplus').innerHTML = renderTasksList(tasksDayAfterPlus);
 
           container.classList.remove('hidden');
         } else {
@@ -726,22 +773,16 @@
       });
     }
 
-    function switchTaskTab(tab) {
-      document.querySelectorAll('.task-tab').forEach(function(el) { el.classList.remove('active'); });
-      document.getElementById('tab-' + tab).classList.add('active');
-      document.getElementById('tasks-list-today').classList.add('hidden');
-      document.getElementById('tasks-list-tomorrow').classList.add('hidden');
-      document.getElementById('tasks-list-dayafter').classList.add('hidden');
-      document.getElementById('tasks-list-dayafterplus').classList.add('hidden');
-      document.getElementById('tasks-list-' + tab).classList.remove('hidden');
-    }
-
-    function toggleOverdueTasks() {
-      var el = document.getElementById('tasks-list-remaining');
-      var icon = document.getElementById('overdue-toggle-icon');
-      var isHidden = el.classList.contains('hidden');
-      el.classList.toggle('hidden');
-      icon.textContent = isHidden ? '▼' : '▶';
+    function toggleAccordion(id) {
+      var content = document.getElementById('content-' + id);
+      var icon = document.getElementById('icon-' + id);
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.textContent = '▼';
+      } else {
+        content.classList.add('hidden');
+        icon.textContent = '▶';
+      }
     }
 
     function completeTask(type, roomId, dateStr) {
