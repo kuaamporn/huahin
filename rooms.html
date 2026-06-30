@@ -267,7 +267,14 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <div class="fg"><label class="fl">Room</label><select class="fs" id="mRoom"></select></div>
     </div>
     <div id="booking-fields">
-    <div class="fg"><label class="fl">Guest / Tenant</label><input class="fi" type="text" id="mGuest" placeholder="Full name…"></div>
+    <div class="fg">
+      <label class="fl">Guest / Tenant</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input class="fi" type="text" id="mGuest" list="guest-datalist" placeholder="Full name…" style="flex:1;">
+        <button class="btn btn-o" type="button" onclick="openCusModal()" style="padding:10px 14px;white-space:nowrap;font-size:13px;border-color:var(--muted);color:var(--muted);">＋ New Guest</button>
+      </div>
+      <datalist id="guest-datalist"></datalist>
+    </div>
     <div class="fg"><label class="fl">Booking Type</label>
       <div class="tbtns">
         <div class="tbtn sel" onclick="selType('monthly',this)">📅 Monthly</div>
@@ -312,6 +319,27 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div style="display:flex;gap:9px;margin-top:16px">
       <button class="btn btn-o" style="flex:1" onclick="closeMod()">Cancel</button>
       <button class="btn btn-m" style="flex:2" id="saveBtn" onclick="saveBook()">✓ Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CREATE NEW CUSTOMER MODAL ===================== -->
+<div id="cus-modal" class="mbg hidden" onclick="if(event.target===this) closeCusModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,.4); display:flex; align-items:center; justify-content:center; z-index:1001;">
+  <div class="modal" style="max-width: 500px;">
+    <div class="mhdr">
+      <h2 class="mtitle">Create New Guest</h2>
+      <button class="mx" onclick="closeCusModal()">×</button>
+    </div>
+    <div class="fg"><label class="fl">Full Name *</label><input class="fi" type="text" id="cName" required></div>
+    <div class="fg"><label class="fl">Phone Number</label><input class="fi" type="text" id="cPhone" placeholder="e.g. 0812345678"></div>
+    <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email" id="cEmail" placeholder="e.g. guest@example.com"></div>
+    <div class="fg"><label class="fl">ID Card / Passport</label><input class="fi" type="text" id="cIdCard" placeholder="ID or Passport Number"></div>
+    <div class="fg"><label class="fl">Address</label><textarea class="fta" id="cAddress" style="height: 60px;" placeholder="Full mailing address..."></textarea></div>
+    <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="cNotes" style="height: 60px;" placeholder="Special requests, preferences..."></textarea></div>
+    <div class="cwarn" id="cus-warn"></div>
+    <div style="display:flex;gap:9px;margin-top:16px">
+      <button class="btn btn-o" style="flex:1" onclick="closeCusModal()">Cancel</button>
+      <button class="btn btn-m" style="flex:2" onclick="saveCustomer()">✓ Save Guest</button>
     </div>
   </div>
 </div>
@@ -404,6 +432,7 @@ document.getElementById('logout-link').addEventListener('click', function(e) {
 });
 
 function bootApp() {
+  loadDatalist();
   var outD = new Date(TODAY); outD.setDate(outD.getDate()+7);
   document.getElementById('fIn').value = dk(TODAY);
   document.getElementById('fOut').value = dk(outD);
@@ -1011,6 +1040,48 @@ async function doEarlyMoveOut(bookingId, roomId) {
   showToast('Early move-out processed. Room is now scheduled for cleaning.', 'ok');
   closeDetail();
   bootApp();
+}
+
+function openCusModal() {
+  var currentName = document.getElementById('mGuest').value.trim();
+  document.getElementById('cName').value = currentName;
+  document.getElementById('cPhone').value = '';
+  document.getElementById('cEmail').value = '';
+  document.getElementById('cIdCard').value = '';
+  document.getElementById('cAddress').value = '';
+  document.getElementById('cNotes').value = '';
+  document.getElementById('cus-warn').textContent = '';
+  show('cus-modal');
+}
+function closeCusModal() { hide('cus-modal'); }
+function saveCustomer() {
+  var name = document.getElementById('cName').value.trim();
+  var phone = document.getElementById('cPhone').value.trim();
+  var email = document.getElementById('cEmail').value.trim();
+  var idCard = document.getElementById('cIdCard').value.trim();
+  var address = document.getElementById('cAddress').value.trim();
+  var notes = document.getElementById('cNotes').value.trim();
+  var warn = document.getElementById('cus-warn');
+  if (!name) { warn.textContent = 'Full Name is required.'; return; }
+  callApi('roomsAddCustomer', [sessionToken, name, phone, email, idCard, address, notes]).then(function(res) {
+    if (!res.ok) { warn.textContent = res.error || 'Error saving customer.'; return; }
+    document.getElementById('mGuest').value = name;
+    loadDatalist();
+    hide('cus-modal');
+    showToast('Guest created successfully!', 'ok');
+  });
+}
+function loadDatalist() {
+  callApi('roomsGetCustomers', [sessionToken]).then(function(res) {
+    if (res.ok) {
+      var datalist = document.getElementById('guest-datalist');
+      if (datalist) {
+        datalist.innerHTML = (res.customers || []).map(function(c) {
+          return '<option value="' + escapeHtml(c.name) + '">';
+        }).join('');
+      }
+    }
+  });
 }
 </script>
 

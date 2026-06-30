@@ -183,9 +183,11 @@
             Deposit <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
           </div>
         </div>
-        <div class="stat">
+        <div class="stat" style="cursor:pointer;" id="btn-view-reservations">
           <div class="n" id="finance-reservations" style="color:#0284c7;">฿0</div>
-          <div class="l">Reservation</div>
+          <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            Reservation <span style="background:#0284c7;color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
+          </div>
         </div>
       </div>
 
@@ -367,6 +369,26 @@
             <tr><th>Date</th><th>Room</th><th>Guest</th><th>Amount</th><th>Action</th></tr>
           </thead>
           <tbody id="unrefunded-table-body">
+            <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PENDING RESERVATIONS MODAL ===================== -->
+  <div id="reservations-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="mhdr">
+        <h2 class="mtitle" style="color:#0284c7;">Reservations Waiting for Check-in</h2>
+        <button class="mx" id="reservations-modal-close">×</button>
+      </div>
+      <div style="max-height:60vh;overflow-y:auto;">
+        <table style="width:100%;">
+          <thead>
+            <tr><th>Check-in Date</th><th>Room</th><th>Guest</th><th>Deposit Amount</th><th>Booking Type</th></tr>
+          </thead>
+          <tbody id="reservations-table-body">
             <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
           </tbody>
         </table>
@@ -589,7 +611,9 @@
       document.getElementById('finance-modal-save').addEventListener('click', saveFinanceEntry);
       document.getElementById('finance-export-csv-btn').addEventListener('click', exportFinanceCsv);
       document.getElementById('btn-view-unrefunded').addEventListener('click', openUnrefundedModal);
+      document.getElementById('btn-view-reservations').addEventListener('click', openReservationsModal);
       document.getElementById('unrefunded-modal-close').addEventListener('click', function () { hide('unrefunded-modal'); });
+      document.getElementById('reservations-modal-close').addEventListener('click', function () { hide('reservations-modal'); });
       document.getElementById('btn-manage-vendors').addEventListener('click', openVendorsModal);
       document.getElementById('vendors-modal-close').addEventListener('click', function() { hide('vendors-modal'); });
       document.getElementById('btn-new-vendor').addEventListener('click', function() { openVendorForm(); });
@@ -1325,6 +1349,33 @@
             '<td>'+escapeHtml(d.guest_or_vendor || '-')+'</td>' +
             '<td><b>'+formatTHB(d.deposit_amount)+'</b></td>' +
             '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+')">Refund</button></td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openReservationsModal() {
+      var propertyId = document.getElementById('finance-property').value;
+      show('reservations-modal');
+      var tbody = document.getElementById('reservations-table-body');
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>';
+
+      callApi('financeGetPendingReservations', [session.token, propertyId]).then(function(res) {
+        if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="error">'+escapeHtml(res.error)+'</td></tr>'; return; }
+        var list = res.reservations || [];
+        if (!list.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">No pending reservations waiting for check-in.</td></tr>';
+          return;
+        }
+        var html = '';
+        list.forEach(function(r) {
+          html += '<tr>' +
+            '<td>'+escapeHtml(r.checkin_date)+'</td>' +
+            '<td>'+escapeHtml(r.room_id || '-')+'</td>' +
+            '<td>'+escapeHtml(r.guest_name || '-')+'</td>' +
+            '<td><b>'+formatTHB(r.reservation_deposit || 0)+'</b></td>' +
+            '<td style="text-transform:capitalize;">'+escapeHtml(r.booking_type || '-')+'</td>' +
             '</tr>';
         });
         tbody.innerHTML = html;
