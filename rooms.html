@@ -277,8 +277,12 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       </div>
     </div>
     <div class="fg" style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
-      <input type="checkbox" id="mReservation" style="width:18px; height:18px;" onchange="calcP()" />
+      <input type="checkbox" id="mReservation" style="width:18px; height:18px;" onchange="toggleResDep(); calcP()" />
       <label for="mReservation" style="font-weight: 500; font-size: 13px; color: var(--ink);">Reservation (Pending Check-in)</label>
+    </div>
+    <div class="fg hidden" id="mResDepWrapper" style="margin-top: 10px;">
+      <label class="fl">Reservation Deposit (฿)</label>
+      <input class="fi" type="number" id="mResDep" value="0" min="0" oninput="calcP()" placeholder="Amount paid to hold room...">
     </div>
     <div class="frow">
       <div class="fg"><label class="fl">Check-in</label><input class="fi" type="date" id="mIn" onchange="calcP()"></div>
@@ -616,6 +620,8 @@ function openBook(rid, date, prop){
   document.getElementById('mGuest').value = '';
   document.getElementById('mNotes').value = '';
   document.getElementById('mReservation').checked = false;
+  document.getElementById('mResDepWrapper').classList.add('hidden');
+  document.getElementById('mResDep').value = '0';
   document.getElementById('mDep').value = '8000';
   document.getElementById('mCardDepQty').value = '0';
   document.getElementById('mCardDepPrice').value = '500';
@@ -631,6 +637,18 @@ function openBook(rid, date, prop){
 
 function closeMod(e){ if(e && e.target!==e.currentTarget) return; document.getElementById('mbg').classList.remove('open'); }
 function selType(t, el){ selBT=t; document.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('sel');}); el.classList.add('sel'); calcP(); }
+
+function toggleResDep() {
+  var chk = document.getElementById('mReservation').checked;
+  var wrapper = document.getElementById('mResDepWrapper');
+  var input = document.getElementById('mResDep');
+  if (chk) {
+    wrapper.classList.remove('hidden');
+  } else {
+    wrapper.classList.add('hidden');
+    input.value = '0';
+  }
+}
 
 function calcP(){
   var ci=document.getElementById('mIn').value, co=document.getElementById('mOut').value;
@@ -723,8 +741,9 @@ function saveBook(){
   btn.disabled=true; btn.textContent='Saving…';
 
   var isRes = document.getElementById('mReservation').checked;
+  var resDep = parseFloat(document.getElementById('mResDep').value) || 0;
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes]).then(function(res){
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep]).then(function(res){
     btn.disabled=false; btn.textContent='✓ Confirm Booking';
     if(res.ok){
       closeMod();
