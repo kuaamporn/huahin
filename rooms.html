@@ -301,6 +301,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <div class="prow"><span>Duration</span><span id="pDur">—</span></div>
       <div class="prow"><span>Rate</span><span id="pRate">—</span></div>
       <div class="prow"><span>Deposit</span><span id="pDep">—</span></div>
+      <div class="prow hidden" id="pResRow"><span>Reservation</span><span id="pRes">—</span></div>
       <div class="prow tot"><span>Total Due Now</span><span id="pTot">—</span></div>
     </div>
     </div>
@@ -680,9 +681,19 @@ function calcP(){
   }
   document.getElementById('pDep').textContent = depText;
 
+  var resDep = parseFloat(document.getElementById('mResDep').value) || 0;
+  var isRes = document.getElementById('mReservation').checked;
+  var resRow = document.getElementById('pResRow');
+  if (isRes && resDep > 0) {
+    resRow.classList.remove('hidden');
+    document.getElementById('pRes').textContent = '-฿' + resDep.toLocaleString();
+  } else {
+    resRow.classList.add('hidden');
+  }
+
   var total = 0;
-  if (selBT === 'monthly' || selBT === 'Booking.com' || selBT === 'Expedia.com') { total = rate + totalDep; }
-  else { total = (nights * rate) + totalDep; }
+  if (selBT === 'monthly' || selBT === 'Booking.com' || selBT === 'Expedia.com') { total = rate + totalDep - resDep; }
+  else { total = (nights * rate) + totalDep - resDep; }
   document.getElementById('pTot').textContent = '฿'+total.toLocaleString();
 }
 

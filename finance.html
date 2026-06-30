@@ -935,7 +935,9 @@
           var tr = document.createElement('tr');
           
           var statusLabel = '';
-          if (t.is_verified) {
+          if (t.status === 'pending') {
+            statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">Reservation</span>';
+          } else if (t.is_verified) {
             statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">Verified</span>';
           } else if (t.is_approved) {
             statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">Approved</span>';

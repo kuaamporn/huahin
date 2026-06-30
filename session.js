@@ -12,16 +12,24 @@
       roles: roles || []
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     return session;
   }
 
   function getSession() {
     var raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) {
+      raw = localStorage.getItem(SESSION_KEY);
+      if (raw) {
+        sessionStorage.setItem(SESSION_KEY, raw);
+      }
+    }
     if (!raw) return null;
     try {
       return JSON.parse(raw);
     } catch (e) {
       sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(SESSION_KEY);
       return null;
     }
   }
@@ -41,6 +49,7 @@
 
   function clearSession() {
     sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(SESSION_KEY);
   }
 
   function hasRole() {
