@@ -203,7 +203,7 @@
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th style="width:40px;"></th><th>Date</th><th>Direction</th><th>Property</th><th>Category</th><th>Amount</th><th>Guest/Vendor</th><th>Note</th><th>Action</th></tr>
+          <tr><th style="width:40px;"></th><th>Date</th><th>Direction</th><th>Property</th><th>Room</th><th>Category</th><th>Amount</th><th>Guest/Vendor</th><th>Note</th><th>Action</th></tr>
         </thead>
         <tbody id="finance-table-body">
           <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">Select a month and click Load.</td></tr>
@@ -408,6 +408,19 @@
         <div style="font-size:20px; font-weight:bold; color:var(--text);" id="mo-deposit-amount">฿0</div>
         <input type="hidden" id="mo-txn-id">
         <input type="hidden" id="mo-deposit-val">
+      </div>
+
+      <div id="mo-card-audit-section" class="field" style="background:#f3f1ec; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: none;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:12px; color:var(--muted);">Key Cards Issued</div>
+            <div style="font-size:16px; font-weight:bold; color:var(--text);" id="mo-cards-issued-text">0 cards (฿0 deposit each)</div>
+          </div>
+          <div>
+            <label for="mo-cards-returned" style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Cards Returned</label>
+            <input type="number" id="mo-cards-returned" min="0" value="0" style="width:70px; padding:6px; border-radius:6px; border:1px solid var(--line); font-weight:bold; text-align:center;" oninput="onMoCardsReturnedChange()">
+          </div>
+        </div>
       </div>
 
       <h3>Deductions (Water, Elec, Cleaning, etc.)</h3>
@@ -951,7 +964,7 @@
         var list = res.transactions || [];
         TRANSACTIONS = list;
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
           return;
         }
         tbody.innerHTML = '';
@@ -1017,6 +1030,7 @@
             '<td style="white-space:nowrap;">' + (t.txn_date || '') + '</td>' +
             '<td style="white-space:nowrap;">' + dirLabel + '</td>' +
             '<td>' + (t.property_id || '') + '</td>' +
+            '<td>' + (t.room_id || '-') + '</td>' +
             '<td>' + (t.category || 'Multiple') + '</td>' +
             '<td style="white-space:nowrap;font-weight:600;">' + formatTHB(t.net_amount || t.amount) + '</td>' +
             '<td>' + (t.guest_or_vendor || '') + '</td>' +
@@ -1348,7 +1362,7 @@
             '<td>'+escapeHtml(d.room_id || '-')+'</td>' +
             '<td>'+escapeHtml(d.guest_or_vendor || '-')+'</td>' +
             '<td><b>'+formatTHB(d.deposit_amount)+'</b></td>' +
-            '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+')">Refund</button></td>' +
+            '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+', '+(d.card_deposit || 0)+', '+(d.card_deposit_qty || 0)+')">Refund</button></td>' +
             '</tr>';
         });
         tbody.innerHTML = html;
@@ -1392,15 +1406,67 @@
     }
 
     var MO_ITEMS = [];
+    var MO_CARD_DEP = 0;
+    var MO_CARD_QTY = 0;
 
-    function openMoveOutModal(txnId, depositAmount) {
+    function openMoveOutModal(txnId, depositAmount, cardDeposit, cardDepositQty) {
       document.getElementById('mo-txn-id').value = txnId;
       document.getElementById('mo-deposit-val').value = depositAmount;
       document.getElementById('mo-deposit-amount').textContent = formatTHB(depositAmount);
+
+      MO_CARD_DEP = cardDeposit || 0;
+      MO_CARD_QTY = cardDepositQty || 0;
+
+      var cardAudit = document.getElementById('mo-card-audit-section');
+      if (MO_CARD_QTY > 0) {
+        document.getElementById('mo-cards-issued-text').textContent = MO_CARD_QTY + ' card' + (MO_CARD_QTY > 1 ? 's' : '') + ' (฿' + MO_CARD_DEP + ' deposit each)';
+        document.getElementById('mo-cards-returned').value = MO_CARD_QTY;
+        document.getElementById('mo-cards-returned').max = MO_CARD_QTY;
+        cardAudit.style.display = '';
+      } else {
+        cardAudit.style.display = 'none';
+      }
+
       MO_ITEMS = [];
       renderMoveOutItems();
       show('moveout-modal');
       hide('unrefunded-modal');
+    }
+
+    function onMoCardsReturnedChange() {
+      var returned = parseInt(document.getElementById('mo-cards-returned').value);
+      if (isNaN(returned) || returned < 0) returned = 0;
+      if (returned > MO_CARD_QTY) {
+        returned = MO_CARD_QTY;
+        document.getElementById('mo-cards-returned').value = returned;
+      }
+
+      var lost = MO_CARD_QTY - returned;
+      var foundIdx = MO_ITEMS.findIndex(function(item) {
+        return item.description.indexOf('Unreturned Key Card') === 0;
+      });
+
+      if (lost > 0) {
+        var amt = lost * MO_CARD_DEP;
+        var desc = 'Unreturned Key Card (' + lost + ' card' + (lost > 1 ? 's' : '') + ')';
+        var newItem = {
+          description: desc,
+          category: 'other',
+          units: lost,
+          unit_price: MO_CARD_DEP,
+          amount: amt
+        };
+        if (foundIdx >= 0) {
+          MO_ITEMS[foundIdx] = newItem;
+        } else {
+          MO_ITEMS.push(newItem);
+        }
+      } else {
+        if (foundIdx >= 0) {
+          MO_ITEMS.splice(foundIdx, 1);
+        }
+      }
+      renderMoveOutItems();
     }
 
     document.getElementById('moveout-modal-close').addEventListener('click', function() { hide('moveout-modal'); show('unrefunded-modal'); });
@@ -1426,6 +1492,14 @@
         '</div>';
       });
       document.getElementById('mo-items-container').innerHTML = html;
+
+      var hasLostCardItem = MO_ITEMS.some(function(item) {
+        return item.description.indexOf('Unreturned Key Card') === 0;
+      });
+      if (!hasLostCardItem && MO_CARD_QTY > 0) {
+        document.getElementById('mo-cards-returned').value = MO_CARD_QTY;
+      }
+
       calcMoTotal();
     }
 
@@ -1480,13 +1554,13 @@
     });
 
     function exportFinanceCsv() {
-      var rows = [['Date', 'Direction', 'Property', 'Category', 'Amount', 'Guest/Vendor', 'Note']];
+      var rows = [['Date', 'Direction', 'Property', 'Room', 'Category', 'Amount', 'Guest/Vendor', 'Note']];
       document.querySelectorAll('#finance-table-body tr').forEach(function (tr) {
         if (tr.classList.contains('items-expand-row')) return;
         var cells = [];
         var tdList = tr.querySelectorAll('td');
-        if (tdList.length >= 8) {
-          for (var i = 1; i <= 7; i++) {
+        if (tdList.length >= 9) {
+          for (var i = 1; i <= 8; i++) {
             cells.push(tdList[i].textContent.trim());
           }
           rows.push(cells);
@@ -1524,7 +1598,7 @@
         var newTr = document.createElement('tr');
         newTr.className = 'items-expand-row';
         
-        var html = '<td colspan="9" style="background:#fcfbf9;padding:12px 24px;border-bottom:1px solid var(--line);">';
+        var html = '<td colspan="10" style="background:#fcfbf9;padding:12px 24px;border-bottom:1px solid var(--line);">';
         if (!t.items || t.items.length === 0) {
           html += '<div style="color:var(--muted);font-style:italic;font-size:12px;">No items found for this transaction.</div>';
         } else {
