@@ -1,82 +1,297 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invoice</title>
+  <title>Invoice — The Precious / The Moment</title>
   <style>
-    body { font-family: sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; }
-    .a4-paper { background: #fff; max-width: 21cm; margin: 0 auto; padding: 2cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
-    .title { font-size: 28px; font-weight: bold; }
-    .meta { text-align: right; font-size: 14px; line-height: 1.5; }
-    .bill-to { margin-bottom: 30px; }
-    .bill-to p { margin: 5px 0; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-    th, td { border-bottom: 1px solid #ddd; padding: 12px; text-align: left; }
-    th { background: #f9f9f9; font-weight: bold; }
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: #e5e5e5;
+      margin: 0;
+      padding: 20px;
+      color: #000;
+    }
+
+    .a4-paper {
+      background: #fff;
+      width: 21cm;
+      min-height: 29.7cm;
+      margin: 0 auto 20px auto;
+      padding: 1.5cm 1.5cm;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .logo-img {
+      height: 65px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .company-details {
+      flex: 1;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .comp-title-th { font-size: 15px; font-weight: bold; }
+    .comp-title-en { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+    .comp-txt { color: #333; }
+
+    .invoice-title-bar {
+      border-top: 1.5px solid #000;
+      border-bottom: 1.5px solid #000;
+      padding: 5px 0;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .meta-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 20px;
+    }
+
+    .meta-col {
+      flex: 1;
+      font-size: 13px;
+    }
+
+    .meta-row {
+      display: flex;
+      margin-bottom: 4px;
+    }
+
+    .meta-label {
+      width: 140px;
+      color: #555;
+    }
+
+    .meta-value {
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th {
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+      padding: 8px 5px;
+      font-weight: bold;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    td {
+      padding: 8px 5px;
+      font-size: 13px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .border-bottom-dot {
+      border-bottom: 1px dashed #ccc;
+    }
+
     .right { text-align: right; }
-    .total-row { font-size: 18px; font-weight: bold; }
-    .footer { text-align: center; color: #555; font-size: 12px; margin-top: 50px; border-top: 1px solid #ddd; padding-top: 20px; }
-    .warning { text-align: center; color: red; font-weight: bold; margin-top: 20px; font-size: 14px; }
+    .center { text-align: center; }
+
+    .grand-total-row {
+      font-size: 14px;
+      font-weight: bold;
+      border-top: 1.5px solid #000;
+      border-bottom: 1.5px solid #000;
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .baht-text-box {
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    .payment-block {
+      margin-top: auto;
+      padding: 12px;
+      border: 1px dashed #000;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      background: #fafafa;
+    }
+
+    .signature-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 100px;
+      margin-top: 30px;
+      padding-bottom: 10px;
+    }
+
+    .sig-col {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .sig-line {
+      border-bottom: 1px dashed #000;
+      margin-bottom: 8px;
+      height: 45px;
+    }
+
+    .no-print-bar {
+      max-width: 21cm;
+      margin: 0 auto 15px auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .btn-print {
+      padding: 10px 20px;
+      background: #0F766E;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+
     @media print {
       body { background: #fff; padding: 0; }
-      .a4-paper { box-shadow: none; margin: 0; min-height: 0; }
-      .no-print { display: none; }
+      .a4-paper { box-shadow: none; margin: 0; padding: 1.5cm 1.5cm; width: auto; height: auto; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
 <body>
+
+  <div class="no-print-bar no-print">
+    <label style="font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+      <input type="checkbox" id="toggle-bank-checkbox" checked onchange="toggleBankInfo(this)" style="cursor: pointer;" />
+      Show Bank Payment Info
+    </label>
+    <button class="btn-print" onclick="window.print()">Print A4</button>
+  </div>
+
   <div class="a4-paper">
-    <div style="text-align:right; margin-bottom: 20px;" class="no-print">
-      <button onclick="window.print()" style="padding:10px 20px; background:#0F766E; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">Print A4</button>
-    </div>
-
-    <div class="header">
-      <div>
-        <div class="title" id="inv-property">The Precious Moment</div>
-        <div>Hua Hin, Thailand</div>
-      </div>
-      <div class="meta">
-        <div><strong>INVOICE</strong></div>
-        <div id="inv-date">Date: </div>
-        <div id="inv-txn">Ref: </div>
+    <div class="logo-header">
+      <img src="theserene.jpg" class="logo-img" alt="The Serene" />
+      <div class="company-details">
+        <div class="comp-title-th" id="inv-comp-th">บริษัท เดอะ ซีรีน จำกัด (สำนักงานใหญ่)</div>
+        <div class="comp-title-en" id="inv-comp-en">The Serene Company Limited (Head Office)</div>
+        <div class="comp-txt" id="inv-address-th">เลขที่ 21/234  ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จังหวัดประจวบคีรีขันธ์ 77110</div>
+        <div class="comp-txt" id="inv-address-en">21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110</div>
+        <div style="font-weight: bold; margin-top: 4px;">
+          เลขประจำตัวผู้เสียภาษี/ Tax No. <span id="inv-tax-id">0-7755-55000-56-5</span> &nbsp;&nbsp;&nbsp;&nbsp; โทร./ Tel. <span id="inv-tel">094-567-4488, 094-249-1188</span>
+        </div>
       </div>
     </div>
 
-    <div class="bill-to">
-      <strong>Bill To:</strong>
-      <p id="inv-guest"></p>
-      <p>Room: <span id="inv-room" style="font-weight:bold;"></span></p>
-      <p>Billing Month: <span id="inv-month"></span></p>
+    <div class="invoice-title-bar">ใบแจ้งหนี้ / INVOICE</div>
+
+    <div class="meta-grid">
+      <div class="meta-col">
+        <div class="meta-row">
+          <div class="meta-label">ชื่อผู้เช่า Name :</div>
+          <div class="meta-value" style="font-weight:bold;" id="inv-guest-name">-</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">ที่อยู่ Address :</div>
+          <div class="meta-value" id="inv-guest-address">-</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">เลขเสียภาษี Tax No:</div>
+          <div class="meta-value" style="font-family:monospace; letter-spacing:1.5px;" id="inv-guest-tax">-</div>
+        </div>
+      </div>
+      <div class="meta-col" style="max-width: 320px;">
+        <div class="meta-row">
+          <div class="meta-label" style="width:110px;">เลขที่/No.</div>
+          <div class="meta-value" style="font-weight:bold; font-family:monospace;" id="inv-no-val">-</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label" style="width:110px;">วันที่/Date</div>
+          <div class="meta-value" id="inv-date-val">-</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label" style="width:110px;">ห้อง/Room No.</div>
+          <div class="meta-value" style="font-weight:bold;" id="inv-room-val">-</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label" style="width:110px;">เดือน/Billing Month</div>
+          <div class="meta-value" id="inv-month-val">-</div>
+        </div>
+        <div class="meta-row" style="font-size:11px;color:#555;">
+          <div class="meta-label" style="width:110px;">อ้างอิง/Ref.</div>
+          <div class="meta-value" id="inv-ref-val">-</div>
+        </div>
+      </div>
     </div>
 
     <table>
       <thead>
         <tr>
-          <th>Description</th>
-          <th class="right">Qty/Units</th>
-          <th class="right">Unit Price</th>
-          <th class="right">Total (THB)</th>
+          <th style="width: 8%;">ลำดับ<br>No.</th>
+          <th style="width: 52%;">รายการ<br>Description</th>
+          <th style="width: 12%; text-align: right;">จำนวน<br>Quantity</th>
+          <th style="width: 13%; text-align: right;">หน่วยละ<br>Price</th>
+          <th style="width: 15%; text-align: right;">จำนวนเงิน (บาท)<br>Amount (THB)</th>
         </tr>
       </thead>
       <tbody id="inv-items">
+        <tr><td colspan="5" class="center muted">Loading invoice details...</td></tr>
       </tbody>
-      <tfoot>
-        <tr class="total-row">
-          <td colspan="3" class="right">GRAND TOTAL:</td>
-          <td class="right" id="inv-total">฿0</td>
-        </tr>
-      </tfoot>
     </table>
 
-    <div class="warning">
-      * Please make payment within the 5th of the month to avoid late fees. *<br>
-      <span style="font-size:12px;font-weight:normal;color:#000;">(If paying after the 5th, a late fee will be added to your balance)</span>
+    <div class="grand-total-row">
+      <div class="baht-text-box" id="inv-bahttext">( - )</div>
+      <div style="font-size:16px;">ยอดรวมสุทธิ / Grand Total: <span style="font-size:18px;" id="inv-total-val">฿0.00</span></div>
     </div>
 
-    <div class="footer">
-      Thank you for staying with us.
+    <!-- Bank details section (interactive toggle via checkbox) -->
+    <div id="inv-payment-block" class="payment-block">
+      <div style="font-weight: bold; margin-bottom: 4px;">ช่องทางการชำระเงิน / Payment Instructions :</div>
+      <div>โอนเข้าบัญชี / Bank Transfer: <strong>บริษัท เดอะ ซีรีน จำกัด</strong></div>
+      <div>ธนาคารกสิกรไทย / KBank สาขา หัวหิน</div>
+      <div>เลขบัญชี / Account No: <strong>485-2-43288-3</strong></div>
+    </div>
+
+    <div class="signature-grid">
+      <div class="sig-col">
+        <div class="sig-line"></div>
+        <div>ผู้แจ้งหนี้ / Issued By</div>
+      </div>
+      <div class="sig-col">
+        <div class="sig-line"></div>
+        <div>ผู้จัดการ / Manager</div>
+      </div>
     </div>
   </div>
 
@@ -84,42 +299,176 @@
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
-    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function escapeHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    function toggleBankInfo(checkbox) {
+      var block = document.getElementById('inv-payment-block');
+      block.style.display = checkbox.checked ? 'block' : 'none';
+    }
+
+    function formatBE(dateStr) {
+      if (!dateStr) return '-';
+      var parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      var y = parseInt(parts[0]) + 543;
+      return parts[2] + '/' + parts[1] + '/' + y;
+    }
+
+    function getPreviousMonthName(billingMonthStr) {
+      if (!billingMonthStr || billingMonthStr.split('-').length !== 2) return '';
+      var TH_MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      var parts = billingMonthStr.split('-');
+      var y = parseInt(parts[0]);
+      var m = parseInt(parts[1]) - 1;
+      var d = new Date(y, m - 1, 1);
+      return TH_MONTHS[d.getMonth()];
+    }
+
+    function bahtText(num) {
+      if (!num || isNaN(num)) return 'ศูนย์บาทถ้วน';
+      num = Math.round(num * 100) / 100;
+      var parts = num.toString().split('.');
+      var baht = parts[0];
+      var satang = parts.length > 1 ? parts[1] : null;
+
+      var numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+      var positions = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+
+      function convertSection(section) {
+        var text = '';
+        var len = section.length;
+        for (var i = 0; i < len; i++) {
+          var digit = parseInt(section.charAt(i));
+          var pos = len - i - 1;
+          if (digit !== 0) {
+            if (pos === 1 && digit === 2) text += 'ยี่';
+            else if (pos === 1 && digit === 1) text += '';
+            else if (pos === 0 && digit === 1 && len > 1) text += 'เอ็ด';
+            else text += numbers[digit];
+            text += positions[pos];
+          }
+        }
+        return text;
+      }
+
+      var text = '';
+      if (baht.length > 6) {
+        var million = baht.substring(0, baht.length - 6);
+        var sub = baht.substring(baht.length - 6);
+        text += convertSection(million) + 'ล้าน' + convertSection(sub);
+      } else {
+        text += convertSection(baht);
+      }
+
+      if (text === '') text = 'ศูนย์';
+      text += 'บาท';
+
+      if (!satang || parseInt(satang) === 0) {
+        text += 'ถ้วน';
+      } else {
+        if (satang.length === 1) satang += '0';
+        text += convertSection(satang) + 'สตางค์';
+      }
+      return text;
+    }
 
     window.onload = function() {
       if (!HuaHinSession.requireSession()) return;
       var urlParams = new URLSearchParams(window.location.search);
+      var invoiceNo = urlParams.get('invoice_no');
       var txnId = urlParams.get('id');
-      if (!txnId) { alert('No transaction ID provided.'); return; }
+
+      if (!invoiceNo && !txnId) { alert('No invoice number or transaction ID provided.'); return; }
 
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
+
+      var action = invoiceNo ? 'financeGetInvoice' : 'financeGetTransaction';
+      var params = invoiceNo ? [token, invoiceNo] : [token, txnId];
+
       fetch(WORKER_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'financeGetTransaction', params: [token, txnId] })
+        body: JSON.stringify({ action: action, params: params })
       }).then(function(res) { return res.json(); }).then(function(data) {
         if (!data.ok) { alert(data.error); return; }
 
-        var t = data.transaction;
-        document.getElementById('inv-property').textContent = t.property_id === 'precious' ? 'The Precious' : 'The Moment';
-        document.getElementById('inv-date').textContent = 'Date: ' + t.txn_date;
-        document.getElementById('inv-txn').textContent = 'Ref: ' + t.txn_id;
-        document.getElementById('inv-guest').textContent = t.guest_or_vendor || '-';
-        document.getElementById('inv-room').textContent = t.room_name || '-';
-        document.getElementById('inv-month').textContent = t.billing_month;
-        document.getElementById('inv-total').textContent = '฿' + t.amount.toLocaleString();
+        var r = invoiceNo ? data.invoice : null;
+        var t = invoiceNo ? data.transaction : data.transaction;
+        var c = invoiceNo ? data.customer : null;
+        var b = invoiceNo ? data.booking : null;
+        var settings = data.settings || {};
 
+        // Fill company info
+        if (settings) {
+          if (settings.company_name_th) document.getElementById('inv-comp-th').textContent = settings.company_name_th;
+          if (settings.company_name_en) document.getElementById('inv-comp-en').textContent = settings.company_name_en;
+          if (settings.company_address_th) document.getElementById('inv-address-th').textContent = settings.company_address_th;
+          if (settings.company_address_en) document.getElementById('inv-address-en').textContent = settings.company_address_en;
+          if (settings.company_tax_id) document.getElementById('inv-tax-id').textContent = settings.company_tax_id;
+          if (settings.company_tel) document.getElementById('inv-tel').textContent = settings.company_tel;
+        }
+
+        // Fill invoice metadata
+        document.getElementById('inv-no-val').textContent = invoiceNo ? invoiceNo : 'TX-' + t.txn_id;
+        document.getElementById('inv-date-val').textContent = r ? formatBE(r.invoice_date) : formatBE(t.txn_date);
+        document.getElementById('inv-ref-val').textContent = t.txn_id;
+
+        // Fill customer bill to
+        document.getElementById('inv-guest-name').textContent = t.guest_or_vendor || '-';
+        document.getElementById('inv-guest-address').textContent = c ? (c.address || '-') : '-';
+        document.getElementById('inv-guest-tax').textContent = c ? (c.id_card || '-') : '-';
+
+        document.getElementById('inv-room-val').textContent = t.room_name || '-';
+        document.getElementById('inv-month-val').textContent = t.billing_month || '-';
+
+        var totalVal = r ? r.amount : t.amount;
+        document.getElementById('inv-total-val').textContent = '฿' + totalVal.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('inv-bahttext').textContent = '(' + bahtText(totalVal) + ')';
+
+        // Render items
         var tbody = document.getElementById('inv-items');
+        tbody.innerHTML = '';
+        var itemIndex = 1;
         t.items.forEach(function(i) {
           var tr = document.createElement('tr');
+
+          var desc = i.description;
+          // Apply receipt-style mapping for descriptions
+          if (i.category === 'rent' || i.category === 'monthly rent' || i.category === 'daily rent' || i.category === 'BK rent' || i.category === 'EXP rent') {
+            desc = 'ค่าเช่าห้อง / Room Rent';
+            var isMonthly = t.category === 'monthly rent' || t.category === 'rent' || (b && b.booking_type === 'monthly');
+            if (b) {
+              desc += '<br><span style="font-size:11px; color:#555;">Move-in: ' + formatBE(b.checkin_date) + ' | Move-out: ' + formatBE(b.checkout_date) + '</span>';
+            }
+          } else if (i.category === 'utility' || i.description.toLowerCase().indexOf('electric') !== -1) {
+            var prevMonth = getPreviousMonthName(t.billing_month);
+            desc = 'ค่าไฟฟ้า / Electric Supply' + (prevMonth ? ' เดือน ' + prevMonth : '');
+          } else if (i.category === 'utility' || i.description.toLowerCase().indexOf('water') !== -1) {
+            var prevMonth = getPreviousMonthName(t.billing_month);
+            desc = 'ค่าน้ำ / Water Supply' + (prevMonth ? ' เดือน ' + prevMonth : '');
+          }
+
           tr.innerHTML =
-            '<td>' + escapeHtml(i.description) + '</td>' +
-            '<td class="right">' + (i.units || 1) + '</td>' +
-            '<td class="right">' + i.unit_price + '</td>' +
-            '<td class="right">' + i.amount.toLocaleString() + '</td>';
+            '<td class="border-bottom-dot">' + itemIndex + '</td>' +
+            '<td class="border-bottom-dot">' + desc + '</td>' +
+            '<td class="border-bottom-dot right">' + (i.units || 1) + '</td>' +
+            '<td class="border-bottom-dot right">' + i.unit_price.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td class="border-bottom-dot right">' + i.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>';
           tbody.appendChild(tr);
+          itemIndex++;
         });
+
+        // Pad blank rows to match layout
+        for (var k = itemIndex; k <= 5; k++) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
+          tbody.appendChild(tr);
+        }
       }).catch(function(err) {
         alert("Failed to load invoice data: " + err.message);
       });

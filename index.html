@@ -86,6 +86,10 @@
     .userbar-nav { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
     .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
     .btn-signout:hover { background: rgba(220,38,38,0.12); }
+
+    .task-tabs { display: flex; gap: 4px; background: var(--paper); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+    .task-tab { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
+    .task-tab.active { background: var(--go); color: #fff; }
   </style>
 </head>
 <body>
@@ -166,28 +170,32 @@
         <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
           <span>📋</span> Active Tasks
         </h2>
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--warn);">Remaining / Overdue</h3>
-            <div id="tasks-list-remaining" class="muted"></div>
+        <div style="display:flex;flex-direction:column;">
+          <!-- Collapsible Overdue Section -->
+          <div id="overdue-section" class="hidden" style="margin-bottom: 16px;">
+            <div id="overdue-header" onclick="toggleOverdueTasks()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.15); border-radius: 12px; transition: background 0.2s;">
+              <div style="font-weight:600; color:var(--warn); display:flex; align-items:center; gap:6px; font-size:13px;">
+                <span>⚠️</span> Remaining / Overdue (<span id="overdue-count">0</span>)
+              </div>
+              <span id="overdue-toggle-icon" style="color:var(--warn); font-size:11px;">▼</span>
+            </div>
+            <div id="tasks-list-remaining" class="muted" style="margin-top: 12px; display:flex; flex-direction:column; gap:12px; max-height:250px; overflow-y:auto; padding: 2px;"></div>
           </div>
-          <div style="display:flex; gap:16px; align-items:flex-start;">
-            <div style="flex:1;">
-              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-today">Today</h3>
-              <div id="tasks-list-today" class="muted">Loading...</div>
-            </div>
-            <div style="flex:1;">
-              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-tomorrow">Tomorrow</h3>
-              <div id="tasks-list-tomorrow" class="muted"></div>
-            </div>
-            <div style="flex:1;">
-              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-dayafter">Day After</h3>
-              <div id="tasks-list-dayafter" class="muted"></div>
-            </div>
-            <div style="flex:1;">
-              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-dayafterplus">Day After + 1</h3>
-              <div id="tasks-list-dayafterplus" class="muted"></div>
-            </div>
+
+          <!-- Segmented Tabs for 4 Days -->
+          <div class="task-tabs">
+            <div class="task-tab active" onclick="switchTaskTab('today')" id="tab-today">Today</div>
+            <div class="task-tab" onclick="switchTaskTab('tomorrow')" id="tab-tomorrow">Tomorrow</div>
+            <div class="task-tab" onclick="switchTaskTab('dayafter')" id="tab-dayafter">Day After</div>
+            <div class="task-tab" onclick="switchTaskTab('dayafterplus')" id="tab-dayafterplus">Upcoming</div>
+          </div>
+
+          <!-- Task Lists -->
+          <div id="tasks-content">
+            <div id="tasks-list-today" class="muted">Loading...</div>
+            <div id="tasks-list-tomorrow" class="muted hidden"></div>
+            <div id="tasks-list-dayafter" class="muted hidden"></div>
+            <div id="tasks-list-dayafterplus" class="muted hidden"></div>
           </div>
         </div>
       </div>
@@ -623,12 +631,12 @@
           var parts = todayDate.split('-');
           var d0 = new Date(parts[0], parts[1] - 1, parts[2]);
 
-          function formatDateLabel(d) {
-            var y = d.getFullYear();
+          function formatDateLabelShort(d) {
             var m = String(d.getMonth() + 1).padStart(2, '0');
             var day = String(d.getDate()).padStart(2, '0');
-            return day + '-' + m + '-' + y;
+            return day + '/' + m;
           }
+
           function getIsoString(d) {
             var y = d.getFullYear();
             var m = String(d.getMonth() + 1).padStart(2, '0');
@@ -643,14 +651,14 @@
           var d3 = new Date(d0); d3.setDate(d3.getDate() + 3);
           var dayAfterPlusStr = getIsoString(d3);
 
-          document.getElementById('header-today').textContent = 'Today (' + formatDateLabel(d0) + ')';
-          document.getElementById('header-tomorrow').textContent = 'Tomorrow (' + formatDateLabel(d1) + ')';
-          document.getElementById('header-dayafter').textContent = formatDateLabel(d2);
-          document.getElementById('header-dayafterplus').textContent = formatDateLabel(d3);
+          document.getElementById('tab-today').textContent = 'Today (' + formatDateLabelShort(d0) + ')';
+          document.getElementById('tab-tomorrow').textContent = 'Tom (' + formatDateLabelShort(d1) + ')';
+          document.getElementById('tab-dayafter').textContent = formatDateLabelShort(d2);
+          document.getElementById('tab-dayafterplus').textContent = formatDateLabelShort(d3);
 
           if (tasks.length === 0) {
-            listRemaining.innerHTML = '';
-            listToday.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
+            hide('overdue-section');
+            document.getElementById('tasks-list-today').innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
             document.getElementById('tasks-list-tomorrow').innerHTML = '';
             document.getElementById('tasks-list-dayafter').innerHTML = '';
             document.getElementById('tasks-list-dayafterplus').innerHTML = '';
@@ -665,7 +673,7 @@
           var tasksDayAfterPlus = tasks.filter(function(t) { return t.date && t.date === dayAfterPlusStr; });
 
           function renderTasksList(taskList) {
-            if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;">None</div>';
+            if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">None</div>';
             var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
             taskList.forEach(function(task) {
               var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
@@ -694,11 +702,19 @@
             return html;
           }
 
-          listRemaining.innerHTML = renderTasksList(tasksRemaining);
-          listToday.innerHTML = renderTasksList(tasksToday);
+          if (tasksRemaining.length === 0) {
+            hide('overdue-section');
+          } else {
+            show('overdue-section');
+            document.getElementById('overdue-count').textContent = tasksRemaining.length;
+            document.getElementById('tasks-list-remaining').innerHTML = renderTasksList(tasksRemaining);
+          }
+
+          document.getElementById('tasks-list-today').innerHTML = renderTasksList(tasksToday);
           document.getElementById('tasks-list-tomorrow').innerHTML = renderTasksList(tasksTomorrow);
           document.getElementById('tasks-list-dayafter').innerHTML = renderTasksList(tasksDayAfter);
           document.getElementById('tasks-list-dayafterplus').innerHTML = renderTasksList(tasksDayAfterPlus);
+
           container.classList.remove('hidden');
         } else {
           list.innerHTML = '<div class="error">Error loading tasks: ' + res.error + '</div>';
@@ -708,6 +724,24 @@
         list.innerHTML = '<div class="error">Connection error: ' + err.message + '</div>';
         container.classList.remove('hidden');
       });
+    }
+
+    function switchTaskTab(tab) {
+      document.querySelectorAll('.task-tab').forEach(function(el) { el.classList.remove('active'); });
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('tasks-list-today').classList.add('hidden');
+      document.getElementById('tasks-list-tomorrow').classList.add('hidden');
+      document.getElementById('tasks-list-dayafter').classList.add('hidden');
+      document.getElementById('tasks-list-dayafterplus').classList.add('hidden');
+      document.getElementById('tasks-list-' + tab).classList.remove('hidden');
+    }
+
+    function toggleOverdueTasks() {
+      var el = document.getElementById('tasks-list-remaining');
+      var icon = document.getElementById('overdue-toggle-icon');
+      var isHidden = el.classList.contains('hidden');
+      el.classList.toggle('hidden');
+      icon.textContent = isHidden ? '▼' : '▶';
     }
 
     function completeTask(type, roomId, dateStr) {

@@ -346,8 +346,22 @@
         <div id="fm-receipt-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
       </div>
 
+      <!-- Full Invoice Generation Section -->
+      <div id="fm-invoice-gen-section" class="hidden" style="margin-top: 15px; padding: 15px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">Full Invoice Generation</h4>
+        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 120px;">
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">Invoice Date</label>
+            <input type="date" id="fm-invoice-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
+          </div>
+          <button id="fm-generate-invoice-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate Full Invoice</button>
+        </div>
+        <div id="fm-invoice-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
+      </div>
+
       <div class="modal-footer-row">
         <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);">🖨️ Print Invoice</button>
+        <button id="fm-print-full-invoice-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0F766E; color:#0F766E;">🖨️ Print Full Invoice</button>
         <button id="fm-print-receipt-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0284C7; color:#0284C7;">🖨️ Print Receipt</button>
         <button class="btn-secondary" id="finance-modal-cancel">Cancel</button>
         <button class="btn-primary" id="finance-modal-save">Save</button>
@@ -1096,6 +1110,8 @@
 
       hide('finance-modal-error');
       document.getElementById('fm-print-btn').classList.add('hidden');
+      document.getElementById('fm-print-full-invoice-btn').classList.add('hidden');
+      document.getElementById('fm-invoice-gen-section').classList.add('hidden');
       document.getElementById('fm-print-receipt-btn').classList.add('hidden');
       document.getElementById('fm-receipt-gen-section').classList.add('hidden');
       document.getElementById('fm-receipt-error').classList.add('hidden');
@@ -1271,6 +1287,12 @@
       receiptGenSection.classList.add('hidden');
       document.getElementById('fm-receipt-error').classList.add('hidden');
 
+      var printFullInvoiceBtn = document.getElementById('fm-print-full-invoice-btn');
+      var invoiceGenSection = document.getElementById('fm-invoice-gen-section');
+      printFullInvoiceBtn.classList.add('hidden');
+      invoiceGenSection.classList.add('hidden');
+      document.getElementById('fm-invoice-error').classList.add('hidden');
+
       if (t.direction === 'IN') {
         if (t.receipt_no) {
           printReceiptBtn.classList.remove('hidden');
@@ -1331,6 +1353,58 @@
             }).catch(function(err) {
               genBtn.disabled = false;
               genBtn.textContent = 'Generate Receipt';
+              errorEl.textContent = 'Connection error: ' + err.message;
+              errorEl.classList.remove('hidden');
+            });
+          };
+        }
+
+        if (t.invoice_no) {
+          printFullInvoiceBtn.classList.remove('hidden');
+          printFullInvoiceBtn.onclick = function(e) {
+            e.preventDefault();
+            window.open('invoice.html?invoice_no=' + encodeURIComponent(t.invoice_no), '_blank');
+          };
+        } else {
+          invoiceGenSection.classList.remove('hidden');
+          document.getElementById('fm-invoice-date').value = t.txn_date || todayDateStringForInput();
+
+          document.getElementById('fm-generate-invoice-btn').onclick = function(e) {
+            e.preventDefault();
+            var date = document.getElementById('fm-invoice-date').value;
+            var errorEl = document.getElementById('fm-invoice-error');
+            errorEl.classList.add('hidden');
+
+            if (!date) {
+              errorEl.textContent = 'Please select an invoice date.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            var genBtn = document.getElementById('fm-generate-invoice-btn');
+            genBtn.disabled = true;
+            genBtn.textContent = 'Generating...';
+
+            callApi('financeGenerateInvoice', [session.token, t.txn_id, date]).then(function(res) {
+              genBtn.disabled = false;
+              genBtn.textContent = 'Generate Full Invoice';
+              if (res.ok) {
+                alert('Invoice generated successfully: ' + res.invoice_no);
+                callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
+                  if (txnRes.ok) {
+                    var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
+                    if (localIdx >= 0) TRANSACTIONS[localIdx] = txnRes.transaction;
+                    editTransaction(t.txn_id);
+                  }
+                  loadFinanceData();
+                });
+              } else {
+                errorEl.textContent = res.error;
+                errorEl.classList.remove('hidden');
+              }
+            }).catch(function(err) {
+              genBtn.disabled = false;
+              genBtn.textContent = 'Generate Full Invoice';
               errorEl.textContent = 'Connection error: ' + err.message;
               errorEl.classList.remove('hidden');
             });
