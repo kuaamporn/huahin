@@ -95,24 +95,24 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .chip.m{background:rgba(13,148,136,.08);border-color:rgba(13,148,136,.25);color:var(--m)}
 
 .gwrap{flex:1;overflow:auto;position:relative}
-.gantt{min-width:max-content;border-collapse:separate;border-spacing:0}
+.gantt{min-width:max-content;border-collapse:separate;border-spacing:0;table-layout:fixed}
 .gantt thead th{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:2px solid var(--border)}
 .gantt td.rc,.gantt th.rc{position:sticky;left:0;z-index:15;background:var(--surface);border-right:2px solid var(--border)}
 .gantt thead th.rc{z-index:25}
-.gantt th{padding:0;font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;min-width:34px;text-align:center;border-right:1px solid var(--border)}
+.gantt th{padding:0;font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;width:40px;min-width:40px;max-width:40px;text-align:center;border-right:1px solid var(--border)}
 .gantt th .dn{display:block;padding:4px 2px 1px;font-size:11px;font-weight:600;color:var(--text)}
 .gantt th .dd{display:block;padding:0 2px 3px;font-size:9px;text-transform:uppercase;color:var(--muted)}
 .gantt th.tc{background:rgba(15,118,110,.06)!important} .gantt th.tc .dn{color:var(--primary)}
-.rc{min-width:165px;max-width:165px;padding:0 10px}
+.rc{width:165px;min-width:165px;max-width:165px;padding:0 10px}
 .rn{font-weight:600;font-size:12px;font-family:'Lexend',sans-serif} .rs{font-size:10px;color:var(--muted)}
-.gantt td{height:30px;border-right:1px solid #F1F5F9;border-bottom:1px solid #F1F5F9;padding:0;position:relative;background:var(--surface);cursor:pointer}
+.gantt td{height:30px;border-right:1px solid #F1F5F9;border-bottom:1px solid #F1F5F9;padding:0;position:relative;background:var(--surface);cursor:pointer;width:40px;min-width:40px;max-width:40px}
 .gantt td.tc{background:rgba(15,118,110,.03)!important}
 .gantt tr:hover td{background:#F8FAFC} .gantt tr:hover td.rc{background:var(--surface)}
 .ph td{background:#F8FAFC!important;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;padding:6px 12px!important;border-bottom:2px solid!important;font-family:'Lexend',sans-serif}
 .ph.precious td{color:var(--pn);border-bottom-color:var(--p)!important}
 .ph.moment td{color:var(--mn);border-bottom-color:var(--m)!important}
 .fh td{background:#F1F5F9!important;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:4px 12px!important;border-bottom:1px solid var(--border)!important}
-.bar{position:absolute;top:3px;bottom:3px;left:1px;border-radius:4px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;cursor:pointer;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.bar{position:absolute;top:3px;bottom:3px;border-radius:4px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;cursor:pointer;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .bar:hover{filter:brightness(1.1);z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .bar.monthly{background:linear-gradient(90deg,#2563EB,#3B82F6)}
 .bar.monthly-draft{background:repeating-linear-gradient(45deg, #93C5FD, #93C5FD 10px, #BFDBFE 10px, #BFDBFE 20px); border: 1px dashed #2563EB; color: #1E3A8A; opacity: 0.8;}
@@ -500,7 +500,12 @@ function render(){
     return a.roomId.localeCompare(b.roomId);
   });
 
-  var html = '<thead><tr><th class="rc" rowspan="2"><div style="padding:8px;font-size:10px;color:var(--muted)">UNIT</div></th></tr><tr>';
+  var html = '<colgroup><col style="width:165px;">';
+  dates.forEach(function(){
+    html += '<col style="width:40px;">';
+  });
+  html += '</colgroup>';
+  html += '<thead><tr><th class="rc" rowspan="2"><div style="padding:8px;font-size:10px;color:var(--muted)">UNIT</div></th></tr><tr>';
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   dates.forEach(function(d){
     var ds=dk(d), isT=ds===todayStr;
@@ -541,9 +546,15 @@ function render(){
         var isFirst = ds===dk(new Date(Math.max(cin.getTime(), WIN_S.getTime())));
         if(isFirst && !rendered[b.bookingId]){
           rendered[b.bookingId]=true;
-          var w = dd(d, new Date(Math.min(cout.getTime(), WIN_E.getTime())))*34-2;
+          var colWidth = 40;
+          var startCoord = (cin.getTime() >= WIN_S.getTime()) ? 0.5 : 0.0;
+          var numDays = dd(d, cout);
+          var endCoord = (cout.getTime() <= WIN_E.getTime()) ? (numDays + 0.5) : (dd(d, WIN_E) + 1.0);
+          var left = startCoord * colWidth;
+          var w = (endCoord - startCoord) * colWidth - 2;
           var bt = (b.bookingType || '').replace(/\./g, '-').toLowerCase();
-          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="width:'+w+'px" onclick="showDetail(\''+b.bookingId+'\')">'+escapeHtml(b.guestName||'')+'</div></td>';
+          var detailTitle = escapeHtml(b.guestName || '') + ' (' + b.checkinDate + ' to ' + b.checkoutDate + ', ' + dd(cin, cout) + ' nights, ' + tl(b.bookingType) + ')';
+          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="left:'+left+'px; width:'+w+'px" title="'+detailTitle+'" onclick="showDetail(\''+b.bookingId+'\')">'+escapeHtml(b.guestName||'')+'</div></td>';
         } else {
           html += '<td class="'+(isT?'tc':'')+'"></td>';
         }
