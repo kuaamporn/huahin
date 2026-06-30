@@ -456,43 +456,56 @@
       ].join('\n');
     }
 
-    window.onload = function() {
+    window.onload = async function() {
       if (!HuaHinSession.requireSession()) return;
       var urlParams = new URLSearchParams(window.location.search);
-      var receiptNo = urlParams.get('receipt_no');
-      if (!receiptNo) { alert('No receipt number provided.'); return; }
+      var receiptNoStr = urlParams.get('receipt_no');
+      if (!receiptNoStr) { alert('No receipt number provided.'); return; }
+
+      var receiptNos = receiptNoStr.split(',').filter(function(r) { return r.trim(); });
+      var container = document.getElementById('receipt-container');
+      container.innerHTML = '<div class="no-print" style="text-align:center; padding: 50px; font-weight:bold;">Loading receipts...</div>';
 
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
+      var fullHtml = '';
+      var successCount = 0;
 
-      fetch(WORKER_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'financeGetReceipt', params: [token, receiptNo] })
-      }).then(function(res) {
-        return res.json();
-      }).then(function(data) {
-        if (!data.ok) {
-          alert(data.error);
-          return;
+      for (var i = 0; i < receiptNos.length; i++) {
+        var receiptNo = receiptNos[i];
+        try {
+          var res = await fetch(WORKER_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'financeGetReceipt', params: [token, receiptNo] })
+          });
+          var data = await res.json();
+          if (!data.ok) {
+            console.error('Failed to load receipt ' + receiptNo + ': ' + data.error);
+            continue;
+          }
+
+          var r = data.receipt;
+          var t = data.transaction;
+          var c = data.customer;
+          var b = data.booking;
+          var settings = data.settings || {};
+
+          var originalHtml = renderReceiptHtml('ใบเสร็จรับเงิน / Original Receipt', r, t, c, b, settings);
+          var copyHtml = renderReceiptHtml('สำเนาใบเสร็จรับเงิน / Copy Receipt', r, t, c, b, settings);
+
+          fullHtml += originalHtml + copyHtml;
+          successCount++;
+        } catch (err) {
+          console.error('Connection error for receipt ' + receiptNo, err);
         }
+      }
 
-        var r = data.receipt;
-        var t = data.transaction;
-        var c = data.customer;
-        var b = data.booking;
-        var settings = data.settings || {};
-
-        var container = document.getElementById('receipt-container');
-
-        var originalHtml = renderReceiptHtml('ใบเสร็จรับเงิน / Original Receipt', r, t, c, b, settings);
-        var copyHtml = renderReceiptHtml('สำเนาใบเสร็จรับเงิน / Copy Receipt', r, t, c, b, settings);
-
-        container.innerHTML = originalHtml + copyHtml;
-
-      }).catch(function(err) {
-        alert("Failed to load receipt details: " + err.message);
-      });
+      if (successCount > 0) {
+        container.innerHTML = fullHtml;
+      } else {
+        container.innerHTML = '<div class="no-print" style="text-align:center; color:red; padding: 50px;">Failed to load any receipts.</div>';
+      }
     };
   </script>
 </body>

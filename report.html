@@ -28,11 +28,11 @@
     .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
     .btn-signout:hover { background: rgba(220,38,38,0.12); }
 
-    .ftabs { display: flex; gap: 3px; background: var(--line); border-radius: 12px; padding: 3px; margin-bottom: 24px; max-width: 320px; }
-    .ftab { flex: 1; text-align: center; padding: 6px 12px; border-radius: 9px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); transition: all 0.15s; }
+    .ftabs { display: flex; gap: 3px; background: var(--line); border-radius: 12px; padding: 3px; margin-bottom: 24px; max-width: 550px; }
+    .ftab { flex: 1; text-align: center; padding: 6px 8px; border-radius: 9px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
     .ftab.active { background: var(--go); color: #fff; }
 
-    .card-section { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); }
+    .card-section { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); position: relative; }
     .toolbar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
     .tool-group { display: flex; flex-direction: column; }
     label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
@@ -55,6 +55,16 @@
     .status-badge.cleaned { background: #d8efe2; color: #16523a; }
     .status-badge.overdue { background: #fde2d3; color: var(--warn); }
     .status-badge.pending { background: #fef3c7; color: #b45309; }
+    .status-badge.paid { background: #d8efe2; color: #16523a; }
+    .status-badge.unpaid { background: #fde2d3; color: var(--warn); }
+
+    .action-link { color: var(--go); text-decoration: none; font-weight: 600; cursor: pointer; font-size: 12px; margin-right: 8px; }
+    .action-link:hover { text-decoration: underline; }
+
+    .batch-bar { display: none; background: #0F766E; color: #fff; border-radius: 16px; padding: 12px 20px; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(15,118,110,0.25); }
+    .batch-bar.show { display: flex; }
+    .btn-batch-print { background: #fff; color: #0F766E; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .btn-batch-print:hover { background: #F5F5F7; }
 
     .hidden { display: none !important; }
     .muted { color: var(--muted); }
@@ -75,7 +85,7 @@
       <div class="topbar-header">
         <div>
           <h1>System Reports</h1>
-          <div class="sub" style="margin-bottom:0;">KPI tracking and bookings analysis dashboards.</div>
+          <div class="sub" style="margin-bottom:0;">KPI tracking, booking aggregates, receipts and invoices dashboards.</div>
         </div>
         <a href="#" class="btn-signout" id="logout-link">Sign out</a>
       </div>
@@ -93,6 +103,8 @@
     <div class="ftabs">
       <div class="ftab active" id="tab-hk" onclick="switchTab('hk')">Housekeeping</div>
       <div class="ftab" id="tab-bookings" onclick="switchTab('bookings')">Bookings Summary</div>
+      <div class="ftab" id="tab-receipts" onclick="switchTab('receipts')">Receipt Report</div>
+      <div class="ftab" id="tab-invoices" onclick="switchTab('invoices')">Invoice Report</div>
     </div>
 
     <!-- HOUSEKEEPING VIEW -->
@@ -244,6 +256,125 @@
       </div>
     </div>
 
+    <!-- RECEIPTS VIEW -->
+    <div id="section-receipts" class="hidden">
+      <div class="batch-bar" id="receipt-batch-bar">
+        <div><span id="receipt-selected-count">0</span> receipts selected</div>
+        <button class="btn-batch-print" onclick="batchPrintReceipts()">Print Selected Receipts</button>
+      </div>
+
+      <div class="card-section">
+        <div class="toolbar">
+          <div class="tool-group">
+            <label>Property</label>
+            <select id="filter-receipt-property" onchange="loadReceiptReport()">
+              <option value="both">Both Properties</option>
+              <option value="precious">The Precious</option>
+              <option value="moment">The Moment</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Start Date</label>
+            <input type="date" id="filter-receipt-start" onchange="loadReceiptReport()" />
+          </div>
+          <div class="tool-group">
+            <label>End Date</label>
+            <input type="date" id="filter-receipt-end" onchange="loadReceiptReport()" />
+          </div>
+          <div class="tool-group" style="flex:1; min-width:180px;">
+            <label>Search</label>
+            <input type="text" id="filter-receipt-search" placeholder="Search receipt no, guest, room..." oninput="loadReceiptReport()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all-receipts" onchange="toggleAllReceipts(this)" /></th>
+                <th>Receipt No</th>
+                <th>Date</th>
+                <th>Room</th>
+                <th>Guest Name</th>
+                <th>Type</th>
+                <th style="text-align:right;">Amount</th>
+                <th style="text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="receipts-table-body">
+              <tr><td colspan="8" class="muted" style="text-align:center;padding:24px;">Loading receipt data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES VIEW -->
+    <div id="section-invoices" class="hidden">
+      <div class="batch-bar" id="invoice-batch-bar">
+        <div><span id="invoice-selected-count">0</span> invoices selected</div>
+        <button class="btn-batch-print" onclick="batchPrintInvoices()">Print Selected Invoices</button>
+      </div>
+
+      <div class="card-section">
+        <div class="toolbar">
+          <div class="tool-group">
+            <label>Property</label>
+            <select id="filter-invoice-property" onchange="loadInvoiceReport()">
+              <option value="both">Both Properties</option>
+              <option value="precious">The Precious</option>
+              <option value="moment">The Moment</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Status</label>
+            <select id="filter-invoice-status" onchange="loadInvoiceReport()">
+              <option value="all">All Invoices</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Start Date</label>
+            <input type="date" id="filter-invoice-start" onchange="loadInvoiceReport()" />
+          </div>
+          <div class="tool-group">
+            <label>End Date</label>
+            <input type="date" id="filter-invoice-end" onchange="loadInvoiceReport()" />
+          </div>
+          <div class="tool-group" style="flex:1; min-width:180px;">
+            <label>Search</label>
+            <input type="text" id="filter-invoice-search" placeholder="Search invoice ID, guest, room..." oninput="loadInvoiceReport()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all-invoices" onchange="toggleAllInvoices(this)" /></th>
+                <th>Invoice ID</th>
+                <th>Room</th>
+                <th>Billing Month</th>
+                <th>Guest Name</th>
+                <th>Issue Date</th>
+                <th style="text-align:right;">Amount</th>
+                <th style="text-align:center;">Status</th>
+                <th style="text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoices-table-body">
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading invoice data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="session.js"></script>
@@ -279,17 +410,25 @@
 
     // --- TAB SYSTEM ---
     function switchTab(tab) {
+      document.querySelectorAll('.ftab').forEach(function(x) { x.classList.remove('active'); });
+      document.getElementById('tab-' + tab).classList.add('active');
+
+      document.getElementById('section-hk').classList.add('hidden');
+      document.getElementById('section-bookings').classList.add('hidden');
+      document.getElementById('section-receipts').classList.add('hidden');
+      document.getElementById('section-invoices').classList.add('hidden');
+
       if (tab === 'hk') {
-        document.getElementById('tab-hk').classList.add('active');
-        document.getElementById('tab-bookings').classList.remove('active');
         document.getElementById('section-hk').classList.remove('hidden');
-        document.getElementById('section-bookings').classList.add('hidden');
-      } else {
-        document.getElementById('tab-hk').classList.remove('active');
-        document.getElementById('tab-bookings').classList.add('active');
-        document.getElementById('section-hk').classList.add('hidden');
+      } else if (tab === 'bookings') {
         document.getElementById('section-bookings').classList.remove('hidden');
         loadBookingReport();
+      } else if (tab === 'receipts') {
+        document.getElementById('section-receipts').classList.remove('hidden');
+        loadReceiptReport();
+      } else if (tab === 'invoices') {
+        document.getElementById('section-invoices').classList.remove('hidden');
+        loadInvoiceReport();
       }
     }
 
@@ -318,6 +457,16 @@
 
     document.getElementById('filter-start-date').value = startStr;
     document.getElementById('filter-end-date').value = todayStr;
+
+    // Default dates for receipts and invoices
+    var defaultReportStart = new Date();
+    defaultReportStart.setMonth(defaultReportStart.getMonth() - 1);
+    var reportStartStr = getThaiDateString(defaultReportStart);
+
+    document.getElementById('filter-receipt-start').value = reportStartStr;
+    document.getElementById('filter-receipt-end').value = todayStr;
+    document.getElementById('filter-invoice-start').value = reportStartStr;
+    document.getElementById('filter-invoice-end').value = todayStr;
 
     var ALL_TASKS = [];
 
@@ -499,6 +648,163 @@
       }).catch(function(err) {
         tbody.innerHTML = '<tr><td colspan="4" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
       });
+    }
+
+    // --- RECEIPT REPORT LOGIC ---
+    function loadReceiptReport() {
+      var prop = document.getElementById('filter-receipt-property').value;
+      var sDate = document.getElementById('filter-receipt-start').value;
+      var eDate = document.getElementById('filter-receipt-end').value;
+      var q = document.getElementById('filter-receipt-search').value.trim();
+
+      document.getElementById('check-all-receipts').checked = false;
+      updateReceiptSelection();
+
+      var tbody = document.getElementById('receipts-table-body');
+      tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px;">Loading receipts...</td></tr>';
+
+      callApi('reportsListReceipts', [sessionToken, prop, sDate, eDate, q]).then(function(res) {
+        if (!res.ok) {
+          tbody.innerHTML = '<tr><td colspan="8" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+          return;
+        }
+
+        var list = res.receipts || [];
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px;">No receipts found matching filters.</td></tr>';
+          return;
+        }
+
+        var html = '';
+        list.forEach(function(r) {
+          html += '<tr>' +
+            '<td style="text-align:center;"><input type="checkbox" class="receipt-select" value="' + escapeHtml(r.receipt_no) + '" onchange="updateReceiptSelection()" /></td>' +
+            '<td><strong>' + escapeHtml(r.receipt_no) + '</strong></td>' +
+            '<td>' + escapeHtml(r.receipt_date) + '</td>' +
+            '<td>' + escapeHtml(r.room_name || '—') + '</td>' +
+            '<td>' + escapeHtml(r.guest_or_vendor || '—') + '</td>' +
+            '<td>' + escapeHtml(r.receipt_type) + '</td>' +
+            '<td style="text-align:right; font-weight:600;">฿' + r.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td style="text-align:center;"><a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(r.receipt_no) + '" target="_blank">Print</a></td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="8" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
+      });
+    }
+
+    function toggleAllReceipts(chk) {
+      document.querySelectorAll('.receipt-select').forEach(function(el) {
+        el.checked = chk.checked;
+      });
+      updateReceiptSelection();
+    }
+
+    function updateReceiptSelection() {
+      var checked = document.querySelectorAll('.receipt-select:checked');
+      var bar = document.getElementById('receipt-batch-bar');
+      var label = document.getElementById('receipt-selected-count');
+
+      if (checked.length > 0) {
+        label.textContent = checked.length;
+        bar.classList.add('show');
+      } else {
+        bar.classList.remove('show');
+      }
+    }
+
+    function batchPrintReceipts() {
+      var checked = document.querySelectorAll('.receipt-select:checked');
+      var nos = [];
+      checked.forEach(function(el) { nos.push(el.value); });
+      if (nos.length === 0) return;
+      window.open('receipt.html?receipt_no=' + encodeURIComponent(nos.join(',')), '_blank');
+    }
+
+    // --- INVOICE REPORT LOGIC ---
+    function loadInvoiceReport() {
+      var prop = document.getElementById('filter-invoice-property').value;
+      var status = document.getElementById('filter-invoice-status').value;
+      var sDate = document.getElementById('filter-invoice-start').value;
+      var eDate = document.getElementById('filter-invoice-end').value;
+      var q = document.getElementById('filter-invoice-search').value.trim();
+
+      document.getElementById('check-all-invoices').checked = false;
+      updateInvoiceSelection();
+
+      var tbody = document.getElementById('invoices-table-body');
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading invoices...</td></tr>';
+
+      callApi('reportsListInvoices', [sessionToken, prop, sDate, eDate, status, q]).then(function(res) {
+        if (!res.ok) {
+          tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+          return;
+        }
+
+        var list = res.invoices || [];
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No invoices found matching filters.</td></tr>';
+          return;
+        }
+
+        var html = '';
+        list.forEach(function(inv) {
+          var statusPill = inv.status === 'paid'
+            ? '<span class="status-badge paid">Paid</span>'
+            : '<span class="status-badge unpaid">Pending</span>';
+
+          var rcAction = inv.receipt_no
+            ? '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(inv.receipt_no) + '" target="_blank">Print Receipt</a>'
+            : '<span class="muted" style="font-size:11px;">Unpaid</span>';
+
+          html += '<tr>' +
+            '<td style="text-align:center;"><input type="checkbox" class="invoice-select" value="' + escapeHtml(inv.txn_id) + '" onchange="updateInvoiceSelection()" /></td>' +
+            '<td><strong style="font-family:monospace;">' + escapeHtml(inv.txn_id) + '</strong></td>' +
+            '<td><strong>Room ' + escapeHtml(inv.room_name) + '</strong></td>' +
+            '<td>' + escapeHtml(inv.billing_month) + '</td>' +
+            '<td>' + escapeHtml(inv.guest_or_vendor || '—') + '</td>' +
+            '<td>' + escapeHtml(inv.txn_date) + '</td>' +
+            '<td style="text-align:right; font-weight:600;">฿' + inv.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td style="text-align:center;">' + statusPill + '</td>' +
+            '<td style="text-align:center; white-space:nowrap;">' +
+              '<a class="action-link" href="invoice.html?id=' + escapeHtml(inv.txn_id) + '" target="_blank">Print Invoice</a>' +
+              rcAction +
+            '</td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
+      });
+    }
+
+    function toggleAllInvoices(chk) {
+      document.querySelectorAll('.invoice-select').forEach(function(el) {
+        el.checked = chk.checked;
+      });
+      updateInvoiceSelection();
+    }
+
+    function updateInvoiceSelection() {
+      var checked = document.querySelectorAll('.invoice-select:checked');
+      var bar = document.getElementById('invoice-batch-bar');
+      var label = document.getElementById('invoice-selected-count');
+
+      if (checked.length > 0) {
+        label.textContent = checked.length;
+        bar.classList.add('show');
+      } else {
+        bar.classList.remove('show');
+      }
+    }
+
+    function batchPrintInvoices() {
+      var checked = document.querySelectorAll('.invoice-select:checked');
+      var ids = [];
+      checked.forEach(function(el) { ids.push(el.value); });
+      if (ids.length === 0) return;
+      window.open('batch-invoice.html?ids=' + encodeURIComponent(ids.join(',')), '_blank');
     }
 
     function escapeHtml(str) {
