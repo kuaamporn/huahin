@@ -136,7 +136,7 @@
         <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
-        <a href="hk-report.html" id="link-report" class="hidden">HK Report</a>
+        <a href="report.html" id="link-report" class="hidden">Reports</a>
       </div>
     </div>
 
@@ -562,10 +562,7 @@
 
     document.getElementById('logout-link').addEventListener('click', function (e) {
       e.preventDefault();
-      var s = HuaHinSession.getSession();
-      if (s && s.token) callApi('logout', [s.token]).catch(function () {});
-      HuaHinSession.clearSession();
-      window.location.href = 'index.html';
+      HuaHinSession.logout();
     });
 
     function todayDateStringForInput() {

@@ -197,7 +197,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
           <a href="dashboard.html" class="nav-link hidden" id="link-dashboard">Dashboard</a>
           <a href="hr.html" class="nav-link hidden" id="link-hr">HR</a>
           <a href="billing.html" class="nav-link hidden" id="link-billing">Billing</a>
-          <a href="hk-report.html" class="nav-link hidden" id="link-report">HK Report</a>
+          <a href="report.html" class="nav-link hidden" id="link-report">Reports</a>
         </div>
       </div>
       <div class="topbar-user-section">
@@ -393,10 +393,9 @@ if (session) {
   bootApp();
 }
 
-document.getElementById('logout-link').addEventListener('click', function() {
-  callApi('logout', [sessionToken]).catch(function() {});
-  HuaHinSession.clearSession();
-  window.location.href = 'index.html';
+document.getElementById('logout-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  HuaHinSession.logout();
 });
 
 function bootApp() {

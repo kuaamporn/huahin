@@ -26,6 +26,19 @@
     }
   }
 
+  function logout() {
+    var session = getSession();
+    if (session && session.token) {
+      fetch('https://huahin-api.huahin.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout', params: [session.token] })
+      }).catch(function() {});
+    }
+    clearSession();
+    window.location.href = 'index.html';
+  }
+
   function clearSession() {
     sessionStorage.removeItem(SESSION_KEY);
   }
@@ -87,6 +100,7 @@
     saveSessionPartial: saveSessionPartial,
     updateSessionRoles: updateSessionRoles,
     getSession: getSession,
+    logout: logout,
     clearSession: clearSession,
     hasRole: hasRole,
     requireSession: requireSession,

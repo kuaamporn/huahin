@@ -121,7 +121,7 @@
           <a href="dashboard.html" class="toplink hidden" id="dashboard-link">Dashboard</a>
           <a href="hr.html" class="toplink hidden" id="hr-link">HR</a>
           <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
-          <a href="hk-report.html" class="toplink hidden" id="report-link">HK Report</a>
+          <a href="report.html" class="toplink hidden" id="report-link">Reports</a>
         </div>
       </div>
 
@@ -341,10 +341,7 @@
     document.getElementById('logout-link').addEventListener('click', function(e) {
       e.preventDefault();
       if (html5QrCode) { try { html5QrCode.stop(); } catch (e) {} }
-      callApi('logout', [sessionToken]).catch(function() {});
-      HuaHinSession.clearSession();
-      sessionToken = null;
-      location.reload();
+      HuaHinSession.logout();
     });
 
     // ---------- CAMERA PERMISSION + QR SCANNING ----------

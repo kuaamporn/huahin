@@ -70,7 +70,7 @@
         <a href="finance.html">Finance</a>
         <a href="billing.html">Billing</a>
         <a href="hr.html">HR</a>
-        <a href="hk-report.html" id="link-report" class="hidden">HK Report</a>
+        <a href="report.html" id="link-report" class="hidden">Reports</a>
       </div>
     </div>
 
@@ -109,6 +109,40 @@
       </div>
     </div>
 
+    <!-- Bookings Analysis Bento Row -->
+    <div class="charts-row">
+      <div class="chart-box" style="flex: 1; display: flex; flex-direction: column;">
+        <h2>Booking Source Distribution</h2>
+        <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;">
+          <button id="btn-metric-count" class="btn active" style="padding: 6px 12px; font-size: 12px; background: var(--go); color: #fff; border: none; border-radius: 8px;" onclick="toggleBookingMetric('count')">By Count</button>
+          <button id="btn-metric-revenue" class="btn" style="padding: 6px 12px; font-size: 12px; background: var(--paper); color: var(--muted); border: 1px solid var(--line); border-radius: 8px;" onclick="toggleBookingMetric('revenue')">By Revenue</button>
+        </div>
+        <div style="flex: 1; position: relative; min-height: 250px;">
+          <canvas id="bookingRatioChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-box" style="flex: 2; overflow-x: auto; max-height: 380px;">
+        <h2>Recent Bookings</h2>
+        <table style="width:100%;">
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Property</th>
+              <th>Room</th>
+              <th>Type</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th style="text-align:right">Rate</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recent-bookings-body">
+            <tr><td colspan="8" class="muted" style="text-align:center; padding:24px;">Loading bookings...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="chart-box" style="overflow-x:auto;">
       <h2>Yearly Matrix</h2>
       <div id="matrixTableContainer"></div>
@@ -127,8 +161,8 @@
       document.getElementById('link-report').classList.remove('hidden');
     }
 
-    document.getElementById('logout-link').addEventListener('click', function() {
-      fetch(WORKER_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout', params: [sessionToken] }) });
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+      e.preventDefault();
       HuaHinSession.logout();
     });
 
@@ -160,6 +194,7 @@
         if (!res.ok) return alert(res.error);
         processData(res, year);
       }).catch(function(err) { alert('Network error: ' + err.message); });
+      loadBookingData(prop, year);
     }
 
     function processData(res, year) {
@@ -312,6 +347,131 @@
       var div = document.createElement('div');
       div.appendChild(document.createTextNode(str));
       return div.innerHTML;
+    }
+
+    var bookingRatioChartObj = null;
+    var bookingRatioData = [];
+    var currentBookingMetric = 'count';
+
+    function loadBookingData(prop, year) {
+      fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'dashboardGetBookingRatios', params: [sessionToken, prop, year] })
+      }).then(function(r) { return r.json(); }).then(function(res) {
+        if (!res.ok) return console.error('Booking stats error:', res.error);
+        bookingRatioData = res.ratios || [];
+        drawBookingRatioChart();
+        renderRecentBookings(res.recent || []);
+      }).catch(function(err) { console.error('Error loading booking data:', err); });
+    }
+
+    function toggleBookingMetric(metric) {
+      currentBookingMetric = metric;
+      var btnCount = document.getElementById('btn-metric-count');
+      var btnRevenue = document.getElementById('btn-metric-revenue');
+      if (metric === 'count') {
+        btnCount.style.background = 'var(--go)';
+        btnCount.style.color = '#fff';
+        btnCount.style.border = 'none';
+        btnRevenue.style.background = 'var(--paper)';
+        btnRevenue.style.color = 'var(--muted)';
+        btnRevenue.style.border = '1px solid var(--line)';
+      } else {
+        btnRevenue.style.background = 'var(--go)';
+        btnRevenue.style.color = '#fff';
+        btnRevenue.style.border = 'none';
+        btnCount.style.background = 'var(--paper)';
+        btnCount.style.color = 'var(--muted)';
+        btnCount.style.border = '1px solid var(--line)';
+      }
+      drawBookingRatioChart();
+    }
+
+    function getBookingTypeLabel(type) {
+      if (type === 'monthly') return 'Monthly';
+      if (type === 'monthly-draft') return 'Monthly (Draft)';
+      if (type === 'walkin') return 'Walk-in';
+      if (type === 'commercial') return 'Commercial';
+      if (type === 'booking.com') return 'Booking.com';
+      if (type === 'expedia.com') return 'Expedia.com';
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+
+    function getBookingColor(type) {
+      if (type === 'monthly') return '#3B82F6';
+      if (type === 'monthly-draft') return '#93C5FD';
+      if (type === 'walkin') return '#22C55E';
+      if (type === 'commercial') return '#8B5CF6';
+      if (type === 'booking.com') return '#0071C2';
+      if (type === 'expedia.com') return '#FBAF00';
+      return '#86868B';
+    }
+
+    function drawBookingRatioChart() {
+      var ctx = document.getElementById('bookingRatioChart').getContext('2d');
+      if (bookingRatioChartObj) bookingRatioChartObj.destroy();
+
+      var labels = [];
+      var data = [];
+      var colors = [];
+
+      bookingRatioData.forEach(function(row) {
+        labels.push(getBookingTypeLabel(row.booking_type));
+        data.push(currentBookingMetric === 'count' ? row.count : row.revenue);
+        colors.push(getBookingColor(row.booking_type));
+      });
+
+      bookingRatioChartObj = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { size: 10 } } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  var val = context.raw;
+                  return context.label + ': ' + (currentBookingMetric === 'revenue' ? '฿' + val.toLocaleString() : val + ' bookings');
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderRecentBookings(list) {
+      var tbody = document.getElementById('recent-bookings-body');
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center; padding:24px;">No bookings found for this period.</td></tr>';
+        return;
+      }
+      var html = '';
+      list.forEach(function(b) {
+        html += '<tr>' +
+          '<td>' + escapeHtml(b.guest_name) + '</td>' +
+          '<td>' + escapeHtml(b.property_name) + '</td>' +
+          '<td><strong>Room ' + escapeHtml(b.room_name) + '</strong></td>' +
+          '<td>' + getBookingTypeLabel(b.booking_type) + '</td>' +
+          '<td>' + b.checkin_date + '</td>' +
+          '<td>' + b.checkout_date + '</td>' +
+          '<td class="amt">฿' + b.rate.toLocaleString() + '</td>' +
+          '<td><span style="font-size:11px; padding:2px 8px; border-radius:10px; font-weight:600; background:#d8efe2; color:#16523a;">' + b.status + '</span></td>' +
+        '</tr>';
+      });
+      tbody.innerHTML = html;
     }
 
     if (session) loadData();

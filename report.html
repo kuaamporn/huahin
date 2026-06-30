@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Housekeeping Report — The Precious / The Moment</title>
+  <title>System Reports — The Precious / The Moment</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     :root {
@@ -28,14 +28,16 @@
     .btn-signout { font-size: 12px; color: var(--warn); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
     .btn-signout:hover { background: rgba(220,38,38,0.12); }
 
+    .ftabs { display: flex; gap: 3px; background: var(--line); border-radius: 12px; padding: 3px; margin-bottom: 24px; max-width: 320px; }
+    .ftab { flex: 1; text-align: center; padding: 6px 12px; border-radius: 9px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); transition: all 0.15s; }
+    .ftab.active { background: var(--go); color: #fff; }
+
     .card-section { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); }
     .toolbar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
     .tool-group { display: flex; flex-direction: column; }
     label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
     select, input[type="date"], input[type="text"] { padding: 8px 10px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; outline: none; background: #fff; }
     select:focus, input:focus { border-color: var(--go); }
-    .btn-primary { background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
-    .btn-primary:hover { background: #0E6B63; }
 
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .kpi-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -72,8 +74,8 @@
     <div class="topbar">
       <div class="topbar-header">
         <div>
-          <h1>Housekeeping Report</h1>
-          <div class="sub" style="margin-bottom:0;">KPI and task list compliance tracker.</div>
+          <h1>System Reports</h1>
+          <div class="sub" style="margin-bottom:0;">KPI tracking and bookings analysis dashboards.</div>
         </div>
         <a href="#" class="btn-signout" id="logout-link">Sign out</a>
       </div>
@@ -84,84 +86,164 @@
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
-        <a href="report.html" id="link-report" class="hidden" style="color:var(--go);font-weight:600;">HK Report</a>
+        <a href="report.html" id="link-report" class="hidden" style="color:var(--go);font-weight:600;">Reports</a>
       </div>
     </div>
 
-    <div class="summary-grid">
-      <div class="kpi-card total">
-        <div class="kpi-val" id="kpi-total">0</div>
-        <div class="kpi-lbl">Total Tasks Scheduled</div>
+    <div class="ftabs">
+      <div class="ftab active" id="tab-hk" onclick="switchTab('hk')">Housekeeping</div>
+      <div class="ftab" id="tab-bookings" onclick="switchTab('bookings')">Bookings Summary</div>
+    </div>
+
+    <!-- HOUSEKEEPING VIEW -->
+    <div id="section-hk">
+      <div class="summary-grid">
+        <div class="kpi-card total">
+          <div class="kpi-val" id="kpi-total">0</div>
+          <div class="kpi-lbl">Total Tasks Scheduled</div>
+        </div>
+        <div class="kpi-card remaining">
+          <div class="kpi-val" id="kpi-remaining">0</div>
+          <div class="kpi-lbl">Remaining / Overdue</div>
+        </div>
+        <div class="kpi-card completed">
+          <div class="kpi-val" id="kpi-completed">0</div>
+          <div class="kpi-lbl">Completed (Cleaned)</div>
+        </div>
+        <div class="kpi-card rate">
+          <div class="kpi-val" id="kpi-rate">0%</div>
+          <div class="kpi-lbl">Completion Rate</div>
+        </div>
       </div>
-      <div class="kpi-card remaining">
-        <div class="kpi-val" id="kpi-remaining">0</div>
-        <div class="kpi-lbl">Remaining / Overdue</div>
+
+      <div class="card-section">
+        <div class="toolbar">
+          <div class="tool-group">
+            <label>Property</label>
+            <select id="filter-property" onchange="applyFilters()">
+              <option value="all">All Properties</option>
+              <option value="precious">The Precious</option>
+              <option value="moment">The Moment</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Status</label>
+            <select id="filter-status" onchange="applyFilters()">
+              <option value="all">All Statuses</option>
+              <option value="CLEANED">Cleaned</option>
+              <option value="remaining">Remaining (Pending / Overdue)</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Start Date</label>
+            <input type="date" id="filter-start-date" onchange="loadReport()" />
+          </div>
+          <div class="tool-group">
+            <label>End Date</label>
+            <input type="date" id="filter-end-date" onchange="loadReport()" />
+          </div>
+          <div class="tool-group" style="flex:1;min-width:180px;">
+            <label>Search</label>
+            <input type="text" id="filter-search" placeholder="Search guest, room..." oninput="applyFilters()" />
+          </div>
+        </div>
       </div>
-      <div class="kpi-card completed">
-        <div class="kpi-val" id="kpi-completed">0</div>
-        <div class="kpi-lbl">Completed (Cleaned)</div>
-      </div>
-      <div class="kpi-card rate">
-        <div class="kpi-val" id="kpi-rate">0%</div>
-        <div class="kpi-lbl">Completion Rate</div>
+
+      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Room</th>
+                <th>Property</th>
+                <th>Guest Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Cleaned At</th>
+                <th>Cleaned By</th>
+              </tr>
+            </thead>
+            <tbody id="report-table-body">
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading report data...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="card-section">
-      <div class="toolbar">
-        <div class="tool-group">
-          <label>Property</label>
-          <select id="filter-property" onchange="applyFilters()">
-            <option value="all">All Properties</option>
-            <option value="precious">The Precious</option>
-            <option value="moment">The Moment</option>
-          </select>
+    <!-- BOOKINGS VIEW -->
+    <div id="section-bookings" class="hidden">
+      <div class="summary-grid">
+        <div class="kpi-card total">
+          <div class="kpi-val" id="kpi-booking-total">0</div>
+          <div class="kpi-lbl">Total Bookings</div>
         </div>
-        <div class="tool-group">
-          <label>Status</label>
-          <select id="filter-status" onchange="applyFilters()">
-            <option value="all">All Statuses</option>
-            <option value="CLEANED">Cleaned</option>
-            <option value="remaining">Remaining (Pending / Overdue)</option>
-          </select>
+        <div class="kpi-card rate">
+          <div class="kpi-val" id="kpi-booking-revenue">฿0</div>
+          <div class="kpi-lbl">Total Revenue</div>
         </div>
-        <div class="tool-group">
-          <label>Start Date</label>
-          <input type="date" id="filter-start-date" onchange="loadReport()" />
+        <div class="kpi-card completed">
+          <div class="kpi-val" id="kpi-booking-avg-duration">—</div>
+          <div class="kpi-lbl">Avg. Stay Duration</div>
         </div>
-        <div class="tool-group">
-          <label>End Date</label>
-          <input type="date" id="filter-end-date" onchange="loadReport()" />
+      </div>
+
+      <div class="card-section">
+        <div class="toolbar">
+          <div class="tool-group">
+            <label>Property</label>
+            <select id="filter-booking-property" onchange="loadBookingReport()">
+              <option value="both">Both Properties</option>
+              <option value="precious">The Precious</option>
+              <option value="moment">The Moment</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Year</label>
+            <select id="filter-booking-year" onchange="loadBookingReport()"></select>
+          </div>
+          <div class="tool-group">
+            <label>Month</label>
+            <select id="filter-booking-month" onchange="loadBookingReport()">
+              <option value="">All Months</option>
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
         </div>
-        <div class="tool-group" style="flex:1;min-width:180px;">
-          <label>Search</label>
-          <input type="text" id="filter-search" placeholder="Search guest, room..." oninput="applyFilters()" />
+      </div>
+
+      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking Type / OTA</th>
+                <th style="text-align:right">Number of Bookings</th>
+                <th style="text-align:right">Total Revenue</th>
+                <th style="text-align:right">Average Stay Duration</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+              <tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">Click Run or select filters to load.</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Room</th>
-              <th>Property</th>
-              <th>Guest Name</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Cleaned At</th>
-              <th>Cleaned By</th>
-            </tr>
-          </thead>
-          <tbody id="report-table-body">
-            <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading report data...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <script src="session.js"></script>
@@ -190,12 +272,28 @@
       document.getElementById('link-report').classList.remove('hidden');
     }
 
-    document.getElementById('logout-link').addEventListener('click', function() {
-      callApi('logout', [sessionToken]).catch(function() {});
-      HuaHinSession.clearSession();
-      window.location.href = 'index.html';
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      HuaHinSession.logout();
     });
 
+    // --- TAB SYSTEM ---
+    function switchTab(tab) {
+      if (tab === 'hk') {
+        document.getElementById('tab-hk').classList.add('active');
+        document.getElementById('tab-bookings').classList.remove('active');
+        document.getElementById('section-hk').classList.remove('hidden');
+        document.getElementById('section-bookings').classList.add('hidden');
+      } else {
+        document.getElementById('tab-hk').classList.remove('active');
+        document.getElementById('tab-bookings').classList.add('active');
+        document.getElementById('section-hk').classList.add('hidden');
+        document.getElementById('section-bookings').classList.remove('hidden');
+        loadBookingReport();
+      }
+    }
+
+    // --- HOUSEKEEPING REPORT LOGIC ---
     function getThaiDateString(d) {
       var date = d ? new Date(d) : new Date();
       var utc = date.getTime() + (date.getTimezoneOffset() * 60000);
@@ -207,7 +305,6 @@
       if (!utcString) return '—';
       var parts = utcString.split(/[- :]/);
       if (parts.length < 6) return utcString;
-
       var date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5]));
       var dateStr = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
       var timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -252,17 +349,14 @@
 
       var filtered = ALL_TASKS.filter(function(t) {
         if (prop !== 'all' && t.propertyId !== prop) return false;
-
         if (status === 'CLEANED' && t.status !== 'CLEANED') return false;
         if (status === 'remaining' && t.status === 'CLEANED') return false;
-
         if (query) {
           var matchRoom = t.displayName.toLowerCase().indexOf(query) >= 0;
           var matchGuest = (t.guestName || '').toLowerCase().indexOf(query) >= 0;
           var matchBy = (t.cleanedBy || '').toLowerCase().indexOf(query) >= 0;
           return matchRoom || matchGuest || matchBy;
         }
-
         return true;
       });
 
@@ -285,7 +379,6 @@
         tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No housekeeping tasks found matching filters.</td></tr>';
         return;
       }
-
       var html = '';
       list.forEach(function(t) {
         var statusBadge = '';
@@ -296,7 +389,6 @@
         } else {
           statusBadge = '<span class="status-badge pending">Pending</span>';
         }
-
         var propName = t.propertyId === 'precious' ? 'The Precious' : 'The Moment';
 
         html += '<tr>' +
@@ -311,8 +403,107 @@
           '<td>' + (t.cleanedBy || '—') + '</td>' +
         '</tr>';
       });
-
       tbody.innerHTML = html;
+    }
+
+    // --- BOOKING REPORT LOGIC ---
+    (function populateBookingYears() {
+      var sel = document.getElementById('filter-booking-year');
+      var cur = new Date().getFullYear();
+      for (var y = cur; y >= cur - 3; y--) {
+        var opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        sel.appendChild(opt);
+      }
+    })();
+
+    function getBookingTypeLabel(type) {
+      if (type === 'monthly') return 'Monthly';
+      if (type === 'monthly-draft') return 'Monthly (Draft)';
+      if (type === 'walkin') return 'Walk-in';
+      if (type === 'commercial') return 'Commercial';
+      if (type === 'booking.com') return 'Booking.com';
+      if (type === 'expedia.com') return 'Expedia.com';
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+
+    function loadBookingReport() {
+      var prop = document.getElementById('filter-booking-property').value;
+      var year = document.getElementById('filter-booking-year').value;
+      var m = document.getElementById('filter-booking-month').value;
+
+      var period = year;
+      var monthParam = null;
+      if (m) {
+        monthParam = year + '-' + m;
+      }
+
+      var tbody = document.getElementById('bookings-table-body');
+      tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">Loading booking report data...</td></tr>';
+
+      callApi('reportsGetBookingStats', [sessionToken, prop, period, monthParam]).then(function(res) {
+        if (!res.ok) {
+          tbody.innerHTML = '<tr><td colspan="4" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+          return;
+        }
+
+        var stats = res.stats || [];
+        var totalCount = 0;
+        var totalRev = 0;
+        var durationSum = 0;
+        var durationCount = 0;
+
+        var html = '';
+        if (stats.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">No booking records found for this period.</td></tr>';
+          document.getElementById('kpi-booking-total').textContent = '0';
+          document.getElementById('kpi-booking-revenue').textContent = '฿0';
+          document.getElementById('kpi-booking-avg-duration').textContent = '—';
+          return;
+        }
+
+        stats.forEach(function(row) {
+          totalCount += row.count;
+          totalRev += row.revenue;
+          if (row.avg_duration !== null) {
+            durationSum += row.avg_duration * row.count;
+            durationCount += row.count;
+          }
+
+          var label = getBookingTypeLabel(row.booking_type);
+          var avgDur = row.avg_duration !== null ? parseFloat(row.avg_duration).toFixed(1) + ' nights' : '—';
+
+          html += '<tr>' +
+            '<td><strong>' + label + '</strong></td>' +
+            '<td style="text-align:right">' + row.count.toLocaleString() + '</td>' +
+            '<td style="text-align:right">฿' + row.revenue.toLocaleString() + '</td>' +
+            '<td style="text-align:right">' + avgDur + '</td>' +
+          '</tr>';
+        });
+
+        var overallAvg = durationCount > 0 ? (durationSum / durationCount).toFixed(1) + ' nights' : '—';
+
+        html += '<tr style="font-weight:700; background:#F1F5F9;">' +
+          '<td>Total</td>' +
+          '<td style="text-align:right">' + totalCount.toLocaleString() + '</td>' +
+          '<td style="text-align:right">฿' + totalRev.toLocaleString() + '</td>' +
+          '<td style="text-align:right">' + overallAvg + '</td>' +
+        '</tr>';
+
+        tbody.innerHTML = html;
+        document.getElementById('kpi-booking-total').textContent = totalCount.toLocaleString();
+        document.getElementById('kpi-booking-revenue').textContent = '฿' + totalRev.toLocaleString();
+        document.getElementById('kpi-booking-avg-duration').textContent = overallAvg;
+      }).catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="4" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
     }
 
     loadReport();
