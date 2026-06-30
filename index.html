@@ -172,14 +172,22 @@
             <div id="tasks-list-remaining" class="muted"></div>
           </div>
           <div style="display:flex; gap:16px; align-items:flex-start;">
-          <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Today</h3>
-            <div id="tasks-list-today" class="muted">Loading...</div>
-          </div>
-          <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Next 3 Days</h3>
-            <div id="tasks-list-tomorrow" class="muted"></div>
-          </div>
+            <div style="flex:1;">
+              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-today">Today</h3>
+              <div id="tasks-list-today" class="muted">Loading...</div>
+            </div>
+            <div style="flex:1;">
+              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-tomorrow">Tomorrow</h3>
+              <div id="tasks-list-tomorrow" class="muted"></div>
+            </div>
+            <div style="flex:1;">
+              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-dayafter">Day After</h3>
+              <div id="tasks-list-dayafter" class="muted"></div>
+            </div>
+            <div style="flex:1;">
+              <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);" id="header-dayafterplus">Day After + 1</h3>
+              <div id="tasks-list-dayafterplus" class="muted"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -613,24 +621,48 @@
           var todayDate = res.today || new Date().toISOString().slice(0,10);
 
           var parts = todayDate.split('-');
-          var d = new Date(parts[0], parts[1] - 1, parts[2]);
-          d.setDate(d.getDate() + 3);
-          var y = d.getFullYear();
-          var m = String(d.getMonth() + 1).padStart(2, '0');
-          var day = String(d.getDate()).padStart(2, '0');
-          var maxDateStr = y + '-' + m + '-' + day;
+          var d0 = new Date(parts[0], parts[1] - 1, parts[2]);
+
+          function formatDateLabel(d) {
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return day + '-' + m + '-' + y;
+          }
+          function getIsoString(d) {
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+          }
+
+          var d1 = new Date(d0); d1.setDate(d1.getDate() + 1);
+          var tomorrowStr = getIsoString(d1);
+          var d2 = new Date(d0); d2.setDate(d2.getDate() + 2);
+          var dayAfterStr = getIsoString(d2);
+          var d3 = new Date(d0); d3.setDate(d3.getDate() + 3);
+          var dayAfterPlusStr = getIsoString(d3);
+
+          document.getElementById('header-today').textContent = 'Today (' + formatDateLabel(d0) + ')';
+          document.getElementById('header-tomorrow').textContent = 'Tomorrow (' + formatDateLabel(d1) + ')';
+          document.getElementById('header-dayafter').textContent = formatDateLabel(d2);
+          document.getElementById('header-dayafterplus').textContent = formatDateLabel(d3);
 
           if (tasks.length === 0) {
             listRemaining.innerHTML = '';
             listToday.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
-            listTomorrow.innerHTML = '';
+            document.getElementById('tasks-list-tomorrow').innerHTML = '';
+            document.getElementById('tasks-list-dayafter').innerHTML = '';
+            document.getElementById('tasks-list-dayafterplus').innerHTML = '';
             container.classList.remove('hidden');
             return;
           }
 
           var tasksRemaining = tasks.filter(function(t) { return t.date && t.date < todayDate; });
           var tasksToday = tasks.filter(function(t) { return !t.date || t.date === todayDate; });
-          var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date > todayDate && t.date <= maxDateStr; });
+          var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date === tomorrowStr; });
+          var tasksDayAfter = tasks.filter(function(t) { return t.date && t.date === dayAfterStr; });
+          var tasksDayAfterPlus = tasks.filter(function(t) { return t.date && t.date === dayAfterPlusStr; });
 
           function renderTasksList(taskList) {
             if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;">None</div>';
@@ -664,7 +696,9 @@
 
           listRemaining.innerHTML = renderTasksList(tasksRemaining);
           listToday.innerHTML = renderTasksList(tasksToday);
-          listTomorrow.innerHTML = renderTasksList(tasksTomorrow);
+          document.getElementById('tasks-list-tomorrow').innerHTML = renderTasksList(tasksTomorrow);
+          document.getElementById('tasks-list-dayafter').innerHTML = renderTasksList(tasksDayAfter);
+          document.getElementById('tasks-list-dayafterplus').innerHTML = renderTasksList(tasksDayAfterPlus);
           container.classList.remove('hidden');
         } else {
           list.innerHTML = '<div class="error">Error loading tasks: ' + res.error + '</div>';
