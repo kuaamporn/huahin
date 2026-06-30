@@ -177,7 +177,7 @@
             <div id="tasks-list-today" class="muted">Loading...</div>
           </div>
           <div style="flex:1;">
-            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Tomorrow</h3>
+            <h3 style="font-size:14px; margin:0 0 8px 0; color:var(--muted);">Next 3 Days</h3>
             <div id="tasks-list-tomorrow" class="muted"></div>
           </div>
           </div>
@@ -612,6 +612,14 @@
           var tasks = res.tasks || [];
           var todayDate = res.today || new Date().toISOString().slice(0,10);
 
+          var parts = todayDate.split('-');
+          var d = new Date(parts[0], parts[1] - 1, parts[2]);
+          d.setDate(d.getDate() + 3);
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, '0');
+          var day = String(d.getDate()).padStart(2, '0');
+          var maxDateStr = y + '-' + m + '-' + day;
+
           if (tasks.length === 0) {
             listRemaining.innerHTML = '';
             listToday.innerHTML = '<div style="color:var(--muted);font-style:italic;">No active tasks.</div>';
@@ -622,7 +630,7 @@
 
           var tasksRemaining = tasks.filter(function(t) { return t.date && t.date < todayDate; });
           var tasksToday = tasks.filter(function(t) { return !t.date || t.date === todayDate; });
-          var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date > todayDate; });
+          var tasksTomorrow = tasks.filter(function(t) { return t.date && t.date > todayDate && t.date <= maxDateStr; });
 
           function renderTasksList(taskList) {
             if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;">None</div>';
