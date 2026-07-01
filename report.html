@@ -917,6 +917,17 @@
     }
 
     // --- INVOICE REPORT LOGIC ---
+    function formatInvoiceDisplayId(inv) {
+      if (!inv.billing_month) return inv.txn_id;
+      var parts = inv.billing_month.split('-');
+      var yr = parseInt(parts[0]);
+      var budYr = (yr + 543).toString().slice(-2);
+      var mm = parts[1] || '00';
+      var roomNo = (inv.room_name || '').replace(/^R\./i, '');
+      var propChar = inv.property_id === 'precious' ? 'P' : 'M';
+      return propChar + budYr + mm + '-' + roomNo;
+    }
+
     function loadInvoiceReport() {
       var prop = document.getElementById('filter-invoice-property').value;
       var status = document.getElementById('filter-invoice-status').value;
@@ -959,8 +970,8 @@
 
           html += '<tr>' +
             '<td style="text-align:center;"><input type="checkbox" class="invoice-select" value="' + escapeHtml(inv.txn_id) + '" onchange="updateInvoiceSelection()" /></td>' +
-            '<td><strong style="font-family:monospace;">' + escapeHtml(inv.txn_id) + '</strong></td>' +
-            '<td><strong>Room ' + escapeHtml(inv.room_name) + '</strong></td>' +
+            '<td><strong style="font-family:monospace;">' + escapeHtml(formatInvoiceDisplayId(inv)) + '</strong></td>' +
+            '<td><strong>' + escapeHtml(inv.room_name) + '</strong></td>' +
             '<td>' + escapeHtml(inv.billing_month) + '</td>' +
             '<td>' + escapeHtml(inv.guest_or_vendor || '—') + '</td>' +
             '<td>' + escapeHtml(inv.txn_date) + '</td>' +

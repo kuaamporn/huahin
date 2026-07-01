@@ -175,9 +175,9 @@
       </div>
 
       <div class="summary">
-        <div class="stat"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l">Revenue</div></div>
-        <div class="stat"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l">Expense</div></div>
-        <div class="stat"><div class="n" id="finance-net">฿0</div><div class="l">Net Profit</div></div>
+        <div class="stat" id="card-revenue"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l">Revenue</div></div>
+        <div class="stat" id="card-expense"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l">Expense</div></div>
+        <div class="stat" id="card-net"><div class="n" id="finance-net">฿0</div><div class="l">Net Profit</div></div>
         <div class="stat" style="cursor:pointer;" id="btn-view-unrefunded">
           <div class="n" id="finance-deposits" style="color:var(--muted);">฿0</div>
           <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
@@ -557,7 +557,7 @@
     // ---------------------------------------------------------------------
     var session = HuaHinSession.requireSession();
     if (session) {
-      var canViewFinance = HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense');
+      var canViewFinance = HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk');
       if (!canViewFinance) {
         hide('finance-content');
         show('access-denied');
@@ -588,6 +588,13 @@
 
         loadRoomsAndBookingsCache();
         initFinancePage();
+
+        var canViewFullFinance = HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense');
+        if (!canViewFullFinance) {
+          hide('card-revenue');
+          hide('card-expense');
+          hide('card-net');
+        }
       }
     }
     // If session is null, requireSession() already triggered a redirect —

@@ -695,7 +695,7 @@ function checkAvail(){
   el.className = 'avres show ' + (rooms.length?'has':'no');
   document.getElementById('avtitle').textContent = rooms.length ? ('✓ '+rooms.length+' rooms available · '+nights+' night'+(nights>1?'s':'')) : ('✗ No rooms available '+ci+' → '+co);
   document.getElementById('avchips').innerHTML = rooms.map(function(r){
-    return '<div class="chip '+r.propertyId+'" onclick="openBook(\''+r.roomId+'\',\''+ci+'\',\''+r.propertyId+'\')">'+r.displayName+(r.rate?' · ฿'+r.rate.toLocaleString():'')+'</div>';
+    return '<div class="chip '+r.propertyId+'" onclick="openBook(\''+r.roomId+'\',\''+ci+'\',\''+r.propertyId+'\',\''+co+'\')">'+r.displayName+(r.rate?' · ฿'+r.rate.toLocaleString():'')+'</div>';
   }).join('');
 }
 
@@ -711,7 +711,7 @@ function updateRooms(){
   }
 }
 
-function openBook(rid, date, prop){
+function openBook(rid, date, prop, endDate){
   document.getElementById('mAction').value = 'book';
   document.getElementById('mReason').value = '';
   toggleModalAction();
@@ -719,24 +719,41 @@ function openBook(rid, date, prop){
   updateRooms();
   if(rid) document.getElementById('mRoom').value = rid;
   var ci = date || dk(TODAY);
-  var coD = new Date(pd(ci)); coD.setMonth(coD.getMonth()+1);
+  var co = endDate;
+  if (!co) {
+    var coD = new Date(pd(ci)); coD.setMonth(coD.getMonth()+1);
+    co = dk(coD);
+  }
   document.getElementById('mIn').value = ci;
-  document.getElementById('mOut').value = dk(coD);
-  document.getElementById('mNights').value = dd(ci, dk(coD));
+  document.getElementById('mOut').value = co;
+
+  var nights = dd(ci, co);
+  document.getElementById('mNights').value = nights;
+
+  // Auto-select type based on duration
+  var isLessThanMonth = nights < 30;
+  selBT = isLessThanMonth ? 'walkin' : 'monthly';
+  var btns = document.querySelectorAll('.tbtn');
+  btns.forEach(function(e,i){ e.classList.toggle('sel', isLessThanMonth ? i===1 : i===0); });
+
   document.getElementById('mGuest').value = '';
   document.getElementById('mNotes').value = '';
   document.getElementById('mReservation').checked = false;
   document.getElementById('mResDepWrapper').classList.add('hidden');
   document.getElementById('mResDep').value = '0';
-  document.getElementById('mDep').value = '8000';
-  document.getElementById('mCardDepQty').value = '0';
+
+  // Apply default deposit values
+  if (selBT === 'walkin') {
+    document.getElementById('mDep').value = '0';
+  } else {
+    document.getElementById('mDep').value = '8000';
+  }
+  document.getElementById('mCardDepQty').value = '1';
+
   var p = (prop === 'moment') ? 'moment' : 'precious';
   document.getElementById('mCardDepPrice').value = (window.ROOMS_SETTINGS && window.ROOMS_SETTINGS[p + '_default_keycard_deposit']) || '500';
   document.getElementById('mRate').value = '';
   document.getElementById('cwarn').style.display = 'none';
-  selBT = 'monthly';
-  var btns = document.querySelectorAll('.tbtn');
-  btns.forEach(function(e,i){ e.classList.toggle('sel', i===0); });
   calcP();
   document.getElementById('mTitle').textContent = 'New Booking';
   document.getElementById('mbg').classList.add('open');
@@ -747,6 +764,15 @@ function selType(t, el){
   selBT=t;
   document.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('sel');});
   el.classList.add('sel');
+
+  // Default values based on selected booking type
+  if (t === 'walkin' || t === 'Booking.com' || t === 'Expedia.com') {
+    document.getElementById('mDep').value = '0';
+    document.getElementById('mCardDepQty').value = '1';
+  } else if (t === 'monthly') {
+    document.getElementById('mDep').value = '8000';
+    document.getElementById('mCardDepQty').value = '1';
+  }
   calcP();
 
   var otaWrapper = document.getElementById('mOtaBookingIdWrapper');
