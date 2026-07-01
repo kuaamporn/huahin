@@ -16,7 +16,7 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
     h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
     .topbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
@@ -216,6 +216,11 @@
           <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">Select a month and click Load.</td></tr>
         </tbody>
       </table>
+      </div>
+      <div id="finance-pagination" class="no-print" style="display:flex;align-items:center;justify-content:center;gap:15px;margin-top:20px;font-size:13px;font-weight:600;">
+        <button id="btn-page-prev" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">&lt; Previous</button>
+        <span id="page-indicator" style="color:var(--muted);">Page 1 of 1</span>
+        <button id="btn-page-next" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">Next &gt;</button>
       </div>
     </div>
   </div>
@@ -645,41 +650,29 @@
         });
       }
 
-      function applyFinanceFilter() {
-        var q = document.getElementById('finance-search').value.trim().toLowerCase();
-        var statusFilter = document.getElementById('finance-status-filter').value;
+      document.getElementById('finance-search').addEventListener('input', function() {
+        currentPage = 1;
+        renderFinanceTable();
+      });
+      document.getElementById('finance-status-filter').addEventListener('change', function() {
+        currentPage = 1;
+        renderFinanceTable();
+      });
 
-        document.querySelectorAll('.items-expand-row').forEach(function(row) {
-          row.parentNode.removeChild(row);
-        });
-        document.querySelectorAll('.expand-toggle').forEach(function(el) {
-          el.textContent = '＋';
-        });
-
-        var rows = document.querySelectorAll('#finance-table-body tr');
-        rows.forEach(function (row) {
-          if (row.cells.length === 1 && row.cells[0].classList.contains('muted')) return;
-          var idxAttr = row.getAttribute('data-idx');
-          if (idxAttr === null) return;
-          var idx = parseInt(idxAttr);
-          var t = TRANSACTIONS[idx];
-          if (!t) return;
-
-          var matchSearch = row.textContent.toLowerCase().indexOf(q) >= 0;
-          var matchStatus = true;
-          if (statusFilter === 'unverified') {
-            matchStatus = t.status !== 'pending' && t.is_approved && !t.is_verified;
-          } else if (statusFilter === 'pending-approval') {
-            matchStatus = t.status !== 'pending' && !t.is_approved;
-          } else if (statusFilter === 'verified') {
-            matchStatus = t.status !== 'pending' && !!t.is_verified;
-          }
-          row.style.display = (matchSearch && matchStatus) ? '' : 'none';
-        });
-      }
-
-      document.getElementById('finance-search').addEventListener('input', applyFinanceFilter);
-      document.getElementById('finance-status-filter').addEventListener('change', applyFinanceFilter);
+      document.getElementById('btn-page-prev').addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          renderFinanceTable();
+        }
+      });
+      document.getElementById('btn-page-next').addEventListener('click', function() {
+        var filtered = getFilteredTransactions();
+        var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderFinanceTable();
+        }
+      });
 
       document.getElementById('fm-property').addEventListener('change', function () {
         clearSelectedRoom();
@@ -974,7 +967,6 @@
       callApi('financeListTransactions', [session.token, propertyId, billingMonth]).then(function (res) {
         if (!res.ok) { alert(res.error); return; }
         
-        var tbody = document.getElementById('finance-table-body');
         var list = res.transactions || [];
         TRANSACTIONS = list;
 
@@ -983,83 +975,142 @@
         document.getElementById('opt-unverified').textContent = 'Pending Verification (' + unverifiedCount + ')';
         document.getElementById('opt-pending-approval').textContent = 'Pending Approval (' + pendingApprovalCount + ')';
 
-        if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
-          return;
+        currentPage = 1;
+        renderFinanceTable();
+      });
+    }
+
+    var currentPage = 1;
+    var pageSize = 40;
+
+    function renderFinanceTable() {
+      var tbody = document.getElementById('finance-table-body');
+
+      document.querySelectorAll('.items-expand-row').forEach(function(row) {
+        row.parentNode.removeChild(row);
+      });
+
+      var filtered = getFilteredTransactions();
+      var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      document.getElementById('page-indicator').textContent = 'Page ' + currentPage + ' of ' + totalPages + ' (' + filtered.length + ' items)';
+      document.getElementById('btn-page-prev').disabled = currentPage === 1;
+      document.getElementById('btn-page-next').disabled = currentPage === totalPages;
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">No transactions found.</td></tr>';
+        return;
+      }
+
+      var paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+      tbody.innerHTML = '';
+
+      paginated.forEach(function (t) {
+        var idx = TRANSACTIONS.findIndex(function(item) { return item.txn_id === t.txn_id; });
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-idx', idx);
+
+        var statusLabel = '';
+        if (t.status === 'pending') {
+          statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">Reservation</span>';
+        } else if (t.is_verified) {
+          statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">Verified</span>';
+        } else if (t.is_approved) {
+          statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">Approved</span>';
+        } else {
+          statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">Pending Approval</span>';
         }
-        tbody.innerHTML = '';
-        list.forEach(function (t, idx) {
-          var tr = document.createElement('tr');
-          tr.setAttribute('data-idx', idx);
-          
-          var statusLabel = '';
-          if (t.status === 'pending') {
-            statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">Reservation</span>';
-          } else if (t.is_verified) {
-            statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">Verified</span>';
+
+        var dirLabel = '<div style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">' +
+          (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">Revenue</span>' : '<span class="pill flag" style="white-space:nowrap;">Expense</span>') +
+          statusLabel + '</div>';
+        var isOwner = HuaHinSession.hasRole('owner');
+        var isRevenue = HuaHinSession.hasRole('revenue');
+        var isExpense = HuaHinSession.hasRole('expense');
+
+        var canApproveRevenue = (isOwner || isRevenue) && t.direction === 'IN' && !t.is_approved;
+        var canApproveExpense = (isOwner || isExpense) && t.direction === 'OUT' && !t.is_approved;
+        var canVerify = isOwner && t.is_approved && !t.is_verified;
+        var canEdit = isOwner || !t.is_approved;
+
+        var actionHtml = '';
+        if (!t.is_approved) {
+          if (canApproveRevenue || canApproveExpense) {
+            actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">Approve</button>';
+          }
+        } else if (!t.is_verified) {
+          if (canVerify) {
+            actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">Verify</button>';
+          }
+        }
+
+        if (canEdit && !t.is_verified) {
+          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+        } else if (t.is_verified && isOwner) {
+          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+        }
+
+        if (isOwner) {
+          actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">Delete</button>';
+        }
+
+        if (actionHtml === '') {
+          if (t.is_verified) {
+            actionHtml = '<span class="muted">Verified</span>';
           } else if (t.is_approved) {
-            statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">Approved</span>';
+            actionHtml = '<span class="muted">Approved</span>';
           } else {
-            statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">Pending Approval</span>';
+            actionHtml = '<span class="muted">Pending</span>';
           }
-          
-          var dirLabel = '<div style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">' + 
-            (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">Revenue</span>' : '<span class="pill flag" style="white-space:nowrap;">Expense</span>') + 
-            statusLabel + '</div>';
-          var isOwner = HuaHinSession.hasRole('owner');
-          var isRevenue = HuaHinSession.hasRole('revenue');
-          var isExpense = HuaHinSession.hasRole('expense');
-          
-          var canApproveRevenue = (isOwner || isRevenue) && t.direction === 'IN' && !t.is_approved;
-          var canApproveExpense = (isOwner || isExpense) && t.direction === 'OUT' && !t.is_approved;
-          var canVerify = isOwner && t.is_approved && !t.is_verified;
-          var canEdit = isOwner || !t.is_approved;
+        }
 
-          var actionHtml = '';
-          if (!t.is_approved) {
-            if (canApproveRevenue || canApproveExpense) {
-              actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">Approve</button>';
-            }
-          } else if (!t.is_verified) {
-            if (canVerify) {
-              actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">Verify</button>';
-            }
-          }
+        tr.innerHTML =
+          '<td style="text-align:center;cursor:pointer;font-weight:bold;color:var(--go);font-size:16px;white-space:nowrap;" class="expand-toggle" onclick="toggleTxnItems(\''+t.txn_id+'\', this)">＋</td>' +
+          '<td style="white-space:nowrap;">' + (t.txn_date || '') + '</td>' +
+          '<td style="white-space:nowrap;">' + dirLabel + '</td>' +
+          '<td>' + (t.property_id || '') + '</td>' +
+          '<td>' + (t.room_id || '-') + '</td>' +
+          '<td>' + (t.category || 'Multiple') + '</td>' +
+          '<td style="white-space:nowrap;font-weight:600;">' + formatTHB(t.net_amount || t.amount) + '</td>' +
+          '<td>' + (t.guest_or_vendor || '') + '</td>' +
+          '<td>' + (t.notes || '') + '</td>' +
+          '<td style="white-space:nowrap;">' + actionHtml + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
 
-          if (canEdit && !t.is_verified) {
-            actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
-          } else if (t.is_verified && isOwner) {
-            actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
-          }
+    function getFilteredTransactions() {
+      var q = document.getElementById('finance-search').value.trim().toLowerCase();
+      var statusFilter = document.getElementById('finance-status-filter').value;
 
-          if (isOwner) {
-            actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">Delete</button>';
-          }
+      return TRANSACTIONS.filter(function(t) {
+        var matchSearch = true;
+        if (q) {
+          var searchStr = (
+            (t.txn_date || '') + ' ' +
+            (t.direction || '') + ' ' +
+            (t.property_id || '') + ' ' +
+            (t.room_id || '') + ' ' +
+            (t.category || '') + ' ' +
+            (t.guest_or_vendor || '') + ' ' +
+            (t.notes || '')
+          ).toLowerCase();
+          matchSearch = searchStr.indexOf(q) >= 0;
+        }
 
-          if (actionHtml === '') {
-            if (t.is_verified) {
-              actionHtml = '<span class="muted">Verified</span>';
-            } else if (t.is_approved) {
-              actionHtml = '<span class="muted">Approved</span>';
-            } else {
-              actionHtml = '<span class="muted">Pending</span>';
-            }
-          }
+        var matchStatus = true;
+        if (statusFilter === 'unverified') {
+          matchStatus = t.status !== 'pending' && t.is_approved && !t.is_verified;
+        } else if (statusFilter === 'pending-approval') {
+          matchStatus = t.status !== 'pending' && !t.is_approved;
+        } else if (statusFilter === 'verified') {
+          matchStatus = t.status !== 'pending' && !!t.is_verified;
+        }
 
-          tr.innerHTML =
-            '<td style="text-align:center;cursor:pointer;font-weight:bold;color:var(--go);font-size:16px;white-space:nowrap;" class="expand-toggle" onclick="toggleTxnItems(\''+t.txn_id+'\', this)">＋</td>' +
-            '<td style="white-space:nowrap;">' + (t.txn_date || '') + '</td>' +
-            '<td style="white-space:nowrap;">' + dirLabel + '</td>' +
-            '<td>' + (t.property_id || '') + '</td>' +
-            '<td>' + (t.room_id || '-') + '</td>' +
-            '<td>' + (t.category || 'Multiple') + '</td>' +
-            '<td style="white-space:nowrap;font-weight:600;">' + formatTHB(t.net_amount || t.amount) + '</td>' +
-            '<td>' + (t.guest_or_vendor || '') + '</td>' +
-            '<td>' + (t.notes || '') + '</td>' +
-            '<td style="white-space:nowrap;">' + actionHtml + '</td>';
-          tbody.appendChild(tr);
-        });
-
+        return matchSearch && matchStatus;
       });
     }
 
