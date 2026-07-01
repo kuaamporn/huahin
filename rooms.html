@@ -286,6 +286,10 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
         <div class="tbtn" onclick="selType('Expedia.com',this)">🌐 Expedia.com</div>
       </div>
     </div>
+    <div class="fg hidden" id="mOtaBookingIdWrapper" style="margin-top: 10px;">
+      <label class="fl">OTA Booking ID *</label>
+      <input class="fi" type="text" id="mOtaBookingId" placeholder="Enter Booking.com or Expedia Booking ID...">
+    </div>
     <div class="fg" style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
       <input type="checkbox" id="mReservation" style="width:18px; height:18px;" onchange="toggleResDep(); calcP()" />
       <label for="mReservation" style="font-weight: 500; font-size: 13px; color: var(--ink);">Reservation (Pending Check-in)</label>
@@ -739,7 +743,20 @@ function openBook(rid, date, prop){
 }
 
 function closeMod(e){ if(e && e.target!==e.currentTarget) return; document.getElementById('mbg').classList.remove('open'); }
-function selType(t, el){ selBT=t; document.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('sel');}); el.classList.add('sel'); calcP(); }
+function selType(t, el){
+  selBT=t;
+  document.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('sel');});
+  el.classList.add('sel');
+  calcP();
+
+  var otaWrapper = document.getElementById('mOtaBookingIdWrapper');
+  if (selBT === 'Booking.com' || selBT === 'Expedia.com') {
+    otaWrapper.classList.remove('hidden');
+  } else {
+    otaWrapper.classList.add('hidden');
+    document.getElementById('mOtaBookingId').value = '';
+  }
+}
 
 function toggleResDep() {
   var chk = document.getElementById('mReservation').checked;
@@ -850,13 +867,19 @@ function saveBook(){
   if(dep < 0){ showToast('Deposit cannot be below 0','err'); return; }
   if(cardPrice < 0 || cardQty < 0){ showToast('Card deposit cannot be below 0','err'); return; }
 
+  var otaBookingId = '';
+  if (selBT === 'Booking.com' || selBT === 'Expedia.com') {
+    otaBookingId = document.getElementById('mOtaBookingId').value.trim();
+    if (!otaBookingId) { showToast('Please enter the OTA Booking ID', 'err'); return; }
+  }
+
   var btn=document.getElementById('saveBtn');
   btn.disabled=true; btn.textContent='Saving…';
 
   var isRes = document.getElementById('mReservation').checked;
   var resDep = parseFloat(document.getElementById('mResDep').value) || 0;
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep]).then(function(res){
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId]).then(function(res){
     btn.disabled=false; btn.textContent='✓ Confirm Booking';
     if(res.ok){
       closeMod();
@@ -889,11 +912,13 @@ function showDetail(id){
     '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':(b.bookingType==='Booking.com'||b.bookingType==='Expedia.com'?'/booking':'/night')):'TBD')+'</span></div>'+
     '<div class="df"><label>Damage Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'-')+'</span></div>'+
     '<div class="df"><label>Card Deposit</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' card'+(b.cardDepositQty>1?'s':'')+' @ ฿'+b.cardDeposit+')':'-')+'</span></div>'+
+    (b.otaBookingId ? '<div class="df"><label>OTA Booking ID</label><span style="font-weight:700;color:var(--primary)">'+escapeHtml(b.otaBookingId)+'</span></div>' : '') +
     '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType==='monthly-draft'?'Monthly (Draft)':(b.bookingType||'-'))+'</span></div>'+
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.notes)+'</span></div>':'')+
     (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.createdByName)+'</span></div>':'')+
     '<div class="dactions" style="flex-wrap:wrap;gap:8px 12px;">'+
       (b.status === 'CONFIRMED' ? '<button class="btn btn-p" onclick="checkInGuest(\''+b.bookingId+'\')">🛎️ Check In Guest</button>' : '')+
+      (b.status === 'CONFIRMED' ? '<button class="btn btn-o" onclick="openChangeDatesModal(\''+b.bookingId+'\')">📅 Change Dates</button>' : '')+
       '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">' + (b.status === 'CONFIRMED' ? '🗑 Cancel Reservation' : '🗑 Cancel Booking') + '</button>'+
       '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">➕ Extend Stay</button>'+
       ((b.status === 'CHECKED_IN' && (b.bookingType==='monthly'||b.bookingType==='monthly-draft')) ?
@@ -1158,6 +1183,78 @@ function loadDatalist() {
     }
   });
 }
+
+function openChangeDatesModal(id) {
+  var b = bookings.find(function(x) { return x.bookingId === id; });
+  if (!b) return;
+  document.getElementById('cdBookingId').value = id;
+  document.getElementById('cdCheckin').value = b.checkinDate;
+  document.getElementById('cdCheckout').value = b.checkoutDate;
+  document.getElementById('cdSelectedRoomId').value = '';
+  document.getElementById('cd-alt-group').classList.add('hidden');
+  document.getElementById('cd-inputs-group').style.opacity = '1';
+  document.getElementById('cdCheckin').disabled = false;
+  document.getElementById('cdCheckout').disabled = false;
+  var saveBtn = document.getElementById('btn-save-cd');
+  saveBtn.textContent = 'Save Changes';
+  saveBtn.onclick = submitChangeDates;
+  document.getElementById('changeDatesBg').classList.remove('hidden');
+}
+function closeChangeDates(e) {
+  if (e && e.target !== e.currentTarget && e.target.className !== 'mx') return;
+  document.getElementById('changeDatesBg').classList.add('hidden');
+}
+function submitChangeDates() {
+  var id = document.getElementById('cdBookingId').value;
+  var checkin = document.getElementById('cdCheckin').value;
+  var checkout = document.getElementById('cdCheckout').value;
+  var altRoomId = document.getElementById('cdSelectedRoomId').value;
+  if (!checkin || !checkout) {
+    showToast('Please select both check-in and check-out dates.', 'err');
+    return;
+  }
+  var params = [sessionToken, id, checkin, checkout];
+  if (altRoomId) params.push(altRoomId);
+  showToast('Saving stay dates...', 'info');
+  callApi('roomsUpdateBookingDates', params).then(function(res) {
+    if (res.ok) {
+      showToast('Dates updated successfully!', 'ok');
+      document.getElementById('changeDatesBg').classList.add('hidden');
+      closeDetail();
+      loadData();
+    } else if (res.conflict) {
+      showToast('Room is occupied. Showing alternative rooms...', 'err');
+      var select = document.getElementById('cdAltRoomSelect');
+      select.innerHTML = '';
+      if (!res.alternativeRooms || res.alternativeRooms.length === 0) {
+        select.innerHTML = '<option value="">No alternative rooms of this type available</option>';
+        document.getElementById('btn-save-cd').disabled = true;
+      } else {
+        res.alternativeRooms.forEach(function(r) {
+          var name = (r.property_id === 'precious' ? 'P-' : 'M-') + r.room_number;
+          select.innerHTML += '<option value="' + r.room_id + '">' + name + ' (Floor ' + r.floor + ')</option>';
+        });
+        document.getElementById('btn-save-cd').disabled = false;
+      }
+      document.getElementById('cd-alt-group').classList.remove('hidden');
+      document.getElementById('cd-inputs-group').style.opacity = '0.6';
+      document.getElementById('cdCheckin').disabled = true;
+      document.getElementById('cdCheckout').disabled = true;
+      var saveBtn = document.getElementById('btn-save-cd');
+      saveBtn.textContent = 'Confirm & Move Room';
+      saveBtn.onclick = function() {
+        var chosenRoomId = select.value;
+        if (!chosenRoomId) { showToast('No room selected.', 'err'); return; }
+        document.getElementById('cdSelectedRoomId').value = chosenRoomId;
+        submitChangeDates();
+      };
+    } else {
+      showToast(res.error || 'Could not change dates.', 'err');
+    }
+  }).catch(function(err) {
+    showToast('Network error: ' + err.message, 'err');
+  });
+}
 </script>
 
   <div class="mbg hidden" id="moveRoomBg" onclick="closeMoveRoom(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
@@ -1204,6 +1301,35 @@ function loadDatalist() {
       </div>
       <div style="display:flex; justify-content:flex-end;">
         <button class="btn btn-o" onclick="closeCancelRes()" style="padding:8px 16px;">Abort</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="changeDatesBg" onclick="closeChangeDates(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:450px; max-width:90%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div class="mtitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;">Change Reservation Dates</div>
+        <button class="mx" onclick="closeChangeDates()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="cdBookingId">
+      <input type="hidden" id="cdSelectedRoomId">
+      <div id="cd-inputs-group">
+        <div class="fg" style="margin-bottom:12px;">
+          <label class="fl" style="display:block; font-size:13px; color:var(--muted); margin-bottom:6px;">Check-in Date</label>
+          <input class="fi" type="date" id="cdCheckin" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px;">
+        </div>
+        <div class="fg" style="margin-bottom:20px;">
+          <label class="fl" style="display:block; font-size:13px; color:var(--muted); margin-bottom:6px;">Check-out Date</label>
+          <input class="fi" type="date" id="cdCheckout" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px;">
+        </div>
+      </div>
+      <div id="cd-alt-group" class="hidden" style="margin-bottom:20px; background:#fff8f6; border:1px solid #ffccba; border-radius:12px; padding:16px;">
+        <div style="font-size:13px; color:#c92a2a; font-weight:600; margin-bottom:10px;">⚠️ Selected room is occupied. Select an alternative room:</div>
+        <select class="fs" id="cdAltRoomSelect" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff;"></select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-o" onclick="closeChangeDates()">Cancel</button>
+        <button class="btn btn-m" id="btn-save-cd" onclick="submitChangeDates()">Save Changes</button>
       </div>
     </div>
   </div>

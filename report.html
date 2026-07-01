@@ -126,6 +126,7 @@
       <div class="ftab" id="tab-receipts" onclick="switchTab('receipts')">Receipt Report</div>
       <div class="ftab" id="tab-invoices" onclick="switchTab('invoices')">Invoice Report</div>
       <div class="ftab" id="tab-full-invoices" onclick="switchTab('full-invoices')">Full Invoice Report</div>
+      <div class="ftab" id="tab-ota" onclick="switchTab('ota')">OTA Bookings</div>
     </div>
 
     <!-- HOUSEKEEPING VIEW -->
@@ -462,6 +463,70 @@
       </div>
     </div>
 
+    <!-- OTA BOOKINGS VIEW -->
+    <div id="section-ota" class="hidden">
+      <div class="summary-grid">
+        <div class="kpi-card total">
+          <div class="kpi-val" id="kpi-ota-total">0</div>
+          <div class="kpi-label">Total OTA Stays</div>
+        </div>
+        <div class="kpi-card pending">
+          <div class="kpi-val" id="kpi-ota-revenue">฿0</div>
+          <div class="kpi-label">OTA Net Revenue</div>
+        </div>
+        <div class="kpi-card cleaned">
+          <div class="kpi-val" id="kpi-ota-split">B: 0 / E: 0</div>
+          <div class="kpi-label">Booking.com / Expedia</div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-bottom: 16px;">
+        <div class="tool-group">
+          <label>Property</label>
+          <select id="filter-ota-property" onchange="loadOtaReport()">
+            <option value="all">All Properties</option>
+            <option value="precious">The Precious</option>
+            <option value="moment">The Moment</option>
+          </select>
+        </div>
+        <div class="tool-group">
+          <label>Stay Start Date</label>
+          <input type="date" id="filter-ota-start" onchange="loadOtaReport()">
+        </div>
+        <div class="tool-group">
+          <label>Stay End Date</label>
+          <input type="date" id="filter-ota-end" onchange="loadOtaReport()">
+        </div>
+        <div class="tool-group" style="flex:1;min-width:180px;">
+          <label>Search</label>
+          <input type="text" id="filter-ota-search" placeholder="Search Guest or OTA ID..." oninput="applyOtaFilters()">
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div style="overflow-x:auto;">
+          <table style="min-width: 1000px;">
+            <thead>
+              <tr>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Property</th>
+                <th>Room</th>
+                <th>Guest Name</th>
+                <th>OTA Channel</th>
+                <th>OTA Booking ID</th>
+                <th>Rent Rate</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="ota-table-body">
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Select dates and load report.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="session.js"></script>
@@ -506,6 +571,7 @@
       document.getElementById('section-receipts').classList.add('hidden');
       document.getElementById('section-invoices').classList.add('hidden');
       document.getElementById('section-full-invoices').classList.add('hidden');
+      document.getElementById('section-ota').classList.add('hidden');
 
       if (tab === 'hk') {
         document.getElementById('section-hk').classList.remove('hidden');
@@ -521,6 +587,9 @@
       } else if (tab === 'full-invoices') {
         document.getElementById('section-full-invoices').classList.remove('hidden');
         loadFullInvoiceReport();
+      } else if (tab === 'ota') {
+        document.getElementById('section-ota').classList.remove('hidden');
+        loadOtaReport();
       }
     }
 
@@ -561,6 +630,8 @@
     document.getElementById('filter-invoice-end').value = todayStr;
     document.getElementById('filter-full-invoice-start').value = reportStartStr;
     document.getElementById('filter-full-invoice-end').value = todayStr;
+    document.getElementById('filter-ota-start').value = reportStartStr;
+    document.getElementById('filter-ota-end').value = todayStr;
 
     var ALL_TASKS = [];
 
@@ -979,6 +1050,85 @@
     }
 
     loadReport();
+
+    var ALL_OTA_BOOKINGS = [];
+
+    function loadOtaReport() {
+      var propVal = document.getElementById('filter-ota-property').value;
+      var prop = propVal === 'all' ? null : propVal;
+      var sDate = document.getElementById('filter-ota-start').value;
+      var eDate = document.getElementById('filter-ota-end').value;
+
+      var tbody = document.getElementById('ota-table-body');
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading OTA bookings...</td></tr>';
+
+      callApi('reportsGetOtaBookings', [sessionToken, prop, sDate, eDate]).then(function(res) {
+        if (res.ok) {
+          ALL_OTA_BOOKINGS = res.bookings || [];
+          applyOtaFilters();
+        } else {
+          tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+        }
+      }).catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Connection error: ' + err.message + '</td></tr>';
+      });
+    }
+
+    function applyOtaFilters() {
+      var q = document.getElementById('filter-ota-search').value.toLowerCase().trim();
+      var filtered = ALL_OTA_BOOKINGS.filter(function(b) {
+        if (q) {
+          var matchGuest = (b.guestName || '').toLowerCase().indexOf(q) >= 0;
+          var matchOtaId = (b.otaBookingId || '').toLowerCase().indexOf(q) >= 0;
+          var matchRoom = (b.roomDisplayName || '').toLowerCase().indexOf(q) >= 0;
+          return matchGuest || matchOtaId || matchRoom;
+        }
+        return true;
+      });
+
+      var totalCount = filtered.length;
+      var totalRevenue = 0;
+      var bCount = 0;
+      var eCount = 0;
+
+      if (totalCount === 0) {
+        document.getElementById('ota-table-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No OTA stays match filters.</td></tr>';
+        document.getElementById('kpi-ota-total').textContent = '0';
+        document.getElementById('kpi-ota-revenue').textContent = '฿0';
+        document.getElementById('kpi-ota-split').textContent = 'B: 0 / E: 0';
+        return;
+      }
+
+      var html = '';
+      filtered.forEach(function(b) {
+        totalRevenue += b.rate || 0;
+        if (b.bookingType === 'Booking.com') bCount++;
+        else if (b.bookingType === 'Expedia.com') eCount++;
+
+        var channelBadge = '<span style="padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;' +
+          (b.bookingType === 'Booking.com' ? 'background:#E8F0FE;color:#1A73E8;' : 'background:#FFF8E1;color:#F57C00;') + '">' + escapeHtml(b.bookingType) + '</span>';
+
+        var statusBadge = b.status === 'CONFIRMED' ? '<span class="status-badge pending">Reserved</span>' : '<span class="status-badge cleaned">Checked-In</span>';
+        if (b.status === 'CHECKED_OUT') statusBadge = '<span class="status-badge muted" style="background:#ECEFF1;color:#37474F;">Checked-Out</span>';
+
+        html += '<tr>' +
+          '<td>' + b.checkinDate + '</td>' +
+          '<td>' + b.checkoutDate + '</td>' +
+          '<td>' + (b.propertyId === 'precious' ? 'The Precious' : 'The Moment') + '</td>' +
+          '<td><strong>' + escapeHtml(b.roomDisplayName) + '</strong></td>' +
+          '<td>' + escapeHtml(b.guestName || '-') + '</td>' +
+          '<td>' + channelBadge + '</td>' +
+          '<td><strong style="color:var(--go);font-family:monospace;font-size:13px;">' + escapeHtml(b.otaBookingId || '-') + '</strong></td>' +
+          '<td>฿' + Number(b.rate || 0).toLocaleString() + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '</tr>';
+      });
+
+      document.getElementById('ota-table-body').innerHTML = html;
+      document.getElementById('kpi-ota-total').textContent = totalCount;
+      document.getElementById('kpi-ota-revenue').textContent = '฿' + totalRevenue.toLocaleString();
+      document.getElementById('kpi-ota-split').textContent = 'B: ' + bCount + ' / E: ' + eCount;
+    }
   </script>
 </body>
 </html>
