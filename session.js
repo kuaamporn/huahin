@@ -44,18 +44,33 @@
       }).catch(function() {});
     }
     clearSession();
+    sessionStorage.removeItem('huahin_role_override');
     window.location.href = 'index.html';
   }
 
   function clearSession() {
     sessionStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem('huahin_role_override');
   }
 
   function hasRole() {
     var session = getSession();
     if (!session) return false;
     var roles = session.roles || [];
+
+    // Client-side testing override for owners
+    var isOwner = roles.indexOf('owner') >= 0;
+    if (isOwner) {
+      var override = sessionStorage.getItem('huahin_role_override');
+      if (override && override !== 'owner') {
+        for (var i = 0; i < arguments.length; i++) {
+          if (arguments[i] === override) return true;
+        }
+        return false;
+      }
+    }
+
     for (var i = 0; i < arguments.length; i++) {
       if (roles.indexOf(arguments[i]) >= 0) return true;
     }
@@ -96,7 +111,7 @@
     if (allowedRoles.length === 0) return session;
 
     var ok = allowedRoles.some(function (r) {
-      return (session.roles || []).indexOf(r) >= 0;
+      return hasRole(r);
     });
 
     if (!ok) {
@@ -104,6 +119,72 @@
       return null;
     }
     return session;
+  }
+
+  // Inject floating view-as dropdown for owners
+  if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', function() {
+      var session = getSession();
+      if (session && (session.roles || []).indexOf('owner') >= 0) {
+        var widget = document.createElement('div');
+        widget.id = 'owner-view-as-widget';
+        widget.style.position = 'fixed';
+        widget.style.bottom = '10px';
+        widget.style.right = '10px';
+        widget.style.background = '#1F2937';
+        widget.style.color = '#fff';
+        widget.style.padding = '8px 12px';
+        widget.style.borderRadius = '8px';
+        widget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.15)';
+        widget.style.zIndex = '999999';
+        widget.style.fontSize = '12px';
+        widget.style.fontFamily = 'sans-serif';
+        widget.style.display = 'flex';
+        widget.style.alignItems = 'center';
+        widget.style.gap = '8px';
+        widget.style.border = '1px solid #4B5563';
+        widget.className = 'no-print';
+
+        var currentOverride = sessionStorage.getItem('huahin_role_override') || 'owner';
+
+        var label = document.createElement('span');
+        label.textContent = 'View As:';
+        widget.appendChild(label);
+
+        var select = document.createElement('select');
+        select.style.background = '#374151';
+        select.style.color = '#fff';
+        select.style.border = '1px solid #4B5563';
+        select.style.borderRadius = '4px';
+        select.style.padding = '2px 6px';
+        select.style.cursor = 'pointer';
+
+        var roles = [
+          { val: 'owner', label: 'Owner (Default)' },
+          { val: 'frontdesk', label: 'Frontdesk' },
+          { val: 'accountant', label: 'Accountant' },
+          { val: 'revenue', label: 'Revenue Admin' },
+          { val: 'expense', label: 'Expense Admin' },
+          { val: 'housekeeping', label: 'Housekeeper' }
+        ];
+
+        roles.forEach(function(r) {
+          var opt = document.createElement('option');
+          opt.value = r.val;
+          opt.textContent = r.label;
+          if (r.val === currentOverride) opt.selected = true;
+          select.appendChild(opt);
+        });
+
+        select.onchange = function() {
+          sessionStorage.setItem('huahin_role_override', select.value);
+          window.location.reload();
+        };
+
+        widget.appendChild(select);
+        document.body.appendChild(widget);
+      }
+    });
   }
 
   global.HuaHinSession = {
