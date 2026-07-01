@@ -349,6 +349,7 @@
             <input type="date" id="fm-receipt-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
           </div>
           <button id="fm-generate-receipt-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate Receipt</button>
+          <button id="fm-split-receipts-btn" class="btn-primary hidden" style="padding: 7px 12px; font-size: 13px; background: #ea580c; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate & Split (Rent + Deposit)</button>
         </div>
         <div id="fm-receipt-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
       </div>
@@ -891,12 +892,19 @@
         cats = cats.concat(['electricity', 'water', 'utility']);
       }
 
-      var catOptions = cats.map(function(c) { return '<option value="'+c+'">'+c.charAt(0).toUpperCase() + c.slice(1)+'</option>'; }).join('');
-
       CURRENT_ITEMS.forEach(function(item, i) {
+        var itemCats = cats.slice();
+        if (item.category && itemCats.indexOf(item.category) === -1) {
+          itemCats.push(item.category);
+        }
+        var catOptions = itemCats.map(function(c) {
+          var sel = c === item.category ? ' selected' : '';
+          return '<option value="'+c+'"'+sel+'>'+c.charAt(0).toUpperCase() + c.slice(1)+'</option>';
+        }).join('');
+
         html += '<div class="item-row">';
         html += '<div><label style="font-size:11px;color:#888;">Description</label><input type="text" placeholder="Item description" list="fm-prev-items" value="'+escapeHtml(item.description)+'" onchange="updateItemField('+i+', \'description\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">Category</label><select onchange="updateItemField('+i+', \'category\', this.value)">' + catOptions.replace('value="'+item.category+'"', 'value="'+item.category+'" selected') + '</select></div>';
+        html += '<div><label style="font-size:11px;color:#888;">Category</label><select onchange="updateItemField('+i+', \'category\', this.value)">' + catOptions + '</select></div>';
         html += '<div><label style="font-size:11px;color:#888;">Qty/Units</label><input type="number" placeholder="Qty" value="'+escapeHtml(item.units)+'" onchange="updateItemField('+i+', \'units\', this.value)"></div>';
         html += '<div><label style="font-size:11px;color:#888;">Unit Price</label><input type="number" placeholder="Price" value="'+escapeHtml(item.unit_price)+'" onchange="updateItemField('+i+', \'unit_price\', this.value)"></div>';
         html += '<div><label style="font-size:11px;color:#888;">Amount</label><input type="number" placeholder="Total" value="'+escapeHtml(item.amount)+'" onchange="updateItemField('+i+', \'amount\', this.value)"></div>';
@@ -1276,6 +1284,10 @@
       var printReceiptBtn = document.getElementById('fm-print-receipt-btn');
       var receiptGenSection = document.getElementById('fm-receipt-gen-section');
       printReceiptBtn.classList.add('hidden');
+      var oldButtons = document.querySelectorAll('.fm-receipt-btn-dynamic');
+      oldButtons.forEach(function(b) { b.remove(); });
+      document.getElementById('fm-split-receipts-btn').classList.add('hidden');
+
       receiptGenSection.classList.add('hidden');
       document.getElementById('fm-receipt-error').classList.add('hidden');
 
@@ -1287,11 +1299,23 @@
 
       if (t.direction === 'IN') {
         if (t.receipt_no) {
-          printReceiptBtn.classList.remove('hidden');
-          printReceiptBtn.onclick = function(e) {
-            e.preventDefault();
-            window.open('receipt.html?receipt_no=' + encodeURIComponent(t.receipt_no), '_blank');
-          };
+          printReceiptBtn.classList.add('hidden');
+          var receiptNos = t.receipt_no.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+          if (receiptNos.length > 0) {
+            receiptNos.forEach(function(rNo) {
+              var btn = document.createElement('button');
+              btn.className = 'btn-secondary fm-receipt-btn-dynamic';
+              btn.style.marginRight = '12px';
+              btn.style.borderColor = '#0284C7';
+              btn.style.color = '#0284C7';
+              btn.innerHTML = '🖨️ Print Receipt (' + rNo + ')';
+              btn.onclick = function(e) {
+                e.preventDefault();
+                window.open('receipt.html?receipt_no=' + encodeURIComponent(rNo), '_blank');
+              };
+              printReceiptBtn.parentNode.insertBefore(btn, printReceiptBtn);
+            });
+          }
         } else {
           receiptGenSection.classList.remove('hidden');
           document.getElementById('fm-receipt-date').value = t.txn_date || todayDateStringForInput();
@@ -1304,6 +1328,73 @@
             typeSelect.value = 'RD';
           } else {
             typeSelect.value = 'RR';
+          }
+
+          var hasRent = false;
+          var hasDeposit = false;
+          if (t.items && t.items.length > 0) {
+            t.items.forEach(function(item) {
+              var cat = (item.category || '').toLowerCase();
+              if (cat.indexOf('rent') >= 0) hasRent = true;
+              if (cat.indexOf('deposit') >= 0) hasDeposit = true;
+            });
+          }
+
+          var splitBtn = document.getElementById('fm-split-receipts-btn');
+          if (hasRent && hasDeposit) {
+            splitBtn.classList.remove('hidden');
+            splitBtn.onclick = function(e) {
+              e.preventDefault();
+              var rDate = document.getElementById('fm-receipt-date').value;
+              var errorEl = document.getElementById('fm-receipt-error');
+              errorEl.classList.add('hidden');
+              if (!rDate) {
+                errorEl.textContent = 'Please select a receipt date.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+              splitBtn.disabled = true;
+              splitBtn.textContent = 'Splitting...';
+              callApi('financeGenerateReceipt', [session.token, t.txn_id, 'RR', rDate]).then(function(res1) {
+                if (!res1.ok) {
+                  splitBtn.disabled = false;
+                  splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
+                  errorEl.textContent = 'Rent Receipt Error: ' + res1.error;
+                  errorEl.classList.remove('hidden');
+                  return;
+                }
+                callApi('financeGenerateReceipt', [session.token, t.txn_id, 'RA', rDate]).then(function(res2) {
+                  splitBtn.disabled = false;
+                  splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
+                  if (res2.ok) {
+                    alert('Receipts generated and split successfully:\nRent: ' + res1.receipt_no + '\nDeposit: ' + res2.receipt_no);
+                    callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
+                      if (txnRes.ok) {
+                        var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
+                        if (localIdx >= 0) TRANSACTIONS[localIdx] = txnRes.transaction;
+                        editTransaction(t.txn_id);
+                      }
+                      loadFinanceData();
+                    });
+                  } else {
+                    errorEl.textContent = 'Deposit Receipt Error: ' + res2.error;
+                    errorEl.classList.remove('hidden');
+                  }
+                }).catch(function(err) {
+                  splitBtn.disabled = false;
+                  splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
+                  errorEl.textContent = 'Deposit Receipt Connection Error: ' + err.message;
+                  errorEl.classList.remove('hidden');
+                });
+              }).catch(function(err) {
+                splitBtn.disabled = false;
+                splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
+                errorEl.textContent = 'Rent Receipt Connection Error: ' + err.message;
+                errorEl.classList.remove('hidden');
+              });
+            };
+          } else {
+            splitBtn.classList.add('hidden');
           }
 
           document.getElementById('fm-generate-receipt-btn').onclick = function(e) {
@@ -1547,10 +1638,15 @@
     function renderMoveOutItems() {
       var html = '';
       MO_ITEMS.forEach(function (item, index) {
+        var mCats = REVENUE_CATS.slice();
+        if (item.category && mCats.indexOf(item.category) === -1) {
+          mCats.push(item.category);
+        }
+        var catOpts = mCats.map(c => '<option value="'+c+'" '+(item.category === c ? 'selected' : '')+'>'+c+'</option>').join('');
         html += '<div class="item-row" style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">' +
           '<input type="text" placeholder="Description (e.g. Water)" value="'+escapeHtml(item.description)+'" onchange="MO_ITEMS['+index+'].description=this.value" style="flex:2;">' +
           '<select onchange="MO_ITEMS['+index+'].category=this.value" style="flex:1;">' +
-            REVENUE_CATS.map(c => '<option value="'+c+'" '+(item.category === c ? 'selected' : '')+'>'+c+'</option>').join('') +
+            catOpts +
           '</select>' +
           '<input type="number" placeholder="Units" value="'+item.units+'" onchange="MO_ITEMS['+index+'].units=this.value; calcMoRow('+index+')" id="mo-u-'+index+'" style="width:60px;">' +
           '<input type="number" placeholder="Price" value="'+item.unit_price+'" onchange="MO_ITEMS['+index+'].unit_price=this.value; calcMoRow('+index+')" id="mo-p-'+index+'" style="width:80px;">' +

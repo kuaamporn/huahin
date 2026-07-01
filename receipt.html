@@ -329,9 +329,10 @@
         var subRowsHtml = '';
         var unitLabel = 'รายการ';
 
-        if (item.category === 'rent' || item.category === 'monthly rent' || item.category === 'daily rent' || item.category === 'BK rent' || item.category === 'EXP rent') {
+        var catLower = (item.category || '').toLowerCase();
+        if (catLower === 'rent' || catLower === 'monthly rent' || catLower === 'daily rent' || catLower === 'bk rent' || catLower === 'exp rent') {
           description = 'ค่าเช่าห้อง/room rent';
-          var isMonthly = t.category === 'monthly rent' || t.category === 'rent' || (b && b.booking_type === 'monthly');
+          var isMonthly = t.category === 'monthly rent' || t.category === 'rent' || (b && b.booking_type === 'monthly') || catLower === 'monthly rent';
           unitLabel = isMonthly ? 'เดือน' : 'วัน';
 
           if (b) {
