@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Batch Invoices</title>
   <style>
-    body { font-family: 'Tahoma', sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; font-size: 11px; }
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Sarabun', sans-serif; background: #e5e5e5; margin: 0; padding: 20px; color: #000; font-size: 11px; }
     .print-btn-container { text-align: center; margin-bottom: 20px; }
+    .btn-print { padding: 15px 30px; font-size: 18px; background: #0F766E; color: #fff; border: none; cursor: pointer; font-weight: bold; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
     .a4-page {
-      width: 21cm; min-height: 29.7cm; margin: 0 auto 30px; background: #fff;
+      width: 21cm; height: 29.7cm; margin: 0 auto 30px; background: #fff;
       padding: 0.5cm; display: flex; flex-direction: column; gap: 0.5cm;
       page-break-after: always; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
@@ -21,30 +23,42 @@
       box-sizing: border-box;
     }
 
-    .slip-header { display: flex; padding: 4px; border-bottom: 2px solid #000; font-weight: bold; font-size: 13px; }
-    .slip-remark { display: flex; border-bottom: 2px solid #000; }
-    .slip-meta { display: flex; border-bottom: 2px solid #000; }
+    .slip-header { display: flex; align-items: center; border-bottom: 2px solid #000; padding: 4px; font-weight: bold; }
+    .slip-remark { display: flex; border-bottom: 2px solid #000; font-size: 8.5px; line-height: 1.25; }
+    .slip-meta { display: flex; border-bottom: 2px solid #000; font-size: 10px; }
     .slip-items { flex: 1; display: flex; flex-direction: column; border-bottom: 2px solid #000; }
-    .items-head { display: flex; border-bottom: 2px solid #000; background: #f0f0f0; }
+    .items-head { display: flex; border-bottom: 2px solid #000; background: #f0f0f0; font-weight: bold; }
     .items-body { flex: 1; display: flex; flex-direction: column; }
-    .item-row { display: flex; }
+    .item-row { display: flex; font-size: 11px; }
     .item-row div { padding: 4px; }
-    .slip-footer { display: flex; height: 2cm; }
-    .bank-info { flex: 1; padding: 4px; font-size: 10px; line-height: 1.4; border-right: 2px solid #000; }
+    .slip-footer { display: flex; height: 1.8cm; font-size: 10px; }
+    .bank-info { flex: 1; padding: 4px; border-right: 2px solid #000; line-height: 1.4; }
     .sig-box { width: 35%; display: flex; flex-direction: column; }
-    .grand-total { display: flex; border-bottom: 2px solid #000; }
-    .sig-space { flex: 1; text-align: center; padding-top: 25px; }
+    .grand-total { display: flex; border-bottom: 2px solid #000; font-weight: bold; }
+    .sig-space { flex: 1; text-align: center; padding-top: 12px; }
+
+    .back-slip {
+      border: 2px solid #000;
+      height: 9.1cm;
+      display: flex; flex-direction: column;
+      box-sizing: border-box;
+      padding: 12px;
+      justify-content: center;
+    }
+    .back-slip-title { text-align: center; font-weight: bold; font-size: 12px; margin-bottom: 8px; border-bottom: 1.5px solid #000; padding-bottom: 4px; }
+    .back-slip-text-th { font-size: 9.5px; line-height: 1.35; margin-bottom: 8px; text-align: justify; }
+    .back-slip-text-en { font-size: 9px; line-height: 1.3; text-align: justify; }
 
     @media print {
       body { background: #fff; padding: 0; }
       .a4-page { box-shadow: none; margin: 0; }
-      .no-print { display: none; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
 <body>
   <div class="print-btn-container no-print">
-    <button onclick="window.print()" style="padding:15px 30px; font-size:18px; background:#0F766E; color:#fff; border:none; cursor:pointer; font-weight:bold; border-radius:6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Print All Invoices</button>
+    <button class="btn-print" onclick="window.print()">Print All Invoices</button>
   </div>
 
   <div id="invoices-container">
@@ -55,13 +69,146 @@
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
-    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function escapeHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    function formatBE(dateStr) {
+      if (!dateStr) return '-';
+      var parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      var y = parseInt(parts[0]) + 543;
+      return parts[2] + '/' + parts[1] + '/' + y;
+    }
+
+    function getPreviousMonthName(billingMonthStr) {
+      if (!billingMonthStr || billingMonthStr.split('-').length !== 2) return '';
+      var TH_MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      var parts = billingMonthStr.split('-');
+      var y = parseInt(parts[0]);
+      var m = parseInt(parts[1]) - 1;
+      var d = new Date(y, m - 1, 1);
+      return TH_MONTHS[d.getMonth()];
+    }
+
+    function formatItemDescription(item, billingMonth, booking) {
+      var desc = item.description || '';
+      var catLower = (item.category || '').toLowerCase();
+
+      if (catLower === 'rent' || catLower === 'monthly rent' || catLower === 'daily rent' || catLower === 'bk rent' || catLower === 'exp rent') {
+        desc = 'ค่าเช่าห้องและเฟอร์นิเจอร์ / Room and furniture Charge';
+        if (booking) {
+          desc += ' <span style="font-size:10px; color:#555;">(Move-in: ' + formatBE(booking.checkin_date) + ' | Move-out: ' + formatBE(booking.checkout_date) + ')</span>';
+        }
+      } else if (catLower === 'electricity' || (catLower === 'utility' && desc.toLowerCase().indexOf('elec') !== -1) || desc.toLowerCase().indexOf('electric') !== -1) {
+        var prevMonth = getPreviousMonthName(billingMonth);
+        desc = 'ค่าไฟฟ้า / Electric Supply' + (prevMonth ? ' เดือน ' + prevMonth : '') + ' (' + item.unit_price + '.-/unit)';
+      } else if (catLower === 'water' || (catLower === 'utility' && desc.toLowerCase().indexOf('water') !== -1)) {
+        var prevMonth = getPreviousMonthName(billingMonth);
+        desc = 'ค่าน้ำ / Water Supply' + (prevMonth ? ' เดือน ' + prevMonth : '') + ' (' + item.unit_price + '.-/unit)';
+      }
+      return desc;
+    }
+
+    function buildSlipHtml(t, b, displayInvNo) {
+      var itemsHtml = '';
+      t.items.forEach(function(item) {
+        var desc = formatItemDescription(item, t.billing_month, b);
+        itemsHtml +=
+          '<div class="item-row">' +
+          '<div style="flex:1; border-right: 2px solid #000;">' + desc + '</div>' +
+          '<div style="width:20%; border-right: 2px solid #000; text-align: center;">' + (item.units || 1) + '</div>' +
+          '<div style="width:25%; text-align: right;">' + item.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
+          '</div>';
+      });
+
+      itemsHtml +=
+        '<div class="item-row" style="flex:1;">' +
+        '<div style="flex:1; border-right: 2px solid #000;"></div>' +
+        '<div style="width:20%; border-right: 2px solid #000;"></div>' +
+        '<div style="width:25%;"></div>' +
+        '</div>';
+
+      var propertyName = t.property_id === 'moment' ? 'The Moment' : 'The Precious';
+      var propAddress = t.property_id === 'moment'
+        ? '21/234 ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จ.ประจวบคีรีขันธ์ 77110'
+        : 'เลขที่ 21/234 ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จังหวัดประจวบคีรีขันธ์ 77110';
+
+      var remarkText = 'Remark : *ค่าปรับกำหนดให้ชำระภายในวันที่ 5 ของเดือน หากชำระเกินกว่าวันที่ 5 ของเดือน จะปรับ 150 บาท/วัน โดยไม่มีข้อยกเว้น / *Rent and utility charges are to be paid by the 5th day of every month. 150 Baht per day will be charged in case of payment delays.';
+
+      var bankName = t.property_id === 'moment' ? 'บริษัท เดอะ โมเมนต์ หัวหิน จำกัด' : 'บริษัท เดอะ ซีรีน จำกัด';
+      var bankAcc = t.property_id === 'moment' ? '077-5-56100-2' : '485-2-43288-3';
+      var bankInfoHtml =
+        'โอนเข้าบัญชี / Bank Transfer: <strong>' + bankName + '</strong><br>' +
+        'ธนาคารกสิกรไทย / KBank เลขบัญชี / A/C No: <strong>' + bankAcc + '</strong>';
+
+      return (
+        '<div class="slip">' +
+          '<div class="slip-header">' +
+            '<div style="flex:1;">' + propertyName + ' <span style="font-size:8.5px; font-weight:normal; color:#444; margin-left:6px;">' + propAddress + '</span></div>' +
+            '<div style="text-transform:uppercase;">Invoice / ใบแจ้งหนี้</div>' +
+          '</div>' +
+          '<div class="slip-remark">' +
+            '<div style="flex:1; border-right: 2px solid #000; padding: 4px;">' + remarkText + '</div>' +
+            '<div style="width:25%; display:flex;">' +
+              '<div style="flex:1; border-right: 2px solid #000; padding: 4px; display:flex; align-items:center; justify-content:center; text-align:center;">Issue Month</div>' +
+              '<div style="flex:1; padding: 4px; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:bold;">' + escapeHtml(t.billing_month || '') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="slip-meta">' +
+            '<div style="width:7%; padding: 4px; border-right: 1px solid #000;">Name</div>' +
+            '<div style="width:28%; padding: 4px; border-right: 2px solid #000; text-align: center; font-weight: bold;">' + escapeHtml(t.guest_or_vendor || '-') + '</div>' +
+            '<div style="width:7%; padding: 4px; border-right: 1px solid #000;">Room</div>' +
+            '<div style="width:8%; padding: 4px; border-right: 2px solid #000; text-align: center; font-weight: bold;">' + escapeHtml(t.room_name || '-') + '</div>' +
+            '<div style="width:10%; padding: 4px; border-right: 1px solid #000;">Issue date</div>' +
+            '<div style="width:12%; padding: 4px; border-right: 2px solid #000; text-align: center;">' + escapeHtml(t.txn_date) + '</div>' +
+            '<div style="width:13%; padding: 4px; border-right: 1px solid #000;">Invoice No</div>' +
+            '<div style="width:15%; padding: 4px; text-align: center; font-weight: bold;">' + escapeHtml(displayInvNo) + '</div>' +
+          '</div>' +
+          '<div class="slip-items">' +
+            '<div class="items-head">' +
+              '<div style="flex:1; padding: 4px; text-align: center; border-right: 2px solid #000;">Description / รายละเอียด</div>' +
+              '<div style="width:20%; padding: 4px; text-align: center; border-right: 2px solid #000;">Units</div>' +
+              '<div style="width:25%; padding: 4px; text-align: center;">Amount</div>' +
+            '</div>' +
+            '<div class="items-body">' + itemsHtml + '</div>' +
+          '</div>' +
+          '<div class="slip-footer">' +
+            '<div class="bank-info">' + bankInfoHtml + '</div>' +
+            '<div class="sig-box">' +
+              '<div class="grand-total">' +
+                '<div style="flex:1; padding: 4px; border-right: 2px solid #000;">Grand Total</div>' +
+                '<div style="flex:1; padding: 4px; text-align: right;">฿' + t.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
+              '</div>' +
+              '<div class="sig-space">Approved by / ผู้อนุมัติ</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    function buildBackSlipHtml() {
+      var termsTh = 'เมื่อผู้เช่าผิดนัดชำระค่าเช่า ค่าน้ำประปา ค่าไฟฟ้า ค่าใช้จ่ายในการให้บริการ ค่าบริการสาธารณูปโภค และค่าบริการอื่นๆ เกินกว่าวันที่ 5 ของเดือน ผู้เช่าตกลงให้ผู้ให้เช่าถือเอาหนังสือที่ผู้ให้เช่าแจ้งให้ผู้เช่าชำระค่าเช่าเป็นหนังสือบอกกล่าวให้ผู้เช่าปฏิบัติตามสัญญา "หากผู้เช่าไม่ชำระค่าเช่าภายใน 30 วัน นับแต่วันครบกำหนดชำระค่าเช่า ผู้ให้เช่าขอถือเอาหนังสือแจ้งให้ผู้เช่าชำระค่าเช่าดังกล่าวเป็นหนังสือบอกเลิกสัญญาและผู้เช่าตกลงให้ผู้ให้เช่าคิดค่าปรับการชำระค่าเช่า ค่าน้ำประปา ค่าไฟฟ้า ค่าใช้จ่ายในการให้บริการค่าบริการสาธารณูปโภค และค่าบริการอื่นๆ ล่าช้า ในอัตราวันละ 150 บาท นับแต่วันผิดนัดเป็นต้นไปจนกว่าผู้เช่าจะชำระค่าเช่า ค่าน้ำประปา ค่าไฟฟ้า ค่าใช้จ่ายในการให้บริการ ค่าบริการสาธารณูปโภค และค่าบริการอื่นๆให้กับผู้ให้เช่าจนครบถ้วน"';
+      var termsEn = 'Rent and Utility charge must be paid within 5th of Room Rent month. If the tenant do not pay within 5th of Room Rent month, tenant agrees for landlord to use this invoice as the notice document that "If the tenant do not pay within 30 days after 5th of Room Rent month, landlord will use this invoice as move-out document and tenant agree to pay 150 THB per day will be charged in case of payment delay until payment received."';
+      return (
+        '<div class="back-slip">' +
+          '<div class="back-slip-title">Backside of the Invoice / รายละเอียดด้านหลังใบแจ้งหนี้</div>' +
+          '<div class="back-slip-text-th">' + termsTh + '</div>' +
+          '<div class="back-slip-text-en">' + termsEn + '</div>' +
+        '</div>'
+      );
+    }
 
     window.onload = async function() {
       if (!HuaHinSession.requireSession()) return;
       var urlParams = new URLSearchParams(window.location.search);
       var idsStr = urlParams.get('ids');
-      if (!idsStr) { document.getElementById('invoices-container').innerHTML = '<div style="text-align:center; color:red;">No transaction IDs provided.</div>'; return; }
+      if (!idsStr) {
+        document.getElementById('invoices-container').innerHTML = '<div style="text-align:center; color:red;">No transaction IDs provided.</div>';
+        return;
+      }
 
       var txnIds = idsStr.split(',').filter(function(id) { return id.trim(); });
       var container = document.getElementById('invoices-container');
@@ -70,104 +217,67 @@
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
 
-      var currentA4Page = null;
-      var slipsCount = 0;
+      var groupCount = Math.ceil(txnIds.length / 3);
 
-      for (var i = 0; i < txnIds.length; i++) {
-        var txnId = txnIds[i];
+      for (var g = 0; g < groupCount; g++) {
+        var startIdx = g * 3;
+        var endIdx = Math.min(startIdx + 3, txnIds.length);
 
-        try {
-          var res = await fetch(WORKER_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'financeGetTransaction', params: [token, txnId] })
-          });
-          var data = await res.json();
-          if (!data.ok) {
-            console.error(data.error);
-            continue;
+        var frontPage = document.createElement('div');
+        frontPage.className = 'a4-page';
+        container.appendChild(frontPage);
+
+        var backPage = document.createElement('div');
+        backPage.className = 'a4-page';
+
+        for (var i = startIdx; i < endIdx; i++) {
+          var txnId = txnIds[i];
+
+          try {
+            var res = await fetch(WORKER_API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'financeGetTransaction', params: [token, txnId] })
+            });
+            var data = await res.json();
+            if (!data.ok) { console.error(data.error); continue; }
+
+            var t = data.transaction;
+
+            var booking = null;
+            if (t.invoice_no) {
+              var invRes = await fetch(WORKER_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'financeGetInvoice', params: [token, t.invoice_no] })
+              }).then(function(r) { return r.json(); }).catch(function() { return {}; });
+              if (invRes.ok && invRes.booking) booking = invRes.booking;
+            }
+
+            var displayInvNo = '';
+            if (t.invoice_no) {
+              displayInvNo = t.invoice_no;
+            } else if (t.billing_month) {
+              var parts = t.billing_month.split('-');
+              var yr = parseInt(parts[0]);
+              var budYr = (yr + 543).toString().slice(-2);
+              var mm = parts[1] || '00';
+              var roomNo = (t.room_name || '').replace(/^R\./i, '');
+              var propChar = t.property_id === 'precious' ? 'P' : 'M';
+              displayInvNo = propChar + budYr + mm + '-' + roomNo;
+            } else {
+              displayInvNo = t.txn_id;
+            }
+
+            frontPage.insertAdjacentHTML('beforeend', buildSlipHtml(t, booking, displayInvNo));
+            backPage.insertAdjacentHTML('beforeend', buildBackSlipHtml());
+
+          } catch(e) {
+            console.error(e);
           }
-
-          var t = data.transaction;
-
-          var itemsHtml = '';
-          for (var j = 0; j < t.items.length; j++) {
-            var item = t.items[j];
-            itemsHtml +=
-              '<div class="item-row">' +
-              '<div style="flex:1; border-right: 2px solid #000;">' + escapeHtml(item.description) + '</div>' +
-              '<div style="width:20%; border-right: 2px solid #000; text-align: center;">' + (item.units || 1) + '</div>' +
-              '<div style="width:25%; text-align: right;">' + item.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
-              '</div>';
-          }
-          itemsHtml +=
-            '<div class="item-row" style="flex:1;">' +
-            '<div style="flex:1; border-right: 2px solid #000;"></div>' +
-            '<div style="width:20%; border-right: 2px solid #000;"></div>' +
-            '<div style="width:25%;"></div>' +
-            '</div>';
-
-          var propertyName = t.property_id === 'precious' ? 'The Precious' : 'The Moment';
-
-          var slipHtml =
-            '<div class="slip">' +
-              '<div class="slip-header">' +
-                '<div style="flex:1;">' + propertyName + '</div>' +
-                '<div>Invoice</div>' +
-              '</div>' +
-              '<div class="slip-remark">' +
-                '<div style="flex:1; border-right: 2px solid #000; padding: 4px; font-size: 9px; line-height: 1.2;">' +
-                  'Remark : *rent and utility charges are to be paid by the 5th day of every month. 150 Baht per day will be charged in case of payment delays until payment is received' +
-                '</div>' +
-                '<div style="width: 30%; display: flex;">' +
-                  '<div style="flex:1; border-right: 2px solid #000; padding: 4px; display: flex; align-items: center; justify-content: center;">Issue month</div>' +
-                  '<div style="flex:1; padding: 4px; display: flex; align-items: center; justify-content: center;">' + escapeHtml(t.billing_month || '') + '</div>' +
-                '</div>' +
-              '</div>' +
-              '<div class="slip-meta">' +
-                '<div style="width:10%; padding: 4px; border-right: 1px solid #000;">Name</div>' +
-                '<div style="width:40%; padding: 4px; border-right: 2px solid #000; text-align: center;">' + escapeHtml(t.guest_or_vendor || '-') + '</div>' +
-                '<div style="width:12%; padding: 4px; border-right: 1px solid #000;">Issue date</div>' +
-                '<div style="width:15%; padding: 4px; border-right: 2px solid #000; text-align: center;">' + escapeHtml(t.txn_date) + '</div>' +
-                '<div style="width:13%; padding: 4px; border-right: 1px solid #000;">Room</div>' +
-                '<div style="width:10%; padding: 4px; text-align: center; font-weight: bold;">' + escapeHtml(t.room_name || '-') + '</div>' +
-              '</div>' +
-              '<div class="slip-items">' +
-                '<div class="items-head">' +
-                  '<div style="flex:1; padding: 4px; text-align: center; border-right: 2px solid #000;">Description</div>' +
-                  '<div style="width:20%; padding: 4px; text-align: center; border-right: 2px solid #000;">Units</div>' +
-                  '<div style="width:25%; padding: 4px; text-align: center;">Amount</div>' +
-                '</div>' +
-                '<div class="items-body">' + itemsHtml + '</div>' +
-              '</div>' +
-              '<div class="slip-footer">' +
-                '<div class="bank-info">' +
-                  'Bank Transfer: Account name Krittapong Uaamporn<br>' +
-                  'Bank Account No: 002-1-36419-3<br>' +
-                  'Bank: Kasikorn Bank, Branch: Hua Hin Market Village' +
-                '</div>' +
-                '<div class="sig-box">' +
-                  '<div class="grand-total">' +
-                    '<div style="flex:1; padding: 4px; border-right: 2px solid #000; font-weight: bold;">Grand Total</div>' +
-                    '<div style="flex:1; padding: 4px; text-align: right; font-weight: bold;">' + t.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
-                  '</div>' +
-                  '<div class="sig-space">Approved by</div>' +
-                '</div>' +
-              '</div>' +
-            '</div>';
-
-          if (slipsCount % 3 === 0) {
-            currentA4Page = document.createElement('div');
-            currentA4Page.className = 'a4-page';
-            container.appendChild(currentA4Page);
-          }
-
-          currentA4Page.insertAdjacentHTML('beforeend', slipHtml);
-          slipsCount++;
-
-        } catch(e) {
-          console.error(e);
         }
+
+        container.appendChild(backPage);
       }
 
       if (container.innerHTML === '') {
