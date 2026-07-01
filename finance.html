@@ -1065,8 +1065,15 @@
     }
 
     var financeModalMode = 'revenue';
-    var REVENUE_CATS = ['rent', 'walkin', 'deposit', 'monthly rent', 'monthly deposit', 'daily rent', 'daily deposit', 'BK rent', 'BK deposit', 'EXP rent', 'EXP deposit', 'damage_fee', 'fitness', 'breakfast', 'other'];
-    var EXPENSE_CATS = ['utility', 'repair', 'cleaning', 'supplies', 'salaries', 'deposit_return', 'other'];
+    var REVENUE_CATS = [
+      'monthly rent', 'monthly deposit', 'daily rent', 'daily deposit',
+      'bk rent', 'bk deposit', 'exp rent', 'exp deposit',
+      'electricity', 'water', 'damage_fee', 'fitness', 'breakfast', 'other'
+    ];
+    var EXPENSE_CATS = [
+      'electricity', 'water', 'utility', 'repair', 'cleaning',
+      'supplies', 'salaries', 'deposit_return', 'other'
+    ];
 
     
     function openFinanceModal(mode) {
