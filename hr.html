@@ -413,7 +413,7 @@
       });
     }
 
-    var _session = HuaHinSession.requireRole('index.html', 'owner');
+    var _session = HuaHinSession.requireRole('index.html', 'owner', 'frontdesk');
     var token = _session ? _session.token : null;
     var currentEmployeeId = _session ? _session.employeeId : null;
     var currentUserRoles = _session ? (_session.roles || []) : [];
@@ -479,6 +479,10 @@
     var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', account: 'tab-account', roles: 'tab-roles' };
 
     function switchTab(name) {
+      if ((name === 'employees' || name === 'roles') && !hasRole('owner')) {
+        switchTab('checkins');
+        return;
+      }
       Object.keys(panels).forEach(function(key) {
         document.getElementById(panels[key]).classList.toggle('hidden', key !== name);
         document.getElementById(tabs[key]).classList.toggle('active', key === name);
@@ -1027,15 +1031,13 @@
     }
 
     function hasRole() {
-      for (var i = 0; i < arguments.length; i++) {
-        if (currentUserRoles.indexOf(arguments[i]) >= 0) return true;
-      }
-      return false;
+      return HuaHinSession.hasRole.apply(HuaHinSession, arguments);
     }
 
     function applyRoleVisibility() {
-      var canManageRoles = hasRole('owner');
-      document.getElementById('tab-roles').classList.toggle('hidden', !canManageRoles);
+      var isOwner = hasRole('owner');
+      document.getElementById('tab-roles').classList.toggle('hidden', !isOwner);
+      document.getElementById('tab-employees').classList.toggle('hidden', !isOwner);
     }
 
     // ===================== ROLES =====================

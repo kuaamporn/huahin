@@ -598,6 +598,9 @@
         if (!canViewFullFinance) {
           hide('card-revenue');
           hide('card-expense');
+        }
+        var isOwner = HuaHinSession.hasRole('owner');
+        if (!isOwner) {
           hide('card-net');
         }
       }

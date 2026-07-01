@@ -703,6 +703,9 @@ function updateRooms(){
   var p = document.getElementById('mProp').value;
   var rooms = ROOMS.filter(function(r){ return r.propertyId===p; });
   document.getElementById('mRoom').innerHTML = rooms.map(function(r){
+    if (r.roomId === 'P-OWNER' || r.roomId === 'M-OWNER') {
+      return '<option value="'+r.roomId+'">'+escapeHtml(r.displayName)+'</option>';
+    }
     return '<option value="'+r.roomId+'">'+r.displayName+' · '+tl(r.roomType)+(r.rate>0?(' · ฿'+r.rate.toLocaleString()):' (TBD)')+'</option>';
   }).join('');
 
