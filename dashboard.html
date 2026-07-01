@@ -7,7 +7,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     :root {
-      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA; --go: #0F766E; --warn: #DC2626; --muted: #86868B;
+      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA; --go: #0F766E; --warn: #DC2626; --muted: #4B4B4D;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
@@ -71,6 +71,7 @@
         <a href="billing.html">Billing</a>
         <a href="hr.html">HR</a>
         <a href="report.html" id="link-report" class="hidden">Reports</a>
+        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
       </div>
     </div>
 
@@ -160,6 +161,7 @@
     if (HuaHinSession.hasRole('owner', 'frontdesk')) {
       document.getElementById('link-report').classList.remove('hidden');
     }
+    if (HuaHinSession.hasRole('owner')) document.getElementById('link-setting').classList.remove('hidden');
 
     document.getElementById('logout-link').addEventListener('click', function(e) {
       e.preventDefault();

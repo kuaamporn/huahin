@@ -202,7 +202,7 @@
 
   <div class="a4-paper">
     <div class="logo-header">
-      <img src="theserene.jpg" class="logo-img" alt="The Serene" />
+      <img id="inv-logo" src="theserene.jpg" class="logo-img" alt="Company Logo" />
       <div class="company-details">
         <div class="comp-title-th" id="inv-comp-th">บริษัท เดอะ ซีรีน จำกัด (สำนักงานใหญ่)</div>
         <div class="comp-title-en" id="inv-comp-en">The Serene Company Limited (Head Office)</div>
@@ -403,15 +403,35 @@
         var b = invoiceNo ? data.booking : null;
         var settings = data.settings || {};
 
-        // Fill company info
-        if (settings) {
-          if (settings.company_name_th) document.getElementById('inv-comp-th').textContent = settings.company_name_th;
-          if (settings.company_name_en) document.getElementById('inv-comp-en').textContent = settings.company_name_en;
-          if (settings.company_address_th) document.getElementById('inv-address-th').textContent = settings.company_address_th;
-          if (settings.company_address_en) document.getElementById('inv-address-en').textContent = settings.company_address_en;
-          if (settings.company_tax_id) document.getElementById('inv-tax-id').textContent = settings.company_tax_id;
-          if (settings.company_tel) document.getElementById('inv-tel').textContent = settings.company_tel;
+        // Fill company info (property-scoped)
+        var prop = t.property_id || '';
+        var compNameTh, compNameEn, compAddressTh, compAddressEn, compTaxId, compTel, logoSrc;
+
+        if (prop === 'moment') {
+          logoSrc = 'themoment.jpg';
+          compNameTh = settings.moment_company_name_th || 'บริษัท เดอะ โมเมนต์ หัวหิน จำกัด';
+          compNameEn = settings.moment_company_name_en || 'THE MOMENT HUA HIN COMPANY LIMITED';
+          compAddressTh = settings.moment_company_address_th || '21/234 ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จ.ประจวบคีรีขันธ์ 77110';
+          compAddressEn = settings.moment_company_address_en || '21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110';
+          compTaxId = settings.moment_company_tax_id || '0775561002281';
+          compTel = settings.moment_company_tel || '094-567-4488, 094-249-1188';
+        } else {
+          logoSrc = 'theserene.jpg';
+          compNameTh = settings.precious_company_name_th || settings.company_name_th || 'บริษัท เดอะ ซีรีน จำกัด ( สำนักงานใหญ่ )';
+          compNameEn = settings.precious_company_name_en || settings.company_name_en || 'The Serene Company Limited (Head Office)';
+          compAddressTh = settings.precious_company_address_th || settings.company_address_th || 'เลขที่ 21/234  ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จังหวัดประจวบคีรีขันธ์ 77110';
+          compAddressEn = settings.precious_company_address_en || settings.company_address_en || '21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110';
+          compTaxId = settings.precious_company_tax_id || settings.company_tax_id || '0-7755-55000-56-5';
+          compTel = settings.precious_company_tel || settings.company_tel || '094-567-4488, 094-249-1188';
         }
+
+        document.getElementById('inv-logo').src = logoSrc;
+        document.getElementById('inv-comp-th').textContent = compNameTh;
+        document.getElementById('inv-comp-en').textContent = compNameEn;
+        document.getElementById('inv-address-th').textContent = compAddressTh;
+        document.getElementById('inv-address-en').textContent = compAddressEn;
+        document.getElementById('inv-tax-id').textContent = compTaxId;
+        document.getElementById('inv-tel').textContent = compTel;
 
         // Fill invoice metadata
         document.getElementById('inv-no-val').textContent = invoiceNo ? invoiceNo : 'TX-' + t.txn_id;

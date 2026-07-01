@@ -12,7 +12,7 @@
       --line: #E5E5EA;
       --go: #0F766E;
       --warn: #DC2626;
-      --muted: #86868B;
+      --muted: #4B4B4D;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
@@ -50,7 +50,7 @@
     .login-card { max-width: 360px; margin: 60px auto; background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
     label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
     input { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line); border-radius: 12px; }
-    .btn-primary { width: 100%; margin-top: 14px; background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+    .btn-primary { width: 100%; margin-top: 14px; background: var(--go); background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
     .error { color: var(--warn); font-size: 13px; margin-top: 8px; }
     .success { color: var(--go); font-size: 13px; margin-top: 8px; }
     .hidden { display: none !important; }
@@ -120,6 +120,7 @@
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
         <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
         <a href="report.html" id="link-report" class="hidden">Reports</a>
+        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
       </div>
     </div>
     <div class="navbar">
@@ -425,6 +426,7 @@
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
         document.getElementById('link-report').classList.remove('hidden');
       }
+      if (HuaHinSession.hasRole('owner')) document.getElementById('link-setting').classList.remove('hidden');
       loadToday();
       applyRoleVisibility();
     }

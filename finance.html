@@ -12,7 +12,7 @@
       --line: #E5E5EA;
       --go: #0F766E;
       --warn: #DC2626;
-      --muted: #86868B;
+      --muted: #4B4B4D;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--paper); color: var(--ink); }
@@ -42,7 +42,7 @@
     button { padding: 8px 14px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 7px; cursor: pointer; }
     label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
     input, select { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--line); border-radius: 12px; }
-    .btn-primary { background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+    .btn-primary { background: var(--go); background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
     .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; }
     .error { color: var(--warn); font-size: 13px; margin-top: 8px; }
     .hidden { display: none !important; }
@@ -137,6 +137,7 @@
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="billing.html" id="link-billing" class="hidden">Billing</a>
         <a href="report.html" id="link-report" class="hidden">Reports</a>
+        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
       </div>
     </div>
 
@@ -195,7 +196,13 @@
         <button id="btn-add-revenue" class="hidden" style="background:var(--go);color:#fff;border:none;font-weight:600;">+ Revenue</button>
         <button id="btn-add-expense" class="hidden" style="background:var(--warn);color:#fff;border:none;font-weight:600;">+ Expense</button>
         <button id="btn-manage-vendors" class="hidden btn-secondary" style="font-weight:600;">Manage Vendors</button>
-        <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;">Categories</button>
+        <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;">Settings</button>
+        <select id="finance-status-filter" style="max-width:250px; padding:10px 14px; border:1px solid var(--line); border-radius:12px; font-family:inherit; font-size:13px; background:#fff; outline:none; cursor:pointer; font-weight:600; color:var(--ink);">
+          <option value="all">All Statuses</option>
+          <option value="unverified" id="opt-unverified">Pending Verification (0)</option>
+          <option value="pending-approval" id="opt-pending-approval">Pending Approval (0)</option>
+          <option value="verified">Verified Only</option>
+        </select>
         <input id="finance-search" type="text" placeholder="Search transactions..." style="max-width:250px;" />
         <button id="finance-export-csv-btn" style="margin-left:auto;">Export CSV</button>
       </div>
@@ -400,7 +407,7 @@
       <div style="max-height:60vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>Check-in Date</th><th>Room</th><th>Guest</th><th>Deposit Amount</th><th>Booking Type</th></tr>
+            <tr><th>Check-in Date</th><th>Room</th><th>Guest</th><th>Deposit Amount</th><th>Booking Type</th><th style="text-align:center;">Action</th></tr>
           </thead>
           <tbody id="reservations-table-body">
             <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
@@ -458,29 +465,6 @@
         <button class="btn-secondary" id="moveout-modal-cancel">Cancel</button>
         <button class="btn-primary" id="moveout-save">Confirm Move-Out</button>
       </div>
-    </div>
-  </div>
-
-  <!-- ===================== CATEGORIES SETTINGS MODAL ===================== -->
-  <div id="settings-modal" class="modal-overlay hidden">
-    <div class="modal-box" style="max-width: 500px;">
-      <div class="mhdr">
-        <h2 class="mtitle">Manage Categories</h2>
-        <button class="mx" id="settings-modal-close">&times;</button>
-      </div>
-      <div style="margin-bottom: 12px;">
-        <label for="st-revenue">Revenue Categories (comma separated)</label>
-        <input id="st-revenue" type="text" />
-      </div>
-      <div style="margin-bottom: 12px;">
-        <label for="st-expense">Expense Categories (comma separated)</label>
-        <input id="st-expense" type="text" />
-      </div>
-      <div class="modal-footer-row">
-        <button class="btn-secondary" id="settings-modal-cancel">Cancel</button>
-        <button class="btn-primary" id="settings-save">Save Settings</button>
-      </div>
-      <div class="error hidden" id="settings-error"></div>
     </div>
   </div>
 
@@ -584,6 +568,7 @@
         if (HuaHinSession.hasRole('owner')) {
           show('link-dashboard');
           show('link-hr');
+          show('link-setting');
         }
         if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
@@ -648,35 +633,14 @@
       document.getElementById('vendor-form-save').addEventListener('click', saveVendor);
       if (document.getElementById('btn-settings')) {
         document.getElementById('btn-settings').addEventListener('click', function() {
-          document.getElementById('st-revenue').value = REVENUE_CATS.join(', ');
-          document.getElementById('st-expense').value = EXPENSE_CATS.join(', ');
-          document.getElementById('settings-error').classList.add('hidden');
-          show('settings-modal');
-        });
-        document.getElementById('settings-modal-close').addEventListener('click', function() { hide('settings-modal'); });
-        document.getElementById('settings-modal-cancel').addEventListener('click', function() { hide('settings-modal'); });
-        document.getElementById('settings-save').addEventListener('click', function() {
-          var rev = document.getElementById('st-revenue').value;
-          var exp = document.getElementById('st-expense').value;
-          Promise.all([
-            callApi('financeUpdateSetting', [session.token, 'revenue_categories', rev]),
-            callApi('financeUpdateSetting', [session.token, 'expense_categories', exp])
-          ]).then(function(results) {
-             if (results[0].ok && results[1].ok) {
-               alert('Settings saved. Page will reload.');
-               window.location.reload();
-             } else {
-               document.getElementById('settings-error').textContent = 'Error saving settings.';
-               document.getElementById('settings-error').classList.remove('hidden');
-             }
-          });
+          window.location.href = 'setting.html';
         });
       }
 
-      document.getElementById('finance-search').addEventListener('input', function () {
-        var q = this.value.trim().toLowerCase();
-        
-        // Remove expanded rows during search input to avoid decoupling/orphans
+      function applyFinanceFilter() {
+        var q = document.getElementById('finance-search').value.trim().toLowerCase();
+        var statusFilter = document.getElementById('finance-status-filter').value;
+
         document.querySelectorAll('.items-expand-row').forEach(function(row) {
           row.parentNode.removeChild(row);
         });
@@ -686,9 +650,28 @@
 
         var rows = document.querySelectorAll('#finance-table-body tr');
         rows.forEach(function (row) {
-          row.style.display = row.textContent.toLowerCase().indexOf(q) >= 0 ? '' : 'none';
+          if (row.cells.length === 1 && row.cells[0].classList.contains('muted')) return;
+          var idxAttr = row.getAttribute('data-idx');
+          if (idxAttr === null) return;
+          var idx = parseInt(idxAttr);
+          var t = TRANSACTIONS[idx];
+          if (!t) return;
+
+          var matchSearch = row.textContent.toLowerCase().indexOf(q) >= 0;
+          var matchStatus = true;
+          if (statusFilter === 'unverified') {
+            matchStatus = t.status !== 'pending' && t.is_approved && !t.is_verified;
+          } else if (statusFilter === 'pending-approval') {
+            matchStatus = t.status !== 'pending' && !t.is_approved;
+          } else if (statusFilter === 'verified') {
+            matchStatus = t.status !== 'pending' && !!t.is_verified;
+          }
+          row.style.display = (matchSearch && matchStatus) ? '' : 'none';
         });
-      });
+      }
+
+      document.getElementById('finance-search').addEventListener('input', applyFinanceFilter);
+      document.getElementById('finance-status-filter').addEventListener('change', applyFinanceFilter);
 
       document.getElementById('fm-property').addEventListener('change', function () {
         clearSelectedRoom();
@@ -879,10 +862,11 @@
       }
 
       if (field === 'category' && financeModalMode === 'revenue') {
+        var prop = document.getElementById('fm-property').value || '';
         if (value === 'electricity' || value === 'utility') {
-           CURRENT_ITEMS[index].unit_price = SETTINGS.rate_electricity || 8;
+           CURRENT_ITEMS[index].unit_price = SETTINGS[prop + '_default_electricity_rate'] || SETTINGS.rate_electricity || 8;
         } else if (value === 'water') {
-           CURRENT_ITEMS[index].unit_price = SETTINGS.rate_water || 22;
+           CURRENT_ITEMS[index].unit_price = SETTINGS[prop + '_default_water_rate'] || SETTINGS.rate_water || 22;
         }
       }
 
@@ -957,6 +941,7 @@
     }
 
     function loadFinanceData() {
+      document.getElementById('finance-status-filter').value = 'all';
       var propertyId = document.getElementById('finance-property').value;
       var year = document.getElementById('finance-year').value;
       var month = String(document.getElementById('finance-month').value).padStart(2, '0');
@@ -977,13 +962,20 @@
         var tbody = document.getElementById('finance-table-body');
         var list = res.transactions || [];
         TRANSACTIONS = list;
+
+        var unverifiedCount = list.filter(function(t) { return t.status !== 'pending' && t.is_approved && !t.is_verified; }).length;
+        var pendingApprovalCount = list.filter(function(t) { return t.status !== 'pending' && !t.is_approved; }).length;
+        document.getElementById('opt-unverified').textContent = 'Pending Verification (' + unverifiedCount + ')';
+        document.getElementById('opt-pending-approval').textContent = 'Pending Approval (' + pendingApprovalCount + ')';
+
         if (!list.length) {
           tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">No transactions for this month.</td></tr>';
           return;
         }
         tbody.innerHTML = '';
-        list.forEach(function (t) {
+        list.forEach(function (t, idx) {
           var tr = document.createElement('tr');
+          tr.setAttribute('data-idx', idx);
           
           var statusLabel = '';
           if (t.status === 'pending') {
@@ -1464,6 +1456,7 @@
             '<td>'+escapeHtml(r.guest_name || '-')+'</td>' +
             '<td><b>'+formatTHB(r.reservation_deposit || 0)+'</b></td>' +
             '<td style="text-transform:capitalize;">'+escapeHtml(r.booking_type || '-')+'</td>' +
+            '<td style="text-align:center;"><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="window.location.href=\'rooms.html?booking_id=' + escapeHtml(r.booking_id) + '\'">Check-in</button></td>' +
             '</tr>';
         });
         tbody.innerHTML = html;

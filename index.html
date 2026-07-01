@@ -13,7 +13,7 @@
       --go: #0F766E;
       --go-dark: #0E6B63;
       --warn: #DC2626;
-      --muted: #86868B;
+      --muted: #4B4B4D;
     }
     * { box-sizing: border-box; }
     body {
@@ -125,6 +125,7 @@
           <a href="hr.html" class="toplink hidden" id="hr-link">HR</a>
           <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
           <a href="report.html" class="toplink hidden" id="report-link">Reports</a>
+          <a href="setting.html" class="toplink hidden" id="setting-link">Settings</a>
         </div>
       </div>
 
@@ -275,6 +276,7 @@
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
         show('report-link');
       }
+      if (HuaHinSession.hasRole('owner')) show('setting-link');
     }
 
     var session = HuaHinSession.getSession();
@@ -287,6 +289,22 @@
       applyNavLinkVisibility();
       loadEmployeeTasks();
       loadTodayStatus();
+
+      var apiName = session.isAdmin ? 'adminListEmployeesWithRoles' : 'financeGetEmployees';
+      callApi(apiName, [sessionToken]).then(function(rolesRes) {
+        if (rolesRes.ok && rolesRes.employees) {
+          var me = rolesRes.employees.filter(function(e) {
+            return (e.employeeId || e.employee_id) === session.employeeId;
+          })[0];
+          if (me) {
+            var myRoles = me.roles || [];
+            HuaHinSession.updateSessionRoles(myRoles);
+            applyNavLinkVisibility();
+          }
+        }
+      }).catch(function(err) {
+        console.error('Failed to sync roles on page load:', err);
+      });
     }
 
     function getDeviceId() {

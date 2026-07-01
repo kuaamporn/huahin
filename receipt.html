@@ -157,6 +157,9 @@
       border-bottom: 1px dashed #ccc;
       padding-bottom: 10px;
     }
+    .editable-remark:focus {
+      background: #fff9c4;
+    }
 
     .signature-grid {
       display: flex;
@@ -199,6 +202,7 @@
       body { background: #fff; padding: 0; }
       .a4-paper { box-shadow: none; margin: 0; padding: 1.5cm 1.5cm; width: auto; height: auto; }
       .no-print-bar { display: none; }
+      .editable-remark { border-bottom: none !important; background: transparent !important; }
     }
   </style>
 </head>
@@ -292,12 +296,27 @@
     }
 
     function renderReceiptHtml(title, r, t, c, b, settings) {
-      var compNameTh = settings.company_name_th || 'บริษัท เดอะ ซีรีน จำกัด ( สำนักงานใหญ่ )';
-      var compNameEn = settings.company_name_en || 'The Serene Company Limited (Head Office)';
-      var compAddressTh = settings.company_address_th || 'เลขที่ 21/234  ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จังหวัดประจวบคีรีขันธ์ 77110';
-      var compAddressEn = settings.company_address_en || '21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110';
-      var compTaxId = settings.company_tax_id || '0-7755-55000-56-5';
-      var compTel = settings.company_tel || '094-567-4488, 094-249-1188';
+      var prop = t.property_id || '';
+      var compNameTh = '', compNameEn = '', compAddressTh = '', compAddressEn = '', compTaxId = '', compTel = '';
+      var logoSrc = 'theserene.jpg';
+
+      if (prop === 'moment') {
+        logoSrc = 'themoment.jpg';
+        compNameTh = settings.moment_company_name_th || 'บริษัท เดอะ โมเมนต์ หัวหิน จำกัด';
+        compNameEn = settings.moment_company_name_en || 'THE MOMENT HUA HIN COMPANY LIMITED';
+        compAddressTh = settings.moment_company_address_th || '21/234 ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จ.ประจวบคีรีขันธ์ 77110';
+        compAddressEn = settings.moment_company_address_en || '21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110';
+        compTaxId = settings.moment_company_tax_id || '0775561002281';
+        compTel = settings.moment_company_tel || '094-567-4488, 094-249-1188';
+      } else {
+        logoSrc = 'theserene.jpg';
+        compNameTh = settings.precious_company_name_th || settings.company_name_th || 'บริษัท เดอะ ซีรีน จำกัด ( สำนักงานใหญ่ )';
+        compNameEn = settings.precious_company_name_en || settings.company_name_en || 'The Serene Company Limited (Head Office)';
+        compAddressTh = settings.precious_company_address_th || settings.company_address_th || 'เลขที่ 21/234  ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก ตำบลหัวหิน อำเภอหัวหิน จังหวัดประจวบคีรีขันธ์ 77110';
+        compAddressEn = settings.precious_company_address_en || settings.company_address_en || '21/234 Soi Moo Ban Thang Rot Fai Fang Ta Wan Tok, Tambon Hua Hin, Amphoe Hua Hin, Prachuapkirikhan 77110';
+        compTaxId = settings.precious_company_tax_id || settings.company_tax_id || '0-7755-55000-56-5';
+        compTel = settings.precious_company_tel || settings.company_tel || '094-567-4488, 094-249-1188';
+      }
 
       var formattedReceiptDate = formatBE(r.receipt_date);
       var roomDisp = t.room_name || '-';
@@ -374,7 +393,7 @@
       return [
         '<div class="a4-paper">',
         '  <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">',
-        '    <img src="theserene.jpg" style="height: 60px; width: auto; object-fit: contain;" />',
+        '    <img src="' + logoSrc + '" style="height: 60px; width: auto; object-fit: contain;" />',
         '    <div class="company-header" style="margin-bottom: 0;">',
         '      <div class="company-name-th">' + escapeHtml(compNameTh) + '</div>',
         '      <div class="company-name-en">' + escapeHtml(compNameEn) + '</div>',
@@ -434,7 +453,7 @@
         '  </div>',
         '',
         '  <div class="remark-section">',
-        '    <strong>หมายเหตุ / Remark:</strong> Room ' + escapeHtml(roomDisp) + (t.notes ? (' - ' + escapeHtml(t.notes)) : ''),
+        '    <strong>หมายเหตุ / Remark:</strong> <span contenteditable="true" class="editable-remark" style="display:inline-block; min-width:400px; border-bottom:1px dashed #999; outline:none; padding: 0 4px;"></span>',
         '  </div>',
         '',
         '  <div class="summary-section">',

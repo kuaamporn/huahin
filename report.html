@@ -12,7 +12,7 @@
       --line: #E5E5EA;
       --go: #0F766E;
       --warn: #DC2626;
-      --muted: #86868B;
+      --muted: #4B4B4D;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
@@ -61,8 +61,9 @@
     .action-link { color: var(--go); text-decoration: none; font-weight: 600; cursor: pointer; font-size: 12px; margin-right: 8px; }
     .action-link:hover { text-decoration: underline; }
 
-    .batch-bar { display: none; background: #0F766E; color: #fff; border-radius: 16px; padding: 12px 20px; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(15,118,110,0.25); }
+    .batch-bar { display: none; background: #0F766E; color: #fff; border-radius: 16px; padding: 12px 20px; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .batch-bar.show { display: flex; }
+    .table-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,.02), 0 1px 3px rgba(0,0,0,.04); position: relative; overflow: hidden; }
     .btn-batch-print { background: #fff; color: #0F766E; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
     .btn-batch-print:hover { background: #F5F5F7; }
 
@@ -97,6 +98,7 @@
         <a href="hr.html" id="link-hr" class="hidden">HR</a>
         <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
         <a href="report.html" id="link-report" class="hidden" style="color:var(--go);font-weight:600;">Reports</a>
+        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
       </div>
     </div>
 
@@ -105,6 +107,7 @@
       <div class="ftab" id="tab-bookings" onclick="switchTab('bookings')">Bookings Summary</div>
       <div class="ftab" id="tab-receipts" onclick="switchTab('receipts')">Receipt Report</div>
       <div class="ftab" id="tab-invoices" onclick="switchTab('invoices')">Invoice Report</div>
+      <div class="ftab" id="tab-full-invoices" onclick="switchTab('full-invoices')">Full Invoice Report</div>
     </div>
 
     <!-- HOUSEKEEPING VIEW -->
@@ -161,7 +164,7 @@
         </div>
       </div>
 
-      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+      <div class="table-card">
         <div style="overflow-x: auto;">
           <table>
             <thead>
@@ -237,7 +240,7 @@
         </div>
       </div>
 
-      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+      <div class="table-card">
         <div style="overflow-x: auto;">
           <table>
             <thead>
@@ -288,7 +291,7 @@
         </div>
       </div>
 
-      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+      <div class="table-card">
         <div style="overflow-x: auto;">
           <table>
             <thead>
@@ -351,7 +354,7 @@
         </div>
       </div>
 
-      <div class="card-section" style="padding:0;overflow:hidden;border-radius:16px;">
+      <div class="table-card">
         <div style="overflow-x: auto;">
           <table>
             <thead>
@@ -369,6 +372,54 @@
             </thead>
             <tbody id="invoices-table-body">
               <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading invoice data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL INVOICE VIEW -->
+    <div id="section-full-invoices" class="hidden">
+      <div class="card-section">
+        <div class="toolbar">
+          <div class="tool-group">
+            <label>Property</label>
+            <select id="filter-full-invoice-property" onchange="loadFullInvoiceReport()">
+              <option value="both">Both Properties</option>
+              <option value="precious">The Precious</option>
+              <option value="moment">The Moment</option>
+            </select>
+          </div>
+          <div class="tool-group">
+            <label>Start Date</label>
+            <input type="date" id="filter-full-invoice-start" onchange="loadFullInvoiceReport()" />
+          </div>
+          <div class="tool-group">
+            <label>End Date</label>
+            <input type="date" id="filter-full-invoice-end" onchange="loadFullInvoiceReport()" />
+          </div>
+          <div class="tool-group" style="flex:1; min-width:180px;">
+            <label>Search</label>
+            <input type="text" id="filter-full-invoice-search" placeholder="Search invoice no, guest, room..." oninput="loadFullInvoiceReport()" />
+          </div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Date</th>
+                <th>Room</th>
+                <th>Guest Name</th>
+                <th>Ref Transaction</th>
+                <th style="text-align:right;">Amount</th>
+                <th style="text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="full-invoices-table-body">
+              <tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">Loading full invoice data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -399,6 +450,7 @@
       if (HuaHinSession.hasRole('owner')) {
         document.getElementById('link-dashboard').classList.remove('hidden');
         document.getElementById('link-hr').classList.remove('hidden');
+        document.getElementById('link-setting').classList.remove('hidden');
       }
       document.getElementById('link-report').classList.remove('hidden');
     }
@@ -417,6 +469,7 @@
       document.getElementById('section-bookings').classList.add('hidden');
       document.getElementById('section-receipts').classList.add('hidden');
       document.getElementById('section-invoices').classList.add('hidden');
+      document.getElementById('section-full-invoices').classList.add('hidden');
 
       if (tab === 'hk') {
         document.getElementById('section-hk').classList.remove('hidden');
@@ -429,6 +482,9 @@
       } else if (tab === 'invoices') {
         document.getElementById('section-invoices').classList.remove('hidden');
         loadInvoiceReport();
+      } else if (tab === 'full-invoices') {
+        document.getElementById('section-full-invoices').classList.remove('hidden');
+        loadFullInvoiceReport();
       }
     }
 
@@ -467,6 +523,8 @@
     document.getElementById('filter-receipt-end').value = todayStr;
     document.getElementById('filter-invoice-start').value = reportStartStr;
     document.getElementById('filter-invoice-end').value = todayStr;
+    document.getElementById('filter-full-invoice-start').value = reportStartStr;
+    document.getElementById('filter-full-invoice-end').value = todayStr;
 
     var ALL_TASKS = [];
 
@@ -544,7 +602,7 @@
 
         html += '<tr>' +
           '<td>' + t.taskDate + '</td>' +
-          '<td><strong>Room ' + t.displayName + '</strong></td>' +
+          '<td><strong>' + t.displayName + '</strong></td>' +
           '<td>' + propName + '</td>' +
           '<td>' + (t.guestName || '—') + '</td>' +
           '<td>' + (t.type === 'daily' ? 'Daily Rent' : 'Monthly Request') + '</td>' +
@@ -754,9 +812,14 @@
             ? '<span class="status-badge paid">Paid</span>'
             : '<span class="status-badge unpaid">Pending</span>';
 
-          var rcAction = inv.receipt_no
-            ? '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(inv.receipt_no) + '" target="_blank">Print Receipt</a>'
-            : '<span class="muted" style="font-size:11px;">Unpaid</span>';
+          var rcAction = '';
+          if (inv.receipt_no) {
+            rcAction = '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(inv.receipt_no) + '" target="_blank">Print Receipt</a>';
+          } else if (inv.status === 'paid') {
+            rcAction = '<span class="muted" style="font-size:11px;">No Receipt</span>';
+          } else {
+            rcAction = '<span class="muted" style="font-size:11px;">Unpaid</span>';
+          }
 
           html += '<tr>' +
             '<td style="text-align:center;"><input type="checkbox" class="invoice-select" value="' + escapeHtml(inv.txn_id) + '" onchange="updateInvoiceSelection()" /></td>' +
@@ -805,6 +868,42 @@
       checked.forEach(function(el) { ids.push(el.value); });
       if (ids.length === 0) return;
       window.open('batch-invoice.html?ids=' + encodeURIComponent(ids.join(',')), '_blank');
+    }
+
+    function loadFullInvoiceReport() {
+      var prop = document.getElementById('filter-full-invoice-property').value;
+      var sDate = document.getElementById('filter-full-invoice-start').value;
+      var eDate = document.getElementById('filter-full-invoice-end').value;
+      var q = document.getElementById('filter-full-invoice-search').value.trim();
+      var tbody = document.getElementById('full-invoices-table-body');
+      tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">Loading full invoices...</td></tr>';
+
+      callApi('reportsListFullInvoices', [session.token, prop, sDate, eDate, q]).then(function(res) {
+        if (!res.ok) {
+          tbody.innerHTML = '<tr><td colspan="7" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+          return;
+        }
+        var list = res.invoices || [];
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">No full invoices found matching filters.</td></tr>';
+          return;
+        }
+        var html = '';
+        list.forEach(function(inv) {
+          html += '<tr>' +
+            '<td><strong style="font-family:monospace;">' + escapeHtml(inv.invoice_no) + '</strong></td>' +
+            '<td>' + escapeHtml(inv.invoice_date) + '</td>' +
+            '<td><strong>' + escapeHtml(inv.room_name || '—') + '</strong></td>' +
+            '<td>' + escapeHtml(inv.guest_or_vendor || '—') + '</td>' +
+            '<td><span style="font-family:monospace; font-size:11px;">' + escapeHtml(inv.transaction_id) + '</span></td>' +
+            '<td style="text-align:right; font-weight:600;">฿' + inv.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td style="text-align:center; white-space:nowrap;"><a class="action-link" href="invoice.html?invoice_no=' + escapeHtml(inv.invoice_no) + '" target="_blank">Print Full Invoice</a></td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).catch(function(err) {
+        tbody.innerHTML = '<tr><td colspan="7" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
+      });
     }
 
     function escapeHtml(str) {

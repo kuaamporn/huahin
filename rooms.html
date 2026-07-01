@@ -8,11 +8,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 :root{
   --bg:#F5F5F7;--surface:#FFFFFF;--panel:#FFFFFF;--border:#E5E5EA;
-  --text:#1D1D1F;--muted:#86868B;
+  --text:#1D1D1F;--muted:#4B4B4D;
   --p:#3B82F6;--p2:#7C3AED;--pn:#1E40AF;
   --m:#0D9488;--m2:#D97706;--mn:#065F46;
   --tc:#c8a84b;--tb:#3B82F6;--ta2:#0D9488;--ta1:#EA580C;
-  --primary:#0F766E;--primary-light:#14B8A6;
+  --primary:#0F766E;--primary-light:#14B8A6;--warn:#DC2626;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -27,7 +27,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .fl{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
 .fi{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-size:14px;font-family:'Source Sans 3',sans-serif;outline:none;margin-bottom:14px}
 .fi:focus{border-color:var(--primary)}
-.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.login-btn{width:100%;padding:12px;background:var(--primary);background:linear-gradient(135deg,var(--primary),var(--primary-light));border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
 .login-btn:disabled{opacity:.6;cursor:not-allowed}
 .login-error{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:10px 13px;font-size:12px;color:#DC2626;margin-bottom:14px;display:none}
 .login-error.show{display:block}
@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .timeline-nav { display: flex; align-items: center; gap: 4px; }
 .btn { padding: 7px 14px; border-radius: 12px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Source Sans 3', sans-serif; transition: all .15s; display: flex; align-items: center; gap: 5px; }
 .btn-p { background: var(--primary); color: #fff; } .btn-p:hover { background: #0E6B63; }
-.btn-m { background: var(--primary-light); color: #fff; } .btn-m:hover { background: #0F9D8F; }
+.btn-m { background: var(--primary-light); color: #073330; } .btn-m:hover { background: #0E6B63; color: #fff; }
 .btn-o { background: transparent; color: var(--text); border: 1px solid var(--border); } .btn-o:hover { border-color: var(--primary); color: var(--primary); }
 
 .statsbar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
@@ -118,9 +118,11 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .bar.monthly-draft{background:repeating-linear-gradient(45deg, #93C5FD, #93C5FD 10px, #BFDBFE 10px, #BFDBFE 20px); border: 1px dashed #2563EB; color: #1E3A8A; opacity: 0.8;}
 .bar.walkin{background:linear-gradient(90deg,#15803D,#22C55E);color:#fff}
 .bar.reserved{background:linear-gradient(90deg,#B45309,#F59E0B);color:#fff}
-.bar.commercial{background:linear-gradient(90deg,#6D28D9,#8B5CF6)}
+.bar.commercial{background:linear-gradient(90deg,#9F1239,#E11D48)}
 .bar.booking-com{background:linear-gradient(90deg,#003580,#0071C2);color:#fff}
 .bar.expedia-com{background:linear-gradient(90deg,#C89200,#FBAF00);color:#1a1a1a;text-shadow:none}
+.bar.pending-checkin{border:1.5px dashed rgba(255,255,255,0.7) !important;}
+.bar.pending-checkin::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.15),rgba(255,255,255,0.15) 6px,transparent 6px,transparent 12px);pointer-events:none}
 .ov-bar{position:absolute;top:3px;bottom:3px;left:1px;right:1px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;color:#fff}
 .ov-bar.closed{background:#475569;border:1px solid #334155}
 .ov-bar.maintenance{background:#D97706;border:1px solid #B45309}
@@ -198,6 +200,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
           <a href="hr.html" class="nav-link hidden" id="link-hr">HR</a>
           <a href="billing.html" class="nav-link hidden" id="link-billing">Billing</a>
           <a href="report.html" class="nav-link hidden" id="link-report">Reports</a>
+          <a href="setting.html" class="nav-link hidden" id="link-setting">Settings</a>
         </div>
       </div>
       <div class="topbar-user-section">
@@ -291,9 +294,19 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <label class="fl">Reservation Deposit (฿)</label>
       <input class="fi" type="number" id="mResDep" value="0" min="0" oninput="calcP()" placeholder="Amount paid to hold room...">
     </div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Check-in</label><input class="fi" type="date" id="mIn" onchange="calcP()"></div>
-      <div class="fg"><label class="fl">Check-out</label><input class="fi" type="date" id="mOut" onchange="calcP()"></div>
+    <div class="frow" style="display: flex; gap: 10px; align-items: center;">
+      <div class="fg" style="flex: 1; min-width: 0;">
+        <label class="fl">Check-in</label>
+        <input class="fi" type="date" id="mIn" onchange="onCheckinChange()">
+      </div>
+      <div class="fg" style="width: 75px; flex-shrink: 0;">
+        <label class="fl" style="text-align: center; display: block;">Nights</label>
+        <input class="fi" type="number" id="mNights" min="1" value="1" oninput="onNightsInput()" style="text-align: center; padding: 10px 4px;">
+      </div>
+      <div class="fg" style="flex: 1; min-width: 0;">
+        <label class="fl">Check-out</label>
+        <input class="fi" type="date" id="mOut" onchange="onCheckoutChange()">
+      </div>
     </div>
     <div class="frow">
       <div class="fg"><label class="fl">Rate (฿)</label><input class="fi" type="number" id="mRate" min="0" oninput="calcP()"></div>
@@ -305,11 +318,11 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     </div>
     <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="mNotes"></textarea></div>
     <div class="pbox" id="pbox">
-      <div class="prow"><span>Duration</span><span id="pDur">—</span></div>
-      <div class="prow"><span>Rate</span><span id="pRate">—</span></div>
-      <div class="prow"><span>Deposit</span><span id="pDep">—</span></div>
-      <div class="prow hidden" id="pResRow"><span>Reservation</span><span id="pRes">—</span></div>
-      <div class="prow tot"><span>Total Due Now</span><span id="pTot">—</span></div>
+      <div class="prow"><span>Duration</span><span id="pDur">-</span></div>
+      <div class="prow"><span>Rate</span><span id="pRate">-</span></div>
+      <div class="prow"><span>Deposit</span><span id="pDep">-</span></div>
+      <div class="prow hidden" id="pResRow"><span>Reservation</span><span id="pRes">-</span></div>
+      <div class="prow tot"><span>Total Due Now</span><span id="pTot">-</span></div>
     </div>
     </div>
     <div id="override-fields" class="hidden">
@@ -388,6 +401,45 @@ function dk(d){
 function pd(s){ var d=new Date(s); d.setHours(0,0,0,0); return d; }
 function dd(a,b){ return Math.round((pd(b)-pd(a))/86400000); }
 function buildDates(){ var out=[],d=new Date(WIN_S); while(d<=WIN_E){out.push(new Date(d));d.setDate(d.getDate()+1);} return out; }
+
+function onCheckinChange() {
+  var ci = document.getElementById('mIn').value;
+  var nights = parseInt(document.getElementById('mNights').value) || 1;
+  if (ci) {
+    var d = pd(ci);
+    d.setDate(d.getDate() + nights);
+    document.getElementById('mOut').value = dk(d);
+  }
+  calcP();
+}
+
+function onCheckoutChange() {
+  var ci = document.getElementById('mIn').value;
+  var co = document.getElementById('mOut').value;
+  if (ci && co) {
+    var nights = dd(ci, co);
+    if (nights < 1) {
+      nights = 1;
+      var d = pd(ci);
+      d.setDate(d.getDate() + 1);
+      document.getElementById('mOut').value = dk(d);
+    }
+    document.getElementById('mNights').value = nights;
+  }
+  calcP();
+}
+
+function onNightsInput() {
+  var ci = document.getElementById('mIn').value;
+  var nights = parseInt(document.getElementById('mNights').value);
+  if (isNaN(nights) || nights < 1) return;
+  if (ci) {
+    var d = pd(ci);
+    d.setDate(d.getDate() + nights);
+    document.getElementById('mOut').value = dk(d);
+  }
+  calcP();
+}
 function escapeHtml(str) {
   var div = document.createElement('div');
   div.textContent = String(str == null ? '' : str);
@@ -397,7 +449,7 @@ function escapeHtml(str) {
 var TYPE_META = {
   Deluxe:{label:'Deluxe',color:'#c8a84b'},Penthouse:{label:'Penthouse',color:'#e8c060'},
   Standard:{label:'Standard',color:'#4f8ef7'},Corner:{label:'Corner',color:'#7b5df0'},
-  Commercial:{label:'Commercial',color:'#9966ff'},
+  Commercial:{label:'Commercial',color:'#BE123C'},
   C:{label:'Type C Deluxe',color:'#c8a84b'},B:{label:'Type B 1-Bed',color:'#4f8ef7'},
   A2:{label:'Type A.2 Studio/Mo',color:'#2ec4a0'},A1:{label:'Type A.1 Studio/Day',color:'#e07b3a'}
 };
@@ -419,10 +471,16 @@ if (session) {
   if (HuaHinSession.hasRole('owner')) {
     document.getElementById('link-dashboard').classList.remove('hidden');
     document.getElementById('link-hr').classList.remove('hidden');
+    document.getElementById('link-setting').classList.remove('hidden');
   }
   if (HuaHinSession.hasRole('owner', 'frontdesk')) {
     document.getElementById('link-report').classList.remove('hidden');
   }
+
+  callApi('financeGetSettings', [sessionToken]).then(function(res) {
+    if (res.ok) window.ROOMS_SETTINGS = res.settings;
+  });
+
   bootApp();
 }
 
@@ -449,6 +507,13 @@ function bootApp() {
     renderFloorTabs();
     loadStats();
     render();
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var targetBookingId = urlParams.get('booking_id');
+    if (targetBookingId) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showDetail(targetBookingId);
+    }
   }).catch(function(err) {
     showToast('Could not load data: ' + err.message, 'err');
   });
@@ -559,7 +624,7 @@ function render(){
     var fk = room.propertyId+'_'+room.floor;
     if(fk!==lastFloor){
       lastFloor = fk;
-      var fl = (room.floor===1&&room.propertyId==='moment') ? 'Ground Floor — Commercial' : (room.floor===8?'Floor 8 — Penthouse':'Floor '+room.floor);
+      var fl = (room.floor===1&&room.propertyId==='moment') ? 'Ground Floor · Commercial' : (room.floor===8?'Floor 8 · Penthouse':'Floor '+room.floor);
       html += '<tr class="fh"><td class="rc" colspan="'+(dates.length+1)+'">'+fl+'</td></tr>';
     }
 
@@ -587,8 +652,10 @@ function render(){
           var left = startCoord * colWidth;
           var w = (endCoord - startCoord) * colWidth - 2;
           var bt = (b.bookingType || '').replace(/\./g, '-').toLowerCase();
+          if (b.status === 'CONFIRMED') { bt += ' pending-checkin'; }
+          var guestLabel = (b.status === 'CONFIRMED' ? '🕒 ' : '') + escapeHtml(b.guestName || '');
           var detailTitle = escapeHtml(b.guestName || '') + ' (' + b.checkinDate + ' to ' + b.checkoutDate + ', ' + dd(cin, cout) + ' nights, ' + tl(b.bookingType) + ')';
-          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="left:'+left+'px; width:'+w+'px" title="'+detailTitle+'" onclick="showDetail(\''+b.bookingId+'\')">'+escapeHtml(b.guestName||'')+'</div></td>';
+          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="left:'+left+'px; width:'+w+'px" title="'+detailTitle+'" onclick="showDetail(\''+b.bookingId+'\')">'+guestLabel+'</div></td>';
         } else {
           html += '<td class="'+(isT?'tc':'')+'"></td>';
         }
@@ -632,8 +699,12 @@ function updateRooms(){
   var p = document.getElementById('mProp').value;
   var rooms = ROOMS.filter(function(r){ return r.propertyId===p; });
   document.getElementById('mRoom').innerHTML = rooms.map(function(r){
-    return '<option value="'+r.roomId+'">'+r.displayName+' — '+tl(r.roomType)+(r.rate>0?(' · ฿'+r.rate.toLocaleString()):' (TBD)')+'</option>';
+    return '<option value="'+r.roomId+'">'+r.displayName+' · '+tl(r.roomType)+(r.rate>0?(' · ฿'+r.rate.toLocaleString()):' (TBD)')+'</option>';
   }).join('');
+
+  if (window.ROOMS_SETTINGS) {
+    document.getElementById('mCardDepPrice').value = window.ROOMS_SETTINGS[p + '_default_keycard_deposit'] || '500';
+  }
 }
 
 function openBook(rid, date, prop){
@@ -647,6 +718,7 @@ function openBook(rid, date, prop){
   var coD = new Date(pd(ci)); coD.setMonth(coD.getMonth()+1);
   document.getElementById('mIn').value = ci;
   document.getElementById('mOut').value = dk(coD);
+  document.getElementById('mNights').value = dd(ci, dk(coD));
   document.getElementById('mGuest').value = '';
   document.getElementById('mNotes').value = '';
   document.getElementById('mReservation').checked = false;
@@ -654,7 +726,8 @@ function openBook(rid, date, prop){
   document.getElementById('mResDep').value = '0';
   document.getElementById('mDep').value = '8000';
   document.getElementById('mCardDepQty').value = '0';
-  document.getElementById('mCardDepPrice').value = '500';
+  var p = (prop === 'moment') ? 'moment' : 'precious';
+  document.getElementById('mCardDepPrice').value = (window.ROOMS_SETTINGS && window.ROOMS_SETTINGS[p + '_default_keycard_deposit']) || '500';
   document.getElementById('mRate').value = '';
   document.getElementById('cwarn').style.display = 'none';
   selBT = 'monthly';
@@ -706,7 +779,7 @@ function calcP(){
   } else if (cardDepTotal > 0) {
     depText = '฿' + cardDepTotal.toLocaleString() + ' card';
   } else {
-    depText = '—';
+    depText = '-';
   }
   document.getElementById('pDep').textContent = depText;
 
@@ -808,15 +881,15 @@ function showDetail(id){
   var cardDepTotal = (b.cardDeposit || 0) * (b.cardDepositQty || 0);
   document.getElementById('detailContent').innerHTML =
     '<div class="dbadge '+b.propertyId+'">'+(b.propertyId==='precious'?'The Precious':'The Moment')+'</div>'+
-    '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+escapeHtml(b.guestName||'—')+'</h2>'+
-    '<div class="df"><label>Room</label><span>'+(r?r.displayName:b.roomId)+' — '+(r?tl(r.roomType):'')+'</span></div>'+
-    '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'—')+'</span></div>'+
-    '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'—')+'</span></div>'+
+    '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+escapeHtml(b.guestName||'-')+'</h2>'+
+    '<div class="df"><label>Room</label><span>'+(r?r.displayName:b.roomId)+' · '+(r?tl(r.roomType):'')+'</span></div>'+
+    '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'-')+'</span></div>'+
+    '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'-')+'</span></div>'+
     '<div class="df"><label>Duration</label><span>'+nights+' nights</span></div>'+
     '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?'/mo':(b.bookingType==='Booking.com'||b.bookingType==='Expedia.com'?'/booking':'/night')):'TBD')+'</span></div>'+
-    '<div class="df"><label>Damage Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'—')+'</span></div>'+
-    '<div class="df"><label>Card Deposit</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' card'+(b.cardDepositQty>1?'s':'')+' @ ฿'+b.cardDeposit+')':'—')+'</span></div>'+
-    '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType==='monthly-draft'?'Monthly (Draft)':(b.bookingType||'—'))+'</span></div>'+
+    '<div class="df"><label>Damage Deposit</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'-')+'</span></div>'+
+    '<div class="df"><label>Card Deposit</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' card'+(b.cardDepositQty>1?'s':'')+' @ ฿'+b.cardDeposit+')':'-')+'</span></div>'+
+    '<div class="df"><label>Type</label><span style="text-transform:capitalize">'+(b.bookingType==='monthly-draft'?'Monthly (Draft)':(b.bookingType||'-'))+'</span></div>'+
     (b.notes?'<div class="df"><label>Notes</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.notes)+'</span></div>':'')+
     (b.createdByName?'<div class="df"><label>Added by</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.createdByName)+'</span></div>':'')+
     '<div class="dactions" style="flex-wrap:wrap;gap:8px 12px;">'+
@@ -846,10 +919,12 @@ function extendBooking(id) {
   if (b.bookingType === 'monthly') { coD.setMonth(coD.getMonth() + 1); }
   else { coD.setDate(coD.getDate() + 1); }
   document.getElementById('mOut').value = dk(coD);
+  document.getElementById('mNights').value = dd(document.getElementById('mIn').value, dk(coD));
   document.getElementById('mRate').value = b.rate || '';
   document.getElementById('mDep').value = '0';
   document.getElementById('mCardDepQty').value = '0';
-  document.getElementById('mCardDepPrice').value = '500';
+  var p = b.propertyId || 'precious';
+  document.getElementById('mCardDepPrice').value = (window.ROOMS_SETTINGS && window.ROOMS_SETTINGS[p + '_default_keycard_deposit']) || '500';
   document.getElementById('mNotes').value = 'Extension of ' + b.bookingId;
   selBT = b.bookingType || 'monthly';
   var btns = document.querySelectorAll('.tbtn');
@@ -967,7 +1042,7 @@ function showOverrideDetail(roomId, type, reason) {
     '<div class="dbadge warn">'+label+'</div>'+
     '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">Room '+roomId+'</h2>'+
     '<div class="df"><label>Status</label><span style="text-transform:uppercase;font-weight:600">'+type+'</span></div>'+
-    '<div class="df"><label>Reason</label><span>'+escapeHtml(reason || '—')+'</span></div>'+
+    '<div class="df"><label>Reason</label><span>'+escapeHtml(reason || '-')+'</span></div>'+
     '<div class="dactions" style="margin-top:20px">'+
       '<button class="btn btn-red" onclick="resolveOverride(\''+roomId+'\')">'+btnText+'</button>'+
       '<button class="btn btn-p" onclick="closeDetail()">✓ Done</button></div>';

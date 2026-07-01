@@ -7,11 +7,11 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     :root {
-      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA; --go: #0F766E; --warn: #DC2626; --muted: #86868B;
+      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA; --go: #0F766E; --warn: #DC2626; --muted: #4B4B4D;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); }
-    .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
     h1 { font-size: 22px; margin: 0 0 4px; font-family: 'Lexend', sans-serif; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
     .topbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
@@ -63,6 +63,7 @@
         <a href="finance.html" id="link-finance" class="hidden">Finance</a>
         <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">Billing</a>
         <a href="report.html" id="link-report" class="hidden">Reports</a>
+        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
       </div>
     </div>
 
@@ -163,6 +164,7 @@
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
     var loadedRooms = [];
+    var BILLING_SETTINGS = {};
 
     function show(id) { document.getElementById(id).classList.remove('hidden'); }
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
@@ -176,6 +178,7 @@
       if (HuaHinSession.hasRole('owner')) {
         show('link-dashboard');
         show('link-hr');
+        show('link-setting');
       }
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('link-finance');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
@@ -191,6 +194,11 @@
 
       var d = new Date();
       document.getElementById('sel-month').value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+
+      var sess = HuaHinSession.getSession();
+      if (sess) {
+        apiCall('financeGetSettings', [sess.token]).then(function(res) { if (res.ok) BILLING_SETTINGS = res.settings; });
+      }
     };
 
     function apiCall(action, params) {
@@ -240,19 +248,32 @@
       }
 
       var hasNonPending = false;
+      var prop = document.getElementById('sel-property').value;
       loadedRooms.forEach(function(r, idx) {
         r.extraItems = r.extraItems || [];
         var tr = document.createElement('tr');
-        if (r.pending_txn_id) {
+        if (r.txn_id && r.txn_status === 'pending') {
           tr.innerHTML =
-            '<td><input type="checkbox" class="chk-pending" data-txn-id="' + r.pending_txn_id + '" checked onchange="updatePrintBtn()" /></td>' +
+            '<td><input type="checkbox" class="chk-pending" data-txn-id="' + r.txn_id + '" checked onchange="updatePrintBtn()" /></td>' +
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td colspan="12">' +
               '<div style="padding:10px; background:#fff8e1; border:1px solid #ffe082; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">' +
-                '<div><strong style="color:#b8860b;">Pending Invoice:</strong> ฿' + Number(r.pending_amount).toLocaleString() + '</div>' +
+                '<div><strong style="color:#b8860b;">Pending Invoice:</strong> ฿' + Number(r.txn_amount).toLocaleString() + '</div>' +
                 '<div style="display:flex; gap:10px;">' +
-                  '<button class="btn-primary" onclick="openConfirmPaymentModal(\'' + escapeHtml(r.pending_txn_id) + '\')" style="padding:6px 12px; font-size:13px;">Confirm Paid</button>' +
-                  '<button class="btn-primary" onclick="deletePendingInvoice(\'' + escapeHtml(r.pending_txn_id) + '\')" style="padding:6px 12px; font-size:13px; background:none; color:var(--warn); border:1px solid var(--warn);">Delete</button>' +
+                  '<button class="btn-primary" onclick="openConfirmPaymentModal(\'' + escapeHtml(r.txn_id) + '\')" style="padding:6px 12px; font-size:13px;">Confirm Paid</button>' +
+                  '<button class="btn-primary" onclick="deletePendingInvoice(\'' + escapeHtml(r.txn_id) + '\')" style="padding:6px 12px; font-size:13px; background:none; color:var(--warn); border:1px solid var(--warn);">Delete</button>' +
+                '</div>' +
+              '</div>' +
+            '</td>';
+        } else if (r.txn_id && r.txn_status === 'paid') {
+          tr.innerHTML =
+            '<td><span style="color:var(--go); font-weight:bold; font-size:16px;">✓</span></td>' +
+            '<td>' + escapeHtml(r.room_name) + '</td>' +
+            '<td colspan="12">' +
+              '<div style="padding:10px; background:#e6f4ea; border:1px solid #34a853; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">' +
+                '<div style="color:#137333; font-weight:600;">✓ Invoice Paid & Confirmed: ฿' + Number(r.txn_amount).toLocaleString() + '</div>' +
+                '<div>' +
+                  '<button class="btn-primary" onclick="window.open(\'invoice.html?id=' + escapeHtml(r.txn_id) + '\', \'_blank\')" style="padding:6px 12px; font-size:13px; background:var(--go);">View Invoice</button>' +
                 '</div>' +
               '</div>' +
             '</td>';
@@ -265,21 +286,21 @@
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="rent_' + idx + '" value="' + r.rent + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
-            '<td class="text-right"><input type="number" min="0" style="width:50px" class="grid-input" id="erate_' + idx + '" value="8" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+            '<td class="text-right"><input type="number" min="0" style="width:65px" class="grid-input" id="erate_' + idx + '" value="' + (BILLING_SETTINGS[prop + '_default_electricity_rate'] || 8) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right" id="amt_e_' + idx + '">฿0</td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
-            '<td class="text-right"><input type="number" min="0" style="width:50px" class="grid-input" id="wrate_' + idx + '" value="22" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+            '<td class="text-right"><input type="number" min="0" style="width:65px" class="grid-input" id="wrate_' + idx + '" value="' + (BILLING_SETTINGS[prop + '_default_water_rate'] || 22) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right" id="amt_w_' + idx + '">฿0</td>' +
             '<td class="text-right"><div style="margin-bottom:4px; font-weight:bold;" id="add_tot_' + idx + '">฿0</div><button onclick="openExtraModal(' + idx + ')" style="font-size:11px; padding:3px 6px; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:4px;">Edit</button></td>' +
             '<td class="text-right total-col" id="tot_' + idx + '">฿' + r.rent + '</td>';
         }
         tbody.appendChild(tr);
-        if (!r.pending_txn_id) {
+        if (!r.txn_id) {
           calcRow(idx);
         }
       });
-      var hasPending = loadedRooms.some(function(r) { return r.pending_txn_id; });
+      var hasPending = loadedRooms.some(function(r) { return r.txn_id && r.txn_status === 'pending'; });
       if (hasNonPending || hasPending) {
         document.getElementById('chk-all').checked = true;
         updateGenerateBtn();

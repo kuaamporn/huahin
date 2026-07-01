@@ -70,7 +70,9 @@
     var session = getSession();
     if (!session) return null;
     session.roles = roles || [];
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    var serialized = JSON.stringify(session);
+    sessionStorage.setItem(SESSION_KEY, serialized);
+    localStorage.setItem(SESSION_KEY, serialized);
     return session;
   }
 
