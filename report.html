@@ -78,6 +78,24 @@
       .toolbar { flex-direction: column; align-items: stretch; }
       .summary-grid { grid-template-columns: 1fr 1fr; }
     }
+
+    .btn-primary { background: var(--go); background: linear-gradient(135deg,var(--go),#14B8A6); color: #fff; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .btn-primary:hover { opacity: 0.9; }
+
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .topbar, .ftabs, .summary-grid, .card-section,
+      #section-bookings, #section-receipts, #section-invoices, #section-full-invoices {
+        display: none !important;
+      }
+      .wrap { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+      #print-area-hk .print-header { display: block !important; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+      .table-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+      table { border-collapse: collapse !important; width: 100% !important; border: 1.5px solid #000 !important; }
+      th, td { border: 1px solid #000 !important; padding: 6px 8px !important; font-size: 11px !important; color: #000 !important; }
+      th { background: #f2f2f2 !important; font-weight: bold !important; text-transform: uppercase !important; }
+      tr { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -161,8 +179,25 @@
             <label>Search</label>
             <input type="text" id="filter-search" placeholder="Search guest, room..." oninput="applyFilters()" />
           </div>
+          <div class="tool-group" style="align-self: flex-end; margin-left: auto;">
+            <button class="btn-primary" onclick="printHkReport()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Print Checklist
+            </button>
+          </div>
         </div>
       </div>
+
+      <div id="print-area-hk">
+        <div class="print-header" style="display: none;">
+          <h1 style="font-size: 20px; font-weight: bold; margin: 0 0 6px 0; font-family: 'Lexend', sans-serif;">Housekeeping Tasks Checklist</h1>
+          <div style="font-size: 12px; color: #333; margin-bottom: 15px; display: flex; gap: 16px; flex-wrap: wrap;">
+            <span><strong>Property:</strong> <span id="print-prop">All</span></span>
+            <span><strong>Status:</strong> <span id="print-status">All</span></span>
+            <span><strong>Date Range:</strong> <span id="print-date">Any</span></span>
+            <span><strong>Printed At:</strong> <span id="print-time">-</span></span>
+          </div>
+        </div>
 
       <div class="table-card">
         <div style="overflow-x: auto;">
@@ -185,6 +220,7 @@
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
 
@@ -527,6 +563,35 @@
     document.getElementById('filter-full-invoice-end').value = todayStr;
 
     var ALL_TASKS = [];
+
+    function printHkReport() {
+      var propVal = document.getElementById('filter-property').value;
+      var statusVal = document.getElementById('filter-status').value;
+      var startVal = document.getElementById('filter-start-date').value;
+      var endVal = document.getElementById('filter-end-date').value;
+
+      var propText = propVal === 'all' ? 'All Properties' : (propVal === 'precious' ? 'The Precious' : 'The Moment');
+
+      var statusText = 'All Statuses';
+      if (statusVal === 'CLEANED') statusText = 'Cleaned Only';
+      else if (statusVal === 'remaining') statusText = 'Remaining (Pending / Overdue)';
+
+      var dateText = 'Any Date';
+      if (startVal && endVal) {
+        dateText = startVal + ' to ' + endVal;
+      } else if (startVal) {
+        dateText = 'From ' + startVal;
+      } else if (endVal) {
+        dateText = 'Until ' + endVal;
+      }
+
+      document.getElementById('print-prop').textContent = propText;
+      document.getElementById('print-status').textContent = statusText;
+      document.getElementById('print-date').textContent = dateText;
+      document.getElementById('print-time').textContent = new Date().toLocaleString('en-GB');
+
+      window.print();
+    }
 
     function loadReport() {
       var propId = document.getElementById('filter-property').value;
