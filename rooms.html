@@ -82,6 +82,9 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .ftab{padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted)}
 .ftab.active{background:var(--primary);color:#fff}
 .ftab.active.mt{background:var(--m);color:#fff}
+.col-highlight {
+  background-color: rgba(253, 224, 71, 0.25) !important;
+}
 
 .avres{display:none;margin:0 14px;padding:10px 14px;border-radius:8px;border:1px solid;flex-wrap:wrap;gap:7px;align-items:center;max-height:120px;overflow-y:auto}
 #avchips{display:flex;flex-wrap:wrap;gap:7px;width:100%}
@@ -313,7 +316,11 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       </div>
     </div>
     <div class="frow">
-      <div class="fg"><label class="fl">Rate (฿)</label><input class="fi" type="number" id="mRate" min="0" oninput="calcP()"></div>
+      <div class="fg">
+        <label class="fl">Rate (฿)</label>
+        <input class="fi" type="number" id="mRate" min="0" oninput="calcP()">
+        <div id="mProRateHelper" style="font-size:12px; color:var(--go); margin-top:4px; display:none; cursor:pointer; text-decoration:underline;"></div>
+      </div>
       <div class="fg"><label class="fl">Room Damage Deposit (฿)</label><input class="fi" type="number" id="mDep" min="0" oninput="calcP()"></div>
     </div>
     <div class="frow">
@@ -613,7 +620,7 @@ function render(){
   dates.forEach(function(d){
     var ds=dk(d), isT=ds===todayStr;
     var mon = months[d.getMonth()];
-    html += '<th class="'+(isT?'tc':'')+'" data-date="'+ds+'"><span class="dn">'+d.getDate()+' '+mon+'</span><span class="dd">'+['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]+'</span></th>';
+    html += '<th class="'+(isT?'tc':'')+'" data-date="'+ds+'" onclick="highlightColumn(\''+ds+'\')" style="cursor:pointer;"><span class="dn">'+d.getDate()+' '+mon+'</span><span class="dd">'+['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]+'</span></th>';
   });
   html += '</tr></thead><tbody>';
 
@@ -661,14 +668,14 @@ function render(){
           var detailTitle = escapeHtml(b.guestName || '') + ' (' + b.checkinDate + ' to ' + b.checkoutDate + ', ' + dd(cin, cout) + ' nights, ' + tl(b.bookingType) + ')';
           html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="left:'+left+'px; width:'+w+'px" title="'+detailTitle+'" onclick="showDetail(\''+b.bookingId+'\')">'+guestLabel+'</div></td>';
         } else {
-          html += '<td class="'+(isT?'tc':'')+'"></td>';
+          html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"></td>';
         }
       } else if (ov) {
         var ovText = ov.override_type === 'CLOSED' ? 'Closed' : 'Maintenance';
         var ovClass = ov.override_type === 'CLOSED' ? 'closed' : 'maintenance';
-        html += '<td class="'+(isT?'tc':'')+' '+ovClass+'-cell" title="Room '+room.displayName+' is '+ovText+': '+(ov.reason||'')+'" onclick="showOverrideDetail(\''+room.roomId+'\', \''+ov.override_type+'\', \''+escapeHtml(ov.reason || '')+'\')"><div class="ov-bar '+ovClass+'">'+ovText+'</div></td>';
+        html += '<td class="'+(isT?'tc':'')+' '+ovClass+'-cell" data-date="'+ds+'" title="Room '+room.displayName+' is '+ovText+': '+(ov.reason||'')+'" onclick="showOverrideDetail(\''+room.roomId+'\', \''+ov.override_type+'\', \''+escapeHtml(ov.reason || '')+'\')"><div class="ov-bar '+ovClass+'">'+ovText+'</div></td>';
       } else {
-        html += '<td class="'+(isT?'tc':'')+'" onclick="openBook(\''+room.roomId+'\',\''+ds+'\',\''+room.propertyId+'\')" title="Book '+room.displayName+'"></td>';
+        html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'" onclick="openBook(\''+room.roomId+'\',\''+ds+'\',\''+room.propertyId+'\')" title="Book '+room.displayName+'"></td>';
       }
     });
     html += '</tr>';
@@ -677,6 +684,11 @@ function render(){
   html += '</tbody>';
   document.getElementById('gtbl').innerHTML = html;
   scrollToday();
+  if (window.activeHighlightDate) {
+    document.querySelectorAll('[data-date="' + window.activeHighlightDate + '"]').forEach(function(el) {
+      el.classList.add('col-highlight');
+    });
+  }
 }
 
 function scrollToday(){
@@ -694,9 +706,37 @@ function checkAvail(){
   var nights = dd(d1,d2);
   el.className = 'avres show ' + (rooms.length?'has':'no');
   document.getElementById('avtitle').textContent = rooms.length ? ('✓ '+rooms.length+' rooms available · '+nights+' night'+(nights>1?'s':'')) : ('✗ No rooms available '+ci+' → '+co);
-  document.getElementById('avchips').innerHTML = rooms.map(function(r){
-    return '<div class="chip '+r.propertyId+'" onclick="openBook(\''+r.roomId+'\',\''+ci+'\',\''+r.propertyId+'\',\''+co+'\')">'+r.displayName+(r.rate?' · ฿'+r.rate.toLocaleString():'')+'</div>';
-  }).join('');
+
+  var preciousRooms = rooms.filter(function(r){ return r.propertyId === 'precious'; });
+  var momentRooms = rooms.filter(function(r){ return r.propertyId === 'moment'; });
+
+  var chipsHtml = '';
+  if (activeProp === 'combined' || activeProp === 'precious') {
+    chipsHtml += '<div style="width:100%; display:flex; flex-wrap:wrap; gap:7px; align-items:center;">';
+    chipsHtml += '<strong style="color:var(--go); font-size:12px; margin-right:4px;">The Precious (' + preciousRooms.length + '):</strong>';
+    if (preciousRooms.length === 0) {
+      chipsHtml += '<span style="color:var(--muted); font-size:12px; font-style:italic;">None</span>';
+    } else {
+      chipsHtml += preciousRooms.map(function(r){
+        return '<div class="chip '+r.propertyId+'" onclick="openBook(\''+r.roomId+'\',\''+ci+'\',\''+r.propertyId+'\',\''+co+'\')">'+r.displayName+(r.rate?' · ฿'+r.rate.toLocaleString():'')+'</div>';
+      }).join('');
+    }
+    chipsHtml += '</div>';
+  }
+  if (activeProp === 'combined' || activeProp === 'moment') {
+    var style = (activeProp === 'combined') ? 'margin-top:6px;' : '';
+    chipsHtml += '<div style="width:100%; display:flex; flex-wrap:wrap; gap:7px; align-items:center; ' + style + '">';
+    chipsHtml += '<strong style="color:#7C3AED; font-size:12px; margin-right:4px;">The Moment (' + momentRooms.length + '):</strong>';
+    if (momentRooms.length === 0) {
+      chipsHtml += '<span style="color:var(--muted); font-size:12px; font-style:italic;">None</span>';
+    } else {
+      chipsHtml += momentRooms.map(function(r){
+        return '<div class="chip '+r.propertyId+'" onclick="openBook(\''+r.roomId+'\',\''+ci+'\',\''+r.propertyId+'\',\''+co+'\')">'+r.displayName+(r.rate?' · ฿'+r.rate.toLocaleString():'')+'</div>';
+      }).join('');
+    }
+    chipsHtml += '</div>';
+  }
+  document.getElementById('avchips').innerHTML = chipsHtml;
 }
 
 function updateRooms(){
@@ -757,7 +797,12 @@ function openBook(rid, date, prop, endDate){
 
   var p = (prop === 'moment') ? 'moment' : 'precious';
   document.getElementById('mCardDepPrice').value = (window.ROOMS_SETTINGS && window.ROOMS_SETTINGS[p + '_default_keycard_deposit']) || '500';
-  document.getElementById('mRate').value = '';
+
+  var defaultRoom = ROOMS.find(function(x){ return x.roomId === rid; });
+  var defaultRate = defaultRoom ? defaultRoom.rate : 0;
+  document.getElementById('mRate').value = defaultRate || '';
+  document.getElementById('mRate').dataset.baseRate = defaultRate || '';
+
   document.getElementById('cwarn').style.display = 'none';
   calcP();
   document.getElementById('mTitle').textContent = 'New Booking';
@@ -809,8 +854,32 @@ function calcP(){
   if(!ci||!co||!rate){ pb.style.display='none'; return; }
   pb.style.display='block';
   var nights=dd(ci,co);
-  var durText = selBT==='monthly' ? Math.round(nights/30)+' month(s)' : nights+' nights';
+  var durText = '';
+  if (selBT === 'monthly') {
+    if (nights < 30) {
+      durText = nights + ' day(s) (under 1 month)';
+    } else {
+      durText = Math.round(nights/30) + ' month(s)';
+    }
+  } else {
+    durText = nights + ' nights';
+  }
   document.getElementById('pDur').textContent = durText;
+
+  var baseRate = parseFloat(document.getElementById('mRate').dataset.baseRate) || rate || 0;
+  var helperEl = document.getElementById('mProRateHelper');
+  if (selBT === 'monthly' && nights < 30 && baseRate > 0) {
+    var suggested = Math.round((baseRate / 30) * nights);
+    helperEl.textContent = 'Suggested pro-rate: ฿' + suggested.toLocaleString() + ' (Click to apply)';
+    helperEl.style.display = 'block';
+    helperEl.onclick = function() {
+      document.getElementById('mRate').value = suggested;
+      calcP();
+    };
+  } else {
+    helperEl.style.display = 'none';
+  }
+
   var suffix = '';
   if (selBT === 'monthly') { suffix = '/mo'; }
   else if (selBT === 'Booking.com' || selBT === 'Expedia.com') { suffix = '/booking'; }
@@ -962,6 +1031,26 @@ function showDetail(id){
 
 function closeDetail(){ document.getElementById('detailPanel').classList.remove('open'); }
 
+var activeHighlightDate = null;
+window.highlightColumn = function(date) {
+  // Clear existing highlights
+  document.querySelectorAll('.col-highlight').forEach(function(el) {
+    el.classList.remove('col-highlight');
+  });
+
+  // Toggle off if clicking the same column
+  if (activeHighlightDate === date) {
+    activeHighlightDate = null;
+    return;
+  }
+
+  // Highlight new columns
+  activeHighlightDate = date;
+  document.querySelectorAll('[data-date="' + date + '"]').forEach(function(el) {
+    el.classList.add('col-highlight');
+  });
+};
+
 function extendBooking(id) {
   var b = bookings.find(function(x) { return x.bookingId === id; });
   if (!b) return;
@@ -977,6 +1066,7 @@ function extendBooking(id) {
   document.getElementById('mOut').value = dk(coD);
   document.getElementById('mNights').value = dd(document.getElementById('mIn').value, dk(coD));
   document.getElementById('mRate').value = b.rate || '';
+  document.getElementById('mRate').dataset.baseRate = b.rate || '';
   document.getElementById('mDep').value = '0';
   document.getElementById('mCardDepQty').value = '0';
   var p = b.propertyId || 'precious';
@@ -1004,12 +1094,44 @@ function checkInGuest(id) {
   if (!b) return;
   var r = ROOMS.filter(function(x){ return x.roomId === b.roomId; })[0];
   document.getElementById('ciBookingId').value = id;
-  document.getElementById('ciDetails').innerHTML =
+
+  var d1 = new Date(b.checkinDate);
+  var d2 = new Date(b.checkoutDate);
+  var nights = Math.round((d2 - d1) / 86400000);
+
+  var rentAmount = b.rate || 0;
+  var isDaily = b.bookingType !== 'monthly' && b.bookingType !== 'Booking.com' && b.bookingType !== 'Expedia.com';
+  if (isDaily) {
+    rentAmount = nights * (b.rate || 0);
+  }
+
+  var depAmount = b.deposit || 0;
+  var cardDepTotal = (b.cardDeposit || 0) * (b.cardDepositQty || 0);
+  var totalAmount = rentAmount + depAmount + cardDepTotal;
+  var resDeposit = b.reservationDeposit || 0;
+  var remaining = totalAmount - resDeposit;
+
+  var detailsHtml =
     '<div class="df"><label>Guest</label><span>'+escapeHtml(b.guestName||'-')+'</span></div>'+
     '<div class="df"><label>Room</label><span>'+(r?r.displayName:b.roomId)+'</span></div>'+
-    '<div class="df"><label>Stay</label><span>'+(b.checkinDate||'-')+' → '+(b.checkoutDate||'-')+'</span></div>'+
-    '<div class="df"><label>Rate</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString():'TBD')+'</span></div>'+
-    (b.deposit>0?'<div class="df"><label>Damage Deposit</label><span>฿'+Number(b.deposit).toLocaleString()+'</span></div>':'');
+    '<div class="df"><label>Stay</label><span>'+(b.checkinDate||'-')+' → '+(b.checkoutDate||'-')+' ('+nights+' nights)</span></div>'+
+    '<hr style="margin:12px 0; border:0; border-top:1px solid #eee;">'+
+    '<div class="df"><label>Rent ('+(isDaily ? nights+' nights @ ฿'+b.rate.toLocaleString() : 'Monthly')+')</label><span>฿'+rentAmount.toLocaleString()+'</span></div>';
+
+  if (depAmount > 0) {
+    detailsHtml += '<div class="df"><label>Damage Deposit</label><span>฿'+depAmount.toLocaleString()+'</span></div>';
+  }
+  if (cardDepTotal > 0) {
+    detailsHtml += '<div class="df"><label>Keycard Deposit</label><span>฿'+cardDepTotal.toLocaleString()+' ('+b.cardDepositQty+' @ ฿'+b.cardDeposit+')</span></div>';
+  }
+
+  detailsHtml +=
+    '<div class="df" style="color:var(--go); font-weight:600;"><label>Subtotal</label><span>฿'+totalAmount.toLocaleString()+'</span></div>'+
+    '<div class="df" style="color:#c2410c;"><label>Paid Reservation Deposit</label><span>-฿'+resDeposit.toLocaleString()+'</span></div>'+
+    '<hr style="margin:12px 0; border:0; border-top:1px solid #eee;">'+
+    '<div class="df" style="font-size:16px; font-weight:700; color:var(--go);"><label>Total to Collect</label><span>฿'+(remaining > 0 ? remaining : 0).toLocaleString()+'</span></div>';
+
+  document.getElementById('ciDetails').innerHTML = detailsHtml;
   document.getElementById('checkinBg').classList.remove('hidden');
 }
 function closeCheckIn() { document.getElementById('checkinBg').classList.add('hidden'); }

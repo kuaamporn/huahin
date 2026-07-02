@@ -490,6 +490,14 @@
           </select>
         </div>
         <div class="tool-group">
+          <label>OTA Channel</label>
+          <select id="filter-ota-channel" onchange="applyOtaFilters()">
+            <option value="all">All Channels</option>
+            <option value="booking">Booking.com</option>
+            <option value="expedia">Expedia.com</option>
+          </select>
+        </div>
+        <div class="tool-group">
           <label>Stay Start Date</label>
           <input type="date" id="filter-ota-start" onchange="loadOtaReport()">
         </div>
@@ -1087,7 +1095,12 @@
 
     function applyOtaFilters() {
       var q = document.getElementById('filter-ota-search').value.toLowerCase().trim();
+      var channel = document.getElementById('filter-ota-channel').value;
       var filtered = ALL_OTA_BOOKINGS.filter(function(b) {
+        if (channel !== 'all') {
+          if (channel === 'booking' && b.bookingType !== 'Booking.com') return false;
+          if (channel === 'expedia' && b.bookingType !== 'Expedia.com') return false;
+        }
         if (q) {
           var matchGuest = (b.guestName || '').toLowerCase().indexOf(q) >= 0;
           var matchOtaId = (b.otaBookingId || '').toLowerCase().indexOf(q) >= 0;

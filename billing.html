@@ -267,7 +267,7 @@
             '</td>';
         } else if (r.txn_id && r.txn_status === 'paid') {
           tr.innerHTML =
-            '<td><span style="color:var(--go); font-weight:bold; font-size:16px;">✓</span></td>' +
+            '<td><input type="checkbox" class="chk-pending" data-txn-id="' + r.txn_id + '" checked onchange="updatePrintBtn()" /></td>' +
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td colspan="12">' +
               '<div style="padding:10px; background:#e6f4ea; border:1px solid #34a853; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">' +
