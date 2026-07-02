@@ -126,6 +126,58 @@
           <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
           <a href="report.html" class="toplink hidden" id="report-link">Reports</a>
           <a href="setting.html" class="toplink hidden" id="setting-link">Settings</a>
+          <a href="#" class="toplink" id="account-link" onclick="toggleAccountCard(); return false;">My Account</a>
+        </div>
+      </div>
+
+      <!-- MY ACCOUNT CARD (leave requests, day-off swaps, password change) -->
+      <div class="card hidden" id="account-card">
+        <h2 style="font-size: 16px; margin: 0 0 16px; font-family: 'Lexend', sans-serif;">👤 My Account</h2>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px;">
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">Request Leave</h3>
+          <label for="leave-date">Leave Date</label>
+          <input type="date" id="leave-date" />
+          <label for="leave-type">Leave Type</label>
+          <select id="leave-type" onchange="toggleBehalfField()" style="width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); font-family:'Source Sans 3', sans-serif;">
+            <option value="VACATION">Vacation Leave</option>
+            <option value="MEDICAL">Medical Leave</option>
+          </select>
+          <label for="leave-reason">Reason</label>
+          <input type="text" id="leave-reason" placeholder="Details..." />
+          <div id="behalf-group" class="hidden">
+            <label for="leave-behalf-id">Submitting on behalf of a colleague? Their Employee ID (leave blank if for yourself)</label>
+            <input type="text" id="leave-behalf-id" placeholder="e.g. EMP-..." />
+            <div class="muted" style="margin-top:4px;">Vacation requests with less than 2 days' notice must be submitted by a different frontdesk colleague on the employee's behalf.</div>
+          </div>
+          <button class="btn-primary" onclick="submitLeave()">Submit Leave Request</button>
+          <div class="error hidden" id="leave-error"></div>
+          <div class="success hidden" id="leave-success"></div>
+        </div>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;">
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">Swap Day Off</h3>
+          <label for="swap-original">Original Day Off Date</label>
+          <input type="date" id="swap-original" />
+          <label for="swap-new">New Requested Day Off Date</label>
+          <input type="date" id="swap-new" />
+          <div class="muted" style="margin-top:4px;">Swaps must be submitted at least 2 days before the new date and require a colleague's approval.</div>
+          <button class="btn-primary" onclick="submitSwap()">Submit Swap Request</button>
+          <div class="error hidden" id="swap-error"></div>
+          <div class="success hidden" id="swap-success"></div>
+        </div>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;">
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">Change Password</h3>
+          <label for="pw-current">Current Password</label>
+          <input type="password" id="pw-current" />
+          <label for="pw-new">New Password</label>
+          <input type="password" id="pw-new" />
+          <label for="pw-confirm">Confirm New Password</label>
+          <input type="password" id="pw-confirm" />
+          <button class="btn-primary" onclick="submitPasswordChange()">Update Password</button>
+          <div class="error hidden" id="pw-error"></div>
+          <div class="success hidden" id="pw-success"></div>
         </div>
       </div>
 
@@ -355,6 +407,78 @@
         return res.json();
       });
     }
+
+    // ---------- MY ACCOUNT: leave, swap, password ----------
+    function toggleAccountCard() {
+      var card = document.getElementById('account-card');
+      card.classList.toggle('hidden');
+    }
+
+    function toggleBehalfField() {
+      var type = document.getElementById('leave-type').value;
+      if (type === 'VACATION') show('behalf-group');
+      else hide('behalf-group');
+    }
+
+    window.submitLeave = function() {
+      var date = document.getElementById('leave-date').value;
+      var type = document.getElementById('leave-type').value;
+      var reason = document.getElementById('leave-reason').value;
+      var behalf = document.getElementById('leave-behalf-id').value.trim() || null;
+      hide('leave-error'); hide('leave-success');
+      if (!date) { document.getElementById('leave-error').textContent = 'Select a date.'; show('leave-error'); return; }
+
+      callApi('employeeRequestLeave', [sessionToken, date, type, reason, behalf]).then(function(res) {
+        if (res.ok) {
+          document.getElementById('leave-success').textContent = 'Request submitted successfully!';
+          show('leave-success');
+        } else {
+          document.getElementById('leave-error').textContent = res.error;
+          show('leave-error');
+        }
+      });
+    };
+
+    window.submitSwap = function() {
+      var orig = document.getElementById('swap-original').value;
+      var newVal = document.getElementById('swap-new').value;
+      hide('swap-error'); hide('swap-success');
+      if (!orig || !newVal) { document.getElementById('swap-error').textContent = 'Fill in both dates.'; show('swap-error'); return; }
+
+      callApi('employeeRequestSwap', [sessionToken, orig, newVal]).then(function(res) {
+        if (res.ok) {
+          document.getElementById('swap-success').textContent = 'Swap request submitted successfully!';
+          show('swap-success');
+        } else {
+          document.getElementById('swap-error').textContent = res.error;
+          show('swap-error');
+        }
+      });
+    };
+
+    window.submitPasswordChange = function() {
+      var curr = document.getElementById('pw-current').value;
+      var n1 = document.getElementById('pw-new').value;
+      var n2 = document.getElementById('pw-confirm').value;
+      hide('pw-error'); hide('pw-success');
+      if (!curr || !n1) { document.getElementById('pw-error').textContent = 'Fill in all fields.'; show('pw-error'); return; }
+      if (n1 !== n2) { document.getElementById('pw-error').textContent = 'New passwords do not match.'; show('pw-error'); return; }
+
+      Promise.all([clientHashPassword(curr), clientHashPassword(n1)]).then(function(hashes) {
+        return callApi('employeeChangePassword', [sessionToken, hashes[0], hashes[1]]);
+      }).then(function(res) {
+        if (res.ok) {
+          document.getElementById('pw-success').textContent = 'Password updated successfully!';
+          show('pw-success');
+          document.getElementById('pw-current').value = '';
+          document.getElementById('pw-new').value = '';
+          document.getElementById('pw-confirm').value = '';
+        } else {
+          document.getElementById('pw-error').textContent = res.error;
+          show('pw-error');
+        }
+      });
+    };
 
     // ---------- LOGIN ----------
     document.getElementById('login-btn').addEventListener('click', function() {

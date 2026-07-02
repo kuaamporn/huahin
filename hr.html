@@ -41,6 +41,8 @@
     .grid-cell.A { background: #fde2d3; color: var(--warn); }
     .grid-cell.V, .grid-cell.M { background: #e0e7ff; color: #3730a3; }
     .grid-cell.N { background: #f7f6f3; color: var(--muted); }
+    .grid-cell.D { background: #e2e8f0; color: #334155; }
+    .grid-cell.H { background: #fce7f3; color: #9d174d; }
     .grid-header-cell { text-align: center; font-size: 11px; padding: 6px 4px; background: #F1F5F9; color: var(--muted); font-weight: 600; border-right: 1px solid #E2E8F0; }
     .clickable-row { cursor: pointer; }
     .clickable-row:hover { background: #F1F5F9; }
@@ -129,6 +131,7 @@
         <button class="nav-tab" id="tab-attendance">Attendance</button>
         <button class="nav-tab" id="tab-monthly">Monthly Report</button>
         <button class="nav-tab" id="tab-employees">Employees</button>
+        <button class="nav-tab hidden" id="tab-leaves">Leave &amp; Swap Approvals</button>
         <button class="nav-tab" id="tab-account">My Account</button>
         <button class="nav-tab hidden" id="tab-roles">Roles</button>
       </div>
@@ -191,10 +194,17 @@
       <div class="card-section">
         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
           <div>
+            <label for="monthly-type">Report Type</label>
+            <select id="monthly-type" onchange="toggleReportTypeFields()" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+          <div>
             <label for="monthly-year">Year</label>
             <input id="monthly-year" type="number" style="max-width:120px;" />
           </div>
-          <div>
+          <div id="monthly-month-group">
             <label for="monthly-month">Month</label>
             <select id="monthly-month" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
               <option value="1">January</option>
@@ -266,6 +276,32 @@
         </table>
         </div>
         <div class="muted" id="employees-empty-msg" style="margin-top:14px;">No employees yet.</div>
+      </div>
+    </div>
+
+    <!-- ===================== LEAVE & SWAP APPROVALS ===================== -->
+    <div id="panel-leaves" class="hidden">
+      <h1>Leave &amp; Swap Approvals</h1>
+      <div class="sub">Requests submitted by staff via the check-in portal. You cannot approve your own requests.</div>
+
+      <div class="card-section">
+        <h2 style="margin-top:0;">Pending Leave Requests</h2>
+        <table>
+          <thead>
+            <tr><th>Employee</th><th>Date</th><th>Type</th><th>Reason</th><th>Evidence</th><th>Action</th></tr>
+          </thead>
+          <tbody id="leave-requests-rows"><tr><td colspan="6" class="muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="card-section" style="margin-top:20px;">
+        <h2 style="margin-top:0;">Pending Day-Off Swaps</h2>
+        <table>
+          <thead>
+            <tr><th>Employee</th><th>Original Date</th><th>New Date</th><th>Action</th></tr>
+          </thead>
+          <tbody id="swap-requests-rows"><tr><td colspan="4" class="muted">Loading...</td></tr></tbody>
+        </table>
       </div>
     </div>
 
@@ -393,6 +429,11 @@
 
     function show(id) { document.getElementById(id).classList.remove('hidden'); }
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
 
     function callApi(action, params) {
       return fetch(WORKER_API_URL, {
@@ -475,11 +516,11 @@
     document.getElementById('refresh-btn').addEventListener('click', loadToday);
 
     // ===================== TAB SWITCHING =====================
-    var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', account: 'panel-account', roles: 'panel-roles' };
-    var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', account: 'tab-account', roles: 'tab-roles' };
+    var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', leaves: 'panel-leaves', account: 'panel-account', roles: 'panel-roles' };
+    var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles' };
 
     function switchTab(name) {
-      if ((name === 'employees' || name === 'roles') && !hasRole('owner')) {
+      if ((name === 'employees' || name === 'roles' || name === 'leaves') && !hasRole('owner')) {
         switchTab('checkins');
         return;
       }
@@ -488,6 +529,7 @@
         document.getElementById(tabs[key]).classList.toggle('active', key === name);
       });
       if (name === 'employees') loadEmployees();
+      if (name === 'leaves') loadPendingApprovals();
       if (name === 'attendance') {
         if (!document.getElementById('attendance-date').value) {
           document.getElementById('attendance-date').value = todayDateStringForInput();
@@ -500,15 +542,23 @@
           document.getElementById('monthly-year').value = now.getFullYear();
           document.getElementById('monthly-month').value = String(now.getMonth() + 1);
         }
+        toggleReportTypeFields();
         loadMonthlyReport();
       }
       if (name === 'roles') loadRolesList();
     }
 
+    window.toggleReportTypeFields = function() {
+      var type = document.getElementById('monthly-type').value;
+      if (type === 'yearly') document.getElementById('monthly-month-group').style.display = 'none';
+      else document.getElementById('monthly-month-group').style.display = 'block';
+    };
+
     document.getElementById('tab-checkins').addEventListener('click', function() { switchTab('checkins'); });
     document.getElementById('tab-attendance').addEventListener('click', function() { switchTab('attendance'); });
     document.getElementById('tab-monthly').addEventListener('click', function() { switchTab('monthly'); });
     document.getElementById('tab-employees').addEventListener('click', function() { switchTab('employees'); });
+    document.getElementById('tab-leaves').addEventListener('click', function() { switchTab('leaves'); });
     document.getElementById('tab-account').addEventListener('click', function() { switchTab('account'); });
     document.getElementById('tab-roles').addEventListener('click', function() { switchTab('roles'); });
 
@@ -565,6 +615,90 @@
     });
 
     // ===================== LIST EMPLOYEES =====================
+    function loadPendingApprovals() {
+      callApi('adminListPendingApprovals', [token]).then(function(res) {
+        if (!res.ok) {
+          alert(res.error);
+          return;
+        }
+        renderLeaveRequestRows(res.leaveRequests || []);
+        renderSwapRequestRows(res.swapRequests || []);
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    }
+
+    function renderLeaveRequestRows(rows) {
+      var tbody = document.getElementById('leave-requests-rows');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="muted">No pending leave requests.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      rows.forEach(function(r) {
+        var tr = document.createElement('tr');
+        var evidenceCell = '<span class="muted">n/a</span>';
+        if (r.type === 'MEDICAL') {
+          evidenceCell = r.evidenceVerified
+            ? '<span class="pill ok">Verified</span>'
+            : '<button class="row-action-btn" onclick="verifyEvidence(\'' + r.requestId + '\')">Mark Verified</button>';
+        }
+        tr.innerHTML =
+          '<td>' + escapeHtml(r.employeeName) + '</td>' +
+          '<td>' + r.leaveDate + '</td>' +
+          '<td>' + r.type + '</td>' +
+          '<td>' + escapeHtml(r.reason || '-') + '</td>' +
+          '<td>' + evidenceCell + '</td>' +
+          '<td>' +
+            '<button class="row-action-btn" onclick="processLeave(\'' + r.requestId + '\', \'APPROVED\')">Approve</button> ' +
+            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processLeave(\'' + r.requestId + '\', \'REJECTED\')">Reject</button>' +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderSwapRequestRows(rows) {
+      var tbody = document.getElementById('swap-requests-rows');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="muted">No pending swap requests.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      rows.forEach(function(r) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + escapeHtml(r.employeeName) + '</td>' +
+          '<td>' + r.originalDate + '</td>' +
+          '<td>' + r.newDate + '</td>' +
+          '<td>' +
+            '<button class="row-action-btn" onclick="processSwap(\'' + r.swapId + '\', \'APPROVED\')">Approve</button> ' +
+            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processSwap(\'' + r.swapId + '\', \'REJECTED\')">Reject</button>' +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.processLeave = function(requestId, status) {
+      callApi('adminProcessLeaveRequest', [token, requestId, status]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        loadPendingApprovals();
+      });
+    };
+
+    window.processSwap = function(swapId, status) {
+      callApi('adminProcessSwapRequest', [token, swapId, status]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        loadPendingApprovals();
+      });
+    };
+
+    window.verifyEvidence = function(requestId) {
+      callApi('adminVerifyMedicalEvidence', [token, requestId, true]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        loadPendingApprovals();
+      });
+    };
+
     function loadEmployees() {
       callApi('adminListEmployees', [token]).then(function(res) {
         if (!res.ok) {
@@ -883,7 +1017,9 @@
     function loadMonthlyReport() {
       var year = parseInt(document.getElementById('monthly-year').value, 10);
       var month = parseInt(document.getElementById('monthly-month').value, 10);
-      if (!year || !month) return;
+      var type = document.getElementById('monthly-type').value;
+      if (!year) return;
+      if (type === 'monthly' && !month) return;
 
       expandedEmployeeId = null;
       hide('monthly-grid-section');
@@ -891,7 +1027,10 @@
       var tbody = document.getElementById('monthly-summary-rows');
       tbody.innerHTML = '<tr><td colspan="6" class="muted">Loading...</td></tr>';
 
-      callApi('dashboardGetMonthlyReport', [token, year, month]).then(function(res) {
+      var apiName = type === 'yearly' ? 'dashboardGetYearlyReport' : 'dashboardGetMonthlyReport';
+      var args = type === 'yearly' ? [token, year] : [token, year, month];
+
+      callApi(apiName, args).then(function(res) {
         if (!res.ok) {
           alert(res.error);
           return;
@@ -916,12 +1055,14 @@
       data.employees.forEach(function(emp) {
         var tr = document.createElement('tr');
         tr.className = 'clickable-row';
-        var leaveCount = emp.counts.MEDICAL_LEAVE + emp.counts.VACATION_LEAVE;
+
+        var counts = emp.counts || emp.yearlyTotals;
+        var leaveCount = counts.MEDICAL_LEAVE + counts.VACATION_LEAVE;
         tr.innerHTML =
           '<td>' + emp.name + '</td>' +
-          '<td>' + emp.counts.PRESENT + '</td>' +
-          '<td>' + emp.counts.LATE + '</td>' +
-          '<td>' + emp.counts.ABSENT + '</td>' +
+          '<td>' + counts.PRESENT + '</td>' +
+          '<td>' + counts.LATE + '</td>' +
+          '<td>' + counts.ABSENT + '</td>' +
           '<td>' + leaveCount + '</td>' +
           '<td class="muted">' + (expandedEmployeeId === emp.employeeId ? '▲ Hide' : '▼ Details') + '</td>';
         tr.addEventListener('click', function() {
@@ -930,7 +1071,9 @@
             hide('monthly-grid-section');
           } else {
             expandedEmployeeId = emp.employeeId;
-            renderMonthlyGrid(emp, currentMonthlyData);
+            var type = document.getElementById('monthly-type').value;
+            if (type === 'yearly') renderYearlyGrid(emp);
+            else renderMonthlyGrid(emp, currentMonthlyData);
           }
           renderMonthlySummary(currentMonthlyData);
         });
@@ -945,6 +1088,8 @@
       NOT_YET_CHECKED_IN: 'N',
       MEDICAL_LEAVE: 'M',
       VACATION_LEAVE: 'V',
+      DAY_OFF: 'D',
+      HOLIDAY: 'H',
     };
 
     function renderMonthlyGrid(emp, data) {
@@ -980,12 +1125,44 @@
       show('monthly-grid-section');
     }
 
+    function renderYearlyGrid(emp) {
+      document.getElementById('monthly-grid-title').textContent = 'Monthly breakdown — ' + emp.name;
+      var table = document.getElementById('monthly-grid-table');
+      table.innerHTML =
+        '<thead>' +
+          '<tr>' +
+            '<th>Month</th>' +
+            '<th>Present</th>' +
+            '<th>Late</th>' +
+            '<th>Absent / Unpaid</th>' +
+            '<th>Vacation Leave</th>' +
+            '<th>Medical Leave</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>' +
+          emp.months.map(function(m) {
+            var monthName = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m.month - 1];
+            return '<tr>' +
+              '<td>' + monthName + '</td>' +
+              '<td>' + m.PRESENT + '</td>' +
+              '<td>' + m.LATE + '</td>' +
+              '<td class="text-danger" style="color:var(--warn); font-weight:bold;">' + m.ABSENT + '</td>' +
+              '<td>' + m.VACATION_LEAVE + '</td>' +
+              '<td>' + m.MEDICAL_LEAVE + '</td>' +
+            '</tr>';
+          }).join('') +
+        '</tbody>';
+      show('monthly-grid-section');
+    }
+
     document.getElementById('monthly-export-btn').addEventListener('click', function() {
       if (!currentMonthlyData) {
-        alert('Load a month first.');
+        alert('Load a report first.');
         return;
       }
-      exportMonthlyReportCsv(currentMonthlyData);
+      var type = document.getElementById('monthly-type').value;
+      if (type === 'yearly') exportYearlyReportCsv(currentMonthlyData);
+      else exportMonthlyReportCsv(currentMonthlyData);
     });
 
     function csvEscape(value) {
@@ -1030,6 +1207,31 @@
       URL.revokeObjectURL(url);
     }
 
+    function exportYearlyReportCsv(data) {
+      var lines = [];
+      var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+      lines.push(['Name', 'Month', 'Present', 'Late', 'Absent / Unpaid', 'Vacation Leave', 'Medical Leave'].map(csvEscape).join(','));
+
+      data.employees.forEach(function(emp) {
+        emp.months.forEach(function(m) {
+          var row = [emp.name, monthNames[m.month - 1], m.PRESENT, m.LATE, m.ABSENT, m.VACATION_LEAVE, m.MEDICAL_LEAVE];
+          lines.push(row.map(csvEscape).join(','));
+        });
+      });
+
+      var csvContent = lines.join('\r\n');
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'attendance-yearly-' + document.getElementById('monthly-year').value + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     function hasRole() {
       return HuaHinSession.hasRole.apply(HuaHinSession, arguments);
     }
@@ -1038,6 +1240,7 @@
       var isOwner = hasRole('owner');
       document.getElementById('tab-roles').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-employees').classList.toggle('hidden', !isOwner);
+      document.getElementById('tab-leaves').classList.toggle('hidden', !isOwner);
     }
 
     // ===================== ROLES =====================
