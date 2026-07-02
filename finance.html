@@ -403,6 +403,23 @@
     </div>
   </div>
 
+  <!-- ===================== DELETE TRANSACTION MODAL ===================== -->
+  <div id="delete-txn-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 420px;">
+      <div class="mhdr">
+        <h2 class="mtitle">Delete Transaction</h2>
+        <button class="mx" onclick="closeDeleteTxn()">×</button>
+      </div>
+      <input type="hidden" id="del-txn-id">
+      <div id="del-txn-details" style="background:var(--paper);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px;"></div>
+      <p style="font-size:13px;color:var(--warn);margin-bottom:20px;">This permanently removes the transaction and its line items. It cannot be undone.</p>
+      <div style="display:flex;justify-content:flex-end;gap:12px;">
+        <button class="btn-secondary" onclick="closeDeleteTxn()" style="padding:8px 16px;">Cancel</button>
+        <button id="del-txn-confirm" onclick="confirmDeleteTxn()" style="padding:8px 16px;background:var(--warn);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;">Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== PENDING RESERVATIONS MODAL ===================== -->
   <div id="reservations-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 650px;">
@@ -1118,8 +1135,25 @@
     }
 
     function deleteTransaction(txnId) {
-      if (!confirm("Are you sure you want to delete this transaction? This cannot be undone.")) return;
+      var t = TRANSACTIONS.find(function(x) { return x.txn_id === txnId; });
+      if (!t) return;
+      document.getElementById('del-txn-id').value = txnId;
+      document.getElementById('del-txn-details').innerHTML =
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Date</span><span>' + (t.txn_date || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Type</span><span>' + (t.direction === 'IN' ? 'Revenue' : 'Expense') + ' · ' + (t.category || 'Multiple') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Room</span><span>' + (t.room_id || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Guest/Vendor</span><span>' + escapeHtml(t.guest_or_vendor || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;"><span class="muted">Amount</span><span>' + formatTHB(t.net_amount || t.amount) + '</span></div>';
+      show('delete-txn-modal');
+    }
+    function closeDeleteTxn() { hide('delete-txn-modal'); }
+    function confirmDeleteTxn() {
+      var txnId = document.getElementById('del-txn-id').value;
+      var btn = document.getElementById('del-txn-confirm');
+      btn.disabled = true; btn.textContent = 'Deleting…';
       callApi('financeDeleteTransaction', [session.token, txnId]).then(function(res) {
+        btn.disabled = false; btn.textContent = 'Delete Permanently';
+        closeDeleteTxn();
         if (!res.ok) { alert(res.error); return; }
         loadFinanceData();
       });

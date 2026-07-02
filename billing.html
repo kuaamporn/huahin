@@ -285,11 +285,11 @@
             '<td>' + escapeHtml(r.guest_name) + '</td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="rent_' + idx + '" value="' + r.rent + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
-            '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+            '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" placeholder="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" style="width:65px" class="grid-input" id="erate_' + idx + '" value="' + (BILLING_SETTINGS[prop + '_default_electricity_rate'] || 8) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right" id="amt_e_' + idx + '">฿0</td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
-            '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_w_' + idx + '" value="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+            '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_w_' + idx + '" placeholder="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" style="width:65px" class="grid-input" id="wrate_' + idx + '" value="' + (BILLING_SETTINGS[prop + '_default_water_rate'] || 22) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right" id="amt_w_' + idx + '">฿0</td>' +
             '<td class="text-right"><div style="margin-bottom:4px; font-weight:bold;" id="add_tot_' + idx + '">฿0</div><button onclick="openExtraModal(' + idx + ')" style="font-size:11px; padding:3px 6px; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:4px;">Edit</button></td>' +
@@ -336,18 +336,25 @@
       var r = loadedRooms[idx];
       var rent = parseFloat(document.getElementById('rent_' + idx).value) || 0;
       var prevE = parseFloat(document.getElementById('prev_e_' + idx).value) || 0;
-      var currE = parseFloat(document.getElementById('curr_e_' + idx).value) || 0;
+      var currEEl = document.getElementById('curr_e_' + idx);
+      var eUntouched = currEEl.value === '';
+      var currE = eUntouched ? prevE : (parseFloat(currEEl.value) || 0);
+      currEEl.style.background = eUntouched ? '#fef3c7' : '';
       var eRate = parseFloat(document.getElementById('erate_' + idx).value) || 0;
       var eUnits = currE - prevE; if (eUnits < 0) eUnits = 0;
       var eAmt = eUnits * eRate;
       document.getElementById('amt_e_' + idx).textContent = '฿' + eAmt;
 
       var prevW = parseFloat(document.getElementById('prev_w_' + idx).value) || 0;
-      var currW = parseFloat(document.getElementById('curr_w_' + idx).value) || 0;
+      var currWEl = document.getElementById('curr_w_' + idx);
+      var wUntouched = currWEl.value === '';
+      var currW = wUntouched ? prevW : (parseFloat(currWEl.value) || 0);
+      currWEl.style.background = wUntouched ? '#fef3c7' : '';
       var wRate = parseFloat(document.getElementById('wrate_' + idx).value) || 0;
       var wUnits = currW - prevW; if (wUnits < 0) wUnits = 0;
       var wAmt = wUnits * wRate;
       document.getElementById('amt_w_' + idx).textContent = '฿' + wAmt;
+      r.metersUntouched = eUntouched || wUntouched;
 
       var add = 0;
       if (r.extraItems && r.extraItems.length > 0) {
@@ -428,6 +435,15 @@
     document.getElementById('btn-generate').onclick = async function() {
       var checkedBoxes = document.querySelectorAll('.chk-room:checked');
       if (checkedBoxes.length === 0) return;
+
+      var untouchedRooms = Array.from(checkedBoxes)
+        .map(function(cb) { return loadedRooms[parseInt(cb.getAttribute('data-idx'))]; })
+        .filter(function(r) { return r && r.metersUntouched; })
+        .map(function(r) { return r.room_name; });
+      if (untouchedRooms.length > 0) {
+        if (!confirm('⚠ No current meter reading entered for: ' + untouchedRooms.join(', ') + '.\n\nTheir invoices will bill ฿0 for utilities. Generate anyway?')) return;
+      }
+
       if (!confirm('Are you sure you want to generate Pending Invoices for the ' + checkedBoxes.length + ' selected rooms?')) return;
 
       document.getElementById('btn-generate').disabled = true;

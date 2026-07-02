@@ -747,7 +747,7 @@
                 confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
               }
 
-              html += '<div style="border-left:3px solid '+badgeColor+';padding-left:12px;margin-bottom:4px;">' +
+              html += '<div style="background:'+badgeColor+'08;border-radius:8px;padding:8px 12px;margin-bottom:6px;">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;">' +
                   '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
                   '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
@@ -782,11 +782,11 @@
 
           container.classList.remove('hidden');
         } else {
-          list.innerHTML = '<div class="error">Error loading tasks: ' + res.error + '</div>';
+          document.getElementById('content-today').innerHTML = '<div class="error">Error loading tasks: ' + escapeHtml(res.error || 'Unknown error') + '</div>';
           container.classList.remove('hidden');
         }
       }).catch(function(err) {
-        list.innerHTML = '<div class="error">Connection error: ' + err.message + '</div>';
+        document.getElementById('content-today').innerHTML = '<div class="error">Connection error: ' + escapeHtml(err.message) + '</div>';
         container.classList.remove('hidden');
       });
     }
