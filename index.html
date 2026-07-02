@@ -651,7 +651,7 @@
         var dev = getDeviceId();
 
         btn.textContent = 'Checking out...';
-        callApi('checkIn', [sessionToken, 'OUT', lat, lng, acc, currentOfficeId, dev]).then(function(res) {
+        callApi('checkIn', [sessionToken, 'OUT', currentOfficeId, lat, lng, acc, dev]).then(function(res) {
           btn.disabled = false;
           btn.textContent = 'Check Out Now';
           if (res.ok) {

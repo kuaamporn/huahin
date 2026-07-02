@@ -460,7 +460,7 @@
       var payload = selectedIdxs.map(function(idx) {
         var r = loadedRooms[idx];
         return {
-          roomId: r.room_id, guestName: r.guest_name, rent: r.rent,
+          roomId: r.room_id, bookingId: r.booking_id, guestName: r.guest_name, rent: r.rent,
           prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt, elecRate: r.elecRate,
           prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt, waterRate: r.waterRate,
           additionsAmt: r.additionsAmt, extraItems: r.extraItems, totalAmount: r.totalAmount
