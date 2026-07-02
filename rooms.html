@@ -738,6 +738,8 @@ function openBook(rid, date, prop, endDate){
   selBT = isLessThanMonth ? 'walkin' : 'monthly';
   var btns = document.querySelectorAll('.tbtn');
   btns.forEach(function(e,i){ e.classList.toggle('sel', isLessThanMonth ? i===1 : i===0); });
+  document.getElementById('mOtaBookingIdWrapper').classList.add('hidden');
+  document.getElementById('mOtaBookingId').value = '';
 
   document.getElementById('mGuest').value = '';
   document.getElementById('mNotes').value = '';
