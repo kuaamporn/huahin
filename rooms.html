@@ -1279,6 +1279,16 @@ function doMoveTenant(bookingId, oldRoomId) {
     option.textContent = r.displayName + ' (' + tl(r.roomType) + ')';
     sel.appendChild(option);
   });
+
+  sel.onchange = function() {
+    var r = ROOMS.find(function(x) { return x.roomId === this.value; }.bind(this));
+    if (r) {
+      document.getElementById('mrNewRate').value = r.rate || 0;
+      calcMrPreview();
+    }
+  };
+
+  calcMrPreview();
   showMrModal();
 }
 
@@ -1300,6 +1310,82 @@ async function confirmMoveRoom() {
   closeDetail();
   bootApp();
 }
+
+window.calcMrPreview = function() {
+  var bid = document.getElementById('mrBookingId').value;
+  var b = bookings.find(function(x) { return x.bookingId === bid; });
+  if (!b) return;
+
+  var rateToUse = parseFloat(document.getElementById('mrNewRate').value) || 0;
+  var previewEl = document.getElementById('mrPreview');
+  var today = todayThaiDateString();
+
+  if (today <= b.checkinDate) {
+    var chargeDiff = rateToUse - (b.rate || 0);
+    var txt = '<strong>Move before stay begins:</strong><br>' +
+              '• Current Rate: ฿' + (b.rate || 0).toLocaleString() + '<br>' +
+              '• Proposed Rate: ฿' + rateToUse.toLocaleString() + '<br>';
+    if (chargeDiff > 0) {
+      txt += '<span style="color:#d97706; font-weight:700;">Estimate Charge: +฿' + chargeDiff.toLocaleString() + '</span>';
+    } else if (chargeDiff < 0) {
+      txt += '<span style="color:#2563eb; font-weight:700;">Estimate Refund: -฿' + Math.abs(chargeDiff).toLocaleString() + '</span>';
+    } else {
+      txt += 'No price change.';
+    }
+    previewEl.innerHTML = txt;
+    previewEl.style.display = 'block';
+    return;
+  }
+
+  var d1 = new Date(b.checkinDate);
+  var d2 = new Date(b.checkoutDate);
+  var dt = new Date(today);
+
+  var totalNights = Math.round((d2 - d1) / 86400000);
+  var oldNights = Math.round((dt - d1) / 86400000);
+  var newNights = Math.round((d2 - dt) / 86400000);
+
+  if (oldNights <= 0 || newNights <= 0) {
+    previewEl.style.display = 'none';
+    return;
+  }
+
+  var rentOld = b.rate || 0;
+  var rentNew = rateToUse;
+  var oldTotal = b.rate || 0;
+  var newTotal = rateToUse;
+
+  if (b.bookingType === 'monthly') {
+    rentOld = Math.round(((b.rate || 0) / totalNights) * oldNights);
+    rentNew = Math.round((rateToUse / totalNights) * newNights);
+    oldTotal = b.rate || 0;
+    newTotal = rentOld + rentNew;
+  } else {
+    rentOld = oldNights * (b.rate || 0);
+    rentNew = newNights * rateToUse;
+    oldTotal = totalNights * (b.rate || 0);
+    newTotal = rentOld + rentNew;
+  }
+
+  var chargeDiff = newTotal - oldTotal;
+
+  var txt = '<strong>Mid-stay Split (Move Today):</strong><br>' +
+            '• Old Room (' + oldNights + ' nights): ฿' + rentOld.toLocaleString() + '<br>' +
+            '• New Room (' + newNights + ' nights): ฿' + rentNew.toLocaleString() + '<br>' +
+            '• Original Stay Total: ฿' + oldTotal.toLocaleString() + '<br>' +
+            '• Adjusted Stay Total: ฿' + newTotal.toLocaleString() + '<br>';
+
+  if (chargeDiff > 0) {
+    txt += '<span style="color:#d97706; font-weight:700;">Estimate Charge: +฿' + chargeDiff.toLocaleString() + '</span>';
+  } else if (chargeDiff < 0) {
+    txt += '<span style="color:#2563eb; font-weight:700;">Estimate Refund: -฿' + Math.abs(chargeDiff).toLocaleString() + '</span>';
+  } else {
+    txt += 'No price change.';
+  }
+
+  previewEl.innerHTML = txt;
+  previewEl.style.display = 'block';
+};
 
 function doEarlyMoveOut(bookingId, roomId) {
   var b = bookings.find(function(x) { return x.bookingId === bookingId; });
@@ -1460,12 +1546,13 @@ function submitChangeDates() {
       </div>
       <div class="fg" style="margin-bottom:12px;">
         <label class="fl" style="display:block; font-size:13px; color:var(--muted); margin-bottom:6px;">New Rate (฿/mo)</label>
-        <input class="fi" type="number" id="mrNewRate" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px;">
+        <input class="fi" type="number" id="mrNewRate" oninput="calcMrPreview()" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px;">
       </div>
       <div class="fg" style="margin-bottom:20px;">
         <label class="fl" style="display:block; font-size:13px; color:var(--muted); margin-bottom:6px;">Reason</label>
         <input class="fi" type="text" id="mrReason" placeholder="Optional..." style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px;">
       </div>
+      <div id="mrPreview" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#F8FAFC; border:1px dashed var(--border); font-size:12px; line-height:1.5; color:var(--text);"></div>
       <div style="display:flex; gap:10px; justify-content:flex-end;">
         <button class="btn btn-o" onclick="closeMoveRoom()">Cancel</button>
         <button class="btn btn-m" onclick="confirmMoveRoom()">✓ Move Room</button>

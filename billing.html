@@ -283,7 +283,37 @@
             '<td><input type="checkbox" class="chk-room" data-idx="' + idx + '" checked onchange="updateGenerateBtn()" /></td>' +
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td>' + escapeHtml(r.guest_name) + '</td>' +
-            '<td class="text-right"><input type="number" min="0" class="grid-input" id="rent_' + idx + '" value="' + r.rent + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
+            '<td class="text-right">' +
+              '<input type="number" min="0" class="grid-input" id="rent_' + idx + '" value="' + r.rent + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')">' +
+              (function() {
+                var checkoutDateStr = r.checkout_date;
+                var mo = document.getElementById('sel-month').value;
+                if (!checkoutDateStr || !mo) return '';
+
+                var parts = mo.split('-'); var y = parts[0]; var m = parts[1];
+                var lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
+                var monthEndTarget = y + '-' + m + '-' + String(lastDay).padStart(2, '0');
+
+                var nextM = parseInt(m) === 12 ? 1 : parseInt(m) + 1;
+                var nextY = parseInt(m) === 12 ? parseInt(y) + 1 : parseInt(y);
+                var nextLastDay = new Date(nextY, nextM, 0).getDate();
+                var nextMonthEndTarget = nextY + '-' + String(nextM).padStart(2, '0') + '-' + String(nextLastDay).padStart(2, '0');
+
+                if (checkoutDateStr >= monthEndTarget) return '';
+
+                var curD = new Date(checkoutDateStr);
+                var nightsToMonthEnd = Math.round((new Date(monthEndTarget) - curD) / 86400000);
+                var proRateMonthEnd = Math.round((r.rent / 30) * nightsToMonthEnd);
+
+                var nightsToNextMonthEnd = Math.round((new Date(nextMonthEndTarget) - curD) / 86400000);
+                var proRateNextMonthEnd = Math.round((r.rent / 30) * nightsToNextMonthEnd);
+
+                return '<div style="font-size:10px; margin-top:4px; line-height:1.2; text-align:left;">' +
+                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateMonthEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">Align to End (฿' + proRateMonthEnd.toLocaleString() + ')</a><br>' +
+                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateNextMonthEnd + ', \'' + nextMonthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">Align +1 Mo (฿' + proRateNextMonthEnd.toLocaleString() + ')</a>' +
+                '</div>';
+              })() +
+            '</td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" placeholder="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" style="width:65px" class="grid-input" id="erate_' + idx + '" value="' + (BILLING_SETTINGS[prop + '_default_electricity_rate'] || 8) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
@@ -330,6 +360,12 @@
       if (checkedBoxes.length === 0) return;
       var txnIds = Array.from(checkedBoxes).map(function(cb) { return cb.getAttribute('data-txn-id'); });
       window.open('batch-invoice.html?ids=' + txnIds.join(','), '_blank');
+    };
+
+    window.applyGridProRate = function(idx, amount, targetDate) {
+      document.getElementById('rent_' + idx).value = amount;
+      loadedRooms[idx].newCheckoutDate = targetDate;
+      calcRow(idx);
     };
 
     function calcRow(idx) {
@@ -461,6 +497,7 @@
         var r = loadedRooms[idx];
         return {
           roomId: r.room_id, bookingId: r.booking_id, guestName: r.guest_name, rent: r.rent,
+          newCheckoutDate: r.newCheckoutDate || null,
           prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt, elecRate: r.elecRate,
           prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt, waterRate: r.waterRate,
           additionsAmt: r.additionsAmt, extraItems: r.extraItems, totalAmount: r.totalAmount
