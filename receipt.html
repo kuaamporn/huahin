@@ -28,6 +28,7 @@
       flex-direction: column;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       page-break-after: always;
+      position: relative;
     }
 
     .a4-paper:last-of-type {
@@ -203,6 +204,24 @@
       .a4-paper { box-shadow: none; margin: 0; padding: 1.5cm 1.5cm; width: auto; height: auto; }
       .no-print-bar { display: none; }
       .editable-remark { border-bottom: none !important; background: transparent !important; }
+    }
+  </style>
+  <style>
+    .watermark-cancelled {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-25deg);
+      font-size: 80px;
+      font-weight: bold;
+      color: rgba(220, 38, 38, 0.12);
+      border: 10px solid rgba(220, 38, 38, 0.12);
+      padding: 15px 40px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -391,8 +410,10 @@
       var totalVal = r.amount || t.net_amount || t.amount;
       var totalTextThai = bahtText(totalVal);
 
+      var watermarkHtml = (r.status === 'cancelled') ? '<div class="watermark-cancelled">CANCELLED / ยกเลิก</div>' : '';
       return [
         '<div class="a4-paper">',
+        watermarkHtml,
         '  <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">',
         '    <img src="' + logoSrc + '" style="height: 60px; width: auto; object-fit: contain;" />',
         '    <div class="company-header" style="margin-bottom: 0;">',

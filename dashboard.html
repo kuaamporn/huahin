@@ -111,6 +111,34 @@
     </div>
 
     <!-- Bookings Analysis Bento Row -->
+    <div class="charts-row" style="margin-top: 24px;">
+      <div class="chart-box" style="flex: 1; overflow-x: auto;">
+        <h2>Utilities Profit/Loss Audit (Guest Revenue vs Government Bill)</h2>
+        <div class="muted" style="text-align: center; font-size: 12px; margin-bottom: 16px; font-family:'Source Sans 3',sans-serif;">
+          Comparing utility revenue collected from guests (฿8/unit Elec, ฿22/unit Water) against actual bills paid to the government.
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; font-family: inherit;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--line); text-align: left; background: rgba(15,118,110,0.02); font-weight:600;">
+              <th style="padding: 10px 8px; color: var(--muted);">Month</th>
+              <th style="padding: 10px 8px; text-align: right; color: var(--go);">Elec Rev (Guest)</th>
+              <th style="padding: 10px 8px; text-align: right; color: var(--warn);">Elec Bill (Gov)</th>
+              <th style="padding: 10px 8px; text-align: right; color: var(--go);">Water Rev (Guest)</th>
+              <th style="padding: 10px 8px; text-align: right; color: var(--warn);">Water Bill (Gov)</th>
+              <th style="padding: 10px 8px; text-align: right; color: var(--warn);">Water Treatment</th>
+              <th style="padding: 10px 8px; text-align: right; font-weight: bold; color: var(--ink);">Net Margin</th>
+            </tr>
+          </thead>
+          <tbody id="utilities-audit-table-body">
+            <tr>
+              <td colspan="7" class="muted" style="text-align: center; padding: 24px;">Loading utilities audit data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bookings Analysis Bento Row (moved down) -->
     <div class="charts-row">
       <div class="chart-box" style="flex: 1; display: flex; flex-direction: column;">
         <h2>Booking Source Distribution</h2>
@@ -239,7 +267,47 @@
 
       drawTrendChart(revPerMonth, expPerMonth);
       drawReceiptChart(receiptedRev, unreceiptedRev);
+      populateUtilitiesAudit(revCategories, expCategories, year);
       drawMatrix(revCategories, expCategories, revPerMonth, expPerMonth, receiptedByMonth, unreceiptedByMonth);
+    }
+
+    function populateUtilitiesAudit(revCategories, expCategories, year) {
+      var tbody = document.getElementById('utilities-audit-table-body');
+      if (!tbody) return;
+
+      var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      var html = '';
+      var hasData = false;
+
+      for (var m = 11; m >= 0; m--) {
+        var elecRev = (revCategories['electricity'] ? revCategories['electricity'][m] : 0) + (revCategories['utility'] ? revCategories['utility'][m] : 0);
+        var waterRev = revCategories['water'] ? revCategories['water'][m] : 0;
+
+        var elecExp = expCategories['electricity'] ? expCategories['electricity'][m] : 0;
+        var waterExp = expCategories['water'] ? expCategories['water'][m] : 0;
+        var treatmentExp = expCategories['water treatment'] ? expCategories['water treatment'][m] : 0;
+
+        if (elecRev === 0 && waterRev === 0 && elecExp === 0 && waterExp === 0 && treatmentExp === 0) {
+          continue;
+        }
+        hasData = true;
+
+        var netMargin = (elecRev + waterRev) - (elecExp + waterExp + treatmentExp);
+        var marginStyle = netMargin >= 0 ? 'color:#16a34a; font-weight:bold;' : 'color:#dc2626; font-weight:bold;';
+        var marginSign = netMargin >= 0 ? '+' : '';
+
+        html += '<tr style="border-bottom: 1px solid var(--line);">' +
+          '<td style="padding: 10px 8px; font-weight:600;">' + MONTH_NAMES[m] + ' ' + year + '</td>' +
+          '<td style="padding: 10px 8px; text-align:right; color:#16a34a;">฿' + elecRev.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+          '<td style="padding: 10px 8px; text-align:right; color:#dc2626;">฿' + elecExp.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+          '<td style="padding: 10px 8px; text-align:right; color:#16a34a;">฿' + waterRev.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+          '<td style="padding: 10px 8px; text-align:right; color:#dc2626;">฿' + waterExp.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+          '<td style="padding: 10px 8px; text-align:right; color:#dc2626;">฿' + treatmentExp.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+          '<td style="padding: 10px 8px; text-align:right; ' + marginStyle + '">฿' + marginSign + netMargin.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+        '</tr>';
+      }
+
+      tbody.innerHTML = hasData ? html : '<tr><td colspan="7" class="muted" style="text-align: center; padding: 24px;">No utilities data found for this year.</td></tr>';
     }
 
     function drawTrendChart(revPerMonth, expPerMonth) {

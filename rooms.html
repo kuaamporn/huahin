@@ -358,6 +358,18 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div class="fg"><label class="fl">Phone Number</label><input class="fi" type="text" id="cPhone" placeholder="e.g. 0812345678"></div>
     <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email" id="cEmail" placeholder="e.g. guest@example.com"></div>
     <div class="fg"><label class="fl">ID Card / Passport</label><input class="fi" type="text" id="cIdCard" placeholder="ID or Passport Number"></div>
+    <div class="fg"><label class="fl">Nationality</label><input class="fi" type="text" id="cNationality" placeholder="e.g. Thai, British, Russian"></div>
+    <div class="fg">
+      <label class="fl">Guest Status</label>
+      <select class="fs" id="cStatus" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff;" onchange="toggleBlacklistFields(this.value)">
+        <option value="active">Active</option>
+        <option value="blacklisted">🚨 Blacklisted / Warning</option>
+      </select>
+    </div>
+    <div class="fg hidden" id="cBlacklistReasonWrapper">
+      <label class="fl">Warning / Blacklist Reason</label>
+      <textarea class="fta" id="cBlacklistReason" style="height: 60px;" placeholder="Reason for warning/blacklist..."></textarea>
+    </div>
     <div class="fg"><label class="fl">Address</label><textarea class="fta" id="cAddress" style="height: 60px;" placeholder="Full mailing address..."></textarea></div>
     <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="cNotes" style="height: 60px;" placeholder="Special requests, preferences..."></textarea></div>
     <div class="cwarn" id="cus-warn"></div>
@@ -1005,6 +1017,17 @@ function showDetail(id){
   document.getElementById('detailContent').innerHTML =
     '<div class="dbadge '+b.propertyId+'">'+(b.propertyId==='precious'?'The Precious':'The Moment')+'</div>'+
     '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+escapeHtml(b.guestName||'-')+'</h2>'+
+    (function() {
+      var cusMatch = allCustomers.find(function(c) {
+        return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
+      });
+      if (cusMatch && cusMatch.status === 'blacklisted') {
+        return '<div style="background:#fee2e2; border:1px solid #fecaca; border-radius:12px; padding:10px; margin-bottom:12px; color:#991b1b; font-size:12px;">' +
+          '🚨 <strong>Warning: Blacklisted Guest</strong><br>Reason: <em>' + escapeHtml(cusMatch.blacklist_reason || 'No reason specified') + '</em>' +
+        '</div>';
+      }
+      return '';
+    })() +
     '<div class="df"><label>Room</label><span>'+(r?r.displayName:b.roomId)+' · '+(r?tl(r.roomType):'')+'</span></div>'+
     '<div class="df"><label>Check-in</label><span>'+(b.checkinDate||'-')+'</span></div>'+
     '<div class="df"><label>Check-out</label><span>'+(b.checkoutDate||'-')+'</span></div>'+
@@ -1019,8 +1042,20 @@ function showDetail(id){
     '<div class="dactions" style="flex-wrap:wrap;gap:8px 12px;">'+
       (b.status === 'CONFIRMED' ? '<button class="btn btn-p" onclick="checkInGuest(\''+b.bookingId+'\')">🛎️ Check In Guest</button>' : '')+
       (b.status === 'CONFIRMED' ? '<button class="btn btn-o" onclick="openChangeDatesModal(\''+b.bookingId+'\')">📅 Change Dates</button>' : '')+
+      (function() {
+        var cusMatch = allCustomers.find(function(c) {
+          return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
+        });
+        if (cusMatch) {
+          return '<button class="btn btn-o" onclick="openCustomerHistoryModal(\''+cusMatch.customer_id+'\', \''+escapeHtml(cusMatch.name)+'\')">📜 History Timeline</button>';
+        }
+        return '';
+      })() +
       '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">' + (b.status === 'CONFIRMED' ? '🗑 Cancel Reservation' : '🗑 Cancel Booking') + '</button>'+
-      '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">➕ Extend Stay</button>'+
+      (b.bookingType === 'monthly-draft' ?
+        (b.pendingTxnId ? '<button class="btn btn-m" onclick="openConfirmPaymentModal(\''+b.pendingTxnId+'\')">💵 Confirm Paid</button>' : '') :
+        '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">➕ Extend Stay</button>'
+      )+
       ((b.status === 'CHECKED_IN' && (b.bookingType==='monthly'||b.bookingType==='monthly-draft')) ?
         '<button class="btn btn-o" onclick="doMoveTenant(\''+b.bookingId+'\',\''+b.roomId+'\')">📦 Move Room</button>'+
         '<button class="btn btn-o" onclick="doEarlyMoveOut(\''+b.bookingId+'\',\''+b.roomId+'\')" style="color:var(--warn);border-color:var(--warn);">🚪 Early Move-out</button>'
@@ -1426,6 +1461,10 @@ function openCusModal() {
   document.getElementById('cIdCard').value = '';
   document.getElementById('cAddress').value = '';
   document.getElementById('cNotes').value = '';
+  document.getElementById('cNationality').value = '';
+  document.getElementById('cStatus').value = 'active';
+  document.getElementById('cBlacklistReason').value = '';
+  document.getElementById('cBlacklistReasonWrapper').classList.add('hidden');
   document.getElementById('cus-warn').textContent = '';
   show('cus-modal');
 }
@@ -1435,11 +1474,14 @@ function saveCustomer() {
   var phone = document.getElementById('cPhone').value.trim();
   var email = document.getElementById('cEmail').value.trim();
   var idCard = document.getElementById('cIdCard').value.trim();
+  var nationality = document.getElementById('cNationality').value.trim();
+  var status = document.getElementById('cStatus').value;
+  var blacklistReason = document.getElementById('cBlacklistReason').value.trim();
   var address = document.getElementById('cAddress').value.trim();
   var notes = document.getElementById('cNotes').value.trim();
   var warn = document.getElementById('cus-warn');
   if (!name) { warn.textContent = 'Full Name is required.'; return; }
-  callApi('roomsAddCustomer', [sessionToken, name, phone, email, idCard, address, notes]).then(function(res) {
+  callApi('roomsAddCustomer', [sessionToken, name, phone, email, idCard, address, notes, nationality, status, blacklistReason]).then(function(res) {
     if (!res.ok) { warn.textContent = res.error || 'Error saving customer.'; return; }
     document.getElementById('mGuest').value = name;
     loadDatalist();
@@ -1447,10 +1489,12 @@ function saveCustomer() {
     showToast('Guest created successfully!', 'ok');
   });
 }
+var allCustomers = [];
 function loadDatalist() {
   callApi('roomsGetCustomers', [sessionToken]).then(function(res) {
     if (res.ok) {
       var datalist = document.getElementById('guest-datalist');
+      allCustomers = res.customers || [];
       if (datalist) {
         datalist.innerHTML = (res.customers || []).map(function(c) {
           return '<option value="' + escapeHtml(c.name) + '">';
@@ -1531,6 +1575,122 @@ function submitChangeDates() {
     showToast('Network error: ' + err.message, 'err');
   });
 }
+
+window.openConfirmPaymentModal = function(txnId) {
+  document.getElementById('roomsPaymentTxnId').value = txnId;
+  document.getElementById('roomsPaymentChannel').value = 'cash';
+  document.getElementById('roomsPaymentBg').classList.remove('hidden');
+};
+
+window.closeConfirmPayment = function(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('roomsPaymentBg').classList.add('hidden');
+};
+
+window.submitConfirmPayment = function() {
+  var txnId = document.getElementById('roomsPaymentTxnId').value;
+  var channel = document.getElementById('roomsPaymentChannel').value;
+  var btn = document.querySelector('#roomsPaymentBg .btn-m');
+  btn.disabled = true;
+  btn.textContent = 'Confirming...';
+
+  callApi('billingConfirmPayment', [sessionToken, txnId, channel]).then(function(res) {
+    btn.disabled = false;
+    btn.textContent = '✓ Confirm';
+    if (res.ok) {
+      document.getElementById('roomsPaymentBg').classList.add('hidden');
+      closeDetail();
+      bootApp();
+    } else {
+      alert(res.error);
+    }
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = '✓ Confirm';
+    alert('Connection error: ' + err.message);
+  });
+};
+
+window.toggleBlacklistFields = function(status) {
+  var wrapper = document.getElementById('cBlacklistReasonWrapper');
+  if (status === 'blacklisted') {
+    wrapper.classList.remove('hidden');
+  } else {
+    wrapper.classList.add('hidden');
+  }
+};
+
+document.getElementById('mGuest').addEventListener('input', function(e) {
+  var val = this.value.trim();
+  var alertEl = document.getElementById('mGuestBlacklistAlert');
+  if (!alertEl) {
+    alertEl = document.createElement('div');
+    alertEl.id = 'mGuestBlacklistAlert';
+    alertEl.style.marginTop = '8px';
+    alertEl.style.padding = '12px';
+    alertEl.style.borderRadius = '12px';
+    alertEl.style.background = '#fef2f2';
+    alertEl.style.border = '1px solid #fee2e2';
+    alertEl.style.color = '#991b1b';
+    alertEl.style.fontSize = '13px';
+    alertEl.className = 'hidden';
+    this.parentNode.parentNode.appendChild(alertEl);
+  }
+  var match = allCustomers.find(function(c) {
+    return c.name && c.name.toLowerCase() === val.toLowerCase() && c.status === 'blacklisted';
+  });
+  if (match) {
+    var nat = match.nationality ? ' (' + match.nationality + ')' : '';
+    alertEl.innerHTML = '🚨 <strong>WARNING: BLACKLISTED GUEST</strong><br>Guest Name: <strong>' + escapeHtml(match.name) + nat + '</strong><br>Reason: <em>' + escapeHtml(match.blacklist_reason || 'No reason specified') + '</em>';
+    alertEl.classList.remove('hidden');
+  } else {
+    alertEl.classList.add('hidden');
+  }
+});
+
+window.openCustomerHistoryModal = function(customerId, customerName) {
+  document.getElementById('historyModalTitle').textContent = 'History: ' + customerName;
+  document.getElementById('historyCusId').value = customerId;
+  document.getElementById('historyNoteText').value = '';
+  var timelineContainer = document.getElementById('historyTimelineContent');
+  timelineContainer.innerHTML = '<div class="muted" style="text-align:center; padding:20px;">Loading history timeline...</div>';
+
+  callApi('roomsGetCustomerHistory', [sessionToken, customerId]).then(function(res) {
+    if (!res.ok) { timelineContainer.innerHTML = '<div class="error">' + escapeHtml(res.error) + '</div>'; return; }
+    var html = '';
+    (res.timeline || []).forEach(function(item) {
+      var typeLabel = item.type === 'note' ? '✍️ Note' : (item.type === 'checkin' ? '🔑 Check-in' : (item.type === 'checkout' ? '🚪 Check-out' : '💰 Paid'));
+      var typeBg = item.type === 'note' ? '#f3f4f6' : (item.type === 'checkin' ? '#ecfdf5' : '#eff6ff');
+      var typeColor = item.type === 'note' ? '#374151' : (item.type === 'checkin' ? '#065f46' : '#1e40af');
+
+      html += '<div style="margin-bottom:12px; padding:10px; border-radius:12px; background:'+typeBg+'; border:1px solid rgba(0,0,0,0.02);">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:4px;">' +
+          '<span style="font-weight:700; color:'+typeColor+'; text-transform:uppercase; letter-spacing:0.3px;">'+typeLabel+'</span>' +
+          '<span class="muted">'+item.date+'</span>' +
+        '</div>' +
+        '<div style="font-size:13px; font-weight:600; color:#1f2937;">'+escapeHtml(item.text)+'</div>' +
+      '</div>';
+    });
+    timelineContainer.innerHTML = html || '<div class="muted" style="text-align:center; padding:20px;">No timeline logs found.</div>';
+  });
+  document.getElementById('historyBg').classList.remove('hidden');
+};
+
+window.closeHistoryModal = function(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('historyBg').classList.add('hidden');
+};
+
+window.submitCustomerHistoryNote = function() {
+  var cId = document.getElementById('historyCusId').value;
+  var note = document.getElementById('historyNoteText').value.trim();
+  if (!note) return;
+  callApi('roomsAddCustomerLog', [sessionToken, cId, note]).then(function(res) {
+    if (res.ok) {
+      openCustomerHistoryModal(cId, document.getElementById('historyModalTitle').textContent.replace('History: ', ''));
+    }
+  });
+};
 </script>
 
   <div class="mbg hidden" id="moveRoomBg" onclick="closeMoveRoom(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
@@ -1643,6 +1803,52 @@ function submitChangeDates() {
       <div style="display:flex; gap:10px; justify-content:flex-end;">
         <button class="btn btn-o" onclick="closeChangeDates()">Cancel</button>
         <button class="btn btn-m" id="btn-save-cd" onclick="submitChangeDates()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="roomsPaymentBg" onclick="closeConfirmPayment(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:400px; max-width:90%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div class="mtitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;">Confirm Payment</div>
+        <button class="mx" onclick="closeConfirmPayment()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="roomsPaymentTxnId">
+      <div class="fg" style="margin-bottom:20px;">
+        <label class="fl" style="display:block; font-size:13px; color:var(--muted); margin-bottom:6px;">Payment Method</label>
+        <select class="fs" id="roomsPaymentChannel" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff;">
+          <option value="cash">Cash</option>
+          <option value="kb">KB</option>
+          <option value="scb">SCB</option>
+          <option value="maemanee">Mae Manee</option>
+          <option value="kshop">Kshop</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-o" onclick="closeConfirmPayment()">Cancel</button>
+        <button class="btn btn-m" onclick="submitConfirmPayment()">✓ Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="historyBg" onclick="closeHistoryModal(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:450px; max-width:95%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); display:flex; flex-direction:column; max-height:85vh;">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-shrink:0;">
+        <div class="mtitle" id="historyModalTitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;">Guest History</div>
+        <button class="mx" onclick="closeHistoryModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <input type="hidden" id="historyCusId">
+
+      <!-- Timeline Scroll Container -->
+      <div id="historyTimelineContent" style="flex:1; overflow-y:auto; margin-bottom:15px; padding-right:5px; max-height:45vh;"></div>
+
+      <!-- Add note section -->
+      <div style="border-top:1px solid var(--line); padding-top:15px; flex-shrink:0;">
+        <textarea class="fta" id="historyNoteText" style="height:55px; width:100%; margin-bottom:10px; border-radius:12px;" placeholder="Add custom staff remark (e.g. lost key, warned about noise)..."></textarea>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button class="btn btn-o" onclick="closeHistoryModal()">Close</button>
+          <button class="btn btn-m" onclick="submitCustomerHistoryNote()">✓ Add Note</button>
+        </div>
       </div>
     </div>
   </div>

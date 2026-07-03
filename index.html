@@ -46,6 +46,24 @@
       transform: scale(1.02);
       box-shadow: 0 8px 16px rgba(0,0,0,0.05);
     }
+    .utilities-banner {
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      border: 1px solid transparent;
+    }
+    .success-banner {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #15803d;
+    }
+    .warning-banner {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #b45309;
+    }
     label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; margin-top: 14px; }
     label:first-child { margin-top: 0; }
     input {
@@ -294,6 +312,31 @@
           </div>
         </div>
       </div>
+
+      <!-- UTILITIES COST CARD -->
+      <div class="card" id="utilities-cost-card">
+        <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
+          <span>💡</span> Monthly Government Bills / บิลค่าไฟ-ค่าน้ำหลวง
+        </h2>
+        <div id="utilities-saving-banner" class="utilities-banner hidden"></div>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--line); text-align: left;">
+                <th style="padding: 6px 4px; color: var(--muted);">Month</th>
+                <th style="padding: 6px 4px; text-align: right; color: var(--muted);">Electricity</th>
+                <th style="padding: 6px 4px; text-align: right; color: var(--muted);">Water</th>
+                <th style="padding: 6px 4px; text-align: right; color: var(--muted);">Treatment</th>
+              </tr>
+            </thead>
+            <tbody id="utilities-cost-table-body">
+              <tr>
+                <td colspan="4" class="muted" style="text-align: center; padding: 12px;">Loading cost logs...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -341,6 +384,7 @@
       applyNavLinkVisibility();
       loadEmployeeTasks();
       loadTodayStatus();
+      loadUtilitiesDashboard();
 
       var apiName = session.isAdmin ? 'adminListEmployeesWithRoles' : 'financeGetEmployees';
       callApi(apiName, [sessionToken]).then(function(rolesRes) {
@@ -515,11 +559,13 @@
             applyNavLinkVisibility();
             loadEmployeeTasks();
             loadTodayStatus();
+            loadUtilitiesDashboard();
           }).catch(function() {
             HuaHinSession.updateSessionRoles([]);
             applyNavLinkVisibility();
             loadEmployeeTasks();
             loadTodayStatus();
+            loadUtilitiesDashboard();
             applyNavLinkVisibility();
             loadEmployeeTasks();
           });
@@ -859,30 +905,57 @@
 
           function renderTasksList(taskList) {
             if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">None</div>';
+            var preciousTasks = taskList.filter(function(t) { return (t.propertyId || 'precious') === 'precious'; });
+            var momentTasks = taskList.filter(function(t) { return t.propertyId === 'moment'; });
+
+            var sortFn = function(a, b) {
+              return String(a.displayName).localeCompare(String(b.displayName), undefined, {numeric: true});
+            };
+            preciousTasks.sort(sortFn);
+            momentTasks.sort(sortFn);
+
             var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
-            taskList.forEach(function(task) {
-              var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
-              var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
-              var confirmBtn = '';
 
-              if (task.type === 'housekeeping') {
-                confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
-              } else {
-                confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
+            function renderGroup(groupTasks, propName, propColor, propBg) {
+              var groupHtml = '';
+              if (groupTasks.length > 0) {
+                groupHtml += '<div style="font-size:11px;font-weight:700;color:'+propColor+';text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;margin-bottom:4px;display:flex;align-items:center;gap:6px;">' +
+                  '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+propColor+';"></span>' +
+                  propName + ' (' + groupTasks.length + ')' +
+                '</div>';
+
+                groupTasks.forEach(function(task) {
+                  var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
+                  var badgeText = task.type === 'housekeeping' ? 'Housekeeping' : 'Technician';
+                  var confirmBtn = '';
+
+                  if (task.type === 'housekeeping') {
+                    confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ Confirm Cleaned</button>';
+                  } else {
+                    confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 Confirm Fixed</button>';
+                  }
+
+                  groupHtml += '<div style="background:'+badgeColor+'05;border-left:4px solid '+propColor+';border-radius:8px;padding:8px 12px;margin-bottom:6px;box-shadow:0 1px 2px rgba(0,0,0,0.02);">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                      '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
+                      '<div style="display:flex;align-items:center;gap:6px;">' +
+                        '<span style="background:'+propBg+';color:'+propColor+';padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:0.3px;">'+propName+'</span>' +
+                        '<span class="muted" style="font-size:11px;font-weight:600;">Room '+task.displayName+'</span>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div style="font-weight:600;font-size:14px;margin-top:4px;display:flex;align-items:center;">'+escapeHtml(task.title)+
+                      (task.date ? '<span style="font-size:11px; color:#b45309; background:#fef3c7; padding:2px 6px; border-radius:4px; margin-left:8px; font-weight:normal;">' + escapeHtml(task.date) + '</span>' : '') +
+                    '</div>' +
+                    (task.description ? '<div class="muted" style="font-size:12px;margin-top:2px;">'+escapeHtml(task.description)+'</div>' : '') +
+                    confirmBtn +
+                  '</div>';
+                });
               }
+              return groupHtml;
+            }
 
-              html += '<div style="background:'+badgeColor+'08;border-radius:8px;padding:8px 12px;margin-bottom:6px;">' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                  '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
-                  '<span class="muted" style="font-size:11px;margin-left:8px;">Room '+task.displayName+'</span>' +
-                '</div>' +
-                '<div style="font-weight:600;font-size:14px;margin-top:4px;display:flex;align-items:center;">'+escapeHtml(task.title)+
-                  (task.date ? '<span style="font-size:11px; color:#b45309; background:#fef3c7; padding:2px 6px; border-radius:4px; margin-left:8px; font-weight:normal;">' + escapeHtml(task.date) + '</span>' : '') +
-                '</div>' +
-                (task.description ? '<div class="muted" style="font-size:12px;margin-top:2px;">'+escapeHtml(task.description)+'</div>' : '') +
-                confirmBtn +
-              '</div>';
-            });
+            html += renderGroup(preciousTasks, 'Precious', '#3b82f6', 'rgba(59,130,246,0.1)');
+            html += renderGroup(momentTasks, 'Moment', '#0f766e', 'rgba(15,118,110,0.1)');
             html += '</div>';
             return html;
           }
@@ -940,6 +1013,73 @@
         }
       }).catch(function(err) {
         alert('Connection error: ' + err.message);
+      });
+    }
+
+    function loadUtilitiesDashboard() {
+      callApi('reportsGetMonthlyGovUtilities', [sessionToken]).then(function(res) {
+        if (!res.ok) return;
+        var list = res.history || [];
+        var tbody = document.getElementById('utilities-cost-table-body');
+        var banner = document.getElementById('utilities-saving-banner');
+        if (!tbody) return;
+
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:12px;">No utility bill entries recorded yet.</td></tr>';
+          if (banner) banner.classList.add('hidden');
+          return;
+        }
+
+        var html = '';
+        list.forEach(function(r) {
+          var elec = r.elec_amount || 0;
+          var water = r.water_amount || 0;
+          var treat = r.treatment_amount || 0;
+          var occupied = r.occupied_nights || 0;
+          var costPerNightText = occupied > 0 ? '(฿' + (elec / occupied).toFixed(0) + '/nt)' : '(—)';
+
+          html += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+            '<td style="padding:8px 4px;font-weight:600;">' + escapeHtml(r.billing_month) + '</td>' +
+            '<td style="padding:8px 4px;text-align:right;font-weight:600;">฿' + elec.toLocaleString(undefined, {maximumFractionDigits:0}) + ' <span style="font-size:10.5px;color:var(--muted); font-weight:normal; margin-left:2px;">' + costPerNightText + '</span></td>' +
+            '<td style="padding:8px 4px;text-align:right;">฿' + water.toLocaleString(undefined, {maximumFractionDigits:0}) + '</td>' +
+            '<td style="padding:8px 4px;text-align:right;">฿' + treat.toLocaleString(undefined, {maximumFractionDigits:0}) + '</td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+
+        if (list.length > 0 && banner) {
+          var latestElec = list[0].elec_amount || 0;
+          var latestOccupied = list[0].occupied_nights || 0;
+          var latestCostPerNight = latestOccupied > 0 ? (latestElec / latestOccupied) : 0;
+
+          if (latestCostPerNight > 150) {
+            banner.innerHTML = '⚠️ <strong>Energy Waste Warning!</strong> Average electricity cost per occupied room-night is <strong>฿' + latestCostPerNight.toFixed(0) + '</strong> (Target: < ฿150). Although occupancy is low, electricity is being wasted. Please check empty room ACs!';
+            banner.className = 'utilities-banner warning-banner';
+            banner.classList.remove('hidden');
+          } else if (list.length >= 2) {
+            var latestTotal = (list[0].elec_amount || 0) + (list[0].water_amount || 0) + (list[0].treatment_amount || 0);
+            var prevTotal = (list[1].elec_amount || 0) + (list[1].water_amount || 0) + (list[1].treatment_amount || 0);
+            if (prevTotal > 0) {
+              var diffPct = ((latestTotal - prevTotal) / prevTotal) * 100;
+              if (diffPct < 0) {
+                var savedPct = Math.abs(diffPct).toFixed(1);
+                banner.innerHTML = '📉 <strong>Great Job!</strong> Total utility cost decreased by <strong>' + savedPct + '%</strong> compared to last month. Thank you for saving energy!';
+                banner.className = 'utilities-banner success-banner';
+              } else {
+                var rosePct = diffPct.toFixed(1);
+                banner.innerHTML = '⚠️ <strong>Attention:</strong> Total utility cost increased by <strong>' + rosePct + '%</strong> compared to last month. Please turn off empty room ACs!';
+                banner.className = 'utilities-banner warning-banner';
+              }
+              banner.classList.remove('hidden');
+            } else {
+              banner.classList.add('hidden');
+            }
+          } else {
+            banner.classList.add('hidden');
+          }
+        } else if (banner) {
+          banner.classList.add('hidden');
+        }
       });
     }
   </script>

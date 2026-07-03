@@ -1166,7 +1166,7 @@
       'electricity', 'water', 'damage_fee', 'fitness', 'breakfast', 'other'
     ];
     var EXPENSE_CATS = [
-      'electricity', 'water', 'utility', 'repair', 'cleaning',
+      'electricity', 'water', 'water treatment', 'utility', 'repair', 'cleaning',
       'supplies', 'salaries', 'deposit_return', 'other'
     ];
 
@@ -1442,6 +1442,13 @@
             });
           }
 
+          var genBtn = document.getElementById('fm-generate-receipt-btn');
+          if (hasRent && hasDeposit) {
+            genBtn.textContent = 'Generate Receipt (Except Deposit)';
+          } else {
+            genBtn.textContent = 'Generate Receipt';
+          }
+
           var splitBtn = document.getElementById('fm-split-receipts-btn');
           if (hasRent && hasDeposit) {
             splitBtn.classList.remove('hidden');
@@ -1518,7 +1525,7 @@
 
             callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date]).then(function(res) {
               genBtn.disabled = false;
-              genBtn.textContent = 'Generate Receipt';
+              genBtn.textContent = (hasRent && hasDeposit) ? 'Generate Receipt (Except Deposit)' : 'Generate Receipt';
               if (res.ok) {
                 alert('Receipt generated successfully: ' + res.receipt_no);
                 callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
@@ -1537,7 +1544,7 @@
               }
             }).catch(function(err) {
               genBtn.disabled = false;
-              genBtn.textContent = 'Generate Receipt';
+              genBtn.textContent = (hasRent && hasDeposit) ? 'Generate Receipt (Except Deposit)' : 'Generate Receipt';
               errorEl.textContent = 'Connection error: ' + err.message;
               errorEl.classList.remove('hidden');
             });

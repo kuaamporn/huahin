@@ -878,16 +878,29 @@
         }
 
         var html = '';
+        var isOwner = HuaHinSession.hasRole('owner');
         list.forEach(function(r) {
+          var isCancelled = r.status === 'cancelled';
+          var nameStyle = isCancelled ? 'text-decoration:line-through; color:var(--muted);' : '';
+          var cancelLink = '';
+          if (isCancelled) {
+            cancelLink = '<span style="color:var(--warn); margin-left:12px; font-weight:600; font-size:12px; text-transform:uppercase;">Cancelled</span>';
+          } else if (isOwner) {
+            cancelLink = '<a class="action-link" href="#" onclick="doCancelReceipt(\'' + escapeHtml(r.receipt_no) + '\', event)" style="color:var(--warn); margin-left:12px;">Cancel</a>';
+          }
+
           html += '<tr>' +
-            '<td style="text-align:center;"><input type="checkbox" class="receipt-select" value="' + escapeHtml(r.receipt_no) + '" onchange="updateReceiptSelection()" /></td>' +
-            '<td><strong>' + escapeHtml(r.receipt_no) + '</strong></td>' +
+            '<td style="text-align:center;">' + (isCancelled ? '' : '<input type="checkbox" class="receipt-select" value="' + escapeHtml(r.receipt_no) + '" onchange="updateReceiptSelection()" />') + '</td>' +
+            '<td><strong style="' + nameStyle + '">' + escapeHtml(r.receipt_no) + '</strong></td>' +
             '<td>' + escapeHtml(r.receipt_date) + '</td>' +
             '<td>' + escapeHtml(r.room_name || '—') + '</td>' +
             '<td>' + escapeHtml(r.guest_or_vendor || '—') + '</td>' +
             '<td>' + escapeHtml(r.receipt_type) + '</td>' +
-            '<td style="text-align:right; font-weight:600;">฿' + r.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
-            '<td style="text-align:center;"><a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(r.receipt_no) + '" target="_blank">Print</a></td>' +
+            '<td style="text-align:right; font-weight:600; ' + nameStyle + '">฿' + r.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+            '<td style="text-align:center;">' +
+              '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(r.receipt_no) + '" target="_blank">Print</a>' +
+              cancelLink +
+            '</td>' +
           '</tr>';
         });
         tbody.innerHTML = html;
@@ -923,6 +936,22 @@
       if (nos.length === 0) return;
       window.open('receipt.html?receipt_no=' + encodeURIComponent(nos.join(',')), '_blank');
     }
+
+    window.doCancelReceipt = function(receiptNo, e) {
+      if (e) e.preventDefault();
+      if (!confirm('Are you sure you want to cancel receipt ' + receiptNo + '? This action is permanent, and will mark the receipt as void/cancelled.')) return;
+
+      callApi('financeCancelReceipt', [sessionToken, receiptNo]).then(function(res) {
+        if (res.ok) {
+          alert('Receipt ' + receiptNo + ' cancelled successfully.');
+          loadReceiptReport();
+        } else {
+          alert('Error: ' + res.error);
+        }
+      }).catch(function(err) {
+        alert('Connection error: ' + err.message);
+      });
+    };
 
     // --- INVOICE REPORT LOGIC ---
     function formatInvoiceDisplayId(inv) {

@@ -62,6 +62,10 @@
       <input type="checkbox" id="toggle-bank-checkbox" checked onchange="toggleBankInfo(this)" style="cursor: pointer;" />
       Show Bank Payment Info
     </label>
+    <label style="font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+      <input type="checkbox" id="toggle-qr-checkbox" checked onchange="toggleQrCode(this)" style="cursor: pointer;" />
+      Show QR Code
+    </label>
     <button class="btn-print" onclick="window.print()">Print Invoice</button>
   </div>
 
@@ -83,6 +87,13 @@
       var blocks = document.querySelectorAll('.bank-info');
       blocks.forEach(function(b) {
         b.style.visibility = checkbox.checked ? 'visible' : 'hidden';
+      });
+    }
+
+    function toggleQrCode(checkbox) {
+      var qrs = document.querySelectorAll('.qr-code-img-container');
+      qrs.forEach(function(q) {
+        q.style.display = checkbox.checked ? 'block' : 'none';
       });
     }
 
@@ -187,11 +198,17 @@
 
         var remarkText = 'Remark : *ค่าปรับกำหนดให้ชำระภายในวันที่ 5 ของเดือน หากชำระเกินกว่าวันที่ 5 ของเดือน จะปรับ 150 บาท/วัน โดยไม่มีข้อยกเว้น / *Rent and utility charges are to be paid by the 5th day of every month. 150 Baht per day will be charged in case of payment delays.';
 
-        var bankName = t.property_id === 'moment' ? 'บริษัท เดอะ โมเมนต์ หัวหิน จำกัด' : 'บริษัท เดอะ ซีรีน จำกัด';
-        var bankAcc = t.property_id === 'moment' ? '077-5-56100-2' : '485-2-43288-3';
         var bankInfoHtml =
-          'โอนเข้าบัญชี / Bank Transfer: <strong>' + bankName + '</strong><br>' +
-          'ธนาคารกสิกรไทย / KBank เลขบัญชี / A/C No: <strong>' + bankAcc + '</strong>';
+          '<div style="display:flex; justify-content:space-between; align-items:center; height:100%; width:100%; box-sizing:border-box;">' +
+            '<div>' +
+              'โอนเข้าบัญชี / Bank Transfer: <strong>ธนาคารกสิกรไทย / KBank</strong><br>' +
+              'ชื่อบัญชี / Account Name: <strong>กฤตพงศ์ เอื้ออัมพร / Krittapong Uaamporn</strong><br>' +
+              'เลขบัญชี / A/C No: <strong>002-1-36419-3</strong>' +
+            '</div>' +
+            '<div class="qr-code-img-container" style="padding-right:5px; flex-shrink:0;">' +
+              '<img src="KB Monthly QR.jpeg" style="height:55px; width:55px; display:block; object-fit:contain;" />' +
+            '</div>' +
+          '</div>';
 
         var slipHtml =
           '<div class="slip">' +
