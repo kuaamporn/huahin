@@ -277,6 +277,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <label class="fl">Guest / Tenant</label>
       <div style="display:flex;gap:8px;align-items:center;">
         <input class="fi" type="text" id="mGuest" list="guest-datalist" placeholder="Full name…" style="flex:1;">
+        <button class="btn btn-o hidden" id="editGuestBtn" type="button" style="padding:10px 14px;white-space:nowrap;font-size:13px;border-color:var(--primary);color:var(--primary);">✏️ Edit Guest</button>
         <button class="btn btn-o" type="button" onclick="openCusModal()" style="padding:10px 14px;white-space:nowrap;font-size:13px;border-color:var(--muted);color:var(--muted);">＋ New Guest</button>
       </div>
       <datalist id="guest-datalist"></datalist>
@@ -354,11 +355,28 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <h2 class="mtitle">Create New Guest</h2>
       <button class="mx" onclick="closeCusModal()">×</button>
     </div>
-    <div class="fg"><label class="fl">Full Name *</label><input class="fi" type="text" id="cName" required></div>
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <div style="flex:2;">
+        <label class="fl">First Name *</label>
+        <input class="fi" type="text" id="cFirstName" required placeholder="First name">
+      </div>
+      <div style="flex:1;">
+        <label class="fl">Middle Name</label>
+        <input class="fi" type="text" id="cMiddleName" placeholder="Middle name">
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px;">
+      <label class="fl">Last Name *</label>
+      <input class="fi" type="text" id="cLastName" required placeholder="Last name">
+    </div>
     <div class="fg"><label class="fl">Phone Number</label><input class="fi" type="text" id="cPhone" placeholder="e.g. 0812345678"></div>
     <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email" id="cEmail" placeholder="e.g. guest@example.com"></div>
     <div class="fg"><label class="fl">ID Card / Passport</label><input class="fi" type="text" id="cIdCard" placeholder="ID or Passport Number"></div>
-    <div class="fg"><label class="fl">Nationality</label><input class="fi" type="text" id="cNationality" placeholder="e.g. Thai, British, Russian"></div>
+    <div class="fg" style="margin-bottom:12px;">
+      <label class="fl">Nationality (ISO 3166-1 Alpha-3) *</label>
+      <input class="fi" type="text" id="cNationality" list="nationality-datalist" placeholder="e.g. THA, GBR, USA, RUS" maxlength="3" style="text-transform: uppercase;">
+      <div id="cNationalityLabel" style="font-size: 12px; margin-top: 4px; font-weight: 500;"></div>
+    </div>
     <div class="fg">
       <label class="fl">Guest Status</label>
       <select class="fs" id="cStatus" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff;" onchange="toggleBlacklistFields(this.value)">
@@ -1009,6 +1027,7 @@ function saveBook(){
 }
 
 function showDetail(id){
+  window.currentDetailBookingId = id;
   var b = bookings.filter(function(x){return x.bookingId===id;})[0];
   if(!b) return;
   var r = ROOMS.filter(function(x){return x.roomId===b.roomId;})[0];
@@ -1047,7 +1066,8 @@ function showDetail(id){
           return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
         });
         if (cusMatch) {
-          return '<button class="btn btn-o" onclick="openCustomerHistoryModal(\''+cusMatch.customer_id+'\', \''+escapeHtml(cusMatch.name)+'\')">📜 History Timeline</button>';
+          return '<button class="btn btn-o" onclick="openCustomerHistoryModal(\''+cusMatch.customer_id+'\', \''+escapeHtml(cusMatch.name)+'\')">📜 History Timeline</button>' +
+                 '<button class="btn btn-o" onclick="openEditCusModal(\''+cusMatch.customer_id+'\')">✏️ Edit Guest</button>';
         }
         return '';
       })() +
@@ -1130,6 +1150,18 @@ function checkInGuest(id) {
   var r = ROOMS.filter(function(x){ return x.roomId === b.roomId; })[0];
   document.getElementById('ciBookingId').value = id;
 
+  var matchedCustomer = allCustomers.find(function(c) {
+    return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
+  });
+  var passportWrapper = document.getElementById('ciMissingPassportWrapper');
+  var passportInput = document.getElementById('ciPassportInput');
+  passportInput.value = '';
+  if (!matchedCustomer || !matchedCustomer.id_card) {
+    passportWrapper.classList.remove('hidden');
+  } else {
+    passportWrapper.classList.add('hidden');
+  }
+
   var d1 = new Date(b.checkinDate);
   var d2 = new Date(b.checkoutDate);
   var nights = Math.round((d2 - d1) / 86400000);
@@ -1172,14 +1204,82 @@ function checkInGuest(id) {
 function closeCheckIn() { document.getElementById('checkinBg').classList.add('hidden'); }
 function confirmCheckIn() {
   var id = document.getElementById('ciBookingId').value;
-  var btn = document.getElementById('ciConfirmBtn');
-  btn.disabled = true; btn.textContent = 'Checking in…';
-  callApi('roomsCheckInGuest', [sessionToken, id]).then(function(res){
-    btn.disabled = false; btn.textContent = '🛎️ Check In & Record Revenue';
-    closeCheckIn();
-    if(res.ok){ closeDetail(); showToast('Guest checked in successfully!','ok'); bootApp(); }
-    else showToast(res.error||'Could not check in guest','err');
+  var b = bookings.find(function(x) { return x.bookingId === id; });
+  if (!b) return;
+
+  var matchedCustomer = allCustomers.find(function(c) {
+    return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
   });
+
+  var passportWrapper = document.getElementById('ciMissingPassportWrapper');
+  var passportInput = document.getElementById('ciPassportInput');
+
+  if (!passportWrapper.classList.contains('hidden')) {
+    var passportVal = passportInput.value.trim();
+    if (!passportVal) {
+      alert('Please collect and enter the guest\'s ID Card or Passport number.');
+      return;
+    }
+
+    var btn = document.getElementById('ciConfirmBtn');
+    btn.disabled = true; btn.textContent = 'Updating guest profile...';
+
+    if (matchedCustomer) {
+      callApi('roomsUpdateCustomer', [
+        sessionToken,
+        matchedCustomer.customer_id,
+        matchedCustomer.name,
+        matchedCustomer.phone,
+        matchedCustomer.email,
+        passportVal,
+        matchedCustomer.address,
+        matchedCustomer.notes,
+        matchedCustomer.nationality,
+        matchedCustomer.status,
+        matchedCustomer.blacklist_reason
+      ]).then(function(res) {
+        if (res.ok) {
+          proceedCheckIn();
+        } else {
+          btn.disabled = false; btn.textContent = '🛎️ Check In & Record Revenue';
+          alert('Failed to update guest profile: ' + res.error);
+        }
+      });
+    } else {
+      callApi('roomsAddCustomer', [
+        sessionToken,
+        b.guestName,
+        null,
+        null,
+        passportVal,
+        null,
+        null,
+        null,
+        'active',
+        null
+      ]).then(function(res) {
+        if (res.ok) {
+          proceedCheckIn();
+        } else {
+          btn.disabled = false; btn.textContent = '🛎️ Check In & Record Revenue';
+          alert('Failed to create guest profile: ' + res.error);
+        }
+      });
+    }
+  } else {
+    proceedCheckIn();
+  }
+
+  function proceedCheckIn() {
+    var btn = document.getElementById('ciConfirmBtn');
+    btn.disabled = true; btn.textContent = 'Checking in…';
+    callApi('roomsCheckInGuest', [sessionToken, id]).then(function(res){
+      btn.disabled = false; btn.textContent = '🛎️ Check In & Record Revenue';
+      closeCheckIn();
+      if(res.ok){ closeDetail(); showToast('Guest checked in successfully!','ok'); bootApp(); }
+      else showToast(res.error||'Could not check in guest','err');
+    });
+  }
 }
 
 function delBook(id){
@@ -1453,43 +1553,191 @@ async function confirmEarlyMoveOut() {
   bootApp();
 }
 
+var currentEditCustomerId = null;
+
+function parseFullName(fullName) {
+  var parts = (fullName || '').trim().split(/\s+/);
+  if (parts.length === 1) return { first: parts[0], middle: '', last: '' };
+  if (parts.length === 2) return { first: parts[0], middle: '', last: parts[1] };
+  return {
+    first: parts[0],
+    middle: parts.slice(1, -1).join(' '),
+    last: parts[parts.length - 1]
+  };
+}
+
 function openCusModal() {
+  currentEditCustomerId = null;
+  document.getElementById('cus-modal').querySelector('.mtitle').textContent = 'Create New Guest';
+
   var currentName = document.getElementById('mGuest').value.trim();
-  document.getElementById('cName').value = currentName;
+  var nameParts = parseFullName(currentName);
+  document.getElementById('cFirstName').value = nameParts.first;
+  document.getElementById('cMiddleName').value = nameParts.middle;
+  document.getElementById('cLastName').value = nameParts.last;
+
   document.getElementById('cPhone').value = '';
   document.getElementById('cEmail').value = '';
   document.getElementById('cIdCard').value = '';
   document.getElementById('cAddress').value = '';
   document.getElementById('cNotes').value = '';
   document.getElementById('cNationality').value = '';
+  document.getElementById('cNationalityLabel').textContent = '';
   document.getElementById('cStatus').value = 'active';
   document.getElementById('cBlacklistReason').value = '';
   document.getElementById('cBlacklistReasonWrapper').classList.add('hidden');
   document.getElementById('cus-warn').textContent = '';
   show('cus-modal');
 }
+
+window.openEditCusModal = function(customerId) {
+  var c = allCustomers.find(function(x) { return x.customer_id === customerId; });
+  if (!c) return;
+
+  currentEditCustomerId = customerId;
+  document.getElementById('cus-modal').querySelector('.mtitle').textContent = 'Edit Guest Profile';
+
+  var nameParts = parseFullName(c.name);
+  document.getElementById('cFirstName').value = nameParts.first;
+  document.getElementById('cMiddleName').value = nameParts.middle;
+  document.getElementById('cLastName').value = nameParts.last;
+
+  document.getElementById('cPhone').value = c.phone || '';
+  document.getElementById('cEmail').value = c.email || '';
+  document.getElementById('cIdCard').value = c.id_card || '';
+
+  var code = (c.nationality || '').toUpperCase().trim();
+  document.getElementById('cNationality').value = code;
+  var label = document.getElementById('cNationalityLabel');
+  if (code && ISO_COUNTRIES[code]) {
+    label.textContent = '✈️ ' + ISO_COUNTRIES[code].name + ' (' + ISO_COUNTRIES[code].nationality + ')';
+    label.style.color = 'var(--primary)';
+  } else {
+    label.textContent = '';
+  }
+
+  document.getElementById('cStatus').value = c.status || 'active';
+  document.getElementById('cBlacklistReason').value = c.blacklist_reason || '';
+  if (c.status === 'blacklisted') {
+    document.getElementById('cBlacklistReasonWrapper').classList.remove('hidden');
+  } else {
+    document.getElementById('cBlacklistReasonWrapper').classList.add('hidden');
+  }
+
+  document.getElementById('cAddress').value = c.address || '';
+  document.getElementById('cNotes').value = c.notes || '';
+  document.getElementById('cus-warn').textContent = '';
+  show('cus-modal');
+};
+
 function closeCusModal() { hide('cus-modal'); }
+
 function saveCustomer() {
-  var name = document.getElementById('cName').value.trim();
+  var firstName = document.getElementById('cFirstName').value.trim();
+  var middleName = document.getElementById('cMiddleName').value.trim();
+  var lastName = document.getElementById('cLastName').value.trim();
+
   var phone = document.getElementById('cPhone').value.trim();
   var email = document.getElementById('cEmail').value.trim();
   var idCard = document.getElementById('cIdCard').value.trim();
-  var nationality = document.getElementById('cNationality').value.trim();
+  var nationality = document.getElementById('cNationality').value.trim().toUpperCase();
   var status = document.getElementById('cStatus').value;
   var blacklistReason = document.getElementById('cBlacklistReason').value.trim();
   var address = document.getElementById('cAddress').value.trim();
   var notes = document.getElementById('cNotes').value.trim();
   var warn = document.getElementById('cus-warn');
-  if (!name) { warn.textContent = 'Full Name is required.'; return; }
-  callApi('roomsAddCustomer', [sessionToken, name, phone, email, idCard, address, notes, nationality, status, blacklistReason]).then(function(res) {
+
+  if (!firstName || !lastName) {
+    warn.textContent = 'First Name and Last Name are required.';
+    return;
+  }
+
+  if (nationality && !/^[A-Za-z]{3}$/.test(nationality)) {
+    warn.textContent = 'Nationality must be a 3-letter ISO code (e.g. THA, GBR).';
+    return;
+  }
+
+  var name = [firstName, middleName, lastName].filter(Boolean).join(' ');
+
+  var action = currentEditCustomerId ? 'roomsUpdateCustomer' : 'roomsAddCustomer';
+  var params = currentEditCustomerId
+    ? [sessionToken, currentEditCustomerId, name, phone, email, idCard, address, notes, nationality, status, blacklistReason]
+    : [sessionToken, name, phone, email, idCard, address, notes, nationality, status, blacklistReason];
+
+  callApi(action, params).then(function(res) {
     if (!res.ok) { warn.textContent = res.error || 'Error saving customer.'; return; }
     document.getElementById('mGuest').value = name;
-    loadDatalist();
     hide('cus-modal');
-    showToast('Guest created successfully!', 'ok');
+    showToast(currentEditCustomerId ? 'Guest updated successfully!' : 'Guest created successfully!', 'ok');
+
+    // Reload list and UI
+    callApi('roomsGetCustomers', [sessionToken]).then(function(cRes) {
+      if (cRes.ok) {
+        allCustomers = cRes.customers || [];
+        var datalist = document.getElementById('guest-datalist');
+        if (datalist) {
+          datalist.innerHTML = allCustomers.map(function(c) {
+            return '<option value="' + escapeHtml(c.name) + '">';
+          }).join('');
+        }
+
+        // Trigger dynamic edit button update on current input
+        var event = new Event('input');
+        document.getElementById('mGuest').dispatchEvent(event);
+
+        bootApp();
+
+        if (currentEditCustomerId && window.currentDetailBookingId) {
+          showDetail(window.currentDetailBookingId);
+        }
+      }
+    });
   });
 }
 var allCustomers = [];
+
+var ISO_COUNTRIES = {
+  "THA": { name: "Thailand", nationality: "Thai" },
+  "GBR": { name: "United Kingdom", nationality: "British" },
+  "USA": { name: "United States", nationality: "American" },
+  "RUS": { name: "Russia", nationality: "Russian" },
+  "CHN": { name: "China", nationality: "Chinese" },
+  "DEU": { name: "Germany", nationality: "German" },
+  "FRA": { name: "France", nationality: "French" },
+  "JPN": { name: "Japan", nationality: "Japanese" },
+  "KOR": { name: "South Korea", nationality: "Korean" },
+  "AUS": { name: "Australia", nationality: "Australian" },
+  "CAN": { name: "Canada", nationality: "Canadian" },
+  "IND": { name: "India", nationality: "Indian" },
+  "SGP": { name: "Singapore", nationality: "Singaporean" },
+  "MYS": { name: "Malaysia", nationality: "Malaysian" },
+  "MMR": { name: "Myanmar", nationality: "Burmese" },
+  "KHM": { name: "Cambodia", nationality: "Cambodian" },
+  "LAO": { name: "Laos", nationality: "Laotian" },
+  "VNM": { name: "Vietnam", nationality: "Vietnamese" },
+  "PHL": { name: "Philippines", nationality: "Filipino" },
+  "IDN": { name: "Indonesia", nationality: "Indonesian" },
+  "BRN": { name: "Brunei", nationality: "Bruneian" },
+  "SWE": { name: "Sweden", nationality: "Swedish" },
+  "NOR": { name: "Norway", nationality: "Norwegian" },
+  "DNK": { name: "Denmark", nationality: "Danish" },
+  "FIN": { name: "Finland", nationality: "Finnish" },
+  "CHE": { name: "Switzerland", nationality: "Swiss" },
+  "ITA": { name: "Italy", nationality: "Italian" },
+  "ESP": { name: "Spain", nationality: "Spanish" },
+  "NLD": { name: "Netherlands", nationality: "Dutch" },
+  "IRL": { name: "Ireland", nationality: "Irish" },
+  "AUT": { name: "Austria", nationality: "Austrian" },
+  "BEL": { name: "Belgium", nationality: "Belgian" },
+  "NZL": { name: "New Zealand", nationality: "New Zealander" },
+  "ZAF": { name: "South Africa", nationality: "South African" },
+  "HKG": { name: "Hong Kong", nationality: "Hong Konger" },
+  "TWN": { name: "Taiwan", nationality: "Taiwanese" },
+  "ISR": { name: "Israel", nationality: "Israeli" },
+  "ARE": { name: "United Arab Emirates", nationality: "Emirati" },
+  "SAU": { name: "Saudi Arabia", nationality: "Saudi" }
+};
+
 function loadDatalist() {
   callApi('roomsGetCustomers', [sessionToken]).then(function(res) {
     if (res.ok) {
@@ -1502,7 +1750,30 @@ function loadDatalist() {
       }
     }
   });
+
+  var natDatalist = document.getElementById('nationality-datalist');
+  if (natDatalist && !natDatalist.children.length) {
+    var html = '';
+    Object.keys(ISO_COUNTRIES).forEach(function(code) {
+      html += '<option value="' + code + '">' + escapeHtml(ISO_COUNTRIES[code].name + ' (' + ISO_COUNTRIES[code].nationality + ')') + '</option>';
+    });
+    natDatalist.innerHTML = html;
+  }
 }
+
+document.getElementById('cNationality').addEventListener('input', function(e) {
+  var code = this.value.toUpperCase().trim();
+  var label = document.getElementById('cNationalityLabel');
+  if (ISO_COUNTRIES[code]) {
+    label.textContent = '✈️ ' + ISO_COUNTRIES[code].name + ' (' + ISO_COUNTRIES[code].nationality + ')';
+    label.style.color = 'var(--primary)';
+  } else if (code.length === 3) {
+    label.textContent = '❌ Invalid ISO code';
+    label.style.color = 'var(--warn)';
+  } else {
+    label.textContent = '';
+  }
+});
 
 function openChangeDatesModal(id) {
   var b = bookings.find(function(x) { return x.bookingId === id; });
@@ -1637,9 +1908,20 @@ document.getElementById('mGuest').addEventListener('input', function(e) {
     this.parentNode.parentNode.appendChild(alertEl);
   }
   var match = allCustomers.find(function(c) {
-    return c.name && c.name.toLowerCase() === val.toLowerCase() && c.status === 'blacklisted';
+    return c.name && c.name.toLowerCase() === val.toLowerCase();
   });
-  if (match) {
+
+  var editBtn = document.getElementById('editGuestBtn');
+  if (editBtn) {
+    if (match) {
+      editBtn.classList.remove('hidden');
+      editBtn.onclick = function() { openEditCusModal(match.customer_id); };
+    } else {
+      editBtn.classList.add('hidden');
+    }
+  }
+
+  if (match && match.status === 'blacklisted') {
     var nat = match.nationality ? ' (' + match.nationality + ')' : '';
     alertEl.innerHTML = '🚨 <strong>WARNING: BLACKLISTED GUEST</strong><br>Guest Name: <strong>' + escapeHtml(match.name) + nat + '</strong><br>Reason: <em>' + escapeHtml(match.blacklist_reason || 'No reason specified') + '</em>';
     alertEl.classList.remove('hidden');
@@ -1750,6 +2032,11 @@ window.submitCustomerHistoryNote = function() {
       </div>
       <input type="hidden" id="ciBookingId">
       <div id="ciDetails" style="margin-bottom:16px;"></div>
+      <div id="ciMissingPassportWrapper" class="fg hidden" style="margin-bottom:16px; background:#fff8e1; border:1px solid #ffe082; padding:12px; border-radius:12px;">
+        <label class="fl" style="color:#b78103; font-weight:bold; margin-top:0;">⚠️ Missing ID Card / Passport *</label>
+        <span style="font-size:12px; color:#5d4037; display:block; margin-bottom:8px;">Please collect and record the guest's passport/ID card number to proceed:</span>
+        <input class="fi" type="text" id="ciPassportInput" placeholder="Enter Passport or ID Number" style="background:#fff; border-color:#d7ccc8; margin-bottom:0;">
+      </div>
       <p style="font-size:13px; color:var(--warn); margin-bottom:20px;">Checking in records the remaining balance as paid revenue in Finance now.</p>
       <div style="display:flex; justify-content:flex-end; gap:12px;">
         <button class="btn btn-o" onclick="closeCheckIn()" style="padding:8px 16px;">Cancel</button>
@@ -1757,6 +2044,7 @@ window.submitCustomerHistoryNote = function() {
       </div>
     </div>
   </div>
+  <datalist id="nationality-datalist"></datalist>
 
   <div class="mbg hidden" id="emoBg" onclick="closeEarlyMoveOut()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
     <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:450px; max-width:90%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">

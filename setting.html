@@ -158,6 +158,20 @@
         <input type="text" id="expense_categories" placeholder="e.g. utility, maintenance, salary, other" />
       </div>
 
+      <!-- Card 2.5: Notice & Warning Settings -->
+      <div class="card-section">
+        <h2 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:8px;">Complaint & Warning Notice Configuration (Thai Labor Law)</h2>
+
+        <label>Warning Strike Limit</label>
+        <input type="number" id="notice_strike_limit" min="1" placeholder="3" />
+
+        <label>Warning Rolling Window (days)</label>
+        <input type="number" id="notice_rolling_days" min="1" placeholder="365" />
+
+        <label>Mistake Categories (comma separated)</label>
+        <input type="text" id="notice_categories" placeholder="Cleaning Negligence, Late/Absent, Customer Service Issue, Property/Keycard Damage, Policy Violation" />
+      </div>
+
       <!-- Settings Action Buttons -->
       <div style="display:flex; gap:12px; margin-bottom:32px;">
         <button id="btn-save-settings" class="btn-primary">Save Configuration</button>
@@ -279,7 +293,8 @@
       'moment_company_address_th', 'moment_company_address_en',
       'moment_company_tax_id', 'moment_company_tel',
       'moment_default_electricity_rate', 'moment_default_water_rate', 'moment_default_keycard_deposit',
-      'revenue_categories', 'expense_categories'
+      'revenue_categories', 'expense_categories',
+      'notice_strike_limit', 'notice_rolling_days', 'notice_categories'
     ];
 
     function loadSettings() {

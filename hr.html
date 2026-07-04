@@ -79,6 +79,8 @@
     }
     .card-section:hover { box-shadow: 0 8px 16px rgba(0,0,0,.05); }
     .card-section h2 { font-size: 15px; margin: 0 0 14px; font-family: 'Lexend', sans-serif; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
 
     .btn-secondary {
       background: transparent; color: var(--ink); border: 1px solid var(--line);
@@ -134,6 +136,7 @@
         <button class="nav-tab hidden" id="tab-leaves">Leave &amp; Swap Approvals</button>
         <button class="nav-tab" id="tab-account">My Account</button>
         <button class="nav-tab hidden" id="tab-roles">Roles</button>
+        <button class="nav-tab hidden" id="tab-notices">Complaints &amp; Notices</button>
       </div>
     </div>
 
@@ -352,6 +355,73 @@
       </table>
       </div>
     </div>
+
+    <!-- ===================== COMPLAINTS & NOTICES ===================== -->
+    <div id="panel-notices" class="hidden">
+      <h1>Customer Complaints &amp; Warnings</h1>
+      <div class="sub">Log guest complaints, upload picture evidence, and assign to employees as written warnings under Thai Labor Law.</div>
+
+      <div class="grid-2">
+        <!-- Form Card -->
+        <div class="card-section" style="margin-bottom:0;">
+          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--go); border-bottom:1px solid var(--line); padding-bottom:8px;">Log Customer Complaint</h3>
+
+          <label>Incident Date</label>
+          <input type="date" id="notice-incident-date" />
+
+          <label>Mistake Category</label>
+          <select id="notice-category" style="width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; font-family: inherit; margin-bottom: 12px; outline: none; background:#fff;">
+            <option value="">-- Select Category --</option>
+          </select>
+
+          <label>Employees Responsible</label>
+          <div id="notice-employee-checkboxes" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 12px; background:#fff; display:flex; flex-direction:column; gap:8px;">
+            <!-- Javascript loaded -->
+          </div>
+
+          <label>Incident Description</label>
+          <textarea id="notice-description" style="width: 100%; height: 80px; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; font-family: inherit; margin-bottom: 12px; outline: none; resize:vertical;"></textarea>
+
+          <label>Attach Picture Evidence</label>
+          <input type="file" id="notice-file-input" accept="image/*" style="margin-bottom:12px; font-size:13px;" />
+          <canvas id="notice-compress-canvas" style="display:none;"></canvas>
+
+          <div style="display:flex; gap:12px; align-items:center;">
+            <button class="btn-primary" id="btn-save-notice" style="margin-top:0;">Log &amp; Send Notice</button>
+            <div id="notice-save-status"></div>
+          </div>
+        </div>
+
+        <!-- History Card -->
+        <div class="card-section" style="margin-bottom:0; display:flex; flex-direction:column;">
+          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px;">Complaints Log</h3>
+          <div style="overflow-x:auto; flex:1;">
+            <table style="min-width: 500px;">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Evidence</th>
+                  <th>Assignments &amp; Status</th>
+                </tr>
+              </thead>
+              <tbody id="notices-table-body">
+                <tr><td colspan="5" class="muted" style="text-align:center;">No complaints logged yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Viewer Modal overlay -->
+    <div id="image-viewer-modal" class="modal-overlay hidden" onclick="hide('image-viewer-modal')">
+      <div style="position:relative; max-width:90%; max-height:90%;">
+        <img id="image-viewer-img" src="" style="max-width:100%; max-height:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); object-fit:contain;" />
+      </div>
+    </div>
+
   </div>
 
   <!-- ===================== RESET PASSWORD MODAL ===================== -->
@@ -516,11 +586,11 @@
     document.getElementById('refresh-btn').addEventListener('click', loadToday);
 
     // ===================== TAB SWITCHING =====================
-    var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', leaves: 'panel-leaves', account: 'panel-account', roles: 'panel-roles' };
-    var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles' };
+    var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', leaves: 'panel-leaves', account: 'panel-account', roles: 'panel-roles', notices: 'panel-notices' };
+    var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles', notices: 'tab-notices' };
 
     function switchTab(name) {
-      if ((name === 'employees' || name === 'roles' || name === 'leaves') && !hasRole('owner')) {
+      if ((name === 'employees' || name === 'roles' || name === 'leaves' || name === 'notices') && !hasRole('owner')) {
         switchTab('checkins');
         return;
       }
@@ -529,6 +599,7 @@
         document.getElementById(tabs[key]).classList.toggle('active', key === name);
       });
       if (name === 'employees') loadEmployees();
+      if (name === 'notices') loadComplaints();
       if (name === 'leaves') loadPendingApprovals();
       if (name === 'attendance') {
         if (!document.getElementById('attendance-date').value) {
@@ -561,6 +632,7 @@
     document.getElementById('tab-leaves').addEventListener('click', function() { switchTab('leaves'); });
     document.getElementById('tab-account').addEventListener('click', function() { switchTab('account'); });
     document.getElementById('tab-roles').addEventListener('click', function() { switchTab('roles'); });
+    document.getElementById('tab-notices').addEventListener('click', function() { switchTab('notices'); });
 
     // ===================== ADD EMPLOYEE =====================
     document.getElementById('add-employee-btn').addEventListener('click', function() {
@@ -726,8 +798,9 @@
             });
             tdAction.appendChild(resetBtn);
 
+            var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ Termination Warning</span>' : '';
             tr.innerHTML =
-              '<td>' + emp.name + '</td>' +
+              '<td>' + emp.name + warningBadge + '</td>' +
               '<td>' + emp.username + '</td>' +
               '<td>' + roleLabel + '</td>' +
               '<td>' + statusLabel + '</td>';
@@ -1241,6 +1314,7 @@
       document.getElementById('tab-roles').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-employees').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-leaves').classList.toggle('hidden', !isOwner);
+      document.getElementById('tab-notices').classList.toggle('hidden', !isOwner);
     }
 
     // ===================== ROLES =====================
@@ -1329,6 +1403,198 @@
         document.getElementById('roles-modal-error').textContent = 'Failed to save: ' + err.message;
         show('roles-modal-error');
       });
+    });
+
+    // ===================== CUSTOMER COMPLAINTS / NOTICES =====================
+
+    function loadComplaints() {
+      // 1. Load dynamic mistake categories from settings
+      callApi('financeGetSettings', [token]).then(function(res) {
+        if (res.ok && res.settings) {
+          var catsStr = res.settings.notice_categories || 'Cleaning Negligence,Late/Absent,Customer Service Issue,Property/Keycard Damage,Policy Violation';
+          var select = document.getElementById('notice-category');
+          select.innerHTML = '<option value="">-- Select Category --</option>';
+          catsStr.split(',').forEach(function(cat) {
+            var trimmed = cat.trim();
+            if (trimmed) {
+              var opt = document.createElement('option');
+              opt.value = trimmed;
+              opt.textContent = trimmed;
+              select.appendChild(opt);
+            }
+          });
+        }
+      });
+
+      // 2. Load employees checkbox list
+      callApi('financeGetEmployees', [token]).then(function(res) {
+        if (res.ok && res.employees) {
+          var container = document.getElementById('notice-employee-checkboxes');
+          container.innerHTML = '';
+          res.employees.forEach(function(emp) {
+            var label = document.createElement('label');
+            label.style.display = 'flex';
+            label.style.alignItems = 'center';
+            label.style.gap = '8px';
+            label.style.margin = '0';
+
+            var cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = emp.employee_id;
+            cb.className = 'notice-emp-cb';
+            cb.style.width = 'auto';
+
+            var nameSpan = document.createElement('span');
+            nameSpan.textContent = emp.name + ' (' + emp.username + ')';
+            nameSpan.style.fontSize = '14px';
+            nameSpan.style.color = 'var(--ink)';
+
+            label.appendChild(cb);
+            label.appendChild(nameSpan);
+            container.appendChild(label);
+          });
+        }
+      });
+
+      // 3. Load past complaints log
+      callApi('ownerListComplaints', [token]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        var tbody = document.getElementById('notices-table-body');
+        tbody.innerHTML = '';
+        var list = res.complaints || [];
+        if (!list.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px;">No complaints logged yet.</td></tr>';
+          return;
+        }
+        list.forEach(function(c) {
+          var tr = document.createElement('tr');
+
+          var imgTd = document.createElement('td');
+          if (c.imageBase64) {
+            var img = document.createElement('img');
+            img.src = c.imageBase64;
+            img.style.height = '40px';
+            img.style.width = '40px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '6px';
+            img.style.cursor = 'pointer';
+            img.style.border = '1px solid var(--line)';
+            img.addEventListener('click', function() {
+              document.getElementById('image-viewer-img').src = c.imageBase64;
+              show('image-viewer-modal');
+            });
+            imgTd.appendChild(img);
+          } else {
+            imgTd.innerHTML = '<span class="muted">—</span>';
+          }
+
+          var assignDivs = c.assignments.map(function(a) {
+            var badgeClass = a.acknowledgedAt ? 'pill ok' : 'pill flag';
+            var badgeText = a.acknowledgedAt ? 'Acknowledged' : 'Pending';
+            var ackTime = a.acknowledgedAt ? '<div class="muted" style="font-size:10px;">At: ' + a.acknowledgedAt.slice(0, 16).replace('T', ' ') + '</div>' : '';
+            return '<div style="margin-bottom:8px;">' +
+              '<strong>' + escapeHtml(a.employeeName) + '</strong> ' +
+              '<span class="' + badgeClass + '" style="font-size:10px; padding:2px 6px;">' + badgeText + '</span>' +
+              ackTime +
+            '</div>';
+          }).join('');
+
+          tr.innerHTML =
+            '<td>' + c.incidentDate + '</td>' +
+            '<td><strong>' + escapeHtml(c.category) + '</strong></td>' +
+            '<td style="white-space:pre-wrap; max-width:250px; font-size:12px;">' + escapeHtml(c.description) + '</td>';
+
+          tr.appendChild(imgTd);
+
+          var assignTd = document.createElement('td');
+          assignTd.innerHTML = assignDivs || '<span class="muted">No assignments</span>';
+          tr.appendChild(assignTd);
+
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    document.getElementById('btn-save-notice').addEventListener('click', function() {
+      var date = document.getElementById('notice-incident-date').value;
+      var cat = document.getElementById('notice-category').value;
+      var desc = document.getElementById('notice-description').value.trim();
+      var fileInput = document.getElementById('notice-file-input');
+      var statusEl = document.getElementById('notice-save-status');
+
+      var empIds = [];
+      document.querySelectorAll('.notice-emp-cb').forEach(function(cb) {
+        if (cb.checked) empIds.push(cb.value);
+      });
+
+      if (!date || !cat || !desc || !empIds.length) {
+        statusEl.textContent = 'Please fill out date, category, description, and select at least one employee.';
+        statusEl.className = 'error';
+        show('notice-save-status');
+        return;
+      }
+
+      statusEl.textContent = 'Saving complaint...';
+      statusEl.className = 'success';
+      show('notice-save-status');
+
+      var proceedSave = function(base64Data) {
+        callApi('ownerCreateComplaint', [token, date, cat, desc, base64Data, empIds]).then(function(res) {
+          if (res.ok) {
+            statusEl.textContent = 'Complaint logged and warning sent successfully!';
+            statusEl.className = 'success';
+            document.getElementById('notice-incident-date').value = '';
+            document.getElementById('notice-category').value = '';
+            document.getElementById('notice-description').value = '';
+            fileInput.value = '';
+            document.querySelectorAll('.notice-emp-cb').forEach(function(cb) { cb.checked = false; });
+            loadComplaints();
+            setTimeout(function() { hide('notice-save-status'); }, 3000);
+          } else {
+            statusEl.textContent = 'Error: ' + res.error;
+            statusEl.className = 'error';
+          }
+        }).catch(function(e) {
+          statusEl.textContent = 'Connection error: ' + e.message;
+          statusEl.className = 'error';
+        });
+      };
+
+      if (fileInput.files.length > 0) {
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var canvas = document.getElementById('notice-compress-canvas');
+            var ctx = canvas.getContext('2d');
+
+            var max_w = 800;
+            var max_h = 800;
+            var w = img.width;
+            var h = img.height;
+            if (w > max_w || h > max_h) {
+              if (w > h) {
+                h = Math.round((h * max_w) / w);
+                w = max_w;
+              } else {
+                w = Math.round((w * max_h) / h);
+                h = max_h;
+              }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+
+            var base64 = canvas.toDataURL('image/jpeg', 0.75);
+            proceedSave(base64);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        proceedSave(null);
+      }
     });
   </script>
 </body>

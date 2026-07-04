@@ -187,6 +187,32 @@
     });
   }
 
+  // Intercept global fetch to handle session expiration globally
+  if (typeof window !== 'undefined' && window.fetch) {
+    var originalFetch = window.fetch;
+    window.fetch = function () {
+      return originalFetch.apply(this, arguments).then(function (response) {
+        if (response && response.clone) {
+          var clone = response.clone();
+          return clone.json().then(function (data) {
+            if (data && data.ok === false && (data.error === 'Session expired.' || data.error === 'Session expired. Please log in again.')) {
+              clearSession();
+              if (!window.sessionExpiredAlerted) {
+                window.sessionExpiredAlerted = true;
+                alert('Session expired. Redirecting to login page.');
+                window.location.href = 'index.html';
+              }
+            }
+            return response;
+          }).catch(function () {
+            return response;
+          });
+        }
+        return response;
+      });
+    };
+  }
+
   global.HuaHinSession = {
     saveSession: saveSession,
     saveSessionPartial: saveSessionPartial,
