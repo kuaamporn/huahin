@@ -156,7 +156,7 @@
         if (!data.ok) { alert(data.error); return; }
 
         var t = data.transaction;
-        var b = invoiceNo ? data.booking : null;
+        var b = data.booking || null;
 
         var displayInvNo = '';
         if (invoiceNo) {
@@ -233,6 +233,13 @@
               '<div style="width:13%; padding: 4px; border-right: 1px solid #000;">Invoice No</div>' +
               '<div style="width:15%; padding: 4px; text-align: center; font-weight: bold;">' + escapeHtml(displayInvNo) + '</div>' +
             '</div>' +
+            (b ?
+            '<div class="slip-meta" style="border-bottom: 2px solid #000;">' +
+              '<div style="width:15%; padding: 4px; border-right: 1px solid #000;">Check-in / วันเข้าพัก</div>' +
+              '<div style="width:35%; padding: 4px; border-right: 2px solid #000; text-align: center; font-weight: bold;">' + escapeHtml(b.checkin_date || '-') + '</div>' +
+              '<div style="width:15%; padding: 4px; border-right: 1px solid #000;">Check-out / วันย้ายออก</div>' +
+              '<div style="width:35%; padding: 4px; text-align: center; font-weight: bold;">' + escapeHtml(b.checkout_date || '-') + '</div>' +
+            '</div>' : '') +
             '<div class="slip-items">' +
               '<div class="items-head">' +
                 '<div style="flex:1; padding: 4px; text-align: center; border-right: 2px solid #000;">Description / รายละเอียด</div>' +

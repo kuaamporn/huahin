@@ -590,7 +590,11 @@
     var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles', notices: 'tab-notices' };
 
     function switchTab(name) {
-      if ((name === 'employees' || name === 'roles' || name === 'leaves' || name === 'notices') && !hasRole('owner')) {
+      if ((name === 'employees' || name === 'roles' || name === 'notices') && !hasRole('owner')) {
+        switchTab('checkins');
+        return;
+      }
+      if (name === 'leaves' && !hasRole('owner') && !hasRole('frontdesk')) {
         switchTab('checkins');
         return;
       }
@@ -1313,7 +1317,7 @@
       var isOwner = hasRole('owner');
       document.getElementById('tab-roles').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-employees').classList.toggle('hidden', !isOwner);
-      document.getElementById('tab-leaves').classList.toggle('hidden', !isOwner);
+      document.getElementById('tab-leaves').classList.toggle('hidden', !isOwner && !hasRole('frontdesk'));
       document.getElementById('tab-notices').classList.toggle('hidden', !isOwner);
     }
 
