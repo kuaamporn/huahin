@@ -75,6 +75,12 @@
       </div>
     </div>
 
+    <div style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid var(--line); padding-bottom: 4px;">
+      <a href="javascript:void(0)" id="tab-finance" class="tab-link active" style="font-weight: 700; text-decoration: none; color: var(--go); padding: 8px 16px; border-bottom: 3px solid var(--go);" onclick="switchTab('finance')">Financial Overview</a>
+      <a href="javascript:void(0)" id="tab-hospitality" class="tab-link" style="font-weight: 700; text-decoration: none; color: var(--muted); padding: 8px 16px; border-bottom: 3px solid transparent;" onclick="switchTab('hospitality')">Hospitality Performance</a>
+    </div>
+
+    <div id="finance-section">
     <div class="controls">
       <select id="propSelect" onchange="loadData()">
         <option value="both">Both Properties</option>
@@ -175,6 +181,50 @@
     <div class="chart-box" style="overflow-x:auto;">
       <h2>Yearly Matrix</h2>
       <div id="matrixTableContainer"></div>
+    </div>
+    </div>
+
+    <div id="hospitality-section" style="display: none;">
+      <div class="controls">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size:14px; font-weight:600; color:var(--muted);">Start Date:</label>
+          <input type="date" id="hospitality-start-date" onchange="validateHospitalityDates()">
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size:14px; font-weight:600; color:var(--muted);">End Date:</label>
+          <input type="date" id="hospitality-end-date" onchange="validateHospitalityDates()">
+        </div>
+        <button id="btn-run-hospitality" class="btn" style="padding: 10px 18px; font-size: 14px; background: var(--go); color: #fff; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;" onclick="loadHospitalityStats()">Analyze Performance</button>
+      </div>
+
+      <div class="summary-cards">
+        <div class="stat-card" style="border-top: 4px solid var(--go);">
+          <div class="val" id="valOccupancy" style="color: var(--go);">0%</div>
+          <div class="lbl">Avg Occupancy</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #3B82F6;">
+          <div class="val" id="valAdr" style="color: #3B82F6;">฿0</div>
+          <div class="lbl">Average Daily Rate (ADR)</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #8B5CF6;">
+          <div class="val" id="valRevpar" style="color: #8B5CF6;">฿0</div>
+          <div class="lbl">RevPAR</div>
+        </div>
+        <div class="stat-card" style="border-top: 4px solid #FBAF00;">
+          <div class="val" id="valHospRevenue" style="color: #FBAF00;">฿0</div>
+          <div class="lbl">Pro-rated Revenue</div>
+        </div>
+      </div>
+
+      <div class="chart-box" style="margin-bottom: 24px; padding: 24px;">
+        <h2>The Precious — Occupancy Heatmap</h2>
+        <div id="heatmap-precious" style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;"></div>
+      </div>
+
+      <div class="chart-box" style="margin-bottom: 24px; padding: 24px;">
+        <h2>The Moment — Occupancy Heatmap</h2>
+        <div id="heatmap-moment" style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;"></div>
+      </div>
     </div>
   </div>
 
@@ -542,6 +592,178 @@
         '</tr>';
       });
       tbody.innerHTML = html;
+    }
+
+    (function initHospitalityDates() {
+      var end = new Date();
+      var start = new Date();
+      start.setDate(start.getDate() - 30);
+      document.getElementById('hospitality-start-date').value = start.toISOString().split('T')[0];
+      document.getElementById('hospitality-end-date').value = end.toISOString().split('T')[0];
+    })();
+
+    function validateHospitalityDates() {
+      var start = document.getElementById('hospitality-start-date').value;
+      var end = document.getElementById('hospitality-end-date').value;
+      var btn = document.getElementById('btn-run-hospitality');
+      if (new Date(start) > new Date(end)) {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function switchTab(tab) {
+      var finLink = document.getElementById('tab-finance');
+      var hospLink = document.getElementById('tab-hospitality');
+      var finSec = document.getElementById('finance-section');
+      var hospSec = document.getElementById('hospitality-section');
+
+      if (tab === 'finance') {
+        finLink.style.color = 'var(--go)';
+        finLink.style.borderBottom = '3px solid var(--go)';
+        hospLink.style.color = 'var(--muted)';
+        hospLink.style.borderBottom = '3px solid transparent';
+        finSec.style.display = 'block';
+        hospSec.style.display = 'none';
+      } else {
+        hospLink.style.color = 'var(--go)';
+        hospLink.style.borderBottom = '3px solid var(--go)';
+        finLink.style.color = 'var(--muted)';
+        finLink.style.borderBottom = '3px solid transparent';
+        finSec.style.display = 'none';
+        hospSec.style.display = 'block';
+        loadHospitalityStats();
+      }
+    }
+
+    function loadHospitalityStats() {
+      var start = document.getElementById('hospitality-start-date').value;
+      var end = document.getElementById('hospitality-end-date').value;
+      if (!start || !end) return;
+
+      var btn = document.getElementById('btn-run-hospitality');
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+
+      fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'dashboardGetHospitalityStats', params: [sessionToken, start, end] })
+      }).then(function(r) { return r.json(); }).then(function(res) {
+        if (!res.ok) return alert(res.error);
+        renderHospitalityDashboard(res, start, end);
+      }).catch(function(err) {
+        alert('Network error: ' + err.message);
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Performance';
+      });
+    }
+
+    function renderHospitalityDashboard(res, start, end) {
+      var summary = res.summary;
+      document.getElementById('valOccupancy').textContent = summary.averageOccupancy.toFixed(1) + '%';
+      document.getElementById('valAdr').textContent = '฿' + Math.round(summary.adr).toLocaleString();
+      document.getElementById('valRevpar').textContent = '฿' + Math.round(summary.revpar).toLocaleString();
+      document.getElementById('valHospRevenue').textContent = '฿' + Math.round(summary.totalRevenue).toLocaleString();
+
+      var days = Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
+      renderHeatmapGrid('precious', res.rooms, days);
+      renderHeatmapGrid('moment', res.rooms, days);
+    }
+
+    function renderHeatmapGrid(propertyId, roomsData, totalDays) {
+      var container = document.getElementById('heatmap-' + propertyId);
+      container.innerHTML = '';
+
+      var groups = {};
+      Object.keys(roomsData).forEach(function(roomId) {
+        var room = roomsData[roomId];
+        if (room.propertyId !== propertyId) return;
+
+        var floor = 'G';
+        var parts = room.displayName.split('-');
+        if (parts.length > 1) {
+          var numPart = parts[1];
+          if (numPart.startsWith('G') || numPart.startsWith('g')) {
+            floor = 'G';
+          } else {
+            floor = numPart.charAt(0);
+          }
+        }
+
+        if (!groups[floor]) groups[floor] = [];
+        groups[floor].push(Object.assign({ roomId: roomId }, room));
+      });
+
+      var floors = Object.keys(groups).sort(function(a, b) {
+        if (a === 'G') return -1;
+        if (b === 'G') return 1;
+        return a.localeCompare(b);
+      }).reverse();
+
+      floors.forEach(function(floor) {
+        var floorRow = document.createElement('div');
+        floorRow.style.display = 'flex';
+        floorRow.style.flexWrap = 'wrap';
+        floorRow.style.gap = '8px';
+        floorRow.style.alignItems = 'center';
+
+        var floorLabel = document.createElement('div');
+        floorLabel.style.width = '60px';
+        floorLabel.style.fontSize = '12px';
+        floorLabel.style.fontWeight = '700';
+        floorLabel.style.color = 'var(--muted)';
+        floorLabel.textContent = 'Floor ' + floor;
+        floorRow.appendChild(floorLabel);
+
+        var roomsInFloor = groups[floor].sort(function(a, b) { return a.displayName.localeCompare(b.displayName); });
+        roomsInFloor.forEach(function(room) {
+          var occupancy = totalDays > 0 ? (room.nights / totalDays) * 100 : 0;
+          var hue = 120 - (occupancy * 1.2);
+
+          var cell = document.createElement('div');
+          cell.style.flex = '1';
+          cell.style.minWidth = '65px';
+          cell.style.maxWidth = '100px';
+          cell.style.height = '48px';
+          cell.style.borderRadius = '8px';
+          cell.style.display = 'flex';
+          cell.style.flexDirection = 'column';
+          cell.style.justifyContent = 'center';
+          cell.style.alignItems = 'center';
+          cell.style.backgroundColor = 'hsl(' + hue + ', 70%, 45%)';
+          cell.style.color = '#fff';
+          cell.style.cursor = 'default';
+          cell.style.transition = 'transform 0.15s';
+          cell.onmouseover = function() { cell.style.transform = 'scale(1.05)'; };
+          cell.onmouseout = function() { cell.style.transform = 'scale(1)'; };
+          cell.title = 'Room: ' + room.displayName + '\nNights Booked: ' + room.nights + ' / ' + totalDays + '\nOccupancy: ' + occupancy.toFixed(1) + '%\nRevenue: ฿' + Math.round(room.revenue).toLocaleString();
+
+          var numEl = document.createElement('span');
+          numEl.style.fontSize = '13px';
+          numEl.style.fontWeight = '700';
+          numEl.textContent = room.displayName.split('-')[1] || room.displayName;
+          cell.appendChild(numEl);
+
+          var pctEl = document.createElement('span');
+          pctEl.style.fontSize = '9px';
+          pctEl.style.opacity = '0.9';
+          pctEl.textContent = Math.round(occupancy) + '%';
+          cell.appendChild(pctEl);
+
+          floorRow.appendChild(cell);
+        });
+
+        container.appendChild(floorRow);
+      });
+
+      if (floors.length === 0) {
+        container.innerHTML = '<div class="muted" style="text-align:center; padding:16px;">No rooms found for this property.</div>';
+      }
     }
 
     if (session) loadData();
