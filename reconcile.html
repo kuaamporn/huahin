@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Reconciliation & Payment Matching — The Precious Moment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA;
+      --muted: #86868B; --go: #0F766E; --warn: #D97706;
+      --err: #DC2626; --card: #FFFFFF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); padding: 24px; }
+    h1, h2, h3 { font-family: 'Lexend', sans-serif; }
+    .nav { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+    .nav a { color: var(--go); text-decoration: none; font-weight: 600; font-size: 14px; }
+    .nav a.active { text-decoration: underline; }
+    .card-section { background: var(--card); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+    .tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid var(--line); padding-bottom: 8px; flex-wrap: wrap; }
+    .tab-btn { font-family: 'Lexend', sans-serif; font-weight: 600; padding: 8px 16px; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .tab-btn.active { color: var(--go); border-bottom-color: var(--go); }
+    .btn { padding: 10px 18px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; font-family: 'Lexend', sans-serif; }
+    .btn-primary { background: var(--go); color: #fff; }
+    .btn-warn { background: var(--warn); color: #fff; }
+    .btn-ghost { background: #E5E5EA; color: var(--ink); }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    th { background: #F8FAFC; font-weight: 700; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+    .badge-high { background: #D1FAE5; color: #065F46; }
+    .badge-med { background: #FEF3C7; color: #92400E; }
+    .badge-low { background: #FEE2E2; color: #991B1B; }
+    .badge-balanced { background: #D1FAE5; color: #065F46; }
+    .badge-discrepancy { background: #FEE2E2; color: #991B1B; }
+    select, input[type="date"], input[type="file"] { padding: 10px; border-radius: 12px; border: 1px solid var(--line); font-size: 14px; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 28px; }
+    .page-header p { color: var(--muted); margin-top: 4px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .import-box { display: flex; gap: 12px; align-items: center; margin: 20px 0; flex-wrap: wrap; }
+    #import-status { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html">Check-in</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="finance.html">Finance</a>
+    <a href="billing.html">Billing</a>
+    <a href="reconcile.html" class="active">Reconcile</a>
+    <a href="hr.html">HR</a>
+    <a href="report.html">Reports</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Bank Reconciliation & Payment Matching</h1>
+    <p>Match incoming payments to pending invoices and verify daily aggregator settlements.</p>
+  </div>
+
+  <div class="card-section">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabbtn-suggestions" onclick="showTab('suggestions')">Payment Matching</button>
+      <button class="tab-btn" id="tabbtn-audit" onclick="showTab('audit')">Daily Settlement Audit</button>
+      <button class="tab-btn" id="tabbtn-ota" onclick="showTab('ota')">OTA Payout Reports</button>
+      <button class="tab-btn" id="tabbtn-import" onclick="showTab('import')">Import Statements</button>
+    </div>
+
+    <!-- TAB 1: Payment Matching Suggestions -->
+    <div id="tab-suggestions">
+      <div class="flex-between">
+        <h2>Incoming Payments vs. Pending Invoices</h2>
+        <button class="btn btn-primary" onclick="loadSuggestions()">Refresh</button>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px;">High-confidence = exact amount match to a single pending invoice. Confirm to mark that invoice paid.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Payer / Account</th>
+            <th>Amount</th>
+            <th>Confidence</th>
+            <th>Matched Invoice</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-suggestions">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 2: Daily Settlement Audit -->
+    <div id="tab-audit" style="display:none;">
+      <h2>Aggregator → Bank Daily Settlement Audit</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px;">Verifies that daily K SHOP totals match KBANK deposits, and Mae Manee totals match SCB deposits.</p>
+      <div style="display:flex;gap:12px;margin:16px 0;align-items:center;flex-wrap:wrap;">
+        <label>From: <input type="date" id="audit-start"></label>
+        <label>To: <input type="date" id="audit-end"></label>
+        <button class="btn btn-primary" onclick="runSettlementAudit()">Run Audit</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Aggregator</th>
+            <th>Aggregator Total</th>
+            <th>Bank Deposit</th>
+            <th>Discrepancy</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-audit">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);">Select a date range and click Run Audit.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 3: OTA Payout Reports -->
+    <div id="tab-ota" style="display:none;">
+      <h2>OTA Payout Reports — Booking.com & Expedia → SCB</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px;">Upload a Booking.com CSV or Expedia remittance CSV. Each payout batch is matched against an unmatched SCB deposit line and individual guest invoices.</p>
+
+      <div style="background:#F8FAFC;border-radius:16px;padding:16px;margin:16px 0;">
+        <h3 style="font-size:15px;margin-bottom:12px;">Import New Payout Report</h3>
+        <div class="import-box">
+          <select id="ota-platform">
+            <option value="Booking.com">Booking.com (CSV — Payout ID col 16)</option>
+            <option value="Expedia">Expedia (CSV — from PDF extractor)</option>
+          </select>
+          <input type="file" id="ota-file" accept=".csv">
+          <button class="btn btn-primary" onclick="parseAndImportOta()">Import Payout</button>
+        </div>
+        <div id="ota-import-status"></div>
+      </div>
+
+      <div class="flex-between" style="margin-top:20px;">
+        <h3 style="font-size:15px;">Imported Payout Batches</h3>
+        <button class="btn btn-ghost" style="padding:6px 14px;font-size:13px;" onclick="loadOtaBatches()">Refresh</button>
+      </div>
+      <div id="ota-batches-container">
+        <p style="color:var(--muted);margin-top:12px;">Loading…</p>
+      </div>
+    </div>
+
+    <!-- TAB 4: Import Statements -->
+    <div id="tab-import" style="display:none;">
+      <h2>Upload Bank or Aggregator Statement</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px;">Supports K SHOP (CSV), Mae Manee (XLSX), KBANK statement (CSV/XLSX), SCB statement (CSV/XLSX). Duplicate rows are automatically skipped.</p>
+      <div class="import-box">
+        <select id="sel-account">
+          <option value="ACC-KSHOP-001">K SHOP QR (KSHOP.csv)</option>
+          <option value="ACC-MAEMANEE-001">Mae Manee QR (MAEMANEE.xlsx)</option>
+          <option value="ACC-KBANK-001">KBANK Account 002-1-36419-3</option>
+          <option value="ACC-SCB-001">SCB Account 927-251248-9</option>
+        </select>
+        <input type="file" id="file-import" accept=".csv,.xlsx,.xls">
+        <button class="btn btn-primary" onclick="parseAndImportFile()">Import Rows</button>
+      </div>
+      <div id="import-status"></div>
+    </div>
+  </div>
+
+  <script src="session.js"></script>
+  <script>
+    const WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+    let sessionToken = '';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const session = HuaHinSession.getSession();
+      if (!session) { window.location.href = 'index.html'; return; }
+      sessionToken = session.token || session.sessionToken;
+
+      const today = new Date().toISOString().split('T')[0];
+      const monthAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+      document.getElementById('audit-start').value = monthAgo;
+      document.getElementById('audit-end').value = today;
+
+      loadSuggestions();
+    });
+
+    function showTab(tabName) {
+      ['suggestions','audit','ota','import'].forEach(t => {
+        document.getElementById('tabbtn-' + t).classList.remove('active');
+        document.getElementById('tab-' + t).style.display = 'none';
+      });
+      document.getElementById('tabbtn-' + tabName).classList.add('active');
+      document.getElementById('tab-' + tabName).style.display = 'block';
+      if (tabName === 'ota') loadOtaBatches();
+    }
+
+    async function api(action, params) {
+      const r = await fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, params })
+      });
+      return r.json();
+    }
+
+    async function loadSuggestions() {
+      document.getElementById('tbody-suggestions').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">Loading…</td></tr>';
+      const r = await api('reconcileGetSuggestions', [sessionToken]);
+      const tbody = document.getElementById('tbody-suggestions');
+      tbody.innerHTML = '';
+      if (!r.ok || !r.suggestions || r.suggestions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">No unmatched statement lines found.</td></tr>';
+        return;
+      }
+      r.suggestions.forEach(s => {
+        const tr = document.createElement('tr');
+        const badgeCls = s.confidence === 'high' ? 'badge-high' : s.confidence === 'medium' ? 'badge-med' : 'badge-low';
+        const invText = s.suggestedInvoice
+          ? `${s.suggestedInvoice.room_name || 'Room'} — ${s.suggestedInvoice.guest_name || 'Guest'}<br><small style="color:var(--muted);">฿${parseFloat(s.suggestedInvoice.amount).toLocaleString()}</small>`
+          : '<span style="color:var(--muted);">No match</span>';
+        tr.innerHTML = `
+          <td>${s.line.txn_date}</td>
+          <td><b>${s.line.sender_name || s.line.description || '—'}</b><br><small style="color:var(--muted);">${s.line.account_name}</small></td>
+          <td>฿${parseFloat(s.line.amount).toLocaleString()}</td>
+          <td><span class="badge ${badgeCls}">${s.confidence.toUpperCase()}</span>${s.candidateCount > 1 ? ` <small style="color:var(--muted);">(${s.candidateCount} candidates)</small>` : ''}</td>
+          <td>${invText}</td>
+          <td style="white-space:nowrap;">
+            ${s.suggestedInvoice ? `<button class="btn btn-primary" style="padding:6px 12px;font-size:13px;margin-right:4px;" onclick="confirmMatch('${s.line.line_id}','${s.suggestedInvoice.txn_id}','${s.line.bank_code}')">Confirm</button>` : ''}
+            <button class="btn btn-ghost" style="padding:6px 12px;font-size:13px;" onclick="ignoreLine('${s.line.line_id}')">Ignore</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function confirmMatch(lineId, txnId, channel) {
+      const r = await api('reconcileConfirmMatch', [sessionToken, lineId, txnId, channel]);
+      if (r.ok) loadSuggestions();
+      else alert(r.error || 'Failed to confirm match.');
+    }
+
+    async function ignoreLine(lineId) {
+      await api('reconcileIgnoreLine', [sessionToken, lineId]);
+      loadSuggestions();
+    }
+
+    async function runSettlementAudit() {
+      const start = document.getElementById('audit-start').value;
+      const end = document.getElementById('audit-end').value;
+      if (!start || !end) return alert('Please select a date range.');
+      const r = await api('reconcileRunSettlementAudit', [sessionToken, start, end]);
+      const tbody = document.getElementById('tbody-audit');
+      tbody.innerHTML = '';
+      if (!r.ok || !r.audits || r.audits.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">No settlement data found for this date range.</td></tr>';
+        return;
+      }
+      r.audits.sort((a, b) => a.date < b.date ? 1 : -1).forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${a.date}</td>
+          <td><b>${a.aggregator}</b></td>
+          <td>฿${parseFloat(a.aggregatorAmount).toLocaleString()}</td>
+          <td>฿${parseFloat(a.bankDeposit).toLocaleString()}</td>
+          <td style="color:${Math.abs(a.discrepancy) < 1 ? 'var(--go)' : 'var(--err)'};">฿${parseFloat(a.discrepancy).toLocaleString()}</td>
+          <td><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function parseAndImportFile() {
+      const accountId = document.getElementById('sel-account').value;
+      const fileInput = document.getElementById('file-import');
+      const file = fileInput.files[0];
+      if (!file) return alert('Please select a file.');
+
+      const statusEl = document.getElementById('import-status');
+      statusEl.innerHTML = '<p style="color:var(--muted);">Parsing file…</p>';
+
+      const lines = [];
+      const reader = new FileReader();
+
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        reader.onload = async (e) => {
+          const text = e.target.result;
+          const rows = text.split('\n');
+          rows.forEach(r => {
+            const cols = r.split(',');
+            if (cols.length >= 5) {
+              const rawDate = (cols[1] || '').trim();
+              // Try DD-MM-YY or DD-MM-YYYY format
+              const parts = rawDate.split(/[-\/]/);
+              if (parts.length === 3 && parts[0].length <= 2) {
+                const yr = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                const dateISO = `${yr}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                const amt = parseFloat((cols[4] || '').replace(/,/g, '')) || 0;
+                if (amt > 0) {
+                  lines.push({ txn_date: dateISO, amount: amt, sender_name: (cols[5] || '').trim(), channel: (cols[7] || 'KSHOP').trim(), description: 'K SHOP QR' });
+                }
+              }
+            }
+          });
+          await sendImport(accountId, lines, statusEl);
+        };
+        reader.readAsText(file, 'utf-8');
+      } else {
+        reader.onload = async (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          json.forEach(row => {
+            if (row.length >= 5) {
+              let dateISO = '';
+              if (typeof row[1] === 'number') {
+                const d = new Date(Math.round((row[1] - 25569) * 86400 * 1000));
+                dateISO = d.toISOString().split('T')[0];
+              } else if (typeof row[1] === 'string' && row[1].includes('/')) {
+                const parts = row[1].split('/');
+                if (parts.length === 3) {
+                  const yr = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                  dateISO = `${yr}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                }
+              }
+              const amt = parseFloat(String(row[4] || '').replace(/,/g, '')) || 0;
+              if (dateISO && amt > 0) {
+                lines.push({ txn_date: dateISO, amount: amt, sender_name: String(row[3] || '').trim(), channel: String(row[5] || 'MAEMANEE').trim(), description: 'Mae Manee QR' });
+              }
+            }
+          });
+          await sendImport(accountId, lines, statusEl);
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    }
+
+    async function loadOtaBatches() {
+      const container = document.getElementById('ota-batches-container');
+      container.innerHTML = '<p style="color:var(--muted);">Loading…</p>';
+      const r = await api('reconcileGetOtaBatches', [sessionToken]);
+      if (!r.ok || !r.batches || r.batches.length === 0) {
+        container.innerHTML = '<p style="color:var(--muted);margin-top:12px;">No OTA payout batches imported yet.</p>';
+        return;
+      }
+      container.innerHTML = r.batches.map(b => {
+        const bankStatus = b.matched_statement_line_id
+          ? `<span class="badge badge-high">Bank Match Found</span>`
+          : `<span class="badge badge-low">No Bank Match</span>`;
+        const batchStatus = b.status === 'confirmed'
+          ? `<span class="badge badge-high">CONFIRMED</span>`
+          : `<span class="badge badge-med">PENDING</span>`;
+        const itemRows = (b.items || []).map(it => `
+          <tr>
+            <td>${it.reservation_ref}</td>
+            <td>${it.guest_name}</td>
+            <td>${it.check_in_date || '—'}</td>
+            <td>฿${parseFloat(it.gross_amount).toLocaleString()}</td>
+            <td>฿${parseFloat(it.commission_amount).toLocaleString()}</td>
+            <td>฿${parseFloat(it.net_amount).toLocaleString()}</td>
+            <td><span class="badge ${it.status === 'confirmed' ? 'badge-high' : it.status === 'matched' ? 'badge-med' : 'badge-low'}">${it.status.toUpperCase()}</span></td>
+          </tr>`).join('');
+        return `
+          <div style="border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+              <div>
+                <b style="font-size:15px;">${b.ota_platform}</b>
+                <span style="color:var(--muted);font-size:13px;margin-left:8px;">${b.payout_ref}</span>
+                <span style="color:var(--muted);font-size:13px;margin-left:8px;">${b.payout_date}</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                ${bankStatus} ${batchStatus}
+                ${b.status !== 'confirmed' ? `<button class="btn btn-primary" style="padding:6px 14px;font-size:13px;" onclick="confirmOtaBatch('${b.batch_id}')">Confirm Batch</button>` : ''}
+              </div>
+            </div>
+            <div style="display:flex;gap:24px;margin:10px 0;font-size:13px;color:var(--muted);">
+              <span>Gross: <b style="color:var(--ink);">฿${parseFloat(b.gross_total).toLocaleString()}</b></span>
+              <span>Commission: <b style="color:var(--err);">-฿${parseFloat(b.commission_total).toLocaleString()}</b></span>
+              <span>Net Payout: <b style="color:var(--go);">฿${parseFloat(b.net_total).toLocaleString()}</b></span>
+            </div>
+            ${b.items && b.items.length ? `
+            <div style="overflow-x:auto;margin-top:8px;">
+              <table style="margin-top:0;">
+                <thead><tr>
+                  <th>Reservation Ref</th><th>Guest</th><th>Check-in</th>
+                  <th>Gross</th><th>Commission</th><th>Net</th><th>Status</th>
+                </tr></thead>
+                <tbody>${itemRows}</tbody>
+              </table>
+            </div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    async function confirmOtaBatch(batchId) {
+      if (!confirm('Confirm this OTA payout batch? This will mark matched invoices as paid.')) return;
+      const r = await api('reconcileConfirmOtaBatch', [sessionToken, batchId]);
+      if (r.ok) {
+        loadOtaBatches();
+        loadSuggestions();
+      } else {
+        alert(r.error || 'Failed to confirm batch.');
+      }
+    }
+
+    async function parseAndImportOta() {
+      const platform = document.getElementById('ota-platform').value;
+      const file = document.getElementById('ota-file').files[0];
+      if (!file) return alert('Please select a CSV file.');
+
+      const statusEl = document.getElementById('ota-import-status');
+      statusEl.innerHTML = '<p style="color:var(--muted);">Parsing file…</p>';
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target.result;
+        const rows = text.split('\n').map(r => r.split(',').map(c => c.trim().replace(/^"|"$/g, '')));
+        if (rows.length < 2) {
+          statusEl.innerHTML = '<p style="color:var(--err);">File appears empty.</p>';
+          return;
+        }
+
+        if (platform === 'Booking.com') {
+          // Group by Payout ID (col 16), rows where Type (col 0) = 'Reservation'
+          const batches = {};
+          rows.slice(1).forEach(row => {
+            if (row.length < 17) return;
+            const type = row[0];
+            if (type !== 'Reservation') return;
+            const payoutId = row[16] || 'UNKNOWN';
+            if (!batches[payoutId]) batches[payoutId] = { items: [], payoutDate: row[1] || '' };
+            const gross = parseFloat(row[9]) || 0;
+            const commission = parseFloat(row[10]) || 0;
+            batches[payoutId].items.push({
+              reservation_ref: row[4] || '',
+              guest_name: row[5] || '',
+              check_in_date: row[6] || '',
+              check_out_date: row[7] || '',
+              gross_amount: gross,
+              commission_amount: Math.abs(commission),
+              net_amount: gross - Math.abs(commission)
+            });
+          });
+
+          let imported = 0, errors = [];
+          for (const [payoutRef, batch] of Object.entries(batches)) {
+            const r = await api('reconcileImportOtaPayout', [sessionToken, 'Booking.com', payoutRef, batch.payoutDate, batch.items]);
+            if (r.ok) imported++;
+            else errors.push(r.error);
+          }
+          statusEl.innerHTML = `<p style="color:var(--go);font-weight:600;">Imported ${imported} Booking.com payout batch(es).${errors.length ? ' Errors: ' + errors.join('; ') : ''}</p>`;
+          loadOtaBatches();
+
+        } else {
+          // Expedia CSV: payout_ref, payout_date, reservation_id, guest_name, checkin, checkout, gross, commission, net
+          const header = rows[0].map(h => h.toLowerCase());
+          const get = (row, key) => {
+            const i = header.indexOf(key);
+            return i >= 0 ? row[i] : '';
+          };
+          const payoutRef = get(rows[1], 'payout_ref') || get(rows[1], 'notice_number') || 'EXPEDIA-' + Date.now();
+          const payoutDate = get(rows[1], 'payout_date') || new Date().toISOString().split('T')[0];
+          const items = rows.slice(1).filter(row => get(row, 'reservation_id') || get(row, 'reservation_ref')).map(row => ({
+            reservation_ref: get(row, 'reservation_id') || get(row, 'reservation_ref'),
+            guest_name: get(row, 'guest_name'),
+            check_in_date: get(row, 'check_in') || get(row, 'checkin'),
+            check_out_date: get(row, 'check_out') || get(row, 'checkout'),
+            gross_amount: parseFloat(get(row, 'gross_amount') || get(row, 'gross')) || 0,
+            commission_amount: parseFloat(get(row, 'commission_amount') || get(row, 'commission')) || 0,
+            net_amount: parseFloat(get(row, 'net_amount') || get(row, 'net')) || 0
+          }));
+          const r = await api('reconcileImportOtaPayout', [sessionToken, 'Expedia', payoutRef, payoutDate, items]);
+          if (r.ok) {
+            statusEl.innerHTML = `<p style="color:var(--go);font-weight:600;">Imported Expedia payout ${payoutRef} — ${r.itemsImported} reservations.${r.bankMatchFound ? ' Bank deposit matched.' : ''}</p>`;
+            loadOtaBatches();
+          } else {
+            statusEl.innerHTML = `<p style="color:var(--err);">Error: ${r.error}</p>`;
+          }
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    async function sendImport(accountId, lines, statusEl) {
+      if (lines.length === 0) {
+        statusEl.innerHTML = '<p style="color:var(--warn);">No valid rows found in file. Check format.</p>';
+        return;
+      }
+      const r = await api('reconcileImportBatch', [sessionToken, accountId, lines]);
+      if (r.ok) {
+        statusEl.innerHTML = `<p style="color:var(--go);font-weight:600;">Imported ${r.importedCount} rows. ${r.duplicateCount} duplicates skipped.</p>`;
+        if (r.importedCount > 0) loadSuggestions();
+      } else {
+        statusEl.innerHTML = `<p style="color:var(--err);">Error: ${r.error}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

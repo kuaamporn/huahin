@@ -204,6 +204,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
           <a href="billing.html" class="nav-link hidden" id="link-billing">Billing</a>
           <a href="report.html" class="nav-link hidden" id="link-report">Reports</a>
           <a href="setting.html" class="nav-link hidden" id="link-setting">Settings</a>
+          <a href="reconcile.html" class="nav-link hidden" id="link-reconcile">Reconcile</a>
         </div>
       </div>
       <div class="topbar-user-section">
@@ -517,6 +518,7 @@ if (session) {
   if (HuaHinSession.hasRole('owner', 'frontdesk')) {
     document.getElementById('link-report').classList.remove('hidden');
   }
+  if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
 
   callApi('financeGetSettings', [sessionToken]).then(function(res) {
     if (res.ok) window.ROOMS_SETTINGS = res.settings;

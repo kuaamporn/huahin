@@ -64,6 +64,7 @@
         <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">Billing</a>
         <a href="report.html" id="link-report" class="hidden">Reports</a>
         <a href="setting.html" id="link-setting" class="hidden">Settings</a>
+        <a href="reconcile.html" id="link-reconcile" class="hidden">Reconcile</a>
       </div>
     </div>
 
@@ -185,6 +186,7 @@
         document.getElementById('link-report').classList.remove('hidden');
       }
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
+      if (HuaHinSession.hasRole('owner', 'accountant')) show('link-reconcile');
 
       if (!HuaHinSession.hasRole('owner', 'accountant', 'revenue')) {
         hide('main-content');

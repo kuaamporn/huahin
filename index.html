@@ -144,6 +144,7 @@
           <a href="billing.html" class="toplink hidden" id="billing-link">Billing</a>
           <a href="report.html" class="toplink hidden" id="report-link">Reports</a>
           <a href="setting.html" class="toplink hidden" id="setting-link">Settings</a>
+          <a href="reconcile.html" class="toplink hidden" id="reconcile-link">Reconcile</a>
           <a href="#" class="toplink" id="account-link" onclick="toggleAccountCard(); return false;">My Account</a>
         </div>
       </div>
@@ -396,6 +397,7 @@
         show('report-link');
       }
       if (HuaHinSession.hasRole('owner')) show('setting-link');
+      if (HuaHinSession.hasRole('owner', 'accountant')) show('reconcile-link');
     }
 
     var session = HuaHinSession.getSession();
