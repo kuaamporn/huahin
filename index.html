@@ -154,11 +154,17 @@
         <h2 style="font-size: 16px; margin: 0 0 16px; font-family: 'Lexend', sans-serif;">👤 My Account</h2>
 
         <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px;">
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">My Requests</h3>
+          <div id="vacation-balance" class="muted" style="font-size:13px; margin-bottom:10px;">Loading…</div>
+          <div id="my-requests-list" style="font-size:13px;"></div>
+        </div>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;">
           <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">Request Leave</h3>
           <label for="leave-date">Leave Date</label>
           <input type="date" id="leave-date" />
           <label for="leave-type">Leave Type</label>
-          <select id="leave-type" onchange="toggleBehalfField()" style="width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); font-family:'Source Sans 3', sans-serif;">
+          <select id="leave-type" onchange="onLeaveTypeChange()" style="width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); font-family:'Source Sans 3', sans-serif;">
             <option value="VACATION">Vacation Leave</option>
             <option value="MEDICAL">Medical Leave</option>
           </select>
@@ -480,9 +486,18 @@
     }
 
     // ---------- MY ACCOUNT: leave, swap, password ----------
+    function isoDate(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
     function toggleAccountCard() {
       var card = document.getElementById('account-card');
       card.classList.toggle('hidden');
+      if (!card.classList.contains('hidden')) {
+        onLeaveTypeChange();      // sync behalf field + date min to the default type
+        setRequestDateLimits();   // min dates on swap inputs
+        loadMyRequests();         // show current requests + vacation balance
+      }
     }
 
     function toggleBehalfField() {
@@ -490,6 +505,70 @@
       if (type === 'VACATION') show('behalf-group');
       else hide('behalf-group');
     }
+
+    // Vacation can't be booked in the past; medical leave may be retroactive.
+    function applyLeaveDateMin() {
+      var type = document.getElementById('leave-type').value;
+      var el = document.getElementById('leave-date');
+      if (type === 'VACATION') el.min = isoDate(new Date());
+      else el.removeAttribute('min');
+    }
+
+    function onLeaveTypeChange() {
+      toggleBehalfField();
+      applyLeaveDateMin();
+    }
+
+    function setRequestDateLimits() {
+      var today = new Date();
+      var plus2 = new Date(today.getTime() + 2 * 86400000);
+      document.getElementById('swap-original').min = isoDate(today);
+      document.getElementById('swap-new').min = isoDate(plus2); // backend requires >= 2 days out
+      applyLeaveDateMin();
+    }
+
+    window.loadMyRequests = function() {
+      if (!sessionToken) return;
+      callApi('employeeGetMyLeave', [sessionToken]).then(function(res) {
+        var balEl = document.getElementById('vacation-balance');
+        var listEl = document.getElementById('my-requests-list');
+        if (!res.ok) { balEl.textContent = ''; listEl.innerHTML = ''; return; }
+
+        var v = res.vacation || {};
+        balEl.innerHTML = 'Vacation ' + v.year + ': <b>' + v.remainingDays + '</b> of ' + v.poolDays +
+          ' days remaining' + (v.pendingDays ? ' &middot; ' + v.pendingDays + ' pending' : '');
+
+        var items = [];
+        (res.leaves || []).forEach(function(l) {
+          items.push({
+            date: l.leave_date,
+            label: (l.type === 'VACATION' ? 'Vacation' : 'Medical') + ' Leave &middot; ' + escapeHtml(l.leave_date),
+            status: l.status
+          });
+        });
+        (res.swaps || []).forEach(function(s) {
+          items.push({
+            date: s.new_date,
+            label: 'Day-off swap &middot; ' + escapeHtml(s.original_date) + ' &rarr; ' + escapeHtml(s.new_date),
+            status: s.status
+          });
+        });
+        items.sort(function(a, b) { return a.date < b.date ? 1 : -1; });
+
+        if (!items.length) {
+          listEl.innerHTML = '<div class="muted">No requests yet.</div>';
+          return;
+        }
+        listEl.innerHTML = items.map(function(it) {
+          var color = it.status === 'APPROVED' ? '#16A34A' : it.status === 'REJECTED' ? '#DC2626' : '#D97706';
+          var bg = it.status === 'APPROVED' ? '#dcfce7' : it.status === 'REJECTED' ? '#fee2e2' : '#fef3c7';
+          return '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line);">' +
+            '<span>' + it.label + '</span>' +
+            '<span style="flex-shrink:0; font-size:11px; font-weight:600; color:' + color + '; background:' + bg + '; padding:2px 8px; border-radius:10px;">' + it.status + '</span>' +
+          '</div>';
+        }).join('');
+      });
+    };
 
     window.submitLeave = function() {
       var date = document.getElementById('leave-date').value;
@@ -503,6 +582,10 @@
         if (res.ok) {
           document.getElementById('leave-success').textContent = 'Request submitted successfully!';
           show('leave-success');
+          document.getElementById('leave-date').value = '';
+          document.getElementById('leave-reason').value = '';
+          document.getElementById('leave-behalf-id').value = '';
+          loadMyRequests();
         } else {
           document.getElementById('leave-error').textContent = res.error;
           show('leave-error');
@@ -520,6 +603,9 @@
         if (res.ok) {
           document.getElementById('swap-success').textContent = 'Swap request submitted successfully!';
           show('swap-success');
+          document.getElementById('swap-original').value = '';
+          document.getElementById('swap-new').value = '';
+          loadMyRequests();
         } else {
           document.getElementById('swap-error').textContent = res.error;
           show('swap-error');
