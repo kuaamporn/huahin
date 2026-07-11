@@ -204,6 +204,44 @@
           </table>
         </div>
       </div>
+
+      <!-- Card 4: Company Holidays -->
+      <div class="card-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--line); padding-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <h2 style="font-family:'Lexend',sans-serif; font-size:16px; margin:0;">Company Holidays</h2>
+          <select id="holiday-year" onchange="loadHolidays()" style="padding:6px 10px; border:1px solid var(--line); border-radius:8px; font-size:13px;"></select>
+        </div>
+        <p style="color:var(--muted); font-size:13px; margin:0 0 16px;">Each company holiday adds one day to every employee's yearly vacation pool. Days off already granted weekly are handled separately.</p>
+
+        <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:16px;">
+          <div>
+            <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:4px;">Date</label>
+            <input type="date" id="holiday-date" style="padding:8px 12px; border:1px solid var(--line); border-radius:8px;" />
+          </div>
+          <div style="flex:1; min-width:180px;">
+            <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:4px;">Holiday Name</label>
+            <input type="text" id="holiday-name" placeholder="e.g. Songkran Festival" style="width:100%; padding:8px 12px; border:1px solid var(--line); border-radius:8px;" />
+          </div>
+          <button class="btn-primary" onclick="addHoliday()" style="padding:9px 16px; font-size:13px;">+ Add Holiday</button>
+        </div>
+        <div class="error hidden" id="holiday-error" style="margin-bottom:12px;"></div>
+
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Name</th>
+                <th style="text-align:center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="holidays-table-body">
+              <tr><td colspan="4" style="text-align:center; color:var(--muted);">Loading holidays...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -267,6 +305,7 @@
 
       loadSettings();
       loadOffices();
+      initHolidays();
 
       document.getElementById('btn-save-settings').onclick = saveAllSettings;
     };
@@ -438,6 +477,96 @@
       apiCall('adminDeleteOffice', [id]).then(function(res) {
         if (res.ok) {
           loadOffices();
+        } else {
+          alert('Error: ' + res.error);
+        }
+      }).catch(function(e) {
+        alert('Connection error: ' + e.message);
+      });
+    }
+
+    // ---------- Company Holidays ----------
+    var WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    function initHolidays() {
+      var sel = document.getElementById('holiday-year');
+      var thisYear = new Date().getFullYear();
+      sel.innerHTML = '';
+      for (var y = thisYear - 1; y <= thisYear + 2; y++) {
+        var opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (y === thisYear) opt.selected = true;
+        sel.appendChild(opt);
+      }
+      loadHolidays();
+    }
+
+    function loadHolidays() {
+      var year = document.getElementById('holiday-year').value;
+      apiCall('adminListHolidays', [year]).then(function(res) {
+        if (!res.ok) { console.error(res.error); return; }
+        renderHolidaysTable(res.holidays || []);
+      });
+    }
+
+    function renderHolidaysTable(holidays) {
+      var tbody = document.getElementById('holidays-table-body');
+      tbody.innerHTML = '';
+      if (holidays.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--muted);">No holidays for this year yet. Add one above.</td></tr>';
+        return;
+      }
+      holidays.forEach(function(h) {
+        // Parse as local date to avoid TZ shift on the weekday label
+        var parts = h.holiday_date.split('-');
+        var dow = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td style="font-family:monospace;">' + escapeHtml(h.holiday_date) + '</td>' +
+          '<td style="color:var(--muted);">' + WEEKDAY_NAMES[dow] + '</td>' +
+          '<td>' + escapeHtml(h.name) + '</td>' +
+          '<td style="text-align:center;">' +
+            '<button class="btn-secondary" onclick="deleteHoliday(\'' + escapeHtml(h.id) + '\')" style="padding:4px 8px; font-size:12px; color:var(--warn); border-color:var(--warn);">Delete</button>' +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addHoliday() {
+      var date = document.getElementById('holiday-date').value;
+      var name = document.getElementById('holiday-name').value.trim();
+      var errEl = document.getElementById('holiday-error');
+      hide('holiday-error');
+      if (!date) { errEl.textContent = 'Please choose a date.'; show('holiday-error'); return; }
+      if (!name) { errEl.textContent = 'Please enter a holiday name.'; show('holiday-error'); return; }
+
+      apiCall('adminAddHoliday', [date, name]).then(function(res) {
+        if (res.ok) {
+          document.getElementById('holiday-date').value = '';
+          document.getElementById('holiday-name').value = '';
+          // jump the year filter to the added holiday's year so it's visible
+          var sel = document.getElementById('holiday-year');
+          var addedYear = date.slice(0, 4);
+          if (sel.value !== addedYear && [].some.call(sel.options, function(o) { return o.value === addedYear; })) {
+            sel.value = addedYear;
+          }
+          loadHolidays();
+        } else {
+          errEl.textContent = res.error;
+          show('holiday-error');
+        }
+      }).catch(function(e) {
+        errEl.textContent = 'Connection error: ' + e.message;
+        show('holiday-error');
+      });
+    }
+
+    function deleteHoliday(id) {
+      if (!confirm('Delete this holiday? It will no longer count toward employees\' vacation pool.')) return;
+      apiCall('adminDeleteHoliday', [id]).then(function(res) {
+        if (res.ok) {
+          loadHolidays();
         } else {
           alert('Error: ' + res.error);
         }
