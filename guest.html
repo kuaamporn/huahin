@@ -3,226 +3,511 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Precious Moment @ Huahin — Rooms & Availability</title>
-  <meta name="description" content="Monthly and daily room rentals in Hua Hin, Thailand. The Precious and The Moment residences — see room types and live availability, reserve via LINE or Facebook Messenger.">
+  <title>The Precious Moment @ Huahin — Residences &amp; Availability</title>
+  <meta name="description" content="Monthly and daily residences in Hua Hin, Thailand. The Precious and The Moment — explore room types, check live availability, reserve via LINE or Facebook Messenger.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA;
-      --muted: #86868B; --go: #0F766E; --card: #FFFFFF;
-      --line-green: #06C755; --fb-blue: #0084FF;
+      --ink: #1C1B18;          /* deep charcoal */
+      --ink-soft: #4A4842;
+      --ivory: #F7F4EE;        /* warm paper */
+      --cream: #FDFCF9;
+      --gold: #A16207;         /* accent, WCAG-checked on ivory */
+      --gold-soft: #B08D57;
+      --hairline: #E3DDD2;
+      --line-green: #06C755;
+      --fb-blue: #0084FF;
+      --avail: #2F6B4F;
+      --full: #8A8677;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); padding-bottom: 84px; }
-    h1, h2, h3 { font-family: 'Lexend', sans-serif; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--ivory);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.65;
+      padding-bottom: 76px; /* sticky bar clearance */
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, .serif { font-family: 'Cormorant', serif; font-weight: 500; }
 
-    .hero { background: linear-gradient(135deg, #0F766E 0%, #134E4A 100%); color: #fff; padding: 48px 24px 40px; text-align: center; }
-    .hero h1 { font-size: clamp(26px, 5vw, 40px); letter-spacing: 0.5px; }
-    .hero .sub { margin-top: 10px; font-size: 16px; opacity: 0.9; }
-    .hero .cta-row { margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .kicker {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.32em; text-transform: uppercase;
+    }
 
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 99px; font-weight: 600; font-family: 'Lexend', sans-serif; text-decoration: none; font-size: 15px; border: none; cursor: pointer; transition: transform .15s; }
-    .btn:active { transform: scale(0.97); }
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    /* ── Top bar ─────────────────────────────── */
+    .topbar {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px clamp(20px, 5vw, 56px);
+    }
+    .topbar .brand {
+      font-family: 'Cormorant', serif; font-size: 20px; letter-spacing: 0.08em;
+      color: #F5EFE3; text-decoration: none; font-weight: 500;
+    }
+    .topbar .contact-mini { display: flex; gap: 10px; }
+
+    /* ── Hero ────────────────────────────────── */
+    .hero {
+      position: relative; min-height: 88vh; min-height: 88dvh;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      background:
+        radial-gradient(ellipse 120% 80% at 50% 110%, rgba(161,98,7,0.24), transparent 60%),
+        linear-gradient(175deg, #23221E 0%, #191813 55%, #14130F 100%);
+      overflow: hidden;
+      padding: 96px 24px 72px;
+    }
+    .hero .photo-layer {
+      position: absolute; inset: 0; z-index: 0;
+      background-size: cover; background-position: center;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    .hero .photo-layer.loaded { opacity: 1; }
+    .hero .scrim {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg, rgba(20,19,15,0.55) 0%, rgba(20,19,15,0.25) 45%, rgba(20,19,15,0.65) 100%);
+    }
+    .hero .inner { position: relative; z-index: 2; max-width: 720px; }
+    .hero .kicker { color: var(--gold-soft); }
+    .hero h1 {
+      margin-top: 18px;
+      font-size: clamp(42px, 7.5vw, 84px);
+      line-height: 1.06; font-weight: 400;
+      color: #F8F3E9; letter-spacing: 0.02em;
+    }
+    .hero .divider {
+      width: 56px; height: 1px; background: var(--gold-soft);
+      margin: 26px auto;
+    }
+    .hero .sub {
+      color: #D8D2C4; font-weight: 300; font-size: 15.5px;
+      max-width: 460px; margin: 0 auto; letter-spacing: 0.02em;
+    }
+    .hero .cta-row { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── Buttons ─────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 48px; padding: 13px 30px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+      text-decoration: none; border: 1px solid transparent;
+      transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+    }
+    .btn svg { width: 17px; height: 17px; flex: none; }
+    .btn-gold { background: var(--gold); color: #FFF; }
+    .btn-gold:hover { background: #8A5406; }
+    .btn-ghost { background: transparent; color: #F5EFE3; border-color: rgba(245,239,227,0.45); }
+    .btn-ghost:hover { border-color: #F5EFE3; background: rgba(245,239,227,0.08); }
     .btn-line { background: var(--line-green); color: #fff; }
+    .btn-line:hover { background: #05B04C; }
     .btn-fb { background: var(--fb-blue); color: #fff; }
-    .btn-check { background: var(--go); color: #fff; padding: 10px 20px; border-radius: 12px; }
+    .btn-fb:hover { background: #0074E0; }
 
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-    .section { margin-top: 40px; }
-    .section > h2 { font-size: 24px; }
-    .section > .prop-desc { color: var(--muted); margin-top: 6px; max-width: 640px; }
-    .band-label { font-size: 14px; font-weight: 600; color: var(--go); text-transform: uppercase; letter-spacing: 1px; margin-top: 24px; font-family: 'Lexend', sans-serif; }
+    /* ── Intro strip ─────────────────────────── */
+    .intro {
+      text-align: center; padding: 72px 24px 8px; max-width: 640px; margin: 0 auto;
+    }
+    .intro .kicker { color: var(--gold); }
+    .intro h2 { font-size: clamp(30px, 4.5vw, 44px); font-weight: 400; margin-top: 14px; line-height: 1.15; }
+    .intro p { margin-top: 16px; color: var(--ink-soft); font-weight: 300; font-size: 15.5px; }
 
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; margin-top: 14px; }
-    .card { background: var(--card); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
-    .card .photo { height: 150px; background: linear-gradient(135deg, #CCFBF1, #99F6E4); display: flex; align-items: center; justify-content: center; font-family: 'Lexend', sans-serif; font-weight: 600; color: #0F766E; font-size: 15px; position: relative; }
-    .card .photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-    .card .body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .card h3 { font-size: 17px; }
-    .card .desc { font-size: 13.5px; color: var(--muted); flex: 1; }
-    .badge { align-self: flex-start; padding: 5px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 700; font-family: 'Lexend', sans-serif; }
-    .badge-avail { background: #D1FAE5; color: #065F46; }
-    .badge-full { background: #F3F4F6; color: #6B7280; }
-    .badge-loading { background: #F3F4F6; color: #9CA3AF; }
-    .card .reserve { margin-top: 4px; }
-    .card .reserve a { color: var(--go); font-weight: 600; font-size: 14px; text-decoration: none; }
+    /* ── Property tabs ───────────────────────── */
+    .tabs-wrap { max-width: 1120px; margin: 48px auto 0; padding: 0 20px; }
+    .tabs {
+      display: flex; justify-content: center; gap: 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .tab-btn {
+      background: none; border: none;
+      padding: 16px 34px 18px;
+      font-family: 'Cormorant', serif; font-size: clamp(20px, 3vw, 26px); font-weight: 500;
+      color: var(--ink-soft); letter-spacing: 0.04em;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color .25s ease, border-color .25s ease;
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
+    .tab-btn .tab-note {
+      display: block; font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--gold); margin-top: 3px;
+    }
 
-    .datebox { background: var(--card); border-radius: 16px; padding: 16px; margin-top: 14px; display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-    .datebox label { font-size: 13px; font-weight: 600; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
-    .datebox input { padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; font-family: inherit; }
-    .datebox .note { flex-basis: 100%; font-size: 12.5px; color: var(--muted); }
+    .tab-panel { display: none; padding: 52px 0 8px; }
+    .tab-panel.active { display: block; animation: fadeUp .45s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .tab-panel.active { animation: none; }
+      html { scroll-behavior: auto; }
+    }
 
-    .location { background: var(--card); border-radius: 20px; padding: 24px; margin-top: 40px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-    .location h2 { font-size: 20px; }
-    .location p { margin-top: 8px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
-    .location a { color: var(--go); font-weight: 600; }
+    .panel-desc {
+      text-align: center; max-width: 560px; margin: 0 auto 44px;
+      color: var(--ink-soft); font-weight: 300; font-size: 15px;
+    }
 
-    .foot-note { text-align: center; color: var(--muted); font-size: 12.5px; margin: 36px 0 20px; }
+    .band-head {
+      display: flex; align-items: center; gap: 18px; margin: 44px 0 26px;
+    }
+    .band-head::before, .band-head::after { content: ''; flex: 1; height: 1px; background: var(--hairline); }
+    .band-head span { font-size: 11px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); }
 
-    .stickybar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 10px; justify-content: center; z-index: 50; }
-    .stickybar .btn { flex: 1; max-width: 240px; justify-content: center; }
+    /* ── Room cards ──────────────────────────── */
+    .rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 26px; }
+    .room-card {
+      background: var(--cream); border: 1px solid var(--hairline);
+      display: flex; flex-direction: column;
+      transition: box-shadow .3s ease, transform .3s ease;
+    }
+    .room-card:hover { box-shadow: 0 18px 40px -18px rgba(28,27,24,0.22); transform: translateY(-3px); }
+    .room-card .photo {
+      aspect-ratio: 4 / 2.6; position: relative; overflow: hidden;
+      background: linear-gradient(140deg, #EDE7DA 0%, #E0D7C4 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .room-card .photo .ph-label {
+      font-family: 'Cormorant', serif; font-size: 21px; font-style: italic;
+      color: #A89F8C; letter-spacing: 0.04em;
+    }
+    .room-card .photo img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      transition: transform .6s ease;
+    }
+    .room-card:hover .photo img { transform: scale(1.045); }
+    .room-card .body { padding: 26px 26px 24px; flex: 1; display: flex; flex-direction: column; }
+    .room-card h3 { font-size: 26px; font-weight: 500; letter-spacing: 0.02em; }
+    .room-card .desc { margin-top: 10px; color: var(--ink-soft); font-weight: 300; font-size: 14px; flex: 1; }
+    .room-card .meta-row {
+      margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--hairline);
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .availability {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .availability .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+    .availability.is-avail { color: var(--avail); }
+    .availability.is-avail .dot { background: var(--avail); }
+    .availability.is-full { color: var(--full); }
+    .availability.is-full .dot { background: var(--full); }
+    .availability.is-loading { color: var(--full); }
+    .availability.is-loading .dot { background: var(--hairline); }
+    .room-card .enquire {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); text-decoration: none; white-space: nowrap;
+      border-bottom: 1px solid transparent; padding-bottom: 2px;
+      transition: border-color .25s ease;
+    }
+    .room-card .enquire:hover { border-bottom-color: var(--gold); }
 
-    @media (max-width: 480px) {
-      .hero { padding: 36px 16px 30px; }
-      .cards { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .card .photo { height: 110px; }
-      .card .body { padding: 12px; }
+    /* ── Date checker ────────────────────────── */
+    .datebox {
+      background: var(--cream); border: 1px solid var(--hairline);
+      padding: 26px; margin: 0 0 30px;
+      display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; justify-content: center;
+    }
+    .datebox .field { display: flex; flex-direction: column; gap: 7px; }
+    .datebox label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-soft);
+    }
+    .datebox input {
+      min-height: 48px; padding: 11px 14px; font-size: 15px; font-family: inherit;
+      border: 1px solid var(--hairline); background: #FFF; color: var(--ink);
+    }
+    .datebox .btn { padding: 13px 26px; }
+    .datebox .note { flex-basis: 100%; text-align: center; font-size: 13px; color: var(--ink-soft); font-weight: 300; }
+
+    /* ── Contact section ─────────────────────── */
+    .contact {
+      margin-top: 88px;
+      background: linear-gradient(180deg, #201F1A 0%, #16150F 100%);
+      color: #EFE9DC; text-align: center;
+      padding: 76px 24px 84px;
+    }
+    .contact .kicker { color: var(--gold-soft); }
+    .contact h2 { font-size: clamp(30px, 4.5vw, 42px); font-weight: 400; margin-top: 14px; color: #F8F3E9; }
+    .contact p { max-width: 480px; margin: 16px auto 0; color: #C9C2B1; font-weight: 300; font-size: 15px; }
+    .contact .cta-row { margin-top: 34px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .contact .fine {
+      margin-top: 44px; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #7E7868;
+    }
+
+    /* ── Sticky mobile bar ───────────────────── */
+    .stickybar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(253,252,249,0.96);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--hairline);
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      display: flex; gap: 10px; justify-content: center;
+    }
+    .stickybar .btn { flex: 1; max-width: 230px; min-height: 46px; padding: 11px 18px; }
+
+    @media (max-width: 560px) {
+      .hero { min-height: 76dvh; }
+      .tab-btn { padding: 14px 20px 16px; flex: 1; }
+      .rooms { grid-template-columns: 1fr; }
+      .topbar .contact-mini { display: none; }
     }
   </style>
 </head>
 <body>
 
+  <!-- SVG icon defs -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="ic-chat" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.4 5.1 3.6 6.7-.1.6-.5 2.1-.6 2.4 0 0-.1.3.1.4.2.1.4 0 .4 0 .5-.1 2.5-1.6 3.4-2.2.9.2 2 .4 3.1.4 5.5 0 10-3.9 10-8.7S17.5 3 12 3z"/>
+      </symbol>
+      <symbol id="ic-send" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 2C6.4 2 2 6.1 2 11.2c0 2.9 1.4 5.4 3.7 7.1V22l3.4-1.9c.9.3 1.9.4 2.9.4 5.6 0 10-4.1 10-9.2S17.6 2 12 2zm1.1 12.3-2.6-2.7-5 2.7 5.5-5.8 2.6 2.7 4.9-2.7-5.4 5.8z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- HERO -->
   <header class="hero">
-    <h1>The Precious Moment</h1>
-    <div class="sub">Comfortable monthly &amp; daily stays in the heart of Hua Hin, Thailand</div>
-    <div class="cta-row">
-      <a class="btn btn-line" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">💬 Reserve via LINE</a>
-      <a class="btn btn-fb" href="https://m.me/precious.huahin" target="_blank" rel="noopener">✉️ Messenger</a>
+    <div class="photo-layer" id="hero-photo" role="img" aria-label="The Precious Moment residences, Hua Hin"></div>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="topbar">
+      <a class="brand" href="#">The Precious Moment</a>
+      <div class="contact-mini">
+        <a class="btn btn-ghost" style="min-height:40px;padding:9px 20px;" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">
+          <svg aria-hidden="true"><use href="#ic-chat"/></svg> LINE
+        </a>
+      </div>
+    </div>
+    <div class="inner">
+      <div class="kicker">Hua Hin · Thailand</div>
+      <h1>The Precious<br>Moment</h1>
+      <div class="divider" aria-hidden="true"></div>
+      <p class="sub">Two residences, one philosophy — unhurried living minutes from the sea. Monthly residences and daily stays.</p>
+      <div class="cta-row">
+        <a class="btn btn-gold" href="#residences">Explore Residences</a>
+        <a class="btn btn-ghost" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Reserve via LINE</a>
+      </div>
     </div>
   </header>
 
-  <div class="wrap">
+  <!-- INTRO -->
+  <section class="intro">
+    <div class="kicker">Our Residences</div>
+    <h2>A Room for Every Rhythm</h2>
+    <p>From long-stay studios to top-floor suites — see what is available today, then reserve with a simple message. No forms, no fees, just a conversation.</p>
+  </section>
 
-    <!-- THE PRECIOUS -->
-    <section class="section">
-      <h2>The Precious</h2>
-      <p class="prop-desc">An 8-floor residence with 86 rooms — from cozy standard studios to a top-floor penthouse. Ideal for monthly stays.</p>
-      <div class="cards">
-        <div class="card" data-key="precious|Standard|monthly">
-          <div class="photo"><span>Standard Room</span><img src="images/guest/precious-standard.jpg" alt="Standard room at The Precious" onerror="this.remove()"></div>
+  <!-- TABS -->
+  <div class="tabs-wrap" id="residences">
+    <div class="tabs" role="tablist" aria-label="Choose a residence">
+      <button class="tab-btn" id="tabbtn-precious" role="tab" aria-selected="true" aria-controls="panel-precious" onclick="showTab('precious')">
+        The Precious
+        <span class="tab-note">Monthly Residences</span>
+      </button>
+      <button class="tab-btn" id="tabbtn-moment" role="tab" aria-selected="false" aria-controls="panel-moment" onclick="showTab('moment')">
+        The Moment
+        <span class="tab-note">Monthly &amp; Daily Stays</span>
+      </button>
+    </div>
+
+    <!-- PANEL: THE PRECIOUS -->
+    <section class="tab-panel active" id="panel-precious" role="tabpanel" aria-labelledby="tabbtn-precious">
+      <p class="panel-desc">An eight-floor residence of 86 rooms — from welcoming standard studios to a penthouse that crowns the building. Designed for those who stay a while.</p>
+      <div class="rooms">
+        <article class="room-card" data-key="precious|Standard|monthly">
+          <div class="photo"><span class="ph-label">Standard Room</span><img src="images/guest/precious-standard.jpg" alt="Standard room at The Precious" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Standard</h3>
-            <div class="desc">Comfortable studio room with air-conditioning, private bathroom, and balcony. Available on floors 1–7.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <p class="desc">A comfortable studio with air-conditioning, private bath, and balcony. Floors one through seven.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
-        <div class="card" data-key="precious|Deluxe|monthly">
-          <div class="photo"><span>Deluxe Room</span><img src="images/guest/precious-deluxe.jpg" alt="Deluxe room at The Precious" onerror="this.remove()"></div>
+        </article>
+        <article class="room-card" data-key="precious|Deluxe|monthly">
+          <div class="photo"><span class="ph-label">Deluxe Room</span><img src="images/guest/precious-deluxe.jpg" alt="Deluxe room at The Precious" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Deluxe</h3>
-            <div class="desc">Spacious 7th-floor room with upgraded furnishings and the best views in the building.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <p class="desc">Spacious seventh-floor rooms with upgraded furnishings and the finest outlook in the residence.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
-        <div class="card" data-key="precious|Penthouse|monthly">
-          <div class="photo"><span>Penthouse</span><img src="images/guest/precious-penthouse.jpg" alt="Penthouse at The Precious" onerror="this.remove()"></div>
+        </article>
+        <article class="room-card" data-key="precious|Penthouse|monthly">
+          <div class="photo"><span class="ph-label">Penthouse</span><img src="images/guest/precious-penthouse.jpg" alt="Penthouse at The Precious" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Penthouse</h3>
-            <div class="desc">The entire top floor — our largest and most private residence.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <p class="desc">The entire eighth floor — our largest and most private residence.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
+        </article>
       </div>
     </section>
 
-    <!-- THE MOMENT -->
-    <section class="section">
-      <h2>The Moment</h2>
-      <p class="prop-desc">A modern 7-floor building with studios, one-bedrooms, and deluxe units — monthly stays on floors 2–5, flexible daily stays on floors 6–7.</p>
+    <!-- PANEL: THE MOMENT -->
+    <section class="tab-panel" id="panel-moment" role="tabpanel" aria-labelledby="tabbtn-moment">
+      <p class="panel-desc">A modern seven-floor building. Monthly residences on floors two to five; flexible daily stays on floors six and seven, with breakfast on request.</p>
 
-      <div class="band-label">Monthly stays</div>
-      <div class="cards">
-        <div class="card" data-key="moment|A2|monthly">
-          <div class="photo"><span>Studio</span><img src="images/guest/moment-studio-monthly.jpg" alt="Monthly studio at The Moment" onerror="this.remove()"></div>
+      <div class="band-head"><span>Monthly Residences</span></div>
+      <div class="rooms">
+        <article class="room-card" data-key="moment|A2|monthly">
+          <div class="photo"><span class="ph-label">Studio</span><img src="images/guest/moment-studio-monthly.jpg" alt="Monthly studio at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
-            <h3>Studio (Monthly)</h3>
-            <div class="desc">Bright, modern studio — perfect for long-stay residents. Floors 2–5.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <h3>Studio</h3>
+            <p class="desc">A bright, modern studio — ideal for long-stay residents who want simplicity done well.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
-        <div class="card" data-key="moment|B|monthly">
-          <div class="photo"><span>1-Bedroom</span><img src="images/guest/moment-1br-monthly.jpg" alt="One-bedroom at The Moment" onerror="this.remove()"></div>
+        </article>
+        <article class="room-card" data-key="moment|B|monthly">
+          <div class="photo"><span class="ph-label">One-Bedroom</span><img src="images/guest/moment-1br-monthly.jpg" alt="One-bedroom at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
-            <h3>1-Bedroom (Monthly)</h3>
-            <div class="desc">Separate bedroom and living area — extra space for couples or work-from-home.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <h3>One-Bedroom</h3>
+            <p class="desc">A separate bedroom and living space — room to live, work, and unwind.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
-        <div class="card" data-key="moment|C|monthly">
-          <div class="photo"><span>Deluxe</span><img src="images/guest/moment-deluxe-monthly.jpg" alt="Deluxe unit at The Moment" onerror="this.remove()"></div>
+        </article>
+        <article class="room-card" data-key="moment|C|monthly">
+          <div class="photo"><span class="ph-label">Deluxe</span><img src="images/guest/moment-deluxe-monthly.jpg" alt="Deluxe unit at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
-            <h3>Deluxe (Monthly)</h3>
-            <div class="desc">Our premium corner units with the best light and layout.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <h3>Deluxe</h3>
+            <p class="desc">Premium corner units with the best light and the most generous layout.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
+        </article>
       </div>
 
-      <div class="band-label">Daily stays — floors 6–7</div>
+      <div class="band-head"><span>Daily Stays · Floors 6–7</span></div>
       <div class="datebox">
-        <label>Check-in <input type="date" id="date-in"></label>
-        <label>Check-out <input type="date" id="date-out"></label>
-        <button class="btn btn-check" onclick="checkDates()">Check availability</button>
-        <div class="note" id="date-note">Showing availability for tonight. Pick your dates to check a specific stay.</div>
+        <div class="field">
+          <label for="date-in">Arrival</label>
+          <input type="date" id="date-in">
+        </div>
+        <div class="field">
+          <label for="date-out">Departure</label>
+          <input type="date" id="date-out">
+        </div>
+        <button class="btn btn-gold" onclick="checkDates()">Check Availability</button>
+        <div class="note" id="date-note">Showing availability for tonight — choose your dates to check a specific stay.</div>
       </div>
-      <div class="cards">
-        <div class="card" data-key="moment|A1|daily">
-          <div class="photo"><span>Studio</span><img src="images/guest/moment-studio-daily.jpg" alt="Daily studio at The Moment" onerror="this.remove()"></div>
+      <div class="rooms">
+        <article class="room-card" data-key="moment|A1|daily">
+          <div class="photo"><span class="ph-label">Studio</span><img src="images/guest/moment-studio-daily.jpg" alt="Daily studio at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
-            <h3>Studio (Daily)</h3>
-            <div class="desc">Hotel-style studio for short visits. Breakfast add-on available.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <h3>Studio</h3>
+            <p class="desc">A hotel-style studio for short visits. Breakfast available on request.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
-        <div class="card" data-key="moment|B|daily">
-          <div class="photo"><span>1-Bedroom</span><img src="images/guest/moment-1br-daily.jpg" alt="Daily one-bedroom at The Moment" onerror="this.remove()"></div>
+        </article>
+        <article class="room-card" data-key="moment|B|daily">
+          <div class="photo"><span class="ph-label">One-Bedroom</span><img src="images/guest/moment-1br-daily.jpg" alt="Daily one-bedroom at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
-            <h3>1-Bedroom (Daily)</h3>
-            <div class="desc">More space for families and longer short-stays.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <h3>One-Bedroom</h3>
+            <p class="desc">Extra space for families and longer short-stays.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
-        <div class="card" data-key="moment|C|daily">
-          <div class="photo"><span>Deluxe</span><img src="images/guest/moment-deluxe-daily.jpg" alt="Daily deluxe at The Moment" onerror="this.remove()"></div>
+        </article>
+        <article class="room-card" data-key="moment|C|daily">
+          <div class="photo"><span class="ph-label">Deluxe</span><img src="images/guest/moment-deluxe-daily.jpg" alt="Daily deluxe at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
-            <h3>Deluxe (Daily)</h3>
-            <div class="desc">Top-floor premium units for a special stay.</div>
-            <span class="badge badge-loading">Checking…</span>
-            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+            <h3>Deluxe</h3>
+            <p class="desc">Top-floor premium units for a stay worth remembering.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
           </div>
-        </div>
+        </article>
       </div>
     </section>
-
-    <!-- LOCATION -->
-    <section class="location">
-      <h2>📍 Find us in Hua Hin</h2>
-      <p>Both residences are minutes from Hua Hin's beaches, night markets, and restaurants.
-      Message us on <a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">LINE (ID: the.precious)</a>
-      or <a href="https://m.me/precious.huahin" target="_blank" rel="noopener">Facebook Messenger</a> for directions, photos, and rates —
-      we reply fast and speak English and Thai.</p>
-    </section>
-
-    <p class="foot-note">The Precious Moment @ Huahin · Reservations by chat only — no online payment on this site.</p>
   </div>
 
-  <!-- Sticky contact bar -->
+  <!-- CONTACT -->
+  <section class="contact">
+    <div class="kicker">Reservations</div>
+    <h2>Begin with a Message</h2>
+    <p>Rates, photos, directions, and availability for your dates — one message away. We reply quickly, in English and Thai.</p>
+    <div class="cta-row">
+      <a class="btn btn-line" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">
+        <svg aria-hidden="true"><use href="#ic-chat"/></svg> LINE · the.precious
+      </a>
+      <a class="btn btn-fb" href="https://m.me/precious.huahin" target="_blank" rel="noopener">
+        <svg aria-hidden="true"><use href="#ic-send"/></svg> Messenger
+      </a>
+    </div>
+    <div class="fine">The Precious Moment · Hua Hin · Reservations by chat only</div>
+  </section>
+
+  <!-- Sticky mobile bar -->
   <div class="stickybar">
-    <a class="btn btn-line" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">💬 LINE</a>
-    <a class="btn btn-fb" href="https://m.me/precious.huahin" target="_blank" rel="noopener">✉️ Messenger</a>
+    <a class="btn btn-line" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">
+      <svg aria-hidden="true"><use href="#ic-chat"/></svg> LINE
+    </a>
+    <a class="btn btn-fb" href="https://m.me/precious.huahin" target="_blank" rel="noopener">
+      <svg aria-hidden="true"><use href="#ic-send"/></svg> Messenger
+    </a>
   </div>
 
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
+    /* Hero photo: fades in only if the image exists */
+    (function () {
+      var img = new Image();
+      img.onload = function () {
+        var layer = document.getElementById('hero-photo');
+        layer.style.backgroundImage = 'url(images/guest/hero.jpg)';
+        layer.classList.add('loaded');
+      };
+      img.src = 'images/guest/hero.jpg';
+    })();
+
+    function showTab(name) {
+      ['precious', 'moment'].forEach(function (t) {
+        document.getElementById('tabbtn-' + t).setAttribute('aria-selected', t === name ? 'true' : 'false');
+        document.getElementById('panel-' + t).classList.toggle('active', t === name);
+      });
+    }
+
     function setBadge(key, vacant) {
-      document.querySelectorAll('.card[data-key="' + key + '"] .badge').forEach(function (el) {
+      document.querySelectorAll('.room-card[data-key="' + key + '"] .availability').forEach(function (el) {
+        var txt = el.querySelector('.txt');
         if (vacant > 0) {
-          el.textContent = '✓ ' + vacant + ' available';
-          el.className = 'badge badge-avail';
+          el.className = 'availability is-avail';
+          txt.textContent = vacant + ' Available';
         } else {
-          el.textContent = 'Fully booked — ask us';
-          el.className = 'badge badge-full';
+          el.className = 'availability is-full';
+          txt.textContent = 'Fully Booked';
         }
       });
     }
@@ -239,13 +524,12 @@
         clearTimeout(timer);
         if (!r.ok || !r.availability) return;
         r.availability.forEach(function (g) {
-          var key = g.property + '|' + g.type + '|' + g.band;
           if (dailyOnly && g.band !== 'daily') return;
-          setBadge(key, g.vacant);
+          setBadge(g.property + '|' + g.type + '|' + g.band, g.vacant);
         });
       }).catch(function () {
-        // API unreachable — remove loading badges, page stays a brochure
-        document.querySelectorAll('.badge-loading').forEach(function (el) { el.remove(); });
+        /* API unreachable — hide badges, page remains a brochure */
+        document.querySelectorAll('.availability.is-loading').forEach(function (el) { el.remove(); });
       });
     }
 
@@ -254,13 +538,13 @@
       var end = document.getElementById('date-out').value;
       var note = document.getElementById('date-note');
       if (!start || !end || end <= start) {
-        note.textContent = 'Please pick a check-in date and a later check-out date.';
+        note.textContent = 'Please choose an arrival date and a later departure date.';
         return;
       }
-      note.textContent = 'Showing daily-stay availability for ' + start + ' → ' + end + '.';
-      document.querySelectorAll('.card[data-key$="|daily"] .badge').forEach(function (el) {
-        el.textContent = 'Checking…';
-        el.className = 'badge badge-loading';
+      note.textContent = 'Daily-stay availability for ' + start + ' — ' + end + '.';
+      document.querySelectorAll('.room-card[data-key$="|daily"] .availability').forEach(function (el) {
+        el.className = 'availability is-loading';
+        el.querySelector('.txt').textContent = 'Checking';
       });
       loadAvailability(start, end, true);
     }
