@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Precious Moment @ Huahin — Rooms & Availability</title>
+  <meta name="description" content="Monthly and daily room rentals in Hua Hin, Thailand. The Precious and The Moment residences — see room types and live availability, reserve via LINE or Facebook Messenger.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA;
+      --muted: #86868B; --go: #0F766E; --card: #FFFFFF;
+      --line-green: #06C755; --fb-blue: #0084FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); padding-bottom: 84px; }
+    h1, h2, h3 { font-family: 'Lexend', sans-serif; }
+
+    .hero { background: linear-gradient(135deg, #0F766E 0%, #134E4A 100%); color: #fff; padding: 48px 24px 40px; text-align: center; }
+    .hero h1 { font-size: clamp(26px, 5vw, 40px); letter-spacing: 0.5px; }
+    .hero .sub { margin-top: 10px; font-size: 16px; opacity: 0.9; }
+    .hero .cta-row { margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 99px; font-weight: 600; font-family: 'Lexend', sans-serif; text-decoration: none; font-size: 15px; border: none; cursor: pointer; transition: transform .15s; }
+    .btn:active { transform: scale(0.97); }
+    .btn-line { background: var(--line-green); color: #fff; }
+    .btn-fb { background: var(--fb-blue); color: #fff; }
+    .btn-check { background: var(--go); color: #fff; padding: 10px 20px; border-radius: 12px; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+    .section { margin-top: 40px; }
+    .section > h2 { font-size: 24px; }
+    .section > .prop-desc { color: var(--muted); margin-top: 6px; max-width: 640px; }
+    .band-label { font-size: 14px; font-weight: 600; color: var(--go); text-transform: uppercase; letter-spacing: 1px; margin-top: 24px; font-family: 'Lexend', sans-serif; }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; margin-top: 14px; }
+    .card { background: var(--card); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .card .photo { height: 150px; background: linear-gradient(135deg, #CCFBF1, #99F6E4); display: flex; align-items: center; justify-content: center; font-family: 'Lexend', sans-serif; font-weight: 600; color: #0F766E; font-size: 15px; position: relative; }
+    .card .photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .card .body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .card h3 { font-size: 17px; }
+    .card .desc { font-size: 13.5px; color: var(--muted); flex: 1; }
+    .badge { align-self: flex-start; padding: 5px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 700; font-family: 'Lexend', sans-serif; }
+    .badge-avail { background: #D1FAE5; color: #065F46; }
+    .badge-full { background: #F3F4F6; color: #6B7280; }
+    .badge-loading { background: #F3F4F6; color: #9CA3AF; }
+    .card .reserve { margin-top: 4px; }
+    .card .reserve a { color: var(--go); font-weight: 600; font-size: 14px; text-decoration: none; }
+
+    .datebox { background: var(--card); border-radius: 16px; padding: 16px; margin-top: 14px; display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+    .datebox label { font-size: 13px; font-weight: 600; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+    .datebox input { padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; font-family: inherit; }
+    .datebox .note { flex-basis: 100%; font-size: 12.5px; color: var(--muted); }
+
+    .location { background: var(--card); border-radius: 20px; padding: 24px; margin-top: 40px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+    .location h2 { font-size: 20px; }
+    .location p { margin-top: 8px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+    .location a { color: var(--go); font-weight: 600; }
+
+    .foot-note { text-align: center; color: var(--muted); font-size: 12.5px; margin: 36px 0 20px; }
+
+    .stickybar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 10px; justify-content: center; z-index: 50; }
+    .stickybar .btn { flex: 1; max-width: 240px; justify-content: center; }
+
+    @media (max-width: 480px) {
+      .hero { padding: 36px 16px 30px; }
+      .cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .card .photo { height: 110px; }
+      .card .body { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <h1>The Precious Moment</h1>
+    <div class="sub">Comfortable monthly &amp; daily stays in the heart of Hua Hin, Thailand</div>
+    <div class="cta-row">
+      <a class="btn btn-line" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">💬 Reserve via LINE</a>
+      <a class="btn btn-fb" href="https://m.me/precious.huahin" target="_blank" rel="noopener">✉️ Messenger</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- THE PRECIOUS -->
+    <section class="section">
+      <h2>The Precious</h2>
+      <p class="prop-desc">An 8-floor residence with 86 rooms — from cozy standard studios to a top-floor penthouse. Ideal for monthly stays.</p>
+      <div class="cards">
+        <div class="card" data-key="precious|Standard|monthly">
+          <div class="photo"><span>Standard Room</span><img src="images/guest/precious-standard.jpg" alt="Standard room at The Precious" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Standard</h3>
+            <div class="desc">Comfortable studio room with air-conditioning, private bathroom, and balcony. Available on floors 1–7.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+        <div class="card" data-key="precious|Deluxe|monthly">
+          <div class="photo"><span>Deluxe Room</span><img src="images/guest/precious-deluxe.jpg" alt="Deluxe room at The Precious" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Deluxe</h3>
+            <div class="desc">Spacious 7th-floor room with upgraded furnishings and the best views in the building.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+        <div class="card" data-key="precious|Penthouse|monthly">
+          <div class="photo"><span>Penthouse</span><img src="images/guest/precious-penthouse.jpg" alt="Penthouse at The Precious" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Penthouse</h3>
+            <div class="desc">The entire top floor — our largest and most private residence.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE MOMENT -->
+    <section class="section">
+      <h2>The Moment</h2>
+      <p class="prop-desc">A modern 7-floor building with studios, one-bedrooms, and deluxe units — monthly stays on floors 2–5, flexible daily stays on floors 6–7.</p>
+
+      <div class="band-label">Monthly stays</div>
+      <div class="cards">
+        <div class="card" data-key="moment|A2|monthly">
+          <div class="photo"><span>Studio</span><img src="images/guest/moment-studio-monthly.jpg" alt="Monthly studio at The Moment" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Studio (Monthly)</h3>
+            <div class="desc">Bright, modern studio — perfect for long-stay residents. Floors 2–5.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+        <div class="card" data-key="moment|B|monthly">
+          <div class="photo"><span>1-Bedroom</span><img src="images/guest/moment-1br-monthly.jpg" alt="One-bedroom at The Moment" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>1-Bedroom (Monthly)</h3>
+            <div class="desc">Separate bedroom and living area — extra space for couples or work-from-home.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+        <div class="card" data-key="moment|C|monthly">
+          <div class="photo"><span>Deluxe</span><img src="images/guest/moment-deluxe-monthly.jpg" alt="Deluxe unit at The Moment" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Deluxe (Monthly)</h3>
+            <div class="desc">Our premium corner units with the best light and layout.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="band-label">Daily stays — floors 6–7</div>
+      <div class="datebox">
+        <label>Check-in <input type="date" id="date-in"></label>
+        <label>Check-out <input type="date" id="date-out"></label>
+        <button class="btn btn-check" onclick="checkDates()">Check availability</button>
+        <div class="note" id="date-note">Showing availability for tonight. Pick your dates to check a specific stay.</div>
+      </div>
+      <div class="cards">
+        <div class="card" data-key="moment|A1|daily">
+          <div class="photo"><span>Studio</span><img src="images/guest/moment-studio-daily.jpg" alt="Daily studio at The Moment" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Studio (Daily)</h3>
+            <div class="desc">Hotel-style studio for short visits. Breakfast add-on available.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+        <div class="card" data-key="moment|B|daily">
+          <div class="photo"><span>1-Bedroom</span><img src="images/guest/moment-1br-daily.jpg" alt="Daily one-bedroom at The Moment" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>1-Bedroom (Daily)</h3>
+            <div class="desc">More space for families and longer short-stays.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+        <div class="card" data-key="moment|C|daily">
+          <div class="photo"><span>Deluxe</span><img src="images/guest/moment-deluxe-daily.jpg" alt="Daily deluxe at The Moment" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Deluxe (Daily)</h3>
+            <div class="desc">Top-floor premium units for a special stay.</div>
+            <span class="badge badge-loading">Checking…</span>
+            <div class="reserve"><a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Ask about this room →</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="location">
+      <h2>📍 Find us in Hua Hin</h2>
+      <p>Both residences are minutes from Hua Hin's beaches, night markets, and restaurants.
+      Message us on <a href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">LINE (ID: the.precious)</a>
+      or <a href="https://m.me/precious.huahin" target="_blank" rel="noopener">Facebook Messenger</a> for directions, photos, and rates —
+      we reply fast and speak English and Thai.</p>
+    </section>
+
+    <p class="foot-note">The Precious Moment @ Huahin · Reservations by chat only — no online payment on this site.</p>
+  </div>
+
+  <!-- Sticky contact bar -->
+  <div class="stickybar">
+    <a class="btn btn-line" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">💬 LINE</a>
+    <a class="btn btn-fb" href="https://m.me/precious.huahin" target="_blank" rel="noopener">✉️ Messenger</a>
+  </div>
+
+  <script>
+    var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
+
+    function setBadge(key, vacant) {
+      document.querySelectorAll('.card[data-key="' + key + '"] .badge').forEach(function (el) {
+        if (vacant > 0) {
+          el.textContent = '✓ ' + vacant + ' available';
+          el.className = 'badge badge-avail';
+        } else {
+          el.textContent = 'Fully booked — ask us';
+          el.className = 'badge badge-full';
+        }
+      });
+    }
+
+    function loadAvailability(startDate, endDate, dailyOnly) {
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, 5000);
+      fetch(WORKER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'publicGetAvailability', params: [startDate || null, endDate || null] }),
+        signal: controller.signal
+      }).then(function (res) { return res.json(); }).then(function (r) {
+        clearTimeout(timer);
+        if (!r.ok || !r.availability) return;
+        r.availability.forEach(function (g) {
+          var key = g.property + '|' + g.type + '|' + g.band;
+          if (dailyOnly && g.band !== 'daily') return;
+          setBadge(key, g.vacant);
+        });
+      }).catch(function () {
+        // API unreachable — remove loading badges, page stays a brochure
+        document.querySelectorAll('.badge-loading').forEach(function (el) { el.remove(); });
+      });
+    }
+
+    function checkDates() {
+      var start = document.getElementById('date-in').value;
+      var end = document.getElementById('date-out').value;
+      var note = document.getElementById('date-note');
+      if (!start || !end || end <= start) {
+        note.textContent = 'Please pick a check-in date and a later check-out date.';
+        return;
+      }
+      note.textContent = 'Showing daily-stay availability for ' + start + ' → ' + end + '.';
+      document.querySelectorAll('.card[data-key$="|daily"] .badge').forEach(function (el) {
+        el.textContent = 'Checking…';
+        el.className = 'badge badge-loading';
+      });
+      loadAvailability(start, end, true);
+    }
+
+    loadAvailability(null, null, false);
+  </script>
+</body>
+</html>
