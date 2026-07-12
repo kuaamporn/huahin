@@ -1,0 +1,31 @@
+/* app.css — shared design tokens for The Precious Moment System (staff app).
+ *
+ * Single source of truth for the brand palette. Previously these variables were
+ * duplicated in the <style> block of every page; change them here once now.
+ *
+ * Loaded via @import at the TOP of each page's <style> (must stay before any
+ * other CSS rule). Pages with legitimately different tokens (rooms.html's
+ * property colours, reconcile.html's amber warn) keep their own :root, which
+ * overrides these where the names overlap.
+ */
+:root {
+  /* Core palette — was copied into all 7 main staff pages */
+  --ink: #1D1D1F;       /* primary text */
+  --text: #1D1D1F;      /* alias of --ink (a few rules reference --text) */
+  --paper: #F5F5F7;     /* app background */
+  --card: #FFFFFF;      /* card / surface background */
+  --line: #E5E5EA;      /* borders and dividers */
+  --muted: #4B4B4D;     /* secondary text */
+  --go: #0F766E;        /* brand teal / primary action */
+  --go-dark: #0E6B63;   /* teal hover / pressed */
+  --warn: #DC2626;      /* danger / destructive */
+
+  /* Additive foundation tokens — new, safe to adopt gradually */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06);
+  --shadow: 0 4px 14px rgba(0, 0, 0, .06);
+  --font-head: 'Lexend', 'Segoe UI', sans-serif;
+  --font-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+}
