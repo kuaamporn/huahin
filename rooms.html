@@ -402,6 +402,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 <div class="toast" id="toast"></div>
 
 <script src="session.js"></script>
+<script src="ui.js"></script>
 <script>
 // =====================================================================
 var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
@@ -1284,7 +1285,7 @@ function confirmCheckIn() {
   }
 }
 
-function delBook(id){
+async function delBook(id){
   var b = bookings.find(function(x) { return x.bookingId === id; });
   if (!b) return;
 
@@ -1292,7 +1293,7 @@ function delBook(id){
     document.getElementById('mrCancelBookingId').value = id;
     document.getElementById('cancelResBg').classList.remove('hidden');
   } else {
-    if(!confirm('Cancel this active booking?')) return;
+    if(!(await confirmDialog('Cancel this active booking?', {title:'Cancel booking', confirmText:'Cancel booking', cancelText:'Keep', danger:true}))) return;
     callApi('roomsCancelBooking', [sessionToken, id, true]).then(function(res){
       if(res.ok){ closeDetail(); showToast('Booking cancelled','ok'); bootApp(); }
       else showToast(res.error||'Could not cancel — owner permission required','err');
@@ -1340,13 +1341,7 @@ function jumpToday(){
 }
 
 var toastTimer;
-function showToast(msg, type){
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + (type||'ok');
-  clearTimeout(toastTimer);
-  requestAnimationFrame(function(){ t.classList.add('show'); });
-  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
-}
+// showToast is provided globally by ui.js (accepts 'ok'/'err' aliases).
 
 function toggleModalAction() {
   var act = document.getElementById('mAction').value;
@@ -1382,8 +1377,8 @@ function showOverrideDetail(roomId, type, reason) {
   document.getElementById('detailPanel').classList.add('open');
 }
 
-function resolveOverride(roomId) {
-  if (!confirm('Resolve this room override status?')) return;
+async function resolveOverride(roomId) {
+  if (!(await confirmDialog('Resolve this room override status?', {title:'Resolve status', confirmText:'Resolve'}))) return;
   callApi('roomsResolveMaintenance', [sessionToken, roomId]).then(function(res){
     if (res.ok) {
       closeDetail();

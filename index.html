@@ -374,6 +374,7 @@
 
   <!-- QR scanning library (lightweight, free, no API key needed) -->
   <script src="session.js"></script>
+  <script src="ui.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
     // =====================================================================
@@ -1114,8 +1115,8 @@
       }
     }
 
-    function completeTask(type, roomId, dateStr) {
-      if (!confirm('Mark this task as completed?')) return;
+    async function completeTask(type, roomId, dateStr) {
+      if (!(await confirmDialog('Mark this task as completed?', {title:'Complete task', confirmText:'Mark done'}))) return;
       var apiName = type === 'housekeeping' ? 'roomsMarkCleaned' : 'roomsResolveMaintenance';
       var params = type === 'housekeeping' ? [sessionToken, roomId, dateStr] : [sessionToken, roomId];
 

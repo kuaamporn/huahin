@@ -162,6 +162,7 @@
   </div>
 
   <script src="session.js"></script>
+  <script src="ui.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
     var loadedRooms = [];
@@ -479,10 +480,10 @@
         .filter(function(r) { return r && r.metersUntouched; })
         .map(function(r) { return r.room_name; });
       if (untouchedRooms.length > 0) {
-        if (!confirm('⚠ No current meter reading entered for: ' + untouchedRooms.join(', ') + '.\n\nTheir invoices will bill ฿0 for utilities. Generate anyway?')) return;
+        if (!(await confirmDialog('No current meter reading entered for: ' + untouchedRooms.join(', ') + '.\n\nTheir invoices will bill ฿0 for utilities. Generate anyway?', {title:'Missing meter readings', confirmText:'Generate anyway', danger:true}))) return;
       }
 
-      if (!confirm('Are you sure you want to generate Pending Invoices for the ' + checkedBoxes.length + ' selected rooms?')) return;
+      if (!(await confirmDialog('Generate pending invoices for the ' + checkedBoxes.length + ' selected rooms?', {title:'Generate invoices', confirmText:'Generate'}))) return;
 
       document.getElementById('btn-generate').disabled = true;
       var errEl = document.getElementById('err-display');
@@ -535,8 +536,8 @@
       document.getElementById('btn-load').click();
     };
 
-    function deletePendingInvoice(txnId) {
-      if (!confirm('Are you sure you want to delete this pending invoice?')) return;
+    async function deletePendingInvoice(txnId) {
+      if (!(await confirmDialog('Delete this pending invoice?', {title:'Delete invoice', confirmText:'Delete', danger:true}))) return;
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
       apiCall('financeDeleteTransaction', [token, txnId]).then(function(res) {

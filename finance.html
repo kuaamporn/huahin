@@ -547,6 +547,7 @@
   </div>
 
   <script src="session.js"></script>
+  <script src="ui.js"></script>
   <script>
     // =====================================================================
     // CONFIG — must match the Worker URL used in index.html/rooms.html/hr.html
@@ -1665,8 +1666,8 @@
       });
     }
 
-    function markDepositRefunded(txnId) {
-      if (!confirm('Mark this deposit as refunded? Ensure you also add an Expense transaction for the cash returned.')) return;
+    async function markDepositRefunded(txnId) {
+      if (!(await confirmDialog('Mark this deposit as refunded? Ensure you also add an Expense transaction for the cash returned.', {title:'Mark deposit refunded', confirmText:'Mark refunded'}))) return;
       callApi('financeMarkDepositRefunded', [session.token, txnId]).then(function(res) {
         if (!res.ok) { alert(res.error); return; }
         openUnrefundedModal();
@@ -2091,8 +2092,8 @@
       if (vendor) openVendorForm(vendor);
     };
 
-    window.deleteVendor = function(id) {
-      if (!confirm('Are you sure you want to delete this vendor?')) return;
+    window.deleteVendor = async function(id) {
+      if (!(await confirmDialog('Delete this vendor?', {title:'Delete vendor', confirmText:'Delete', danger:true}))) return;
       callApi('financeDeleteVendor', [session.token, id]).then(function(res) {
         if (!res.ok) alert('Error: ' + res.error);
         else renderVendorsTable();

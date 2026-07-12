@@ -167,6 +167,7 @@
   </div>
 
   <script src="session.js"></script>
+  <script src="ui.js"></script>
   <script>
     const WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
     let sessionToken = '';
@@ -391,7 +392,7 @@
     }
 
     async function confirmOtaBatch(batchId) {
-      if (!confirm('Confirm this OTA payout batch? This will mark matched invoices as paid.')) return;
+      if (!(await confirmDialog('Confirm this OTA payout batch? This will mark matched invoices as paid.', {title:'Confirm payout batch', confirmText:'Confirm'}))) return;
       const r = await api('reconcileConfirmOtaBatch', [sessionToken, batchId]);
       if (r.ok) {
         loadOtaBatches();

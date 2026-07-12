@@ -495,6 +495,7 @@
   </div>
 
   <script src="session.js"></script>
+  <script src="ui.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
@@ -1074,8 +1075,8 @@
         });
     });
 
-    function clearOverride(employeeId, dateStr) {
-      if (!confirm('Clear the manual status for this date? It will go back to auto-detected status.')) return;
+    async function clearOverride(employeeId, dateStr) {
+      if (!(await confirmDialog('Clear the manual status for this date? It will go back to auto-detected status.', {title:'Clear manual status', confirmText:'Clear'}))) return;
       callApi('adminClearAttendanceOverride', [token, employeeId, dateStr]).then(function(res) {
         if (res.ok) {
           loadAttendance();

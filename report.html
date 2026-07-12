@@ -539,6 +539,7 @@
   </div>
 
   <script src="session.js"></script>
+  <script src="ui.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
@@ -939,9 +940,9 @@
       window.open('receipt.html?receipt_no=' + encodeURIComponent(nos.join(',')), '_blank');
     }
 
-    window.doCancelReceipt = function(receiptNo, e) {
+    window.doCancelReceipt = async function(receiptNo, e) {
       if (e) e.preventDefault();
-      if (!confirm('Are you sure you want to cancel receipt ' + receiptNo + '? This action is permanent, and will mark the receipt as void/cancelled.')) return;
+      if (!(await confirmDialog('Cancel receipt ' + receiptNo + '? This is permanent and marks the receipt as void/cancelled.', {title:'Cancel receipt', confirmText:'Cancel receipt', cancelText:'Keep', danger:true}))) return;
 
       callApi('financeCancelReceipt', [sessionToken, receiptNo]).then(function(res) {
         if (res.ok) {
