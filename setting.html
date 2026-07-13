@@ -298,7 +298,7 @@
         show('link-hr');
         show('link-setting');
       }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('link-finance');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) show('link-finance');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-report');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
 

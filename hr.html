@@ -526,7 +526,7 @@
 
     if (_session) {
       if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) document.getElementById('link-finance').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner')) document.getElementById('link-dashboard').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {

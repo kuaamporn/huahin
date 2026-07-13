@@ -180,7 +180,7 @@
         show('link-hr');
         show('link-setting');
       }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense')) show('link-finance');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) show('link-finance');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
         document.getElementById('link-report').classList.remove('hidden');
       }
