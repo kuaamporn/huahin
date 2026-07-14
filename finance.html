@@ -252,6 +252,11 @@
           <datalist id="fm-vendor-list"></datalist>
         </div>
 
+        <div class="full hidden" id="fm-company-banner" style="margin-top:8px; padding:10px 12px; background:#EFF6FF; border:1px solid #BFDBFE; border-left:4px solid #2563EB; border-radius:8px; font-size:13px;">
+          <div style="font-weight:600; color:#1E3A8A;">🏢 <span id="fm-company-banner-title">Billed to company</span></div>
+          <div id="fm-company-banner-body" style="color:#1E40AF; margin-top:2px;"></div>
+        </div>
+
         <div class="full" style="margin-top: 10px;">
           <label>Items</label>
           <div id="fm-items-container"></div>
@@ -1169,6 +1174,7 @@
     
     function openFinanceModal(mode) {
       editingTxnId = null;
+      document.getElementById('fm-company-banner').classList.add('hidden');
       financeModalMode = mode;
       document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? '+ Add Revenue' : '+ Add Expense';
       document.querySelector('label[for="fm-paid-by"]').textContent = mode === 'revenue' ? 'Received By' : 'Paid By';
@@ -1309,7 +1315,45 @@
         });
     }
 
-    
+    // Show a read-only "billed to company" banner in the edit modal when the
+    // transaction is billed to a company. For an already-issued receipt the
+    // authoritative bill-to is the frozen snapshot on the receipt row; before a
+    // receipt is issued we fall back to the booking's current company. Individual
+    // (non-company) transactions leave the banner hidden.
+    function renderCompanyBanner(t) {
+      var banner = document.getElementById('fm-company-banner');
+      var titleEl = document.getElementById('fm-company-banner-title');
+      var bodyEl = document.getElementById('fm-company-banner-body');
+      banner.classList.add('hidden');
+      if (!t || t.direction !== 'IN') return;
+
+      function paint(title, name, taxId, branch) {
+        if (!name) return;
+        titleEl.textContent = title;
+        var line = escapeHtml(name);
+        if (branch) line += ' — ' + escapeHtml(branch);
+        if (taxId) line += ' · Tax ID ' + escapeHtml(taxId);
+        bodyEl.innerHTML = line;
+        banner.classList.remove('hidden');
+      }
+
+      var receiptNos = (t.receipt_no || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      if (receiptNos.length > 0) {
+        callApi('financeGetReceipt', [session.token, receiptNos[0]]).then(function(res){
+          if (res && res.ok && res.receipt && res.receipt.company_name) {
+            paint('Billed to company (on issued receipt)', res.receipt.company_name, res.receipt.company_tax_id, res.receipt.company_branch);
+          }
+        }).catch(function(){});
+      } else {
+        callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(res){
+          if (res && res.ok && res.company) {
+            paint('This receipt will be billed to company', res.company.name, res.company.tax_id, res.company.branch);
+          }
+        }).catch(function(){});
+      }
+    }
+
+
     function editTransaction(txnId) {
       var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
       if (!t) {
@@ -1318,6 +1362,7 @@
       }
 
       editingTxnId = t.txn_id;
+      renderCompanyBanner(t);
       financeModalMode = t.direction === 'IN' ? 'revenue' : 'expense';
 
       document.getElementById('finance-modal-title').textContent = financeModalMode === 'revenue' ? 'Edit Revenue' : 'Edit Expense';

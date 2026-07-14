@@ -220,6 +220,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       </div>
       <div class="board-controls">
         <button class="btn btn-p" id="addBtn" onclick="openBook()">＋ New Booking</button>
+        <button class="btn btn-o hidden" id="companiesBtn" onclick="openCompaniesModal()">🏢 Companies</button>
         <div class="timeline-nav">
           <button class="btn btn-o" onclick="shiftTimeline(-30)">◀</button>
           <button class="btn btn-o" onclick="jumpToday()">Today</button>
@@ -283,6 +284,45 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       </div>
       <datalist id="guest-datalist"></datalist>
     </div>
+
+    <!-- Company booking: bill the receipt to a company, staying guest above stays as-is -->
+    <div class="fg" style="margin-top: 4px; display: flex; align-items: center; gap: 8px;">
+      <input type="checkbox" id="mIsCompany" style="width:18px; height:18px;" onchange="toggleCompanyPanel()" />
+      <label for="mIsCompany" style="font-weight: 500; font-size: 13px; color: var(--ink);">Company booking (bill to company)</label>
+    </div>
+    <div class="fg hidden" id="mCompanyPanel" style="margin-top: 4px; padding: 12px; border: 1px solid var(--line, #e2e2e2); border-radius: 8px; background: var(--soft, #fafafa);">
+      <label class="fl">Bill to (company) — search name or Tax ID</label>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input class="fi" type="text" id="mCompanySearch" placeholder="Type company name or Tax ID…" style="flex:1;" oninput="onCompanySearch()" autocomplete="off">
+        <button class="btn btn-o" type="button" onclick="showNewCompanyForm()" style="padding:10px 12px;white-space:nowrap;font-size:13px;border-color:var(--muted);color:var(--muted);">＋ New</button>
+      </div>
+      <div id="mCompanyResults" style="margin-top:6px;"></div>
+
+      <!-- Selected company summary -->
+      <div id="mCompanySelected" class="hidden" style="margin-top:8px; padding:8px 10px; border-radius:6px; background:var(--card, #fff); border:1px solid var(--primary);">
+        <div style="font-weight:600;font-size:13px;" id="mCompanySelName"></div>
+        <div style="font-size:12px;color:var(--muted);" id="mCompanySelMeta"></div>
+        <button class="btn btn-o" type="button" onclick="clearCompanySelection()" style="margin-top:6px;padding:4px 10px;font-size:12px;">✕ Change</button>
+      </div>
+
+      <!-- Inline create new company -->
+      <div id="mNewCompanyForm" class="hidden" style="margin-top:8px;">
+        <div class="frow"><div class="fg" style="flex:1"><label class="fl">Company Name *</label><input class="fi" type="text" id="ncName"></div></div>
+        <div class="frow">
+          <div class="fg" style="flex:1"><label class="fl">Tax ID *</label><input class="fi" type="text" id="ncTaxId" placeholder="13-digit"></div>
+          <div class="fg" style="flex:1"><label class="fl">Branch</label><input class="fi" type="text" id="ncBranch" placeholder="สำนักงานใหญ่"></div>
+        </div>
+        <div class="fg"><label class="fl">Address</label><textarea class="fta" id="ncAddress" style="min-height:48px;"></textarea></div>
+        <div class="frow">
+          <div class="fg" style="flex:1"><label class="fl">Phone</label><input class="fi" type="text" id="ncPhone"></div>
+          <div class="fg" style="flex:1"><label class="fl">Email</label><input class="fi" type="text" id="ncEmail"></div>
+        </div>
+        <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="ncContact"></div>
+        <div id="ncWarn" style="display:none;color:var(--stop,#c0392b);font-size:12px;margin-bottom:6px;"></div>
+        <button class="btn btn-m" type="button" onclick="saveNewCompany()" style="padding:8px 14px;font-size:13px;">✓ Save Company</button>
+      </div>
+    </div>
+
     <div class="fg"><label class="fl">Booking Type</label>
       <div class="tbtns">
         <div class="tbtn sel" onclick="selType('monthly',this)">📅 Monthly</div>
@@ -395,6 +435,39 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div style="display:flex;gap:9px;margin-top:16px">
       <button class="btn btn-o" style="flex:1" onclick="closeCusModal()">Cancel</button>
       <button class="btn btn-m" style="flex:2" onclick="saveCustomer()">✓ Save Guest</button>
+    </div>
+  </div>
+</div>
+
+<!-- Companies management modal -->
+<div id="companies-modal" class="mbg hidden" onclick="if(event.target===this) closeCompaniesModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,.4); display:flex; align-items:center; justify-content:center; z-index:1001;">
+  <div class="modal" style="max-width: 560px;">
+    <div class="mhdr">
+      <h2 class="mtitle">Companies</h2>
+      <button class="mx" onclick="closeCompaniesModal()">×</button>
+    </div>
+    <div class="sbox" style="margin-bottom:10px;"><span>🔍</span><input type="text" id="coListSearch" placeholder="Search name or Tax ID…" oninput="renderCompaniesList()"></div>
+    <div id="companiesList" style="max-height:340px; overflow-y:auto;"></div>
+
+    <!-- Edit form (hidden until a company is picked) -->
+    <div id="coEditForm" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--line,#e2e2e2);">
+      <input type="hidden" id="coEditId">
+      <div class="frow"><div class="fg" style="flex:1"><label class="fl">Company Name *</label><input class="fi" type="text" id="coName"></div></div>
+      <div class="frow">
+        <div class="fg" style="flex:1"><label class="fl">Tax ID *</label><input class="fi" type="text" id="coTaxId"></div>
+        <div class="fg" style="flex:1"><label class="fl">Branch</label><input class="fi" type="text" id="coBranch"></div>
+      </div>
+      <div class="fg"><label class="fl">Address</label><textarea class="fta" id="coAddress" style="min-height:48px;"></textarea></div>
+      <div class="frow">
+        <div class="fg" style="flex:1"><label class="fl">Phone</label><input class="fi" type="text" id="coPhone"></div>
+        <div class="fg" style="flex:1"><label class="fl">Email</label><input class="fi" type="text" id="coEmail"></div>
+      </div>
+      <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="coContact"></div>
+      <div id="coWarn" style="display:none;color:var(--stop,#c0392b);font-size:12px;margin-bottom:6px;"></div>
+      <div style="display:flex;gap:9px;">
+        <button class="btn btn-o" style="flex:1" onclick="closeCompanyEdit()">Cancel</button>
+        <button class="btn btn-m" style="flex:2" onclick="saveCompanyEdit()">✓ Save Changes</button>
+      </div>
     </div>
   </div>
 </div>
@@ -520,12 +593,20 @@ if (session) {
     document.getElementById('link-report').classList.remove('hidden');
   }
   if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
+  // manageCompany roles: owner, frontdesk, revenue, accountant
+  if (HuaHinSession.hasRole('owner', 'frontdesk', 'revenue', 'accountant')) document.getElementById('companiesBtn').classList.remove('hidden');
 
   callApi('financeGetSettings', [sessionToken]).then(function(res) {
     if (res.ok) window.ROOMS_SETTINGS = res.settings;
   });
 
   bootApp();
+
+  // Deep-link: rooms.html#companies (e.g. from the Billing page) opens the manager.
+  if (window.location.hash === '#companies'
+      && HuaHinSession.hasRole('owner', 'frontdesk', 'revenue', 'accountant')) {
+    openCompaniesModal();
+  }
 }
 
 document.getElementById('logout-link').addEventListener('click', function(e) {
@@ -776,7 +857,7 @@ function updateRooms(){
   var p = document.getElementById('mProp').value;
   var rooms = ROOMS.filter(function(r){ return r.propertyId===p; });
   document.getElementById('mRoom').innerHTML = rooms.map(function(r){
-    if (r.roomId === 'P-OWNER' || r.roomId === 'M-OWNER') {
+    if (r.roomId === 'P-OWNER') {
       return '<option value="'+r.roomId+'">'+escapeHtml(r.displayName)+'</option>';
     }
     return '<option value="'+r.roomId+'">'+r.displayName+' · '+tl(r.roomType)+(r.rate>0?(' · ฿'+r.rate.toLocaleString()):' (TBD)')+'</option>';
@@ -819,6 +900,7 @@ function openBook(rid, date, prop, endDate){
   document.getElementById('mReservation').checked = false;
   document.getElementById('mResDepWrapper').classList.add('hidden');
   document.getElementById('mResDep').value = '0';
+  resetCompanyPanel();
 
   // Apply default deposit values
   if (selBT === 'walkin') {
@@ -1012,7 +1094,14 @@ function saveBook(){
   var isRes = document.getElementById('mReservation').checked;
   var resDep = parseFloat(document.getElementById('mResDep').value) || 0;
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId]).then(function(res){
+  var companyId = document.getElementById('mIsCompany').checked ? (selectedCompanyId || null) : null;
+  if (document.getElementById('mIsCompany').checked && !companyId) {
+    showToast('Select or create a company, or uncheck "Company booking"', 'err');
+    btn.disabled=false; btn.textContent='✓ Confirm Booking';
+    return;
+  }
+
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId, companyId]).then(function(res){
     btn.disabled=false; btn.textContent='✓ Confirm Booking';
     if(res.ok){
       closeMod();
@@ -1028,6 +1117,181 @@ function saveBook(){
     cw.style.display = 'block';
   });
 }
+
+// ---- Company booking (bill-to company) ----
+var selectedCompanyId = null;
+var companySearchTimer = null;
+
+function resetCompanyPanel(){
+  selectedCompanyId = null;
+  var chk = document.getElementById('mIsCompany');
+  if (chk) chk.checked = false;
+  document.getElementById('mCompanyPanel').classList.add('hidden');
+  document.getElementById('mCompanySearch').value = '';
+  document.getElementById('mCompanyResults').innerHTML = '';
+  document.getElementById('mCompanySelected').classList.add('hidden');
+  document.getElementById('mNewCompanyForm').classList.add('hidden');
+  ['ncName','ncTaxId','ncBranch','ncAddress','ncPhone','ncEmail','ncContact'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var w = document.getElementById('ncWarn'); if (w) { w.style.display='none'; w.textContent=''; }
+}
+
+window.toggleCompanyPanel = function(){
+  var on = document.getElementById('mIsCompany').checked;
+  document.getElementById('mCompanyPanel').classList.toggle('hidden', !on);
+  if (!on) { selectedCompanyId = null; }
+};
+
+window.onCompanySearch = function(){
+  var q = document.getElementById('mCompanySearch').value.trim();
+  document.getElementById('mNewCompanyForm').classList.add('hidden');
+  if (companySearchTimer) clearTimeout(companySearchTimer);
+  if (!q) { document.getElementById('mCompanyResults').innerHTML = ''; return; }
+  companySearchTimer = setTimeout(function(){
+    callApi('companySearch', [sessionToken, q]).then(function(res){
+      var box = document.getElementById('mCompanyResults');
+      if (!res.ok) { box.innerHTML = '<div style="font-size:12px;color:var(--stop,#c0392b);">'+escapeHtml(res.error||'Error')+'</div>'; return; }
+      var list = res.companies || [];
+      if (!list.length) { box.innerHTML = '<div style="font-size:12px;color:var(--muted);">No match — use ＋ New to create.</div>'; return; }
+      box.innerHTML = list.map(function(c){
+        return '<div style="padding:6px 8px;border:1px solid var(--line,#e2e2e2);border-radius:6px;margin-bottom:4px;cursor:pointer;background:var(--card,#fff);" '
+          + 'onclick="pickCompany(\''+c.company_id+'\')">'
+          + '<div style="font-weight:600;font-size:13px;">'+escapeHtml(c.name)+'</div>'
+          + '<div style="font-size:11px;color:var(--muted);">Tax '+escapeHtml(c.tax_id)+' · '+escapeHtml(c.branch||'')+'</div>'
+          + '</div>';
+      }).join('');
+    });
+  }, 250);
+};
+
+window.pickCompany = function(companyId){
+  callApi('companyGet', [sessionToken, companyId]).then(function(res){
+    if (!res.ok) { showToast(res.error||'Error', 'err'); return; }
+    var c = res.company;
+    selectedCompanyId = c.company_id;
+    document.getElementById('mCompanySelName').textContent = c.name;
+    document.getElementById('mCompanySelMeta').textContent = 'Tax ' + c.tax_id + ' · ' + (c.branch||'');
+    document.getElementById('mCompanySelected').classList.remove('hidden');
+    document.getElementById('mCompanyResults').innerHTML = '';
+    document.getElementById('mCompanySearch').value = '';
+    document.getElementById('mNewCompanyForm').classList.add('hidden');
+  });
+};
+
+window.clearCompanySelection = function(){
+  selectedCompanyId = null;
+  document.getElementById('mCompanySelected').classList.add('hidden');
+};
+
+window.showNewCompanyForm = function(){
+  document.getElementById('mCompanyResults').innerHTML = '';
+  document.getElementById('mNewCompanyForm').classList.remove('hidden');
+  var q = document.getElementById('mCompanySearch').value.trim();
+  if (q && !document.getElementById('ncName').value) document.getElementById('ncName').value = q;
+};
+
+window.saveNewCompany = function(){
+  var warn = document.getElementById('ncWarn');
+  warn.style.display = 'none';
+  var name = document.getElementById('ncName').value.trim();
+  var taxId = document.getElementById('ncTaxId').value.trim();
+  if (!name) { warn.textContent = 'Company name is required.'; warn.style.display='block'; return; }
+  if (!taxId) { warn.textContent = 'Tax ID is required.'; warn.style.display='block'; return; }
+  var params = [sessionToken, name, taxId,
+    document.getElementById('ncBranch').value.trim(),
+    document.getElementById('ncAddress').value.trim(),
+    document.getElementById('ncPhone').value.trim(),
+    document.getElementById('ncEmail').value.trim(),
+    document.getElementById('ncContact').value.trim(), ''];
+  callApi('companyCreate', params).then(function(res){
+    if (res.ok) {
+      showToast('Company created', 'ok');
+      document.getElementById('mNewCompanyForm').classList.add('hidden');
+      pickCompany(res.company_id);
+      return;
+    }
+    if (res.error === 'DUPLICATE_TAX_ID' && res.existing) {
+      warn.innerHTML = 'A company with this Tax ID already exists: <b>' + escapeHtml(res.existing.name) + '</b>. '
+        + '<a href="#" onclick="pickCompany(\''+res.existing.company_id+'\');return false;" style="text-decoration:underline;">Use it</a>';
+      warn.style.display = 'block';
+      return;
+    }
+    warn.textContent = res.error || 'Failed to create company.';
+    warn.style.display = 'block';
+  });
+};
+
+// ---- Companies management (list + edit) ----
+var allCompanies = [];
+
+window.openCompaniesModal = function(){
+  document.getElementById('coListSearch').value = '';
+  closeCompanyEdit();
+  document.getElementById('companies-modal').classList.remove('hidden');
+  callApi('companyList', [sessionToken]).then(function(res){
+    if (!res.ok) { showToast(res.error || 'Error loading companies', 'err'); return; }
+    allCompanies = res.companies || [];
+    renderCompaniesList();
+  });
+};
+
+window.closeCompaniesModal = function(){ document.getElementById('companies-modal').classList.add('hidden'); };
+
+window.renderCompaniesList = function(){
+  var q = (document.getElementById('coListSearch').value || '').trim().toLowerCase();
+  var list = allCompanies.filter(function(c){
+    if (!q) return true;
+    return (c.name||'').toLowerCase().indexOf(q) >= 0 || (c.tax_id||'').toLowerCase().indexOf(q) >= 0;
+  });
+  var box = document.getElementById('companiesList');
+  if (!list.length) { box.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px;">No companies yet.</div>'; return; }
+  box.innerHTML = list.map(function(c){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line,#e2e2e2);border-radius:6px;margin-bottom:4px;">'
+      + '<div style="min-width:0;"><div style="font-weight:600;font-size:13px;">'+escapeHtml(c.name)+'</div>'
+      + '<div style="font-size:11px;color:var(--muted);">Tax '+escapeHtml(c.tax_id)+' · '+escapeHtml(c.branch||'')+'</div></div>'
+      + '<button class="btn btn-o" style="padding:4px 12px;font-size:12px;flex-shrink:0;" onclick="editCompany(\''+c.company_id+'\')">✏️ Edit</button>'
+      + '</div>';
+  }).join('');
+};
+
+window.editCompany = function(companyId){
+  var c = allCompanies.find(function(x){ return x.company_id === companyId; });
+  if (!c) return;
+  document.getElementById('coEditId').value = c.company_id;
+  document.getElementById('coName').value = c.name || '';
+  document.getElementById('coTaxId').value = c.tax_id || '';
+  document.getElementById('coBranch').value = c.branch || '';
+  document.getElementById('coAddress').value = c.address || '';
+  document.getElementById('coPhone').value = c.phone || '';
+  document.getElementById('coEmail').value = c.email || '';
+  document.getElementById('coContact').value = c.contact_person || '';
+  document.getElementById('coWarn').style.display = 'none';
+  document.getElementById('coEditForm').classList.remove('hidden');
+};
+
+window.closeCompanyEdit = function(){ document.getElementById('coEditForm').classList.add('hidden'); };
+
+window.saveCompanyEdit = function(){
+  var warn = document.getElementById('coWarn');
+  warn.style.display = 'none';
+  var name = document.getElementById('coName').value.trim();
+  var taxId = document.getElementById('coTaxId').value.trim();
+  if (!name) { warn.textContent = 'Company name is required.'; warn.style.display='block'; return; }
+  if (!taxId) { warn.textContent = 'Tax ID is required.'; warn.style.display='block'; return; }
+  var params = [sessionToken, document.getElementById('coEditId').value, name, taxId,
+    document.getElementById('coBranch').value.trim(),
+    document.getElementById('coAddress').value.trim(),
+    document.getElementById('coPhone').value.trim(),
+    document.getElementById('coEmail').value.trim(),
+    document.getElementById('coContact').value.trim(), ''];
+  callApi('companyUpdate', params).then(function(res){
+    if (!res.ok) { warn.textContent = res.error || 'Failed to update.'; warn.style.display='block'; return; }
+    showToast('Company updated', 'ok');
+    closeCompanyEdit();
+    openCompaniesModal();
+  });
+};
 
 function showDetail(id){
   window.currentDetailBookingId = id;

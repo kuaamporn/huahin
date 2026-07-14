@@ -341,6 +341,17 @@
       var formattedReceiptDate = formatBE(r.receipt_date);
       var roomDisp = t.room_name || '-';
 
+      // Buyer block: if this receipt was billed to a company, use the frozen
+      // company snapshot; otherwise fall back to the individual customer.
+      var isCompany = !!(r && r.company_name);
+      var buyerName = isCompany
+        ? (r.company_name + (r.company_branch ? ' (' + r.company_branch + ')' : ''))
+        : (t.guest_or_vendor || '');
+      var buyerAddress = isCompany ? (r.company_address || '') : (c ? c.address : '');
+      var buyerTaxNo = isCompany
+        ? (r.company_tax_id || '-')
+        : (c && c.id_card ? c.id_card : '-');
+
       var rowsHtml = '';
       var itemIndex = 1;
 
@@ -434,15 +445,15 @@
         '    <div class="meta-left">',
         '      <div class="meta-row">',
         '        <div class="meta-label">ได้รับเงินจาก Name :</div>',
-        '        <div class="meta-value" style="font-weight:bold;">' + escapeHtml(t.guest_or_vendor) + '</div>',
+        '        <div class="meta-value" style="font-weight:bold;">' + escapeHtml(buyerName) + '</div>',
         '      </div>',
         '      <div class="meta-row">',
         '        <div class="meta-label">ที่อยู่ Address :</div>',
-        '        <div class="meta-value">' + escapeHtml(c ? c.address : '') + '</div>',
+        '        <div class="meta-value">' + escapeHtml(buyerAddress || '') + '</div>',
         '      </div>',
         '      <div class="meta-row">',
         '        <div class="meta-label">เลขประจำตัวผู้เสียภาษี Tax No:</div>',
-        '        <div class="meta-value" style="font-family:monospace; letter-spacing:1.5px;">' + (c && c.id_card ? escapeHtml(c.id_card) : '-') + '</div>',
+        '        <div class="meta-value" style="font-family:monospace; letter-spacing:1.5px;">' + escapeHtml(buyerTaxNo) + '</div>',
         '      </div>',
         '    </div>',
         '    <div class="meta-right">',
