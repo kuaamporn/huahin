@@ -221,6 +221,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
       <div class="board-controls">
         <button class="btn btn-p" id="addBtn" onclick="openBook()">＋ New Booking</button>
         <button class="btn btn-o hidden" id="companiesBtn" onclick="openCompaniesModal()">🏢 Companies</button>
+        <button class="btn btn-o hidden" id="roomDetailsBtn" onclick="openRoomDetailsModal()">🛏 Room Details</button>
         <div class="timeline-nav">
           <button class="btn btn-o" onclick="shiftTimeline(-30)">◀</button>
           <button class="btn btn-o" onclick="jumpToday()">Today</button>
@@ -472,6 +473,54 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
   </div>
 </div>
 
+<!-- Room Details (guest-page content) modal -->
+<div id="roomdetails-modal" class="mbg hidden" onclick="if(event.target===this) closeRoomDetailsModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,.4); display:flex; align-items:center; justify-content:center; z-index:1001;">
+  <div class="modal" style="max-width: 640px; max-height: 90vh; overflow-y: auto;">
+    <div class="mhdr">
+      <h2 class="mtitle">🛏 Room Details <span style="font-size:12px;font-weight:400;color:var(--muted)">— shown on the public guest page</span></h2>
+      <button class="mx" onclick="closeRoomDetailsModal()">×</button>
+    </div>
+    <div class="fg" style="margin-bottom:10px;"><label class="fl">Property</label>
+      <select class="fi" id="rdProp" onchange="loadRoomDetails()">
+        <option value="precious">The Precious</option>
+        <option value="moment">The Moment</option>
+      </select>
+    </div>
+    <div id="rdTypeList"></div>
+
+    <!-- Edit form (hidden until a room type is picked) -->
+    <div id="rdEditForm" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--line,#e2e2e2);">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px;" id="rdEditTitle"></div>
+      <div class="frow">
+        <div class="fg" style="flex:1"><label class="fl">Size (m²)</label><input class="fi" type="number" min="0" step="0.5" id="rdSize" placeholder="leave blank to hide"></div>
+        <div class="fg" style="flex:1"><label class="fl">Max Occupancy</label><input class="fi" type="number" min="1" max="20" id="rdOcc" placeholder="leave blank to hide"></div>
+      </div>
+      <div class="fg"><label class="fl">Bed Configuration</label><input class="fi" type="text" id="rdBed" placeholder="e.g. Queen Bed / 1 King + Sofa Bed"></div>
+      <div class="fg"><label class="fl">Description (shown to guests)</label><textarea class="fta" id="rdDesc" style="min-height:56px;"></textarea></div>
+      <div class="fg"><label class="fl">Amenities</label>
+        <div id="rdAmenities" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <input class="fi" type="text" id="rdAmenCustom" placeholder="Add custom amenity…" style="flex:1">
+          <button class="btn btn-o" onclick="rdAddCustomAmenity()">＋ Add</button>
+        </div>
+      </div>
+      <div id="rdWarn" style="display:none;color:var(--stop,#c0392b);font-size:12px;margin:6px 0;"></div>
+      <div style="display:flex;gap:9px;margin:10px 0 16px;">
+        <button class="btn btn-o" style="flex:1" onclick="hide('rdEditForm')">Close</button>
+        <button class="btn btn-m" style="flex:2" onclick="rdSaveDetails()">✓ Save Details</button>
+      </div>
+      <div class="fg"><label class="fl">Photos (max 10 — first photo is the card cover on the guest page)</label>
+        <div id="rdPhotoStrip" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        <div style="margin-top:8px;">
+          <input type="file" id="rdPhotoFile" accept="image/*" multiple style="display:none;" onchange="rdUploadPhotos(this.files)">
+          <button class="btn btn-o" id="rdUploadBtn" onclick="document.getElementById('rdPhotoFile').click()">📷 Upload Photos</button>
+          <span id="rdUploadStatus" style="font-size:12px;color:var(--muted);margin-left:8px;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="session.js"></script>
@@ -595,6 +644,7 @@ if (session) {
   if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
   // manageCompany roles: owner, frontdesk, revenue, accountant
   if (HuaHinSession.hasRole('owner', 'frontdesk', 'revenue', 'accountant')) document.getElementById('companiesBtn').classList.remove('hidden');
+  if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('roomDetailsBtn').classList.remove('hidden');
 
   callApi('financeGetSettings', [sessionToken]).then(function(res) {
     if (res.ok) window.ROOMS_SETTINGS = res.settings;
@@ -1290,6 +1340,222 @@ window.saveCompanyEdit = function(){
     showToast('Company updated', 'ok');
     closeCompanyEdit();
     openCompaniesModal();
+  });
+};
+
+// ---- Room Details manager (guest-page content: facts, amenities, photos) ----
+var RD_AMENITY_PRESETS = ['Air Conditioning','Wi-Fi','Private Bathroom','Hot Water','Balcony','TV','Refrigerator','Microwave','Wardrobe','Work Desk','Kitchenette','Washing Machine','Sea View','Pool Access'];
+var rdTypes = [], rdPhotos = [], rdCurType = null;
+
+// escapeHtml() doesn't escape quotes — needed when injecting into attributes.
+function escAttr(str){ return escapeHtml(str).replace(/"/g, '&quot;'); }
+
+window.openRoomDetailsModal = function(){
+  document.getElementById('roomdetails-modal').classList.remove('hidden');
+  loadRoomDetails();
+};
+window.closeRoomDetailsModal = function(){ document.getElementById('roomdetails-modal').classList.add('hidden'); };
+
+window.loadRoomDetails = function(){
+  hide('rdEditForm'); rdCurType = null;
+  document.getElementById('rdTypeList').innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px;">Loading…</div>';
+  callApi('roomsGetTypeDetails', [sessionToken, document.getElementById('rdProp').value]).then(function(res){
+    if (!res.ok) { showToast(res.error || 'Error loading room details', 'err'); return; }
+    rdTypes = res.types || []; rdPhotos = res.photos || [];
+    renderRdTypeList();
+  });
+};
+
+window.renderRdTypeList = function(){
+  var box = document.getElementById('rdTypeList');
+  if (!rdTypes.length) { box.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px;">No room types found.</div>'; return; }
+  box.innerHTML = rdTypes.map(function(t){
+    var nPhotos = rdPhotos.filter(function(p){ return p.room_type === t.room_type; }).length;
+    var facts = [];
+    if (t.size_sqm) facts.push(t.size_sqm + ' m²');
+    if (t.max_occupancy) facts.push('sleeps ' + t.max_occupancy);
+    if (t.bed_config) facts.push(t.bed_config);
+    var amenCount = 0; try { amenCount = (JSON.parse(t.amenities || '[]') || []).length; } catch(e){}
+    var summary = (facts.length ? facts.join(' · ') : 'no facts yet') + ' · ' + amenCount + ' amenities · ' + nPhotos + ' photos';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line,#e2e2e2);border-radius:6px;margin-bottom:4px;">'
+      + '<div style="min-width:0;"><div style="font-weight:600;font-size:13px;">' + escapeHtml(tl(t.room_type)) + ' <span style="font-weight:400;color:var(--muted)">(' + t.room_count + ' rooms)</span></div>'
+      + '<div style="font-size:11px;color:var(--muted);">' + escapeHtml(summary) + '</div></div>'
+      + '<button class="btn btn-o" style="padding:4px 12px;font-size:12px;flex-shrink:0;" onclick="rdEdit(\'' + escAttr(t.room_type) + '\')">✏️ Edit</button>'
+      + '</div>';
+  }).join('');
+};
+
+window.rdEdit = function(roomType){
+  var t = rdTypes.find(function(x){ return x.room_type === roomType; });
+  if (!t) return;
+  rdCurType = roomType;
+  document.getElementById('rdEditTitle').textContent =
+    tl(roomType) + ' — ' + (document.getElementById('rdProp').value === 'precious' ? 'The Precious' : 'The Moment');
+  document.getElementById('rdSize').value = t.size_sqm || '';
+  document.getElementById('rdOcc').value = t.max_occupancy || '';
+  document.getElementById('rdBed').value = t.bed_config || '';
+  document.getElementById('rdDesc').value = t.description || '';
+  var amen = []; try { amen = JSON.parse(t.amenities || '[]') || []; } catch(e){}
+  rdRenderAmenities(amen);
+  rdRenderPhotos();
+  document.getElementById('rdWarn').style.display = 'none';
+  show('rdEditForm');
+};
+
+window.rdRenderAmenities = function(selected){
+  var all = RD_AMENITY_PRESETS.slice();
+  selected.forEach(function(a){ if (all.indexOf(a) < 0) all.push(a); });
+  document.getElementById('rdAmenities').innerHTML = all.map(function(a){
+    var on = selected.indexOf(a) >= 0;
+    return '<label style="display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border:1px solid var(--line,#e2e2e2);border-radius:12px;cursor:pointer;'
+      + (on ? 'background:var(--go,#0F766E);color:#fff;border-color:var(--go,#0F766E);' : '') + '">'
+      + '<input type="checkbox" class="rd-amen" value="' + escAttr(a) + '"' + (on ? ' checked' : '') + ' style="display:none;" onchange="rdRenderAmenities(rdCollectAmenities())">'
+      + escapeHtml(a) + '</label>';
+  }).join('');
+};
+window.rdCollectAmenities = function(){
+  var out = [];
+  document.querySelectorAll('#rdAmenities .rd-amen').forEach(function(cb){ if (cb.checked) out.push(cb.value); });
+  return out;
+};
+window.rdAddCustomAmenity = function(){
+  var inp = document.getElementById('rdAmenCustom');
+  var v = (inp.value || '').trim();
+  if (!v) return;
+  var cur = rdCollectAmenities();
+  if (cur.indexOf(v) < 0) cur.push(v);
+  inp.value = '';
+  rdRenderAmenities(cur);
+};
+
+window.rdSaveDetails = function(){
+  if (!rdCurType) return;
+  var warn = document.getElementById('rdWarn'); warn.style.display = 'none';
+  var params = [sessionToken, document.getElementById('rdProp').value, rdCurType,
+    document.getElementById('rdSize').value || null,
+    document.getElementById('rdOcc').value || null,
+    document.getElementById('rdBed').value.trim() || null,
+    document.getElementById('rdDesc').value.trim() || null,
+    rdCollectAmenities()];
+  callApi('roomsUpdateTypeDetails', params).then(function(res){
+    if (!res.ok) { warn.textContent = res.error || 'Failed to save.'; warn.style.display = 'block'; return; }
+    showToast('Room details saved', 'ok');
+    rdReload(false);
+  });
+};
+
+window.rdRenderPhotos = function(){
+  var list = rdPhotos.filter(function(p){ return p.room_type === rdCurType; });
+  var box = document.getElementById('rdPhotoStrip');
+  if (!list.length) { box.innerHTML = '<div style="font-size:12px;color:var(--muted);">No photos yet — upload the first one.</div>'; return; }
+  box.innerHTML = list.map(function(p, i){
+    return '<div style="width:118px;border:1px solid var(--line,#e2e2e2);border-radius:6px;overflow:hidden;">'
+      + '<img src="' + escAttr(p.thumb_base64) + '" alt="" style="width:100%;height:74px;object-fit:cover;display:block;">'
+      + '<div style="font-size:10px;color:var(--muted);padding:3px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + escAttr(p.caption || '') + '">' + (p.caption ? escapeHtml(p.caption) : '<i>no caption</i>') + '</div>'
+      + '<div style="display:flex;justify-content:space-between;padding:2px 4px 4px;">'
+      + '<button class="btn btn-o" style="padding:1px 7px;font-size:11px;"' + (i === 0 ? ' disabled' : '') + ' onclick="rdMovePhoto(\'' + escAttr(p.photo_id) + '\',-1)">←</button>'
+      + '<button class="btn btn-o" style="padding:1px 7px;font-size:11px;" onclick="rdEditCaption(\'' + escAttr(p.photo_id) + '\')">✏️</button>'
+      + '<button class="btn btn-o" style="padding:1px 7px;font-size:11px;"' + (i === list.length - 1 ? ' disabled' : '') + ' onclick="rdMovePhoto(\'' + escAttr(p.photo_id) + '\',1)">→</button>'
+      + '<button class="btn btn-o" style="padding:1px 7px;font-size:11px;color:var(--stop,#c0392b);" onclick="rdDeletePhoto(\'' + escAttr(p.photo_id) + '\')">🗑</button>'
+      + '</div></div>';
+  }).join('');
+};
+
+window.rdReload = function(rerenderPhotos){
+  callApi('roomsGetTypeDetails', [sessionToken, document.getElementById('rdProp').value]).then(function(r){
+    if (!r.ok) return;
+    rdTypes = r.types || []; rdPhotos = r.photos || [];
+    renderRdTypeList();
+    if (rerenderPhotos !== false && rdCurType) rdRenderPhotos();
+  });
+};
+
+window.rdMovePhoto = function(photoId, dir){
+  var list = rdPhotos.filter(function(p){ return p.room_type === rdCurType; });
+  var idx = list.findIndex(function(p){ return p.photo_id === photoId; });
+  var j = idx + dir;
+  if (idx < 0 || j < 0 || j >= list.length) return;
+  var tmp = list[idx]; list[idx] = list[j]; list[j] = tmp;
+  Promise.all(list.map(function(p, i){
+    return callApi('roomsUpdateTypePhoto', [sessionToken, p.photo_id, p.caption || '', i]);
+  })).then(function(){ rdReload(); });
+};
+
+window.rdEditCaption = function(photoId){
+  var p = rdPhotos.find(function(x){ return x.photo_id === photoId; });
+  if (!p) return;
+  var cap = prompt('Photo caption (shown to guests):', p.caption || '');
+  if (cap === null) return;
+  callApi('roomsUpdateTypePhoto', [sessionToken, photoId, cap.trim(), p.sort_order || 0]).then(function(res){
+    if (!res.ok) { showToast(res.error || 'Failed to update caption', 'err'); return; }
+    rdReload();
+  });
+};
+
+window.rdDeletePhoto = function(photoId){
+  confirmDialog('Delete this photo? It disappears from the guest page immediately.', { danger: true }).then(function(yes){
+    if (!yes) return;
+    callApi('roomsDeleteTypePhoto', [sessionToken, photoId]).then(function(res){
+      if (!res.ok) { showToast(res.error || 'Failed to delete photo', 'err'); return; }
+      showToast('Photo deleted', 'ok');
+      rdReload();
+    });
+  });
+};
+
+function rdCompressImage(file, maxDim, quality){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+window.rdUploadPhotos = function(files){
+  if (!files || !files.length || !rdCurType) return;
+  var arr = Array.prototype.slice.call(files);
+  var status = document.getElementById('rdUploadStatus');
+  var prop = document.getElementById('rdProp').value;
+  var done = 0, failed = 0;
+  document.getElementById('rdUploadBtn').disabled = true;
+  var chain = Promise.resolve();
+  arr.forEach(function(file, i){
+    chain = chain.then(function(){
+      status.textContent = 'Uploading ' + (i + 1) + ' / ' + arr.length + '…';
+      return Promise.all([rdCompressImage(file, 1280, 0.72), rdCompressImage(file, 480, 0.7)])
+        .then(function(imgs){
+          return callApi('roomsAddTypePhoto', [sessionToken, prop, rdCurType, '', imgs[0], imgs[1], null]);
+        })
+        .then(function(res){
+          if (res.ok) { done++; }
+          else { failed++; if (res.error) showToast(res.error, 'err'); }
+        })
+        .catch(function(){ failed++; });
+    });
+  });
+  chain.then(function(){
+    status.textContent = '';
+    document.getElementById('rdUploadBtn').disabled = false;
+    document.getElementById('rdPhotoFile').value = '';
+    if (done) showToast(done + ' photo' + (done > 1 ? 's' : '') + ' uploaded', 'ok');
+    if (failed) showToast(failed + ' upload' + (failed > 1 ? 's' : '') + ' failed', 'err');
+    rdReload();
   });
 };
 
