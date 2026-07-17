@@ -220,12 +220,6 @@
         </div>
       </div>
 
-      <div class="card hidden" id="manual-entry-card">
-        <div class="muted" style="margin-bottom:10px;">ใช้กล้องไม่ได้? กรอกรหัสออฟฟิศที่อยู่ใต้ป้าย QR แทน</div>
-        <input id="manual-office-code" type="text" placeholder="เช่น OFF1" autocapitalize="characters" />
-        <button class="btn-secondary" id="manual-submit-btn" style="margin-top:10px;">ใช้รหัสนี้</button>
-      </div>
-
       <div class="card hidden" id="confirm-card">
         <div id="confirm-office" style="font-weight:600;margin-bottom:4px;"></div>
         <div class="muted" id="confirm-loc" style="margin-bottom:14px;"></div>
@@ -708,7 +702,6 @@
 
     function requestCameraAndStart() {
       hide('camera-error');
-      hide('manual-entry-card');
       var btn = document.getElementById('start-camera-btn');
       btn.disabled = true;
       btn.textContent = 'กำลังขอสิทธิ์ใช้กล้อง…';
@@ -716,8 +709,7 @@
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         btn.disabled = false;
         btn.textContent = 'แตะเพื่อเปิดกล้อง';
-        showCameraError('เบราว์เซอร์นี้เปิดกล้องไม่ได้ กรุณาใช้วิธีกรอกรหัสออฟฟิศด้านล่างแทน');
-        show('manual-entry-card');
+        showCameraError('เบราว์เซอร์นี้เปิดกล้องไม่ได้ กรุณาใช้เบราว์เซอร์อื่น หรือแจ้งหัวหน้างาน');
         return;
       }
 
@@ -741,9 +733,8 @@
           } else if (err.name === 'NotReadableError') {
             showCameraError('กล้องกำลังถูกใช้งานโดยแอปอื่น กรุณาปิดแอปกล้องอื่นแล้วลองใหม่');
           } else {
-            showCameraError('กล้องผิดพลาด: ' + err.message + ' กรุณาใช้วิธีกรอกรหัสออฟฟิศด้านล่างแทน');
+            showCameraError('กล้องผิดพลาด: ' + err.message + ' กรุณาลองใหม่อีกครั้ง');
           }
-          show('manual-entry-card');
         });
     }
 
@@ -766,8 +757,7 @@
       ).catch(function(err) {
         document.getElementById('qr-status').textContent = '';
         hide('qr-reader');
-        showCameraError('เปิดกล้องไม่สำเร็จ: ' + err + ' กรุณาใช้วิธีกรอกรหัสออฟฟิศด้านล่างแทน');
-        show('manual-entry-card');
+        showCameraError('เปิดกล้องไม่สำเร็จ: ' + err + ' กรุณาลองใหม่อีกครั้ง');
       });
     }
 
@@ -796,17 +786,6 @@
       hide('rescan-btn');
       hide('confirm-card');
       startScanner();
-    });
-
-    // ---------- MANUAL OFFICE CODE FALLBACK ----------
-    document.getElementById('manual-submit-btn').addEventListener('click', function() {
-      var code = document.getElementById('manual-office-code').value.trim().toUpperCase();
-      if (!code) return;
-      scannedOfficeId = code;
-      hide('manual-entry-card');
-      document.getElementById('qr-status').textContent = 'กรอกรหัสแล้ว กำลังตรวจตำแหน่ง…';
-      show('rescan-btn');
-      getLocationAndConfirm();
     });
 
     // ---------- GEOLOCATION ----------
