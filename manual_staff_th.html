@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือพนักงาน — เช็คอินและงานประจำวัน</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --bg:#F5F5F7; --surface:#FFFFFF; --border:#E5E5EA;
+  --text:#1D1D1F; --muted:#6b7280;
+  --teal:#0F766E; --teal-light:rgba(15,118,110,.08); --teal-border:rgba(15,118,110,.25);
+  --green:#16A34A; --red:#DC2626; --amber:#D97706;
+  --amber-bg:rgba(217,119,6,.08); --amber-border:rgba(217,119,6,.28);
+  --red-bg:rgba(220,38,38,.06); --red-border:rgba(220,38,38,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:16.5px;line-height:1.7}
+.wrap{max-width:840px;margin:0 auto;padding:32px 22px 120px}
+h1,h2,h3,.eyebrow,.snum,.steps li::before,.mono{font-family:'Lexend',sans-serif}
+.thai-head{font-family:'Sarabun',sans-serif;font-weight:700}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px;flex-wrap:wrap;gap:10px}
+.back{font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--teal-border);border-radius:999px;background:var(--teal-light)}
+.back:hover{background:var(--teal);color:#fff}
+.tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bottom:14px;font-family:'Sarabun',sans-serif}
+.lead{color:var(--muted);font-size:16px;max-width:640px;margin-bottom:14px}
+.lead b{color:var(--text)}
+
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;margin:30px 0 44px}
+.toc h2{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:500}
+.toc ol{list-style:none;counter-reset:t;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.toc li{counter-increment:t}
+.toc a{color:var(--text);text-decoration:none;display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:15.5px}
+.toc a::before{content:counter(t);font-family:'Lexend',sans-serif;font-weight:700;color:var(--teal);min-width:22px;font-size:13px}
+.toc a:hover{color:var(--teal)}
+
+.section{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 30px;margin-bottom:26px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.section-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:8px}
+.snum{flex-shrink:0;width:42px;height:42px;border-radius:13px;background:var(--teal);color:#fff;font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center}
+.section-head h2{font-size:24px;font-weight:700;line-height:1.25;font-family:'Sarabun',sans-serif;padding-top:3px}
+.section-head .en{display:block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:400;margin-top:3px}
+.section > p{color:#3a3a3c;margin:14px 0}
+.section > p.intro{margin-top:16px}
+
+.fig{margin:22px 0;text-align:center}
+.fig img{max-width:100%;width:auto;max-height:640px;border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 20px -8px rgba(0,0,0,.18)}
+.fig.phone img{max-width:330px}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px}
+
+.steps{list-style:none;counter-reset:s;margin:16px 0 4px;padding:0}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 42px;border-bottom:1px solid #f1f1f3}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:27px;height:27px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center}
+.steps li b{color:var(--teal)}
+
+.note,.warn,.tip{border-radius:14px;padding:15px 18px;margin:20px 0;font-size:15.5px;line-height:1.6}
+.note{background:var(--teal-light);border:1px solid var(--teal-border)}
+.warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+.tip{background:var(--red-bg);border:1px solid var(--red-border)}
+.note b,.warn b,.tip b{font-weight:700}
+.warn b{color:var(--amber)} .tip b{color:var(--red)}
+
+table.roles{width:100%;border-collapse:collapse;margin:20px 0;font-size:15px}
+table.roles th,table.roles td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+table.roles th{background:var(--teal-light);font-family:'Lexend',sans-serif;font-weight:600;font-size:13.5px}
+table.roles td .mono{font-size:12.5px;color:var(--teal);background:var(--teal-light);padding:1px 6px;border-radius:5px}
+
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:8px;font-family:'Sarabun',sans-serif}
+.chip.hk{background:var(--teal-light);color:var(--teal)}
+.chip.tech{background:var(--amber-bg);color:var(--amber)}
+
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px;font-family:'DM Mono',monospace;letter-spacing:1px}
+
+@media(max-width:680px){
+  .toc ol{grid-template-columns:1fr}
+  .section{padding:26px 20px}
+  .section-head h2{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="staff_manual.html">← กลับหน้าหลักคู่มือ</a>
+    <span class="tag">The Precious Moment</span>
+  </div>
+
+  <div class="eyebrow">คู่มือพนักงาน · สำหรับพนักงานทุกคน</div>
+  <h1>เช็คอินเข้างาน และงานประจำวัน</h1>
+  <p class="lead">คู่มือนี้สำหรับ<b>พนักงานทุกคน</b> — แม่บ้าน ช่าง และพนักงานทั่วไป ใช้บนมือถือได้เลย
+  ครอบคลุมการเข้าสู่ระบบ การลงเวลาเข้า-ออกงานด้วย QR การดูรายการงานของคุณ การลาและสลับวันหยุด
+  และการเปลี่ยนรหัสผ่าน</p>
+  <p class="lead" style="margin-bottom:0">สิ่งที่คุณเห็นบนหน้าจอขึ้นอยู่กับ<b>หน้าที่</b>ของคุณ —
+  ถ้ามีหน้าจอเตือนสีแดงเด้งขึ้นทันทีหลังเข้าสู่ระบบ ให้ข้ามไปอ่าน<a href="#s7" style="color:var(--teal)">หัวข้อ 7</a>ก่อน</p>
+
+  <nav class="toc">
+    <h2>สารบัญ</h2>
+    <ol>
+      <li><a href="#s1">เข้าสู่ระบบ</a></li>
+      <li><a href="#s2">ลงเวลาเข้า-ออกงาน</a></li>
+      <li><a href="#s3">รายการงานของฉัน</a></li>
+      <li><a href="#s4">บัญชีของฉัน (ลา / สลับวันหยุด / รหัสผ่าน)</a></li>
+      <li><a href="#s5">บิลค่าไฟ-ค่าน้ำ</a></li>
+      <li><a href="#s6">การแจ้งเตือนและเมนู</a></li>
+      <li><a href="#s7">หน้าจอรายงานข้อผิดพลาด</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 LOGIN -->
+  <section class="section" id="s1">
+    <div class="section-head"><div class="snum">1</div><h2>เข้าสู่ระบบ<span class="en">Login</span></h2></div>
+    <p class="intro">เปิดหน้าเว็บของระบบบนมือถือ แล้วกรอกชื่อผู้ใช้และรหัสผ่านที่ได้รับจากผู้จัดการ</p>
+    <figure class="fig phone"><img src="manual_assets/general/01_login.png" alt="หน้าเข้าสู่ระบบ" loading="lazy"></figure>
+    <ol class="steps">
+      <li>กรอก<b>ชื่อผู้ใช้</b> ของคุณ</li>
+      <li>กรอก<b>รหัสผ่าน</b></li>
+      <li>กดปุ่ม <b>เข้าสู่ระบบ</b></li>
+    </ol>
+    <div class="note">ระบบจะ<b>จำคุณไว้</b>บนเครื่องนี้ ครั้งต่อไปที่เปิดหน้าเว็บ คุณจะเข้าหน้าหลักได้เลยโดยไม่ต้องล็อกอินใหม่</div>
+    <p>ถ้าชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง จะมีข้อความสีแดงแจ้งเตือน — ลองพิมพ์ใหม่ให้ถูกต้อง</p>
+    <figure class="fig phone"><img src="manual_assets/general/02_login_error.png" alt="ข้อความแจ้งเตือนเมื่อรหัสผ่านผิด" loading="lazy"><figcaption>เมื่อข้อมูลไม่ถูกต้อง ระบบจะแจ้งเป็นข้อความสีแดง</figcaption></figure>
+  </section>
+
+  <!-- 2 CHECK IN/OUT -->
+  <section class="section" id="s2">
+    <div class="section-head"><div class="snum">2</div><h2>ลงเวลาเข้า-ออกงาน<span class="en">Check in / Check out</span></h2></div>
+    <p class="intro">ทุกวันเมื่อมาถึงที่ทำงาน ให้<b>สแกน QR code</b>ที่ติดไว้ที่ออฟฟิศเพื่อลงเวลา
+    ระบบจะตรวจตำแหน่ง GPS ว่าคุณอยู่ในบริเวณออฟฟิศจริง</p>
+
+    <h3 class="thai-head" style="margin:22px 0 6px;font-size:18px">สถานะวันนี้</h3>
+    <p>ด้านบนของการ์ดจะบอกสถานะของวันนี้ ถ้ายัง<b>ไม่ได้</b>ลงเวลา จะขึ้นข้อความสีแดงและปุ่มเปิดกล้อง</p>
+    <figure class="fig phone"><img src="manual_assets/general/03_status_notchecked.png" alt="สถานะยังไม่ได้เช็คอิน" loading="lazy"></figure>
+    <ol class="steps">
+      <li>ข้อความ <b>“วันนี้ยังไม่ได้ลงเวลาเข้างาน”</b> = วันนี้ยังไม่ได้ลงเวลา</li>
+      <li>กดปุ่ม <b>แตะเพื่อเปิดกล้อง</b></li>
+    </ol>
+
+    <h3 class="thai-head" style="margin:24px 0 6px;font-size:18px">สแกน QR แล้วยืนยัน</h3>
+    <p>เมื่อเปิดกล้อง ให้เล็งไปที่ QR code ที่ออฟฟิศ ระบบจะขอตำแหน่ง GPS แล้วแสดงหน้ายืนยัน</p>
+    <div class="fig" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <img src="manual_assets/general/06_scanner.png" alt="หน้าจอกล้องสแกน QR" loading="lazy" style="max-width:300px">
+      <img src="manual_assets/general/07_confirm.png" alt="หน้ายืนยันเช็คอิน" loading="lazy" style="max-width:340px">
+    </div>
+    <ol class="steps">
+      <li>เล็งกล้องไปที่ <b>QR code</b> ที่ติดอยู่ที่ออฟฟิศ</li>
+      <li>ระบบแสดง <b>ความแม่นยำตำแหน่ง</b> — ยืนยันว่าคุณอยู่ที่ออฟฟิศ</li>
+      <li>ตอนเริ่มงาน กด <b>เข้างาน</b> (สีเขียว) · ตอนเลิกงาน กด <b>ออกงาน</b> (สีแดง)</li>
+    </ol>
+    <div class="note">เลือกปุ่มเอง — ตอนมาถึงกด <b>เข้างาน</b>, ตอนกลับกด <b>ออกงาน</b> เมื่อสำเร็จ สถานะด้านบนจะเปลี่ยนเป็นสีเขียว “✅ ลงเวลาเข้างานแล้ววันนี้”</div>
+
+    <h3 class="thai-head" style="margin:24px 0 6px;font-size:18px">ถ้ากล้องใช้ไม่ได้</h3>
+    <p>ถ้ากล้องเปิดไม่ได้ หรือคุณ<b>ไม่อนุญาต</b>ให้ใช้กล้อง ระบบจะให้กรอก<b>รหัสออฟฟิศ</b>แทน (รหัสอยู่ใต้ป้าย QR)</p>
+    <div class="fig" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <img src="manual_assets/general/09_permission_denied.png" alt="กล้องถูกปฏิเสธ" loading="lazy" style="max-width:330px">
+      <img src="manual_assets/general/10_manual_code.png" alt="กรอกรหัสออฟฟิศ" loading="lazy" style="max-width:330px">
+    </div>
+    <ol class="steps">
+      <li>ถ้ากล้องถูกปฏิเสธ ระบบจะขึ้นวิธีเปิดสิทธิ์กล้อง และแสดงช่องกรอกรหัสให้</li>
+      <li>พิมพ์ <b>รหัสออฟฟิศ</b> (เช่น OFF1) แล้วกด <b>ใช้รหัสนี้</b></li>
+    </ol>
+
+    <h3 class="thai-head" style="margin:24px 0 6px;font-size:18px">ต้องอยู่ในบริเวณออฟฟิศ</h3>
+    <p>ถ้าคุณอยู่<b>ไกลเกินไป</b>จากออฟฟิศ ระบบจะไม่ให้ลงเวลา และแจ้งระยะห่าง — ต้องเข้ามาใกล้ออฟฟิศก่อนแล้วสแกนใหม่</p>
+    <figure class="fig phone"><img src="manual_assets/general/11_geofence.png" alt="อยู่ไกลออฟฟิศเกินไป" loading="lazy"><figcaption>ตัวอย่าง: อยู่ห่างออฟฟิศ 320 เมตร (อนุญาต 150 เมตร) — ลงเวลาไม่ได้</figcaption></figure>
+
+    <h3 class="thai-head" style="margin:24px 0 6px;font-size:18px">ออกงานด้วยปุ่มเดียว</h3>
+    <p>เมื่อคุณลงเวลาเข้างานแล้ว ตอนเลิกงานไม่ต้องสแกนอีก — มีปุ่ม<b>ออกงานปุ่มเดียว</b>ให้กดได้เลย</p>
+    <figure class="fig phone"><img src="manual_assets/general/04_status_checkedin.png" alt="ลงเวลาเข้างานแล้ว" loading="lazy"></figure>
+    <ol class="steps">
+      <li>สถานะสีเขียว <b>“✅ ลงเวลาเข้างานแล้ววันนี้ เวลา …”</b> = ลงเวลาเข้างานเรียบร้อย</li>
+      <li>ตอนเลิกงาน กด <b>ออกงานตอนนี้</b> ระบบจะเช็กตำแหน่งแล้วบันทึกให้อัตโนมัติ</li>
+    </ol>
+  </section>
+
+  <!-- 3 TASKS -->
+  <section class="section" id="s3">
+    <div class="section-head"><div class="snum">3</div><h2>รายการงานของฉัน<span class="en">My tasks</span></h2></div>
+    <p class="intro">การ์ด <b>รายการงาน</b> แสดงงานที่คุณต้องทำ แบ่งตามวัน (วันนี้ / พรุ่งนี้ / ฯลฯ)
+    และแบ่งตามตึก (Precious / Moment) งานที่<b>ค้าง/เลยกำหนด</b>จะอยู่บนสุดเป็นสีแดง</p>
+    <figure class="fig phone"><img src="manual_assets/general/13_tasks.png" alt="รายการงานประจำวัน" loading="lazy" style="max-width:360px"></figure>
+    <ol class="steps">
+      <li>แถบสีแดง <b>ค้าง / เลยกำหนด</b> = งานที่ค้างหรือเลยกำหนด ต้องรีบทำ</li>
+      <li>แถบ <b>วันนี้</b> = งานของวันนี้ (เปิดอยู่แล้ว) แตะหัวข้อวันอื่นเพื่อดูงานล่วงหน้า</li>
+    </ol>
+    <p>แต่ละงานจะมีป้ายบอกประเภท: <span class="chip hk">ทำความสะอาด</span> งานแม่บ้าน หรือ
+    <span class="chip tech">งานช่าง</span> งานซ่อมบำรุง พร้อมเลขห้องและตึก เมื่อทำเสร็จให้กดปุ่มยืนยัน</p>
+    <figure class="fig phone"><img src="manual_assets/general/14_task_confirm.png" alt="ยืนยันงานเสร็จ" loading="lazy" style="max-width:360px"></figure>
+    <ol class="steps">
+      <li>งานทำความสะอาด กด <b>✓ ยืนยันทำความสะอาดแล้ว</b> · งานช่าง กด <b>🔧 ยืนยันซ่อมเสร็จแล้ว</b> แล้วกด <b>ยืนยันเสร็จ</b> อีกครั้ง</li>
+    </ol>
+
+    <h3 class="thai-head" id="multirole" style="margin:26px 0 8px;font-size:18px">ถ้าฉันมีหลายหน้าที่?</h3>
+    <p>คุณอาจได้รับมอบหมายมากกว่าหนึ่งหน้าที่ ระบบจะรวมงาน<b>ทุกหน้าที่</b>ของคุณมาแสดงในรายการเดียว
+    ตัวอย่างในภาพด้านบน พนักงานคนนี้เป็นทั้ง<b>แม่บ้านตึก Precious</b> และ<b>ช่าง</b> —
+    จึงเห็นงานทำความสะอาดของ Precious <b>และ</b>งานช่างของทั้งสองตึก แต่<b>ไม่เห็น</b>งานทำความสะอาดของ Moment</p>
+    <table class="roles">
+      <tr><th>หน้าที่ของคุณ</th><th>งานที่คุณจะเห็น</th></tr>
+      <tr><td>แม่บ้าน — Precious <span class="mono">housekeeping_precious</span></td><td>งานทำความสะอาดของตึก Precious เท่านั้น</td></tr>
+      <tr><td>แม่บ้าน — Moment <span class="mono">housekeeping_moment</span></td><td>งานทำความสะอาดของตึก Moment เท่านั้น</td></tr>
+      <tr><td>แม่บ้าน — ทั้งสองตึก <span class="mono">housekeeping</span></td><td>งานทำความสะอาดของทั้งสองตึก</td></tr>
+      <tr><td>ช่าง <span class="mono">technician</span></td><td>งานช่าง/ซ่อมบำรุง และห้องปิดซ่อม ของทุกตึก</td></tr>
+    </table>
+    <div class="note">ถ้าคุณมีหลายหน้าที่ งานจะ<b>รวมกัน</b> เช่น แม่บ้าน Precious + ช่าง = เห็นทั้งงานทำความสะอาด Precious และงานช่างทุกตึก
+    ถ้าไม่มีงานเลย การ์ดจะขึ้นว่า “ไม่มีงานค้าง”</div>
+  </section>
+
+  <!-- 4 MY ACCOUNT -->
+  <section class="section" id="s4">
+    <div class="section-head"><div class="snum">4</div><h2>บัญชีของฉัน<span class="en">My account · leave, swap, password</span></h2></div>
+    <p class="intro">กดเมนู <b>บัญชีของฉัน</b> เพื่อดูคำขอของคุณ ขอลา สลับวันหยุด และเปลี่ยนรหัสผ่าน</p>
+
+    <h3 class="thai-head" style="margin:20px 0 6px;font-size:18px">คำขอของฉันและวันลาคงเหลือ</h3>
+    <figure class="fig phone"><img src="manual_assets/general/15_myrequests.png" alt="คำขอของฉันและวันลาคงเหลือ" loading="lazy"></figure>
+    <ol class="steps">
+      <li>บรรทัด <b>ลาพักร้อนปี …</b> บอก<b>วันลาพักร้อนคงเหลือ</b>ของปีนี้</li>
+      <li>รายการด้านล่างคือคำขอที่ผ่านมา พร้อมสถานะ: <b style="color:var(--green)">อนุมัติแล้ว</b> · <b style="color:var(--red)">ไม่อนุมัติ</b> · <b style="color:var(--amber)">รออนุมัติ</b></li>
+    </ol>
+
+    <h3 class="thai-head" style="margin:22px 0 6px;font-size:18px">ขอลา (ลาพักร้อน / ลาป่วย)</h3>
+    <figure class="fig phone"><img src="manual_assets/general/16_leave.png" alt="ฟอร์มขอลา" loading="lazy"></figure>
+    <ol class="steps">
+      <li>เลือก<b>ประเภทการลา</b>: <b>ลาพักร้อน</b> หรือ <b>ลาป่วย</b> แล้วเลือกวันที่และกรอกเหตุผล</li>
+      <li>กด <b>ส่งคำขอลา</b> คำขอจะไปรออนุมัติ ดูสถานะได้ที่ “คำขอของฉัน” ด้านบน</li>
+    </ol>
+    <div class="warn"><b>ข้อควรรู้:</b> การลาพักร้อน<b>กระชั้นชิด (น้อยกว่า 2 วัน)</b> ต้องให้หัวหน้า/พนักงานต้อนรับ (frontdesk) เป็นผู้ยื่นให้แทน · การลาป่วยจะนับเป็นวันลาที่ได้รับค่าจ้างต่อเมื่อมี<b>ใบรับรองแพทย์</b>ที่ผู้จัดการตรวจแล้ว</div>
+
+    <h3 class="thai-head" style="margin:22px 0 6px;font-size:18px">สลับวันหยุด และเปลี่ยนรหัสผ่าน</h3>
+    <figure class="fig phone"><img src="manual_assets/general/17_swap_pw.png" alt="สลับวันหยุดและเปลี่ยนรหัสผ่าน" loading="lazy"></figure>
+    <ol class="steps">
+      <li><b>สลับวันหยุด</b>: เลือกวันหยุดเดิมและวันใหม่ — ต้องแจ้ง<b>ล่วงหน้าอย่างน้อย 2 วัน</b> และรออนุมัติ</li>
+      <li><b>เปลี่ยนรหัสผ่าน</b>: กรอกรหัสเดิม รหัสใหม่ และยืนยันรหัสใหม่ แล้วกด <b>อัปเดตรหัสผ่าน</b></li>
+    </ol>
+  </section>
+
+  <!-- 5 UTILITIES -->
+  <section class="section" id="s5">
+    <div class="section-head"><div class="snum">5</div><h2>บิลค่าไฟ-ค่าน้ำ<span class="en">Monthly government bills</span></h2></div>
+    <p class="intro">การ์ดนี้แสดงค่าไฟ ค่าน้ำ และค่าบำบัดน้ำเสียย้อนหลัง 6 เดือน เพื่อให้ทุกคนช่วยกันประหยัด</p>
+    <figure class="fig phone"><img src="manual_assets/general/18_utilities.png" alt="บิลค่าไฟค่าน้ำรายเดือน" loading="lazy"></figure>
+    <ol class="steps">
+      <li>ถ้าค่าไฟต่อคืนสูงเกินเป้า จะมี<b>แถบเตือนสีเหลือง</b> — ช่วยกันปิดแอร์ห้องที่ไม่มีคนพัก</li>
+    </ol>
+    <div class="note">การ์ดนี้ทุกคนเห็น ไม่ต้องทำอะไร เป็นข้อมูลให้ช่วยกันดูแลการใช้ไฟ-น้ำ</div>
+  </section>
+
+  <!-- 6 NAV / TOASTS -->
+  <section class="section" id="s6">
+    <div class="section-head"><div class="snum">6</div><h2>การแจ้งเตือนและเมนู<span class="en">Notifications &amp; menu</span></h2></div>
+    <p class="intro">เมื่อทำรายการต่าง ๆ ระบบจะเด้ง<b>ข้อความแจ้งเตือนเล็ก ๆ</b> (สีเขียว = สำเร็จ, สีแดง = ผิดพลาด) ที่หายไปเอง</p>
+    <p>สำหรับพนักงานทั่วไป เมนูด้านบนจะมีแค่ <b>📖 คู่มือ</b>, <b>บัญชีของฉัน</b> และปุ่ม <b>ออกจากระบบ</b> — เมนูอื่น ๆ
+    (ห้องพัก, การเงิน ฯลฯ) จะไม่ขึ้น เพราะเป็นของหน้าที่อื่น ไม่ใช่ว่าหายหรือเสีย</p>
+    <figure class="fig"><img src="manual_assets/general/20_nav.png" alt="เมนูสำหรับพนักงานทั่วไป" loading="lazy" style="max-width:420px"><figcaption>เมนูของพนักงานทั่วไป — มีคู่มือ บัญชีของฉัน และออกจากระบบ</figcaption></figure>
+  </section>
+
+  <!-- 7 NOTICE -->
+  <section class="section" id="s7">
+    <div class="section-head"><div class="snum">7</div><h2>หน้าจอรายงานข้อผิดพลาด<span class="en">Warning notice</span></h2></div>
+    <p class="intro">ถ้าผู้จัดการบันทึก<b>ข้อผิดพลาด/ข้อร้องเรียน</b>ที่เกี่ยวกับคุณ จะมีหน้าจอสีแดง<b>เต็มจอ</b>เด้งขึ้น
+    ทันทีหลังเข้าสู่ระบบ และจะ<b>บังทุกอย่าง</b>จนกว่าคุณจะกดรับทราบ</p>
+    <figure class="fig phone"><img src="manual_assets/general/19_notice.png" alt="หน้าจอรายงานข้อผิดพลาด" loading="lazy" style="max-width:360px"></figure>
+    <ol class="steps">
+      <li>อ่านหัวข้อ วันที่ และรายละเอียดให้ครบ (อาจมีรูปประกอบ)</li>
+      <li>กดปุ่มสีแดง <b>“ฉันรับทราบข้อผิดพลาด”</b> เพื่อรับทราบ แล้วจึงใช้งานต่อได้</li>
+    </ol>
+    <div class="tip"><b>หมายเหตุ:</b> หน้าจอนี้ไม่มีปุ่มปิด/ข้าม ต้องกดรับทราบก่อนเท่านั้น ถ้ามีหลายรายการ จะให้รับทราบทีละรายการ</div>
+  </section>
+
+  <div class="footer">The Precious Moment System · คู่มือพนักงาน</div>
+</div>
+</body>
+</html>

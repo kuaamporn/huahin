@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือพนักงาน — The Precious Moment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Sarabun:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#F5F5F7; --surface:#FFFFFF; --border:#E5E5EA; --text:#1D1D1F; --muted:#6b7280;
+  --teal:#0F766E; --teal-light:rgba(15,118,110,.08); --teal-border:rgba(15,118,110,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:16.5px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding:44px 22px 100px}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.5px;margin-bottom:14px;font-family:'Sarabun',sans-serif}
+.lead{color:var(--muted);font-size:16.5px;max-width:640px;margin-bottom:8px}
+.lead b{color:var(--text)}
+
+.cards{display:grid;grid-template-columns:1fr;gap:18px;margin-top:40px}
+.rolecard{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:26px 28px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .18s ease,box-shadow .18s ease,border-color .18s}
+.rolecard.on:hover{transform:translateY(-3px);box-shadow:0 16px 34px -16px rgba(15,118,110,.35);border-color:var(--teal-border)}
+.rolecard.off{opacity:.62;cursor:default}
+.rc-top{display:flex;align-items:center;gap:16px}
+.rc-ic{flex-shrink:0;width:54px;height:54px;border-radius:16px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:27px}
+.rc-title{font-family:'Sarabun',sans-serif;font-weight:700;font-size:21px;line-height:1.3}
+.rc-en{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.rc-desc{color:#3a3a3c;font-size:15px;margin-top:14px}
+.rc-go{margin-top:16px;display:inline-flex;align-items:center;gap:7px;font-family:'Lexend',sans-serif;font-weight:600;font-size:13.5px;color:var(--teal)}
+.rc-soon{margin-top:16px;display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:5px 11px;border-radius:8px}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;font-family:'DM Mono',monospace;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">The Precious Moment · Staff Manual</div>
+  <h1>คู่มือการใช้งานระบบ</h1>
+  <p class="lead">เลือก<b>หน้าที่ของคุณ</b>เพื่อดูคู่มือทีละขั้นตอน พร้อมภาพประกอบจากหน้าจอจริง ใช้บนมือถือได้เลย</p>
+  <p class="lead"><b>ทุกคน</b>เริ่มที่ “พนักงานทั่วไป” ก่อน (การเข้าสู่ระบบและลงเวลาเข้างาน) แล้วค่อยดูคู่มือเฉพาะหน้าที่ของคุณ</p>
+
+  <div class="cards">
+    <a class="rolecard on" href="manual_staff_th.html">
+      <div class="rc-top">
+        <div class="rc-ic">🧹</div>
+        <div><div class="rc-title">พนักงานทั่วไป (ทุกคน)</div><div class="rc-en">Everyone · check-in &amp; tasks</div></div>
+      </div>
+      <div class="rc-desc">เข้าสู่ระบบ · ลงเวลาเข้า-ออกงานด้วย QR · รายการงานของฉัน (แม่บ้าน/ช่าง) · การลาและสลับวันหยุด · เปลี่ยนรหัสผ่าน · หน้าจอแจ้งเตือน</div>
+      <span class="rc-go">อ่านคู่มือ →</span>
+    </a>
+
+    <a class="rolecard on" href="manual_frontdesk_th.html">
+      <div class="rc-top">
+        <div class="rc-ic">🛎️</div>
+        <div><div class="rc-title">พนักงานต้อนรับ (Front desk)</div><div class="rc-en">Front desk · bookings &amp; guests</div></div>
+      </div>
+      <div class="rc-desc">กระดานห้องพัก · สร้างการจอง · ลงทะเบียนผู้เข้าพัก · เช็คอินผู้เข้าพัก · ยืนยันการชำระเงิน · ต่อ/ยกเลิกการจอง · บริษัท · พิมพ์ใบเสร็จซ้ำ</div>
+      <span class="rc-soon">กำลังจัดทำ</span>
+    </a>
+
+    <a class="rolecard on" href="manual_finance_th.html">
+      <div class="rc-top">
+        <div class="rc-ic">💵</div>
+        <div><div class="rc-title">ฝ่ายการเงิน/บัญชี</div><div class="rc-en">Finance · revenue, expense, accountant</div></div>
+      </div>
+      <div class="rc-desc">ภาพรวมการเงิน · บันทึกรายรับ-รายจ่าย · ออกใบเสร็จ · ออกใบแจ้งหนี้รายเดือน · รายงานและพิมพ์เอกสารซ้ำ</div>
+      <span class="rc-soon">กำลังจัดทำ</span>
+    </a>
+  </div>
+
+  <div class="footer">The Precious Moment System · คู่มือพนักงาน</div>
+</div>
+</body>
+</html>

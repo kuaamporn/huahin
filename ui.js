@@ -126,8 +126,8 @@
   window.__nativeAlert = window.alert;
   window.alert = function (msg) {
     var s = String(msg == null ? '' : msg);
-    var type = /error|fail|invalid|denied|cannot|unable|wrong|expired|missing|not\s|no\s/i.test(s) ? 'error'
-             : /success|saved|added|updated|deleted|confirmed|sent|complete/i.test(s) ? 'success'
+    var type = /error|fail|invalid|denied|cannot|unable|wrong|expired|missing|not\s|no\s|ผิดพลาด|ไม่สำเร็จ|ไม่ถูกต้อง|ไม่ได้|ล้มเหลว|หมดอายุ|ไม่พบ/i.test(s) ? 'error'
+             : /success|saved|added|updated|deleted|confirmed|sent|complete|สำเร็จ|เรียบร้อย|บันทึกแล้ว|อัปเดตแล้ว|ส่งแล้ว/i.test(s) ? 'success'
              : 'info';
     showToast(s, type);
   };
