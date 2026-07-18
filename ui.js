@@ -132,6 +132,28 @@
     showToast(s, type);
   };
 
+  // --- Thai display translator (additive) -------------------------------
+  // Maps a backend/logic ENGLISH value to its Thai DISPLAY string. Used ONLY
+  // when rendering — the underlying value stays English everywhere (state,
+  // comparisons, API params). Unknown keys pass through unchanged, so it never
+  // blanks a label. Free text (names, notes) is never looked up.
+  var thaiVocab = {
+    // booking status
+    'CHECKED_IN': 'เข้าพักแล้ว', 'CONFIRMED': 'จองแล้ว', 'CHECKED_OUT': 'เช็คเอาท์แล้ว', 'CANCELLED': 'ยกเลิก',
+    // room status / overrides
+    'CLEANING_DUE': 'รอทำความสะอาด', 'CLOSED': 'ปิดห้อง', 'MAINTENANCE': 'ซ่อมบำรุง',
+    // occupancy labels
+    'Occupied': 'มีผู้พัก', 'Vacant': 'ว่าง', 'Reserved': 'จองแล้ว', 'Available': 'ว่าง',
+    // booking types (OTA names kept as-is intentionally)
+    'monthly': 'รายเดือน', 'walkin': 'รายวัน', 'monthly-draft': 'ร่างรายเดือน'
+  };
+  function tv(v) {
+    if (v == null) return v;
+    return Object.prototype.hasOwnProperty.call(thaiVocab, v) ? thaiVocab[v] : v;
+  }
+
   window.showToast = showToast;
   window.confirmDialog = confirmDialog;
+  window.tv = tv;
+  window.thaiVocab = thaiVocab;
 })();
