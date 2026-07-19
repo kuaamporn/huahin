@@ -727,6 +727,14 @@
       return dateStr + ' ' + timeStr;
     }
 
+    // Date-only display: 'YYYY-MM-DD' -> 'DD/MM/YYYY'. Plain reorder (no Date parse)
+    // so it never shifts across timezones. Leaves anything non-ISO untouched.
+    function fmtDate(s) {
+      if (!s) return '-';
+      var m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      return m ? m[3] + '/' + m[2] + '/' + m[1] : String(s);
+    }
+
     var todayStr = getThaiDateString();
     var defaultStart = new Date();
     defaultStart.setDate(defaultStart.getDate() - 7);
@@ -857,7 +865,7 @@
         var propName = t.propertyId === 'precious' ? 'The Precious' : 'The Moment';
 
         html += '<tr>' +
-          '<td>' + t.taskDate + '</td>' +
+          '<td>' + fmtDate(t.taskDate) + '</td>' +
           '<td><strong>' + t.displayName + '</strong></td>' +
           '<td>' + propName + '</td>' +
           '<td>' + (t.guestName || '—') + '</td>' +
@@ -1004,7 +1012,7 @@
           html += '<tr>' +
             '<td style="text-align:center;">' + (isCancelled ? '' : '<input type="checkbox" class="receipt-select" value="' + escapeHtml(r.receipt_no) + '" onchange="updateReceiptSelection()" />') + '</td>' +
             '<td><strong style="' + nameStyle + '">' + escapeHtml(r.receipt_no) + '</strong></td>' +
-            '<td>' + escapeHtml(r.receipt_date) + '</td>' +
+            '<td>' + fmtDate(r.receipt_date) + '</td>' +
             '<td>' + escapeHtml(r.room_name || '—') + '</td>' +
             '<td>' + escapeHtml(r.guest_or_vendor || '—') + '</td>' +
             '<td>' + escapeHtml(r.receipt_type) + '</td>' +
@@ -1123,7 +1131,7 @@
             '<td><strong>' + escapeHtml(inv.room_name) + '</strong></td>' +
             '<td>' + escapeHtml(inv.billing_month) + '</td>' +
             '<td>' + escapeHtml(inv.guest_or_vendor || '—') + '</td>' +
-            '<td>' + escapeHtml(inv.txn_date) + '</td>' +
+            '<td>' + fmtDate(inv.txn_date) + '</td>' +
             '<td style="text-align:right; font-weight:600;">฿' + inv.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
             '<td style="text-align:center;">' + statusPill + '</td>' +
             '<td style="text-align:center; white-space:nowrap;">' +
@@ -1188,7 +1196,7 @@
         list.forEach(function(inv) {
           html += '<tr>' +
             '<td><strong style="font-family:monospace;">' + escapeHtml(inv.invoice_no) + '</strong></td>' +
-            '<td>' + escapeHtml(inv.invoice_date) + '</td>' +
+            '<td>' + fmtDate(inv.invoice_date) + '</td>' +
             '<td><strong>' + escapeHtml(inv.room_name || '—') + '</strong></td>' +
             '<td>' + escapeHtml(inv.guest_or_vendor || '—') + '</td>' +
             '<td><span style="font-family:monospace; font-size:11px;">' + escapeHtml(inv.transaction_id) + '</span></td>' +
@@ -1277,8 +1285,8 @@
         if (b.status === 'CHECKED_OUT') statusBadge = '<span class="status-badge muted" style="background:#ECEFF1;color:#37474F;">Checked-Out</span>';
 
         html += '<tr>' +
-          '<td>' + b.checkinDate + '</td>' +
-          '<td>' + b.checkoutDate + '</td>' +
+          '<td>' + fmtDate(b.checkinDate) + '</td>' +
+          '<td>' + fmtDate(b.checkoutDate) + '</td>' +
           '<td>' + (b.propertyId === 'precious' ? 'The Precious' : 'The Moment') + '</td>' +
           '<td><strong>' + escapeHtml(b.roomDisplayName) + '</strong></td>' +
           '<td>' + escapeHtml(b.guestName || '-') + '</td>' +
@@ -1343,7 +1351,7 @@
       }
       var body = res.ledger.map(function(r) {
         return '<tr><td style="font-family:monospace;">' + escapeHtml(r.receipt_no) + '</td>' +
-          '<td>' + escapeHtml(r.receipt_date) + '</td>' +
+          '<td>' + fmtDate(r.receipt_date) + '</td>' +
           '<td>' + escapeHtml(r.customer || '-') + '</td>' +
           cols.map(function(c) { return '<td style="text-align:right;">' + (r.cats[c.key] ? Number(r.cats[c.key]).toLocaleString() : '-') + '</td>'; }).join('') +
           '<td style="text-align:right;">' + (r.wht ? Number(r.wht).toLocaleString() : '-') + '</td>' +
@@ -1368,7 +1376,7 @@
       }
       body.innerHTML = res.deposits.map(function(d) {
         return '<tr><td style="font-family:monospace;">' + escapeHtml(d.receipt_no) + '</td>' +
-          '<td>' + escapeHtml(d.receipt_date) + '</td>' +
+          '<td>' + fmtDate(d.receipt_date) + '</td>' +
           '<td>' + escapeHtml(d.customer || '-') + '</td>' +
           '<td style="text-align:right;">' + Number(d.deposit).toLocaleString() + '</td>' +
           '<td style="text-align:right;">' + (d.returned ? Number(d.returned).toLocaleString() : '-') + '</td>' +
@@ -1388,14 +1396,14 @@
       var month = document.getElementById('filter-revenue-month').value;
       var rows = [['Receipt No.', 'Date', 'Customer'].concat(cols.map(function(c) { return c.label; })).concat(['หักณที่จ่าย', 'รวม'])];
       res.ledger.forEach(function(r) {
-        rows.push([r.receipt_no, r.receipt_date, r.customer].concat(cols.map(function(c) { return r.cats[c.key] || 0; })).concat([r.wht, r.total]));
+        rows.push([r.receipt_no, fmtDate(r.receipt_date), r.customer].concat(cols.map(function(c) { return r.cats[c.key] || 0; })).concat([r.wht, r.total]));
       });
       var t = res.totals;
       rows.push(['Total', '', ''].concat(cols.map(function(c) { return t.cats[c.key] || 0; })).concat([t.wht, t.total]));
       rows.push([]);
       rows.push(['เงินประกัน (Deposits)']);
       rows.push(['Receipt No.', 'Date', 'Customer', 'Deposit', 'Returned', 'Balance']);
-      res.deposits.forEach(function(d) { rows.push([d.receipt_no, d.receipt_date, d.customer, d.deposit, d.returned, d.balance]); });
+      res.deposits.forEach(function(d) { rows.push([d.receipt_no, fmtDate(d.receipt_date), d.customer, d.deposit, d.returned, d.balance]); });
       rows.push(['Total', '', '', res.depTotals.deposit, res.depTotals.returned, res.depTotals.balance]);
       downloadCsv(rows, 'revenue-' + month + '.csv');
     }
@@ -1417,7 +1425,7 @@
           return;
         }
         document.getElementById('expense-body').innerHTML = res.rows.map(function(r) {
-          return '<tr><td>' + escapeHtml(r.date) + '</td>' +
+          return '<tr><td>' + fmtDate(r.date) + '</td>' +
             '<td>' + escapeHtml(r.category || '-') + '</td>' +
             '<td>' + escapeHtml(r.vendor || '-') + '</td>' +
             '<td>' + escapeHtml(r.items || '-') + '</td>' +
@@ -1443,7 +1451,7 @@
       var res = EXPENSE_DATA;
       var month = document.getElementById('filter-expense-month').value;
       var rows = [['วันที่', 'ประเภท', 'จาก', 'รายการ', 'จำนวนเงิน', 'VAT', 'WHT', 'รวมโอนเงิน', 'รวมค่าใช้จ่าย']];
-      res.rows.forEach(function(r) { rows.push([r.date, r.category, r.vendor, r.items, r.amount, r.vat, r.wht, r.net, r.totalExpense]); });
+      res.rows.forEach(function(r) { rows.push([fmtDate(r.date), r.category, r.vendor, r.items, r.amount, r.vat, r.wht, r.net, r.totalExpense]); });
       var t = res.totals;
       rows.push(['Total', '', '', '', t.amount, t.vat, t.wht, t.net, t.totalExpense]);
       downloadCsv(rows, 'expense-' + month + '.csv');
