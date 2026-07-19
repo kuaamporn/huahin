@@ -145,7 +145,23 @@
     // occupancy labels
     'Occupied': 'มีผู้พัก', 'Vacant': 'ว่าง', 'Reserved': 'จองแล้ว', 'Available': 'ว่าง',
     // booking types (OTA names kept as-is intentionally)
-    'monthly': 'รายเดือน', 'walkin': 'รายวัน', 'monthly-draft': 'ร่างรายเดือน'
+    'monthly': 'รายเดือน', 'walkin': 'รายวัน', 'monthly-draft': 'ร่างรายเดือน',
+    // finance: transaction direction + approval status (display only; values stay English)
+    'Revenue': 'รายรับ', 'Expense': 'รายจ่าย', 'Reservation': 'การจอง',
+    'Verified': 'ตรวจสอบแล้ว', 'Approved': 'อนุมัติแล้ว', 'Pending Approval': 'รออนุมัติ', 'Pending': 'รอดำเนินการ',
+    // finance: revenue categories (keys sent to worker — Thai is display only)
+    'monthly rent': 'ค่าเช่ารายเดือน', 'monthly deposit': 'เงินมัดจำรายเดือน',
+    'daily rent': 'ค่าเช่ารายวัน', 'daily deposit': 'เงินมัดจำรายวัน',
+    'bk rent': 'ค่าเช่า Booking.com', 'bk deposit': 'มัดจำ Booking.com',
+    'exp rent': 'ค่าเช่า Expedia', 'exp deposit': 'มัดจำ Expedia',
+    'damage_fee': 'ค่าเสียหาย', 'fitness': 'ฟิตเนส', 'breakfast': 'อาหารเช้า',
+    // finance: expense categories
+    'electricity': 'ค่าไฟฟ้า', 'water': 'ค่าน้ำ', 'water treatment': 'ค่าบำบัดน้ำ',
+    'utility': 'ค่าสาธารณูปโภค', 'repair': 'ค่าซ่อม', 'cleaning': 'ค่าทำความสะอาด',
+    'supplies': 'ค่าของใช้', 'salaries': 'เงินเดือน', 'deposit_return': 'คืนเงินมัดจำ',
+    'other': 'อื่น ๆ',
+    // finance: VAT wording shown in the item expander
+    'Included': 'รวมภาษี', 'Excluded': 'แยกภาษี'
   };
   function tv(v) {
     if (v == null) return v;

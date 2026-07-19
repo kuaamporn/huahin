@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>The Precious Moment Billing</title>
+  <title>วางบิล — The Precious Moment</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     @import url('app.css');
@@ -48,45 +48,45 @@
     <div class="topbar">
       <div class="topbar-header">
         <div>
-          <h1>The Precious Moment Billing</h1>
-          <div class="sub" style="margin-bottom:0;">Batch generation of monthly invoices.</div>
+          <h1>วางบิล</h1>
+          <div class="sub" style="margin-bottom:0;">ออกใบแจ้งหนี้รายเดือนแบบกลุ่ม</div>
         </div>
-        <a href="#" class="btn-signout" id="logout-link">Sign out</a>
+        <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
       </div>
       <div class="toplinks">
-        <a href="index.html" id="link-checkin">Check-in</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
-        <a href="hr.html" id="link-hr" class="hidden">HR</a>
-        <a href="finance.html" id="link-finance" class="hidden">Finance</a>
-        <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">Billing</a>
-        <a href="rooms.html#companies" id="link-companies" class="hidden">Companies</a>
-        <a href="report.html" id="link-report" class="hidden">Reports</a>
-        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">Reconcile</a>
+        <a href="index.html" id="link-checkin">ลงเวลา</a>
+        <a href="rooms.html" id="link-rooms" class="hidden">ผังห้องพัก</a>
+        <a href="dashboard.html" id="link-dashboard" class="hidden">แดชบอร์ด</a>
+        <a href="hr.html" id="link-hr" class="hidden">บุคคล</a>
+        <a href="finance.html" id="link-finance" class="hidden">การเงิน</a>
+        <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">วางบิล</a>
+        <a href="rooms.html#companies" id="link-companies" class="hidden">บริษัท</a>
+        <a href="report.html" id="link-report" class="hidden">รายงาน</a>
+        <a href="setting.html" id="link-setting" class="hidden">ตั้งค่า</a>
+        <a href="reconcile.html" id="link-reconcile" class="hidden">กระทบยอด</a>
       </div>
     </div>
 
     <div id="access-denied" class="card-section hidden">
-      <div style="color:var(--warn);">You don't have permission to view Billing.</div>
+      <div style="color:var(--warn);">คุณไม่มีสิทธิ์เข้าดูหน้าวางบิล</div>
     </div>
 
     <div id="main-content" class="card-section">
       <div class="toolbar">
         <div>
-          <label>Property</label>
+          <label>อาคาร</label>
           <select id="sel-property">
             <option value="precious">The Precious</option>
             <option value="moment">The Moment</option>
           </select>
         </div>
         <div>
-          <label>Billing Month (e.g. 2025-12)</label>
+          <label>เดือนที่วางบิล (เช่น 2025-12)</label>
           <input type="month" id="sel-month" />
         </div>
-        <button id="btn-load" class="btn-primary" style="background:var(--ink);">Load Active Rooms</button>
-        <button id="btn-generate" class="btn-primary" style="margin-left:auto;" disabled>Generate Invoices</button>
-        <button id="btn-print-selected" class="btn-primary" style="margin-left:12px; background:#0284C7;" disabled>Print Selected</button>
+        <button id="btn-load" class="btn-primary" style="background:var(--ink);">โหลดห้องที่ใช้งาน</button>
+        <button id="btn-generate" class="btn-primary" style="margin-left:auto;" disabled>ออกใบแจ้งหนี้</button>
+        <button id="btn-print-selected" class="btn-primary" style="margin-left:12px; background:#0284C7;" disabled>พิมพ์ที่เลือก</button>
       </div>
       <div id="err-display" class="err-msg"></div>
 
@@ -95,23 +95,23 @@
           <thead>
             <tr>
               <th style="width:30px;"><input type="checkbox" id="chk-all" checked onchange="toggleAllRooms(this.checked)" /></th>
-              <th>Room</th>
-              <th>Guest</th>
-              <th class="text-right">Rent</th>
-              <th class="text-right">Prev E.</th>
-              <th class="text-right">Curr E.</th>
-              <th class="text-right">E. Rate</th>
-              <th class="text-right">E. Amt</th>
-              <th class="text-right">Prev W.</th>
-              <th class="text-right">Curr W.</th>
-              <th class="text-right">W. Rate</th>
-              <th class="text-right">W. Amt</th>
-              <th class="text-right">Extras</th>
-              <th class="text-right">Total</th>
+              <th>ห้อง</th>
+              <th>ผู้เข้าพัก</th>
+              <th class="text-right">ค่าเช่า</th>
+              <th class="text-right">ไฟก่อน</th>
+              <th class="text-right">ไฟปัจจุบัน</th>
+              <th class="text-right">เรตไฟ</th>
+              <th class="text-right">ค่าไฟ</th>
+              <th class="text-right">น้ำก่อน</th>
+              <th class="text-right">น้ำปัจจุบัน</th>
+              <th class="text-right">เรตน้ำ</th>
+              <th class="text-right">ค่าน้ำ</th>
+              <th class="text-right">เพิ่มเติม</th>
+              <th class="text-right">รวม</th>
             </tr>
           </thead>
           <tbody id="billing-body">
-            <tr><td colspan="14" style="text-align:center; color:var(--muted);">Select property and month, then click Load.</td></tr>
+            <tr><td colspan="14" style="text-align:center; color:var(--muted);">เลือกอาคารและเดือน แล้วกดโหลด</td></tr>
           </tbody>
         </table>
       </div>
@@ -120,42 +120,42 @@
 
   <div id="payment-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
     <div style="background:#fff; padding:24px; border-radius:24px; width:400px; max-width:90%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-      <h2 style="margin-top:0; font-family:'Lexend', sans-serif;">Confirm Payment</h2>
-      <label>Payment Method</label>
+      <h2 style="margin-top:0; font-family:'Lexend', sans-serif;">ยืนยันการชำระเงิน</h2>
+      <label>ช่องทางชำระเงิน</label>
       <select id="payment-channel" style="width:100%; margin-bottom:20px; padding:10px; font-size:14px; border:1px solid var(--line); border-radius:6px;">
-        <option value="cash">Cash</option>
+        <option value="cash">เงินสด</option>
         <option value="kb">KB</option>
         <option value="scb">SCB</option>
-        <option value="maemanee">Mae Manee</option>
+        <option value="maemanee">แม่มณี</option>
         <option value="kshop">Kshop</option>
       </select>
       <div style="display:flex; gap:10px; justify-content:flex-end;">
-        <button onclick="hide('payment-modal')" class="btn-primary" style="background:none; color:var(--muted); border:1px solid var(--muted);">Cancel</button>
-        <button id="payment-confirm-btn" class="btn-primary">Confirm</button>
+        <button onclick="hide('payment-modal')" class="btn-primary" style="background:none; color:var(--muted); border:1px solid var(--muted);">ยกเลิก</button>
+        <button id="payment-confirm-btn" class="btn-primary">ยืนยัน</button>
       </div>
     </div>
   </div>
 
   <div id="extra-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
     <div style="background:#fff; padding:24px; border-radius:24px; width:650px; max-width:90%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-      <h2 style="margin-top:0; font-family:'Lexend', sans-serif;">Extra Items for <span id="em-roomname"></span></h2>
+      <h2 style="margin-top:0; font-family:'Lexend', sans-serif;">รายการเพิ่มเติมสำหรับ <span id="em-roomname"></span></h2>
       <table style="width:100%; margin-bottom:15px; background:none; border:none; box-shadow:none;">
         <thead>
           <tr>
-            <th style="background:none;">Description</th>
-            <th style="background:none;">Category</th>
-            <th style="background:none;">Units</th>
-            <th style="background:none;">Unit Price</th>
-            <th style="background:none;">Total</th>
+            <th style="background:none;">รายละเอียด</th>
+            <th style="background:none;">หมวด</th>
+            <th style="background:none;">จำนวน</th>
+            <th style="background:none;">ราคาต่อหน่วย</th>
+            <th style="background:none;">รวม</th>
             <th style="background:none;"></th>
           </tr>
         </thead>
         <tbody id="em-tbody"></tbody>
       </table>
-      <button onclick="emAddRow()" class="btn-primary" style="background:var(--muted); padding:6px 12px; font-size:12px; margin-bottom:15px;">+ Add Item</button>
+      <button onclick="emAddRow()" class="btn-primary" style="background:var(--muted); padding:6px 12px; font-size:12px; margin-bottom:15px;">+ เพิ่มรายการ</button>
       <div style="text-align:right;">
-        <button onclick="closeExtraModal()" class="btn-primary" style="background:none; color:var(--muted); border:1px solid var(--muted); margin-right:10px;">Cancel</button>
-        <button onclick="saveExtraModal()" class="btn-primary">Save Extras</button>
+        <button onclick="closeExtraModal()" class="btn-primary" style="background:none; color:var(--muted); border:1px solid var(--muted); margin-right:10px;">ยกเลิก</button>
+        <button onclick="saveExtraModal()" class="btn-primary">บันทึกรายการเพิ่มเติม</button>
       </div>
     </div>
   </div>
@@ -212,24 +212,24 @@
       })
       .then(function(res) {
         if (!res.ok && (!res.headers.get('content-type') || res.headers.get('content-type').indexOf('application/json') === -1)) {
-           return { ok: false, error: 'Server Error: ' + res.status };
+           return { ok: false, error: 'เซิร์ฟเวอร์ผิดพลาด: ' + res.status };
         }
         return res.json();
       })
       .catch(function(err) {
-        return { ok: false, error: 'Network/Parsing Error: ' + err.message };
+        return { ok: false, error: 'การเชื่อมต่อผิดพลาด: ' + err.message };
       });
     }
 
     document.getElementById('btn-load').onclick = function() {
       var errEl = document.getElementById('err-display');
-      errEl.textContent = 'Loading...';
+      errEl.textContent = 'กำลังโหลด...';
       errEl.style.color = 'var(--ink)';
       document.getElementById('btn-generate').disabled = true;
 
       var prop = document.getElementById('sel-property').value;
       var mo = document.getElementById('sel-month').value;
-      if (!mo) { errEl.style.color = 'var(--warn)'; errEl.textContent = 'Select a month.'; return; }
+      if (!mo) { errEl.style.color = 'var(--warn)'; errEl.textContent = 'เลือกเดือน'; return; }
 
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
@@ -246,7 +246,7 @@
       var tbody = document.getElementById('billing-body');
       tbody.innerHTML = '';
       if (loadedRooms.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;">No active monthly bookings found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;">ไม่พบการจองรายเดือนที่ใช้งานอยู่</td></tr>';
         return;
       }
 
@@ -261,10 +261,10 @@
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td colspan="12">' +
               '<div style="padding:10px; background:#fff8e1; border:1px solid #ffe082; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">' +
-                '<div><strong style="color:#b8860b;">Pending Invoice:</strong> ฿' + Number(r.txn_amount).toLocaleString() + '</div>' +
+                '<div><strong style="color:#b8860b;">ใบแจ้งหนี้รอชำระ:</strong> ฿' + Number(r.txn_amount).toLocaleString() + '</div>' +
                 '<div style="display:flex; gap:10px;">' +
-                  '<button class="btn-primary" onclick="openConfirmPaymentModal(\'' + escapeHtml(r.txn_id) + '\')" style="padding:6px 12px; font-size:13px;">Confirm Paid</button>' +
-                  '<button class="btn-primary" onclick="deletePendingInvoice(\'' + escapeHtml(r.txn_id) + '\')" style="padding:6px 12px; font-size:13px; background:none; color:var(--warn); border:1px solid var(--warn);">Delete</button>' +
+                  '<button class="btn-primary" onclick="openConfirmPaymentModal(\'' + escapeHtml(r.txn_id) + '\')" style="padding:6px 12px; font-size:13px;">ยืนยันชำระแล้ว</button>' +
+                  '<button class="btn-primary" onclick="deletePendingInvoice(\'' + escapeHtml(r.txn_id) + '\')" style="padding:6px 12px; font-size:13px; background:none; color:var(--warn); border:1px solid var(--warn);">ลบ</button>' +
                 '</div>' +
               '</div>' +
             '</td>';
@@ -274,9 +274,9 @@
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td colspan="12">' +
               '<div style="padding:10px; background:#e6f4ea; border:1px solid #34a853; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">' +
-                '<div style="color:#137333; font-weight:600;">✓ Invoice Paid & Confirmed: ฿' + Number(r.txn_amount).toLocaleString() + '</div>' +
+                '<div style="color:#137333; font-weight:600;">✓ ชำระและยืนยันแล้ว: ฿' + Number(r.txn_amount).toLocaleString() + '</div>' +
                 '<div>' +
-                  '<button class="btn-primary" onclick="window.open(\'invoice.html?id=' + escapeHtml(r.txn_id) + '\', \'_blank\')" style="padding:6px 12px; font-size:13px; background:var(--go);">View Invoice</button>' +
+                  '<button class="btn-primary" onclick="window.open(\'invoice.html?id=' + escapeHtml(r.txn_id) + '\', \'_blank\')" style="padding:6px 12px; font-size:13px; background:var(--go);">ดูใบแจ้งหนี้</button>' +
                 '</div>' +
               '</div>' +
             '</td>';
@@ -312,8 +312,8 @@
                 var proRateNextMonthEnd = Math.round((r.rent / 30) * nightsToNextMonthEnd);
 
                 return '<div style="font-size:10px; margin-top:4px; line-height:1.2; text-align:left;">' +
-                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateMonthEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">Align to End (฿' + proRateMonthEnd.toLocaleString() + ')</a><br>' +
-                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateNextMonthEnd + ', \'' + nextMonthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">Align +1 Mo (฿' + proRateNextMonthEnd.toLocaleString() + ')</a>' +
+                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateMonthEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">ปรับถึงสิ้นเดือน (฿' + proRateMonthEnd.toLocaleString() + ')</a><br>' +
+                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateNextMonthEnd + ', \'' + nextMonthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">ปรับ +1 เดือน (฿' + proRateNextMonthEnd.toLocaleString() + ')</a>' +
                 '</div>';
               })() +
             '</td>' +
@@ -325,7 +325,7 @@
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_w_' + idx + '" placeholder="' + (r.prev_water || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" style="width:65px" class="grid-input" id="wrate_' + idx + '" value="' + (BILLING_SETTINGS[prop + '_default_water_rate'] || 22) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right" id="amt_w_' + idx + '">฿0</td>' +
-            '<td class="text-right"><div style="margin-bottom:4px; font-weight:bold;" id="add_tot_' + idx + '">฿0</div><button onclick="openExtraModal(' + idx + ')" style="font-size:11px; padding:3px 6px; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:4px;">Edit</button></td>' +
+            '<td class="text-right"><div style="margin-bottom:4px; font-weight:bold;" id="add_tot_' + idx + '">฿0</div><button onclick="openExtraModal(' + idx + ')" style="font-size:11px; padding:3px 6px; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:4px;">แก้ไข</button></td>' +
             '<td class="text-right total-col" id="tot_' + idx + '">฿' + r.rent + '</td>';
         }
         tbody.appendChild(tr);
@@ -431,8 +431,8 @@
       item = item || {};
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td style="padding:4px;"><input type="text" style="width:100%" class="em-desc" value="" placeholder="e.g. Cleaning"></td>' +
-        '<td style="padding:4px;"><select class="em-cat"><option value="other"' + (item.category==='other'?' selected':'') + '>Other</option><option value="monthly rent"' + (item.category==='monthly rent'?' selected':'') + '>Rent/Fee</option><option value="electricity"' + (item.category==='electricity'?' selected':'') + '>Electricity</option><option value="water"' + (item.category==='water'?' selected':'') + '>Water</option><option value="utility"' + (item.category==='utility'?' selected':'') + '>Utility</option><option value="cleaning"' + (item.category==='cleaning'?' selected':'') + '>Cleaning</option></select></td>' +
+        '<td style="padding:4px;"><input type="text" style="width:100%" class="em-desc" value="" placeholder="เช่น ค่าทำความสะอาด"></td>' +
+        '<td style="padding:4px;"><select class="em-cat"><option value="other"' + (item.category==='other'?' selected':'') + '>อื่น ๆ</option><option value="monthly rent"' + (item.category==='monthly rent'?' selected':'') + '>ค่าเช่า/ค่าธรรมเนียม</option><option value="electricity"' + (item.category==='electricity'?' selected':'') + '>ค่าไฟฟ้า</option><option value="water"' + (item.category==='water'?' selected':'') + '>ค่าน้ำ</option><option value="utility"' + (item.category==='utility'?' selected':'') + '>ค่าสาธารณูปโภค</option><option value="cleaning"' + (item.category==='cleaning'?' selected':'') + '>ค่าทำความสะอาด</option></select></td>' +
         '<td style="padding:4px;"><input type="number" min="1" style="width:55px" class="em-units" value="' + (item.units || 1) + '" oninput="if(this.value<0)this.value=0; emCalcRow(this)"></td>' +
         '<td style="padding:4px;"><input type="number" min="0" style="width:80px" class="em-price" value="' + (item.unitPrice || 0) + '" oninput="if(this.value<0)this.value=0; emCalcRow(this)"></td>' +
         '<td style="padding:4px;"><input type="number" min="0" style="width:80px" class="em-amount" value="' + (item.amount || 0) + '" readonly></td>' +
@@ -463,7 +463,7 @@
         var price = parseFloat(tr.querySelector('.em-price').value) || 0;
         var amount = parseFloat(tr.querySelector('.em-amount').value) || 0;
         if (desc || amount > 0) {
-          items.push({ description: desc || 'Extra', category: cat, units: units, unitPrice: price, amount: amount });
+          items.push({ description: desc || 'รายการเพิ่มเติม', category: cat, units: units, unitPrice: price, amount: amount });
         }
       }
       loadedRooms[emCurrentIdx].extraItems = items;
@@ -480,15 +480,15 @@
         .filter(function(r) { return r && r.metersUntouched; })
         .map(function(r) { return r.room_name; });
       if (untouchedRooms.length > 0) {
-        if (!(await confirmDialog('No current meter reading entered for: ' + untouchedRooms.join(', ') + '.\n\nTheir invoices will bill ฿0 for utilities. Generate anyway?', {title:'Missing meter readings', confirmText:'Generate anyway', danger:true}))) return;
+        if (!(await confirmDialog('ยังไม่ได้กรอกเลขมิเตอร์ปัจจุบันของ: ' + untouchedRooms.join(', ') + '\n\nใบแจ้งหนี้ของห้องเหล่านี้จะคิดค่าสาธารณูปโภคเป็น ฿0 ต้องการออกต่อไปหรือไม่?', {title:'ยังไม่ได้กรอกเลขมิเตอร์', confirmText:'ออกต่อไป', danger:true}))) return;
       }
 
-      if (!(await confirmDialog('Generate pending invoices for the ' + checkedBoxes.length + ' selected rooms?', {title:'Generate invoices', confirmText:'Generate'}))) return;
+      if (!(await confirmDialog('ออกใบแจ้งหนี้รอชำระสำหรับ ' + checkedBoxes.length + ' ห้องที่เลือก?', {title:'ออกใบแจ้งหนี้', confirmText:'ออกใบแจ้งหนี้'}))) return;
 
       document.getElementById('btn-generate').disabled = true;
       var errEl = document.getElementById('err-display');
       errEl.style.color = 'var(--ink)';
-      errEl.textContent = 'Generating...';
+      errEl.textContent = 'กำลังออกใบแจ้งหนี้...';
 
       var prop = document.getElementById('sel-property').value;
       var mo = document.getElementById('sel-month').value;
@@ -516,7 +516,7 @@
       }
 
       errEl.style.color = 'var(--go)';
-      errEl.innerHTML = 'Success! Generated ' + res.count + ' invoices. <button onclick="window.open(\'batch-invoice.html?ids=' + res.txnIds.join(',') + '\', \'_blank\')" class="btn-primary" style="margin-left: 15px; padding: 6px 12px; font-size: 13px; background: #0284C7; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Batch Print</button>';
+      errEl.innerHTML = 'สำเร็จ! ออกใบแจ้งหนี้แล้ว ' + res.count + ' รายการ <button onclick="window.open(\'batch-invoice.html?ids=' + res.txnIds.join(',') + '\', \'_blank\')" class="btn-primary" style="margin-left: 15px; padding: 6px 12px; font-size: 13px; background: #0284C7; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">พิมพ์แบบกลุ่ม</button>';
       document.getElementById('btn-load').click();
     };
 
@@ -537,7 +537,7 @@
     };
 
     async function deletePendingInvoice(txnId) {
-      if (!(await confirmDialog('Delete this pending invoice?', {title:'Delete invoice', confirmText:'Delete', danger:true}))) return;
+      if (!(await confirmDialog('ลบใบแจ้งหนี้รอชำระนี้?', {title:'ลบใบแจ้งหนี้', confirmText:'ลบ', danger:true}))) return;
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
       apiCall('financeDeleteTransaction', [token, txnId]).then(function(res) {

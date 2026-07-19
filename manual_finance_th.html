@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือฝ่ายการเงิน — รายรับ-รายจ่าย ใบเสร็จ และวางบิล</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --bg:#F5F5F7; --surface:#FFFFFF; --border:#E5E5EA;
+  --text:#1D1D1F; --muted:#6b7280;
+  --teal:#0F766E; --teal-light:rgba(15,118,110,.08); --teal-border:rgba(15,118,110,.25);
+  --green:#16A34A; --red:#DC2626; --amber:#D97706;
+  --amber-bg:rgba(217,119,6,.08); --amber-border:rgba(217,119,6,.28);
+  --red-bg:rgba(220,38,38,.06); --red-border:rgba(220,38,38,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:16.5px;line-height:1.7}
+.wrap{max-width:920px;margin:0 auto;padding:32px 22px 120px}
+h1,h2,h3,.eyebrow,.snum,.steps li::before,.mono{font-family:'Lexend',sans-serif}
+.thai-head{font-family:'Sarabun',sans-serif;font-weight:700}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px;flex-wrap:wrap;gap:10px}
+.back{font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--teal-border);border-radius:999px;background:var(--teal-light)}
+.back:hover{background:var(--teal);color:#fff}
+.tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bottom:14px;font-family:'Sarabun',sans-serif}
+.lead{color:var(--muted);font-size:16px;max-width:680px;margin-bottom:14px}
+.lead b{color:var(--text)}
+
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;margin:30px 0 44px}
+.toc h2{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:500}
+.toc ol{list-style:none;counter-reset:t;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.toc li{counter-increment:t}
+.toc a{color:var(--text);text-decoration:none;display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:15.5px}
+.toc a::before{content:counter(t);font-family:'Lexend',sans-serif;font-weight:700;color:var(--teal);min-width:22px;font-size:13px}
+.toc a:hover{color:var(--teal)}
+
+.section{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 30px;margin-bottom:26px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.section-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:8px}
+.snum{flex-shrink:0;width:42px;height:42px;border-radius:13px;background:var(--teal);color:#fff;font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center}
+.section-head h2{font-size:24px;font-weight:700;line-height:1.25;font-family:'Sarabun',sans-serif;padding-top:3px}
+.section-head .en{display:block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:400;margin-top:3px}
+.section > p{color:#3a3a3c;margin:14px 0}
+.section > p.intro{margin-top:16px}
+
+.fig{margin:22px 0;text-align:center}
+.fig img{max-width:100%;width:auto;border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 20px -8px rgba(0,0,0,.18)}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px}
+
+.steps{list-style:none;counter-reset:s;margin:16px 0 4px;padding:0}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 42px;border-bottom:1px solid #f1f1f3}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:27px;height:27px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center}
+.steps li b{color:var(--teal)}
+.steps.circ{counter-reset:none}
+.steps.circ li::before{content:attr(data-n)}
+
+.note,.warn,.tip{border-radius:14px;padding:15px 18px;margin:20px 0;font-size:15.5px;line-height:1.6}
+.note{background:var(--teal-light);border:1px solid var(--teal-border)}
+.warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+.tip{background:var(--red-bg);border:1px solid var(--red-border)}
+.note b,.warn b,.tip b{font-weight:700}
+.warn b{color:var(--amber)} .tip b{color:var(--red)}
+
+table.roles{width:100%;border-collapse:collapse;margin:20px 0;font-size:15px}
+table.roles th,table.roles td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+table.roles th{background:var(--teal-light);font-family:'Lexend',sans-serif;font-weight:600;font-size:13.5px}
+table.roles td .mono{font-size:12.5px;color:var(--teal);background:var(--teal-light);padding:1px 6px;border-radius:5px}
+
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px;font-family:'DM Mono',monospace;letter-spacing:1px}
+
+@media(max-width:680px){
+  .toc ol{grid-template-columns:1fr}
+  .section{padding:26px 20px}
+  .section-head h2{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="staff_manual.html">← กลับหน้าหลักคู่มือ</a>
+    <span class="tag">The Precious Moment</span>
+  </div>
+
+  <div class="eyebrow">คู่มือฝ่ายการเงิน · Finance · Revenue / Expense / Accountant</div>
+  <h1>การเงิน ใบเสร็จ และการวางบิลรายเดือน</h1>
+  <p class="lead">คู่มือนี้สำหรับ<b>ฝ่ายการเงิน บัญชี และผู้ดูแลรายรับ-รายจ่าย</b> —
+  ครอบคลุมการดูภาพรวมการเงิน การบันทึกรายรับและรายจ่าย (พร้อม VAT และภาษีหัก ณ ที่จ่าย)
+  การอนุมัติและตรวจสอบรายการ การออกใบเสร็จและใบแจ้งหนี้ การคืนเงินมัดจำเมื่อผู้เช่าย้ายออก
+  และการวางบิลค่าเช่า-ค่าน้ำ-ค่าไฟรายเดือนแบบกลุ่ม</p>
+  <p class="lead" style="margin-bottom:0">สิ่งที่คุณเห็นและทำได้ขึ้นอยู่กับ<b>หน้าที่</b>ของคุณ —
+  ผู้ที่ดูแลรายรับจะเห็นปุ่ม <b>+ รายรับ</b> ผู้ที่ดูแลรายจ่ายจะเห็นปุ่ม <b>+ รายจ่าย</b>
+  และเจ้าของกิจการเห็นทุกอย่างรวมถึงกำไรสุทธิ</p>
+
+  <nav class="toc">
+    <h2>สารบัญ</h2>
+    <ol>
+      <li><a href="#s1">ภาพรวมหน้าการเงิน</a></li>
+      <li><a href="#s2">บันทึกรายรับ</a></li>
+      <li><a href="#s3">บันทึกรายจ่าย (VAT / หัก ณ ที่จ่าย)</a></li>
+      <li><a href="#s4">อนุมัติและตรวจสอบรายการ</a></li>
+      <li><a href="#s5">ออกใบเสร็จและใบแจ้งหนี้</a></li>
+      <li><a href="#s6">คืนเงินมัดจำเมื่อย้ายออก</a></li>
+      <li><a href="#s7">การจองที่รอเช็คอิน</a></li>
+      <li><a href="#s8">วางบิลรายเดือนแบบกลุ่ม</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 OVERVIEW -->
+  <section class="section" id="s1">
+    <div class="section-head"><div class="snum">1</div><h2>ภาพรวมหน้าการเงิน<span class="en">Finance overview</span></h2></div>
+    <p class="intro">เปิดหน้า <b>การเงิน</b> จากเมนูด้านบน เลือก<b>อาคาร ปี และเดือน</b> แล้วกด <b>โหลด</b>
+    ระบบจะแสดงสรุปยอดและรายการทั้งหมดของเดือนนั้น</p>
+    <figure class="fig"><img src="manual_assets/finance/01_overview.png" alt="ภาพรวมหน้าการเงิน" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ตัวเลือกด้านบน</b> — เลือกอาคาร ปี เดือน แล้วกด <b>โหลด</b> เพื่อดึงข้อมูล</li>
+      <li data-n="2"><b>การ์ดสรุป</b> — รายรับ รายจ่าย กำไรสุทธิ เงินมัดจำที่ถืออยู่ และการจองที่รอเช็คอิน (กดการ์ด <b>เงินมัดจำ</b> หรือ <b>การจอง</b> เพื่อดูรายละเอียด)</li>
+      <li data-n="3"><b>แถบเครื่องมือ</b> — ปุ่ม + รายรับ / + รายจ่าย จัดการผู้ขาย กรองตามสถานะ ค้นหา และส่งออก CSV</li>
+      <li data-n="4"><b>ตารางรายการ</b> — ทุกรายการของเดือน กดเครื่องหมาย <b>+</b> หน้าแถวเพื่อดูรายการย่อย</li>
+    </ol>
+    <div class="note">ป้ายสถานะสีต่าง ๆ บอกขั้นตอนของรายการ: <b>รออนุมัติ</b> → <b>อนุมัติแล้ว</b> → <b>ตรวจสอบแล้ว</b>
+    ส่วน <b>การจอง</b> (สีฟ้า) คือเงินมัดจำที่ยังรอผู้เข้าพักมาเช็คอิน</div>
+  </section>
+
+  <!-- 2 ADD REVENUE -->
+  <section class="section" id="s2">
+    <div class="section-head"><div class="snum">2</div><h2>บันทึกรายรับ<span class="en">Add revenue</span></h2></div>
+    <p class="intro">กดปุ่ม <b>+ รายรับ</b> เพื่อบันทึกเงินที่รับเข้ามา เช่น ค่าเช่า ค่ามัดจำ ค่ารายวัน หรือค่าบริการอื่น ๆ</p>
+    <figure class="fig"><img src="manual_assets/finance/02_add_revenue.png" alt="ฟอร์มบันทึกรายรับ" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ห้อง</b> — พิมพ์รหัสห้อง (เช่น P-101) แล้วเลือกจากรายการ หรือเลือก <b>Walk-in</b> ถ้าไม่มีห้อง ระบบจะดึงเฉพาะห้องที่มีจริงเพื่อไม่ให้กรอกผิด</li>
+      <li data-n="2"><b>ผู้เข้าพัก / ผู้ขาย</b> — เติมอัตโนมัติจากห้องที่เลือก หรือพิมพ์เอง</li>
+      <li data-n="3"><b>รายการ</b> — ใส่รายละเอียด เลือกหมวด จำนวน และราคา กด <b>+ เพิ่มบรรทัดรายการ</b> ได้หลายบรรทัด</li>
+      <li data-n="4"><b>บันทึก</b> — เลือกช่องทางชำระเงิน ผู้รับเงิน วันที่ แล้วกด <b>บันทึก</b></li>
+    </ol>
+    <div class="warn"><b>หมายเหตุ:</b> ทุกบรรทัดต้องมีรายละเอียดและจำนวนเงินมากกว่า 0 มิฉะนั้นระบบจะไม่ให้บันทึก</div>
+  </section>
+
+  <!-- 3 ADD EXPENSE -->
+  <section class="section" id="s3">
+    <div class="section-head"><div class="snum">3</div><h2>บันทึกรายจ่าย (VAT / หัก ณ ที่จ่าย)<span class="en">Add expense · VAT / WHT</span></h2></div>
+    <p class="intro">กดปุ่ม <b>+ รายจ่าย</b> ฟอร์มจะคล้ายรายรับ แต่มีส่วนคำนวณ <b>VAT</b> และ <b>ภาษีหัก ณ ที่จ่าย</b> เพิ่มเข้ามา</p>
+    <figure class="fig"><img src="manual_assets/finance/03_add_expense.png" alt="ฟอร์มบันทึกรายจ่ายพร้อม VAT และหัก ณ ที่จ่าย" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ประเภท VAT</b> — เลือก <b>ไม่มี</b> / <b>รวมภาษี (7%)</b> (ราคารวม VAT แล้ว) / <b>แยกภาษี (+7%)</b> (บวก VAT เพิ่มจากราคา)</li>
+      <li data-n="2"><b>หัก ณ ที่จ่าย %</b> — เลือกอัตราภาษีที่ต้องหัก (0–5%) ตามประเภทค่าใช้จ่าย</li>
+      <li data-n="3"><b>ยอดจ่ายสุทธิ</b> — ระบบคำนวณ ยอดรวม, VAT, ภาษีหัก ณ ที่จ่าย และ <b>ยอดจ่ายสุทธิ</b> ให้อัตโนมัติ</li>
+    </ol>
+    <div class="note">ระบบใช้สูตรมาตรฐาน: สำหรับ <b>รวมภาษี</b> จะถอด VAT ออกจากยอด (× 100 ⁄ 107) ก่อนคำนวณภาษีหัก ณ ที่จ่าย
+    ยอดจ่ายสุทธิคือยอดที่จ่ายจริงหลังหักภาษี ณ ที่จ่ายแล้ว</div>
+  </section>
+
+  <!-- 4 APPROVE / VERIFY -->
+  <section class="section" id="s4">
+    <div class="section-head"><div class="snum">4</div><h2>อนุมัติและตรวจสอบรายการ<span class="en">Approve &amp; verify</span></h2></div>
+    <p class="intro">รายการที่เพิ่งบันทึกจะอยู่สถานะ <b>รออนุมัติ</b> กดปุ่ม <b>อนุมัติ</b> ในแถวเพื่อยืนยันการรับ/จ่ายเงินจริง
+    จากนั้นเจ้าของกิจการจะกด <b>ตรวจสอบ</b> เป็นขั้นสุดท้าย</p>
+    <figure class="fig"><img src="manual_assets/finance/04_approve.png" alt="หน้าต่างยืนยันและอนุมัติรายการ" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ช่องทางชำระเงิน</b> — ยืนยันว่าเงินเข้า/ออกทางไหน (เงินสด, KB, SCB, แม่มณี, Kshop)</li>
+      <li data-n="2"><b>ผู้รับเงิน</b> — เลือกพนักงานที่รับหรือจ่ายเงินจริง</li>
+      <li data-n="3"><b>ยืนยัน</b> — กดปุ่มยืนยัน รายการจะเปลี่ยนเป็น <b>อนุมัติแล้ว</b> (และ <b>ตรวจสอบแล้ว</b> เมื่อเจ้าของตรวจ)</li>
+    </ol>
+    <div class="warn"><b>ลำดับสิทธิ์:</b> ผู้ดูแลรายรับอนุมัติได้เฉพาะรายรับ ผู้ดูแลรายจ่ายอนุมัติได้เฉพาะรายจ่าย
+    ส่วนขั้น <b>ตรวจสอบ</b> ทำได้เฉพาะเจ้าของกิจการเท่านั้น</div>
+  </section>
+
+  <!-- 5 RECEIPT / INVOICE -->
+  <section class="section" id="s5">
+    <div class="section-head"><div class="snum">5</div><h2>ออกใบเสร็จและใบแจ้งหนี้<span class="en">Receipt &amp; invoice</span></h2></div>
+    <p class="intro">เปิดรายการรายรับด้วยปุ่ม <b>แก้ไข</b> ถ้ายังไม่เคยออกใบเสร็จ ส่วน <b>ออกใบเสร็จรับเงิน</b> จะปรากฏขึ้น</p>
+    <figure class="fig"><img src="manual_assets/finance/05_receipt_gen.png" alt="ส่วนออกใบเสร็จรับเงิน" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ประเภทใบเสร็จ</b> — <b>RR</b> ค่าเช่า/รายเดือน · <b>RD</b> รายวัน/Walk-in · <b>RA</b> เงินมัดจำ</li>
+      <li data-n="2"><b>วันที่ใบเสร็จ</b> — วันที่ที่จะพิมพ์บนใบเสร็จ</li>
+      <li data-n="3"><b>ออกใบเสร็จ</b> — กดเพื่อสร้างเลขที่ใบเสร็จ จากนั้นปุ่ม <b>พิมพ์ใบเสร็จ</b> จะปรากฏ</li>
+    </ol>
+    <div class="note">ถ้ารายการมีทั้ง <b>ค่าเช่า</b> และ <b>เงินมัดจำ</b> รวมกัน จะมีปุ่ม <b>ออกและแยก (ค่าเช่า + มัดจำ)</b>
+    เพื่อออกใบเสร็จแยกสองใบให้ถูกต้องตามบัญชี ส่วน <b>ออกใบแจ้งหนี้แบบเต็ม</b> ใช้สำหรับลูกค้าที่ต้องการใบแจ้งหนี้เต็มรูปแบบ</div>
+  </section>
+
+  <!-- 6 MOVE-OUT / DEPOSIT REFUND -->
+  <section class="section" id="s6">
+    <div class="section-head"><div class="snum">6</div><h2>คืนเงินมัดจำเมื่อย้ายออก<span class="en">Deposit refund &amp; move-out</span></h2></div>
+    <p class="intro">กดการ์ด <b>เงินมัดจำ</b> ด้านบนเพื่อดูเงินมัดจำที่ยังไม่ได้คืน แล้วกด <b>คืนเงิน</b> ในแถวของผู้เช่าที่ย้ายออก</p>
+    <figure class="fig"><img src="manual_assets/finance/06_unrefunded.png" alt="รายการเงินมัดจำที่ยังไม่คืน" loading="lazy"></figure>
+    <p>หน้าต่าง <b>ดำเนินการย้ายออก</b> ให้คุณหักค่าใช้จ่ายต่าง ๆ ออกจากเงินมัดจำ แล้วคำนวณเงินที่ต้องคืนผู้เช่า</p>
+    <figure class="fig"><img src="manual_assets/finance/07_moveout.png" alt="หน้าต่างดำเนินการย้ายออก" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>คีย์การ์ด</b> — กรอกจำนวนการ์ดที่ผู้เช่าคืน ระบบหักค่าการ์ดที่ไม่ได้คืนให้อัตโนมัติ</li>
+      <li data-n="2"><b>รายการหักเงิน</b> — เพิ่มค่าน้ำ ค่าไฟ ค่าทำความสะอาด หรือค่าเสียหายที่ต้องหัก</li>
+      <li data-n="3"><b>ยอดสุทธิ</b> — ระบบแสดง <b>เงินสดที่ต้องคืนผู้เข้าพัก</b> (หรือ <b>ค้างชำระ</b> ถ้าหักเกินมัดจำ)</li>
+    </ol>
+    <div class="warn"><b>อย่าลืม:</b> หลังคืนเงินสดให้ผู้เช่า ควรบันทึกเป็นรายการ <b>รายจ่าย</b> ด้วย เพื่อให้ยอดเงินสดตรงกับบัญชี</div>
+  </section>
+
+  <!-- 7 RESERVATIONS -->
+  <section class="section" id="s7">
+    <div class="section-head"><div class="snum">7</div><h2>การจองที่รอเช็คอิน<span class="en">Reservations waiting</span></h2></div>
+    <p class="intro">กดการ์ด <b>การจอง</b> ด้านบนเพื่อดูเงินมัดจำการจองที่ยังรอผู้เข้าพักมาเช็คอิน</p>
+    <figure class="fig"><img src="manual_assets/finance/08_reservations.png" alt="การจองที่รอเช็คอิน" loading="lazy"></figure>
+    <p>แต่ละแถวแสดงวันเช็คอิน ห้อง ผู้เข้าพัก เงินมัดจำ และประเภทการจอง กดปุ่ม <b>เช็คอิน</b>
+    เพื่อไปยังหน้า <b>ผังห้องพัก</b> พร้อมเปิดการจองนั้นให้ทันที</p>
+  </section>
+
+  <!-- 8 BILLING -->
+  <section class="section" id="s8">
+    <div class="section-head"><div class="snum">8</div><h2>วางบิลรายเดือนแบบกลุ่ม<span class="en">Monthly batch billing</span></h2></div>
+    <p class="intro">หน้า <b>วางบิล</b> ใช้ออกใบแจ้งหนี้ค่าเช่า-ค่าน้ำ-ค่าไฟให้ผู้เช่ารายเดือนทุกห้องพร้อมกัน
+    เลือกอาคารและเดือน แล้วกด <b>โหลดห้องที่ใช้งาน</b></p>
+    <figure class="fig"><img src="manual_assets/finance/09_billing.png" alt="หน้าวางบิลรายเดือน" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ตัวเลือกด้านบน</b> — เลือกอาคารและเดือนที่วางบิล แล้วกดโหลด</li>
+      <li data-n="2"><b>ตารางมิเตอร์</b> — กรอกเลขมิเตอร์ไฟและน้ำปัจจุบันของแต่ละห้อง ระบบคำนวณค่าใช้จ่ายและยอดรวมให้</li>
+      <li data-n="3"><b>ออกใบแจ้งหนี้</b> — เลือกห้องที่ต้องการ แล้วกดออกใบแจ้งหนี้พร้อมกันทั้งกลุ่ม</li>
+    </ol>
+    <p>ปุ่ม <b>แก้ไข</b> ในคอลัมน์เพิ่มเติมเปิดหน้าต่างใส่รายการพิเศษ (เช่น ค่าซ่อม ค่าทำความสะอาด) ต่อห้อง</p>
+    <figure class="fig"><img src="manual_assets/finance/10_billing_extras.png" alt="หน้าต่างรายการเพิ่มเติมต่อห้อง" loading="lazy"></figure>
+    <p>เมื่อผู้เช่าชำระแล้ว กด <b>ยืนยันชำระแล้ว</b> ในแถวนั้น แล้วเลือกช่องทางที่รับเงิน</p>
+    <figure class="fig"><img src="manual_assets/finance/11_billing_payment.png" alt="หน้าต่างยืนยันการชำระเงิน" loading="lazy"></figure>
+    <div class="warn"><b>เลขมิเตอร์:</b> ถ้าไม่กรอกเลขมิเตอร์ปัจจุบัน (ช่องจะเป็นสีเหลือง) ใบแจ้งหนี้ห้องนั้นจะคิดค่าน้ำ-ค่าไฟเป็น ฿0
+    ระบบจะเตือนก่อนออกใบแจ้งหนี้</div>
+    <div class="note">หลังออกใบแจ้งหนี้ ห้องจะขึ้นสถานะ <b>ใบแจ้งหนี้รอชำระ</b> และเมื่อยืนยันชำระแล้วจะเป็น
+    <b>ชำระและยืนยันแล้ว</b> ใช้ปุ่ม <b>พิมพ์ที่เลือก</b> หรือ <b>พิมพ์แบบกลุ่ม</b> เพื่อพิมพ์ใบแจ้งหนี้หลายห้องพร้อมกัน</div>
+  </section>
+
+  <div class="footer">The Precious Moment System · คู่มือฝ่ายการเงิน</div>
+</div>
+</body>
+</html>

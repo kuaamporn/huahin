@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>The Precious Moment Finance</title>
+  <title>การเงิน — The Precious Moment</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     @import url('app.css');
@@ -118,103 +118,103 @@
     <div class="topbar">
       <div class="topbar-header">
         <div>
-          <h1>The Precious Moment Finance</h1>
-          <div class="sub" style="margin-bottom:0;">Revenue and expense tracking per property.</div>
+          <h1>การเงิน</h1>
+          <div class="sub" style="margin-bottom:0;">ติดตามรายรับ-รายจ่ายแยกตามอาคาร</div>
         </div>
-        <a href="#" class="btn-signout" id="logout-link">Sign out</a>
+        <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
       </div>
       <div class="toplinks">
-        <a href="index.html" id="link-checkin">Check-in</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
-        <a href="hr.html" id="link-hr" class="hidden">HR</a>
-        <a href="billing.html" id="link-billing" class="hidden">Billing</a>
-        <a href="report.html" id="link-report" class="hidden">Reports</a>
-        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">Reconcile</a>
+        <a href="index.html" id="link-checkin">ลงเวลา</a>
+        <a href="rooms.html" id="link-rooms" class="hidden">ผังห้องพัก</a>
+        <a href="dashboard.html" id="link-dashboard" class="hidden">แดชบอร์ด</a>
+        <a href="hr.html" id="link-hr" class="hidden">บุคคล</a>
+        <a href="billing.html" id="link-billing" class="hidden">วางบิล</a>
+        <a href="report.html" id="link-report" class="hidden">รายงาน</a>
+        <a href="setting.html" id="link-setting" class="hidden">ตั้งค่า</a>
+        <a href="reconcile.html" id="link-reconcile" class="hidden">กระทบยอด</a>
       </div>
     </div>
 
     <div id="access-denied" class="card-section hidden">
-      <div class="error">You don't have permission to view Finance. Redirecting…</div>
+      <div class="error">คุณไม่มีสิทธิ์เข้าดูหน้าการเงิน กำลังนำทางกลับ…</div>
     </div>
 
     <div id="finance-content">
       <div class="card-section">
         <div class="toolbar">
           <div>
-            <label for="finance-property">Property</label>
+            <label for="finance-property">อาคาร</label>
             <select id="finance-property">
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div>
-            <label for="finance-year">Year</label>
+            <label for="finance-year">ปี</label>
             <input id="finance-year" type="number" style="max-width:120px;" />
           </div>
           <div>
-            <label for="finance-month">Month</label>
+            <label for="finance-month">เดือน</label>
             <select id="finance-month">
-              <option value="1">January</option><option value="2">February</option>
-              <option value="3">March</option><option value="4">April</option>
-              <option value="5">May</option><option value="6">June</option>
-              <option value="7">July</option><option value="8">August</option>
-              <option value="9">September</option><option value="10">October</option>
-              <option value="11">November</option><option value="12">December</option>
+              <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option>
+              <option value="3">มีนาคม</option><option value="4">เมษายน</option>
+              <option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
+              <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option>
+              <option value="9">กันยายน</option><option value="10">ตุลาคม</option>
+              <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
             </select>
           </div>
-          <button id="finance-load-btn">Load</button>
+          <button id="finance-load-btn">โหลด</button>
         </div>
       </div>
 
       <div class="summary">
-        <div class="stat" id="card-revenue"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l">Revenue</div></div>
-        <div class="stat" id="card-expense"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l">Expense</div></div>
-        <div class="stat" id="card-net"><div class="n" id="finance-net">฿0</div><div class="l">Net Profit</div></div>
+        <div class="stat" id="card-revenue"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l">รายรับ</div></div>
+        <div class="stat" id="card-expense"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l">รายจ่าย</div></div>
+        <div class="stat" id="card-net"><div class="n" id="finance-net">฿0</div><div class="l">กำไรสุทธิ</div></div>
         <div class="stat" style="cursor:pointer;" id="btn-view-unrefunded">
           <div class="n" id="finance-deposits" style="color:var(--muted);">฿0</div>
           <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            Deposit <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
+            เงินมัดจำ <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">ดู</span>
           </div>
         </div>
         <div class="stat" style="cursor:pointer;" id="btn-view-reservations">
           <div class="n" id="finance-reservations" style="color:#0284c7;">฿0</div>
           <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            Reservation <span style="background:#0284c7;color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">View</span>
+            การจอง <span style="background:#0284c7;color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">ดู</span>
           </div>
         </div>
       </div>
 
       <div class="actions-row">
-        <button id="btn-add-revenue" class="hidden" style="background:var(--go);color:#fff;border:none;font-weight:600;">+ Revenue</button>
-        <button id="btn-add-expense" class="hidden" style="background:var(--warn);color:#fff;border:none;font-weight:600;">+ Expense</button>
-        <button id="btn-manage-vendors" class="hidden btn-secondary" style="font-weight:600;">Manage Vendors</button>
-        <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;">Settings</button>
+        <button id="btn-add-revenue" class="hidden" style="background:var(--go);color:#fff;border:none;font-weight:600;">+ รายรับ</button>
+        <button id="btn-add-expense" class="hidden" style="background:var(--warn);color:#fff;border:none;font-weight:600;">+ รายจ่าย</button>
+        <button id="btn-manage-vendors" class="hidden btn-secondary" style="font-weight:600;">จัดการผู้ขาย</button>
+        <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;">ตั้งค่า</button>
         <select id="finance-status-filter" style="max-width:250px; padding:10px 14px; border:1px solid var(--line); border-radius:12px; font-family:inherit; font-size:13px; background:#fff; outline:none; cursor:pointer; font-weight:600; color:var(--ink);">
-          <option value="all">All Statuses</option>
-          <option value="unverified" id="opt-unverified">Pending Verification (0)</option>
-          <option value="pending-approval" id="opt-pending-approval">Pending Approval (0)</option>
-          <option value="verified">Verified Only</option>
+          <option value="all">ทุกสถานะ</option>
+          <option value="unverified" id="opt-unverified">รอตรวจสอบ (0)</option>
+          <option value="pending-approval" id="opt-pending-approval">รออนุมัติ (0)</option>
+          <option value="verified">ตรวจสอบแล้วเท่านั้น</option>
         </select>
-        <input id="finance-search" type="text" placeholder="Search transactions..." style="max-width:250px;" />
-        <button id="finance-export-csv-btn" style="margin-left:auto;">Export CSV</button>
+        <input id="finance-search" type="text" placeholder="ค้นหารายการ..." style="max-width:250px;" />
+        <button id="finance-export-csv-btn" style="margin-left:auto;">ส่งออก CSV</button>
       </div>
 
       <div style="overflow-x: auto;">
       <table style="min-width: 1000px;">
         <thead>
-          <tr><th style="width:40px;"></th><th>Date</th><th>Direction</th><th>Property</th><th>Room</th><th>Category</th><th>Amount</th><th>Guest/Vendor</th><th>Note</th><th>Action</th></tr>
+          <tr><th style="width:40px;"></th><th>วันที่</th><th>ประเภท</th><th>อาคาร</th><th>ห้อง</th><th>หมวด</th><th>จำนวนเงิน</th><th>ผู้เข้าพัก/ผู้ขาย</th><th>หมายเหตุ</th><th>การจัดการ</th></tr>
         </thead>
         <tbody id="finance-table-body">
-          <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">Select a month and click Load.</td></tr>
+          <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">เลือกเดือนแล้วกดโหลด</td></tr>
         </tbody>
       </table>
       </div>
       <div id="finance-pagination" class="no-print" style="display:flex;align-items:center;justify-content:center;gap:15px;margin-top:20px;font-size:13px;font-weight:600;">
-        <button id="btn-page-prev" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">&lt; Previous</button>
-        <span id="page-indicator" style="color:var(--muted);">Page 1 of 1</span>
-        <button id="btn-page-next" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">Next &gt;</button>
+        <button id="btn-page-prev" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">&lt; ก่อนหน้า</button>
+        <span id="page-indicator" style="color:var(--muted);">หน้า 1 จาก 1</span>
+        <button id="btn-page-next" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">ถัดไป &gt;</button>
       </div>
     </div>
   </div>
@@ -222,11 +222,11 @@
   <!-- ===================== FINANCE ADD MODAL ===================== -->
   <div id="finance-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 id="finance-modal-title">+ Add Revenue</h2>
+      <h2 id="finance-modal-title">+ เพิ่มรายรับ</h2>
       <div class="modal-grid">
 
         <div>
-          <label for="fm-property">Property</label>
+          <label for="fm-property">อาคาร</label>
           <select id="fm-property">
             <option value="precious">The Precious</option>
             <option value="moment">The Moment</option>
@@ -234,9 +234,9 @@
         </div>
 
         <div>
-          <label for="fm-room-search">Room</label>
+          <label for="fm-room-search">ห้อง</label>
           <div class="room-combo">
-            <input id="fm-room-search" type="text" placeholder="Search room ID, e.g. P-110…" autocomplete="off" />
+            <input id="fm-room-search" type="text" placeholder="ค้นหารหัสห้อง เช่น P-110…" autocomplete="off" />
             <div id="fm-room-results" class="room-combo-results hidden"></div>
           </div>
           <!-- Hidden field actually submitted; null when Walk-in is chosen -->
@@ -247,34 +247,34 @@
         </div>
 
         <div class="full">
-          <label for="fm-guest">Guest / Vendor</label>
-          <input id="fm-guest" type="text" placeholder="Auto-filled from room, or enter manually" list="fm-vendor-list" />
+          <label for="fm-guest">ผู้เข้าพัก / ผู้ขาย</label>
+          <input id="fm-guest" type="text" placeholder="กรอกอัตโนมัติจากห้อง หรือพิมพ์เอง" list="fm-vendor-list" />
           <datalist id="fm-vendor-list"></datalist>
         </div>
 
         <div class="full hidden" id="fm-company-banner" style="margin-top:8px; padding:10px 12px; background:#EFF6FF; border:1px solid #BFDBFE; border-left:4px solid #2563EB; border-radius:8px; font-size:13px;">
-          <div style="font-weight:600; color:#1E3A8A;">🏢 <span id="fm-company-banner-title">Billed to company</span></div>
+          <div style="font-weight:600; color:#1E3A8A;">🏢 <span id="fm-company-banner-title">วางบิลในนามบริษัท</span></div>
           <div id="fm-company-banner-body" style="color:#1E40AF; margin-top:2px;"></div>
         </div>
 
         <div class="full" style="margin-top: 10px;">
-          <label>Items</label>
+          <label>รายการ</label>
           <div id="fm-items-container"></div>
-          <button class="add-item-btn" id="fm-add-item">+ Add Item Line</button>
+          <button class="add-item-btn" id="fm-add-item">+ เพิ่มบรรทัดรายการ</button>
         </div>
 
         <div class="full" id="fm-expense-extras" class="hidden">
           <div class="wht-vat-row">
             <div style="flex:1;">
-              <label>VAT Type</label>
+              <label>ประเภท VAT</label>
               <select id="fm-vat-type" onchange="calcTotals()">
-                <option value="none">None (0%)</option>
-                <option value="include">Included (7%)</option>
-                <option value="exclude">Excluded (+7%)</option>
+                <option value="none">ไม่มี (0%)</option>
+                <option value="include">รวมภาษี (7%)</option>
+                <option value="exclude">แยกภาษี (+7%)</option>
               </select>
             </div>
             <div style="flex:1;">
-              <label>WHT %</label>
+              <label>หัก ณ ที่จ่าย %</label>
               <select id="fm-wht-pct" onchange="calcTotals()">
                 <option value="0">0%</option>
                 <option value="1">1%</option>
@@ -286,29 +286,29 @@
           </div>
           <div class="wht-vat-row" style="background:#eaf2e8;">
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;">
-              <span>Subtotal:</span><span id="fm-subtotal">฿0.00</span>
+              <span>ยอดรวม:</span><span id="fm-subtotal">฿0.00</span>
             </div>
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;">
               <span>VAT:</span><span id="fm-vat-amt">฿0.00</span>
             </div>
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;color:var(--warn);">
-              <span>WHT:</span><span id="fm-wht-amt">฿0.00</span>
+              <span>หัก ณ ที่จ่าย:</span><span id="fm-wht-amt">฿0.00</span>
             </div>
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;color:var(--go);">
-              <span>Net Paid:</span><span id="fm-net-amt">฿0.00</span>
+              <span>ยอดจ่ายสุทธิ:</span><span id="fm-net-amt">฿0.00</span>
             </div>
           </div>
         </div>
 
         <div>
-          <label for="fm-channel">Payment channel</label>
+          <label for="fm-channel">ช่องทางชำระเงิน</label>
           <div class="custom-select" id="fm-channel-select">
-            <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('fm-channel-select')">💵 Cash <span class="arrow">▼</span></div>
+            <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('fm-channel-select')">💵 เงินสด <span class="arrow">▼</span></div>
             <div class="custom-select-options">
-              <div class="custom-select-option" data-value="cash">💵 Cash</div>
+              <div class="custom-select-option" data-value="cash">💵 เงินสด</div>
               <div class="custom-select-option" data-value="kb">🟢 KB</div>
               <div class="custom-select-option" data-value="scb">🟣 SCB</div>
-              <div class="custom-select-option" data-value="maemanee">🟪 Mae Manee</div>
+              <div class="custom-select-option" data-value="maemanee">🟪 แม่มณี</div>
               <div class="custom-select-option" data-value="kshop">🟩 Kshop</div>
             </div>
             <input type="hidden" id="fm-channel" value="cash" />
@@ -316,67 +316,67 @@
         </div>
 
         <div>
-          <label for="fm-paid-by">Paid By</label>
+          <label for="fm-paid-by">ผู้จ่าย</label>
           <select id="fm-paid-by"></select>
         </div>
 
         <div>
-          <label for="fm-ref">Transfer ref (optional)</label>
+          <label for="fm-ref">เลขอ้างอิงการโอน (ถ้ามี)</label>
           <input id="fm-ref" type="text" />
         </div>
 
         <div>
-          <label for="fm-date">Transaction date</label>
+          <label for="fm-date">วันที่ทำรายการ</label>
           <input id="fm-date" type="date" />
         </div>
 
         <div class="full">
-          <label for="fm-note">Note (optional)</label>
+          <label for="fm-note">หมายเหตุ (ถ้ามี)</label>
           <input id="fm-note" type="text" />
         </div>
 
       </div>
 
       <div id="fm-receipt-gen-section" class="hidden" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; margin-bottom: 15px;">
-        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">Receipt Generation</h4>
+        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">ออกใบเสร็จรับเงิน</h4>
         <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 120px;">
-            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">Receipt Type</label>
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">ประเภทใบเสร็จ</label>
             <select id="fm-receipt-type" style="width: 100%; padding: 6px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;">
-              <option value="RR">RR (Rent/Monthly)</option>
-              <option value="RD">RD (Daily/Walk-in)</option>
-              <option value="RA">RA (Deposit)</option>
+              <option value="RR">RR (ค่าเช่า/รายเดือน)</option>
+              <option value="RD">RD (รายวัน/Walk-in)</option>
+              <option value="RA">RA (เงินมัดจำ)</option>
             </select>
           </div>
           <div style="flex: 1; min-width: 120px;">
-            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">Receipt Date</label>
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">วันที่ใบเสร็จ</label>
             <input type="date" id="fm-receipt-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
           </div>
-          <button id="fm-generate-receipt-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate Receipt</button>
-          <button id="fm-split-receipts-btn" class="btn-primary hidden" style="padding: 7px 12px; font-size: 13px; background: #ea580c; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate & Split (Rent + Deposit)</button>
+          <button id="fm-generate-receipt-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">ออกใบเสร็จ</button>
+          <button id="fm-split-receipts-btn" class="btn-primary hidden" style="padding: 7px 12px; font-size: 13px; background: #ea580c; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">ออกและแยก (ค่าเช่า + มัดจำ)</button>
         </div>
         <div id="fm-receipt-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
       </div>
 
       <!-- Full Invoice Generation Section -->
       <div id="fm-invoice-gen-section" class="hidden" style="margin-top: 15px; padding: 15px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 15px;">
-        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">Full Invoice Generation</h4>
+        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">ออกใบแจ้งหนี้แบบเต็ม</h4>
         <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 120px;">
-            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">Invoice Date</label>
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">วันที่ใบแจ้งหนี้</label>
             <input type="date" id="fm-invoice-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
           </div>
-          <button id="fm-generate-invoice-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">Generate Full Invoice</button>
+          <button id="fm-generate-invoice-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">ออกใบแจ้งหนี้แบบเต็ม</button>
         </div>
         <div id="fm-invoice-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
       </div>
 
       <div class="modal-footer-row">
-        <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);">🖨️ Print Invoice</button>
-        <button id="fm-print-full-invoice-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0F766E; color:#0F766E;">🖨️ Print Full Invoice</button>
-        <button id="fm-print-receipt-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0284C7; color:#0284C7;">🖨️ Print Receipt</button>
-        <button class="btn-secondary" id="finance-modal-cancel">Cancel</button>
-        <button class="btn-primary" id="finance-modal-save">Save</button>
+        <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);">🖨️ พิมพ์ใบแจ้งหนี้</button>
+        <button id="fm-print-full-invoice-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0F766E; color:#0F766E;">🖨️ พิมพ์ใบแจ้งหนี้แบบเต็ม</button>
+        <button id="fm-print-receipt-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0284C7; color:#0284C7;">🖨️ พิมพ์ใบเสร็จ</button>
+        <button class="btn-secondary" id="finance-modal-cancel">ยกเลิก</button>
+        <button class="btn-primary" id="finance-modal-save">บันทึก</button>
       </div>
       <div class="error hidden" id="finance-modal-error"></div>
     </div>
@@ -386,16 +386,16 @@
   <div id="unrefunded-modal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="mhdr">
-        <h2 class="mtitle">Unrefunded Deposits</h2>
+        <h2 class="mtitle">เงินมัดจำที่ยังไม่คืน</h2>
         <button class="mx" id="unrefunded-modal-close">×</button>
       </div>
       <div style="max-height:60vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>Date</th><th>Room</th><th>Guest</th><th>Amount</th><th>Action</th></tr>
+            <tr><th>วันที่</th><th>ห้อง</th><th>ผู้เข้าพัก</th><th>จำนวนเงิน</th><th>การจัดการ</th></tr>
           </thead>
           <tbody id="unrefunded-table-body">
-            <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
+            <tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>
           </tbody>
         </table>
       </div>
@@ -406,15 +406,15 @@
   <div id="delete-txn-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 420px;">
       <div class="mhdr">
-        <h2 class="mtitle">Delete Transaction</h2>
+        <h2 class="mtitle">ลบรายการ</h2>
         <button class="mx" onclick="closeDeleteTxn()">×</button>
       </div>
       <input type="hidden" id="del-txn-id">
       <div id="del-txn-details" style="background:var(--paper);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px;"></div>
-      <p style="font-size:13px;color:var(--warn);margin-bottom:20px;">This permanently removes the transaction and its line items. It cannot be undone.</p>
+      <p style="font-size:13px;color:var(--warn);margin-bottom:20px;">การลบนี้จะลบรายการและบรรทัดรายการทั้งหมดอย่างถาวร ไม่สามารถกู้คืนได้</p>
       <div style="display:flex;justify-content:flex-end;gap:12px;">
-        <button class="btn-secondary" onclick="closeDeleteTxn()" style="padding:8px 16px;">Cancel</button>
-        <button id="del-txn-confirm" onclick="confirmDeleteTxn()" style="padding:8px 16px;background:var(--warn);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;">Delete Permanently</button>
+        <button class="btn-secondary" onclick="closeDeleteTxn()" style="padding:8px 16px;">ยกเลิก</button>
+        <button id="del-txn-confirm" onclick="confirmDeleteTxn()" style="padding:8px 16px;background:var(--warn);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;">ลบถาวร</button>
       </div>
     </div>
   </div>
@@ -423,16 +423,16 @@
   <div id="reservations-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 650px;">
       <div class="mhdr">
-        <h2 class="mtitle" style="color:#0284c7;">Reservations Waiting for Check-in</h2>
+        <h2 class="mtitle" style="color:#0284c7;">การจองที่รอเช็คอิน</h2>
         <button class="mx" id="reservations-modal-close">×</button>
       </div>
       <div style="max-height:60vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>Check-in Date</th><th>Room</th><th>Guest</th><th>Deposit Amount</th><th>Booking Type</th><th style="text-align:center;">Action</th></tr>
+            <tr><th>วันเช็คอิน</th><th>ห้อง</th><th>ผู้เข้าพัก</th><th>เงินมัดจำ</th><th>ประเภทการจอง</th><th style="text-align:center;">การจัดการ</th></tr>
           </thead>
           <tbody id="reservations-table-body">
-            <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
+            <tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>
           </tbody>
         </table>
       </div>
@@ -443,11 +443,11 @@
   <div id="moveout-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 700px;">
       <div class="mhdr">
-        <h2 class="mtitle">Process Move-Out</h2>
+        <h2 class="mtitle">ดำเนินการย้ายออก</h2>
         <button class="mx" id="moveout-modal-close">×</button>
       </div>
       <div class="field" style="background:#f3f1ec; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-        <div style="font-size:12px; color:var(--muted);">Original Deposit</div>
+        <div style="font-size:12px; color:var(--muted);">เงินมัดจำเดิม</div>
         <div style="font-size:20px; font-weight:bold; color:var(--text);" id="mo-deposit-amount">฿0</div>
         <input type="hidden" id="mo-txn-id">
         <input type="hidden" id="mo-deposit-val">
@@ -456,27 +456,27 @@
       <div id="mo-card-audit-section" class="field" style="background:#f3f1ec; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: none;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="font-size:12px; color:var(--muted);">Key Cards Issued</div>
-            <div style="font-size:16px; font-weight:bold; color:var(--text);" id="mo-cards-issued-text">0 cards (฿0 deposit each)</div>
+            <div style="font-size:12px; color:var(--muted);">คีย์การ์ดที่ออกให้</div>
+            <div style="font-size:16px; font-weight:bold; color:var(--text);" id="mo-cards-issued-text">0 ใบ (มัดจำใบละ ฿0)</div>
           </div>
           <div>
-            <label for="mo-cards-returned" style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Cards Returned</label>
+            <label for="mo-cards-returned" style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">การ์ดที่คืน</label>
             <input type="number" id="mo-cards-returned" min="0" value="0" style="width:70px; padding:6px; border-radius:6px; border:1px solid var(--line); font-weight:bold; text-align:center;" oninput="onMoCardsReturnedChange()">
           </div>
         </div>
       </div>
 
-      <h3>Deductions (Water, Elec, Cleaning, etc.)</h3>
+      <h3>รายการหักเงิน (ค่าน้ำ ค่าไฟ ค่าทำความสะอาด ฯลฯ)</h3>
       <div class="items-list" id="mo-items-container"></div>
-      <button class="btn-secondary" onclick="addMoveOutItem()" style="margin-bottom:16px; font-size: 11px;">+ Add Deduction</button>
+      <button class="btn-secondary" onclick="addMoveOutItem()" style="margin-bottom:16px; font-size: 11px;">+ เพิ่มรายการหัก</button>
 
       <div style="background:#fcfbf9; padding:12px; border-radius:6px; margin-top:16px; border:1px solid var(--line);">
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <span>Total Deductions:</span>
+          <span>รวมรายการหัก:</span>
           <span id="mo-total-deductions" style="font-weight:bold;">฿0</span>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:bold;">
-          <span id="mo-net-label">Cash to Return to Guest:</span>
+          <span id="mo-net-label">เงินสดที่ต้องคืนผู้เข้าพัก:</span>
           <span id="mo-net-amount" style="color:var(--go);">฿0</span>
         </div>
       </div>
@@ -484,8 +484,8 @@
       <div class="error hidden" id="moveout-error" style="margin-top:12px;"></div>
 
       <div class="actions" style="margin-top: 24px; justify-content: flex-end; display:flex; gap:8px;">
-        <button class="btn-secondary" id="moveout-modal-cancel">Cancel</button>
-        <button class="btn-primary" id="moveout-save">Confirm Move-Out</button>
+        <button class="btn-secondary" id="moveout-modal-cancel">ยกเลิก</button>
+        <button class="btn-primary" id="moveout-save">ยืนยันการย้ายออก</button>
       </div>
     </div>
   </div>
@@ -494,19 +494,19 @@
   <div id="vendors-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 800px;">
       <div class="mhdr">
-        <h2 class="mtitle">Manage Vendors</h2>
+        <h2 class="mtitle">จัดการผู้ขาย</h2>
         <button class="mx" id="vendors-modal-close">&times;</button>
       </div>
       <div style="margin-bottom: 16px; display: flex; justify-content: flex-end;">
-         <button class="btn-primary" id="btn-new-vendor">+ New Vendor</button>
+         <button class="btn-primary" id="btn-new-vendor">+ เพิ่มผู้ขาย</button>
       </div>
       <div style="max-height:50vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>Name</th><th>Address</th><th>Tax ID</th><th>Branch</th><th>Action</th></tr>
+            <tr><th>ชื่อ</th><th>ที่อยู่</th><th>เลขประจำตัวผู้เสียภาษี</th><th>สาขา</th><th>การจัดการ</th></tr>
           </thead>
           <tbody id="vendors-table-body">
-            <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
+            <tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>
           </tbody>
         </table>
       </div>
@@ -516,29 +516,29 @@
   <!-- ===================== VENDOR FORM MODAL ===================== -->
   <div id="vendor-form-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 500px; z-index: 101;">
-      <h2 id="vendor-form-title">Add Vendor</h2>
+      <h2 id="vendor-form-title">เพิ่มผู้ขาย</h2>
       <input type="hidden" id="vf-id" />
       <div class="modal-grid">
         <div class="full">
-          <label for="vf-name">Vendor Name</label>
+          <label for="vf-name">ชื่อผู้ขาย</label>
           <input id="vf-name" type="text" />
         </div>
         <div class="full">
-          <label for="vf-address">Address</label>
+          <label for="vf-address">ที่อยู่</label>
           <input id="vf-address" type="text" />
         </div>
         <div class="full">
-          <label for="vf-tax">Tax ID</label>
+          <label for="vf-tax">เลขประจำตัวผู้เสียภาษี</label>
           <input id="vf-tax" type="text" />
         </div>
         <div class="full">
-          <label for="vf-branch">Branch</label>
-          <input id="vf-branch" type="text" value="Head Office" placeholder="Head Office or Branch No. 00001" />
+          <label for="vf-branch">สาขา</label>
+          <input id="vf-branch" type="text" value="Head Office" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" />
         </div>
       </div>
       <div class="modal-footer-row">
-        <button class="btn-secondary" id="vendor-form-cancel">Cancel</button>
-        <button class="btn-primary" id="vendor-form-save">Save</button>
+        <button class="btn-secondary" id="vendor-form-cancel">ยกเลิก</button>
+        <button class="btn-primary" id="vendor-form-save">บันทึก</button>
       </div>
       <div class="error hidden" id="vendor-form-error"></div>
     </div>
@@ -811,13 +811,13 @@
 
       var html = pool.map(function (r) {
         var booking = activeBookingForRoom(r.roomId);
-        var guestHtml = booking ? '<span class="guest">' + escapeHtml(booking.guestName || '') + '</span>' : '<span class="guest">vacant</span>';
+        var guestHtml = booking ? '<span class="guest">' + escapeHtml(booking.guestName || '') + '</span>' : '<span class="guest">ว่าง</span>';
         return '<div class="opt" data-room-id="' + escapeHtml(r.roomId) + '" data-guest="' + escapeHtml(booking ? (booking.guestName || '') : '') + '">' +
           '<span class="rid">' + escapeHtml(r.displayName || r.roomId) + '</span>' + guestHtml +
           '</div>';
       }).join('');
 
-      html += '<div class="opt walkin" data-room-id="">Walk-in / no room (e.g. day-use, no booking on file)</div>';
+      html += '<div class="opt walkin" data-room-id="">Walk-in / ไม่มีห้อง (เช่น ใช้รายวัน ไม่มีการจอง)</div>';
 
       results.innerHTML = html;
       results.classList.remove('hidden');
@@ -843,7 +843,7 @@
         var guestField = document.getElementById('fm-guest');
         if (!guestField.value && guestName) guestField.value = guestName;
       } else {
-        document.getElementById('fm-room-selected-label').textContent = 'Walk-in (no room)';
+        document.getElementById('fm-room-selected-label').textContent = 'Walk-in (ไม่มีห้อง)';
         document.getElementById('fm-room-selected').classList.remove('hidden');
       }
     }
@@ -920,15 +920,15 @@
         }
         var catOptions = itemCats.map(function(c) {
           var sel = c === item.category ? ' selected' : '';
-          return '<option value="'+c+'"'+sel+'>'+c.charAt(0).toUpperCase() + c.slice(1)+'</option>';
+          return '<option value="'+c+'"'+sel+'>'+tv(c)+'</option>';
         }).join('');
 
         html += '<div class="item-row">';
-        html += '<div><label style="font-size:11px;color:#888;">Description</label><input type="text" placeholder="Item description" list="fm-prev-items" value="'+escapeHtml(item.description)+'" onchange="updateItemField('+i+', \'description\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">Category</label><select onchange="updateItemField('+i+', \'category\', this.value)">' + catOptions + '</select></div>';
-        html += '<div><label style="font-size:11px;color:#888;">Qty/Units</label><input type="number" placeholder="Qty" value="'+escapeHtml(item.units)+'" onchange="updateItemField('+i+', \'units\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">Unit Price</label><input type="number" placeholder="Price" value="'+escapeHtml(item.unit_price)+'" onchange="updateItemField('+i+', \'unit_price\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">Amount</label><input type="number" placeholder="Total" value="'+escapeHtml(item.amount)+'" onchange="updateItemField('+i+', \'amount\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">รายละเอียด</label><input type="text" placeholder="รายละเอียดรายการ" list="fm-prev-items" value="'+escapeHtml(item.description)+'" onchange="updateItemField('+i+', \'description\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">หมวด</label><select onchange="updateItemField('+i+', \'category\', this.value)">' + catOptions + '</select></div>';
+        html += '<div><label style="font-size:11px;color:#888;">จำนวน</label><input type="number" placeholder="จำนวน" value="'+escapeHtml(item.units)+'" onchange="updateItemField('+i+', \'units\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">ราคาต่อหน่วย</label><input type="number" placeholder="ราคา" value="'+escapeHtml(item.unit_price)+'" onchange="updateItemField('+i+', \'unit_price\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">จำนวนเงิน</label><input type="number" placeholder="รวม" value="'+escapeHtml(item.amount)+'" onchange="updateItemField('+i+', \'amount\', this.value)"></div>';
         html += '<div><button class="remove-item-btn" onclick="removeItemLine('+i+')">&#10005;</button></div>';
         html += '</div>';
       });
@@ -993,8 +993,8 @@
 
         var unverifiedCount = list.filter(function(t) { return t.status !== 'pending' && t.is_approved && !t.is_verified; }).length;
         var pendingApprovalCount = list.filter(function(t) { return t.status !== 'pending' && !t.is_approved; }).length;
-        document.getElementById('opt-unverified').textContent = 'Pending Verification (' + unverifiedCount + ')';
-        document.getElementById('opt-pending-approval').textContent = 'Pending Approval (' + pendingApprovalCount + ')';
+        document.getElementById('opt-unverified').textContent = 'รอตรวจสอบ (' + unverifiedCount + ')';
+        document.getElementById('opt-pending-approval').textContent = 'รออนุมัติ (' + pendingApprovalCount + ')';
 
         currentPage = 1;
         renderFinanceTable();
@@ -1017,12 +1017,12 @@
       if (currentPage > totalPages) currentPage = totalPages;
       if (currentPage < 1) currentPage = 1;
 
-      document.getElementById('page-indicator').textContent = 'Page ' + currentPage + ' of ' + totalPages + ' (' + filtered.length + ' items)';
+      document.getElementById('page-indicator').textContent = 'หน้า ' + currentPage + ' จาก ' + totalPages + ' (' + filtered.length + ' รายการ)';
       document.getElementById('btn-page-prev').disabled = currentPage === 1;
       document.getElementById('btn-page-next').disabled = currentPage === totalPages;
 
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">No transactions found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">ไม่พบรายการ</td></tr>';
         return;
       }
 
@@ -1036,17 +1036,17 @@
 
         var statusLabel = '';
         if (t.status === 'pending') {
-          statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">Reservation</span>';
+          statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">การจอง</span>';
         } else if (t.is_verified) {
-          statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">Verified</span>';
+          statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">ตรวจสอบแล้ว</span>';
         } else if (t.is_approved) {
-          statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">Approved</span>';
+          statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">อนุมัติแล้ว</span>';
         } else {
-          statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">Pending Approval</span>';
+          statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">รออนุมัติ</span>';
         }
 
         var dirLabel = '<div style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">' +
-          (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">Revenue</span>' : '<span class="pill flag" style="white-space:nowrap;">Expense</span>') +
+          (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">รายรับ</span>' : '<span class="pill flag" style="white-space:nowrap;">รายจ่าย</span>') +
           statusLabel + '</div>';
         var isOwner = HuaHinSession.hasRole('owner');
         var isRevenue = HuaHinSession.hasRole('revenue');
@@ -1060,31 +1060,31 @@
         var actionHtml = '';
         if (!t.is_approved) {
           if (canApproveRevenue || canApproveExpense) {
-            actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">Approve</button>';
+            actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">อนุมัติ</button>';
           }
         } else if (!t.is_verified) {
           if (canVerify) {
-            actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">Verify</button>';
+            actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">ตรวจสอบ</button>';
           }
         }
 
         if (canEdit && !t.is_verified) {
-          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">แก้ไข</button>';
         } else if (t.is_verified && isOwner) {
-          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">Edit</button>';
+          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">แก้ไข</button>';
         }
 
         if (isOwner) {
-          actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">Delete</button>';
+          actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">ลบ</button>';
         }
 
         if (actionHtml === '') {
           if (t.is_verified) {
-            actionHtml = '<span class="muted">Verified</span>';
+            actionHtml = '<span class="muted">ตรวจสอบแล้ว</span>';
           } else if (t.is_approved) {
-            actionHtml = '<span class="muted">Approved</span>';
+            actionHtml = '<span class="muted">อนุมัติแล้ว</span>';
           } else {
-            actionHtml = '<span class="muted">Pending</span>';
+            actionHtml = '<span class="muted">รอดำเนินการ</span>';
           }
         }
 
@@ -1094,7 +1094,7 @@
           '<td style="white-space:nowrap;">' + dirLabel + '</td>' +
           '<td>' + (t.property_id || '') + '</td>' +
           '<td>' + (t.room_id || '-') + '</td>' +
-          '<td>' + (t.category || 'Multiple') + '</td>' +
+          '<td>' + (t.category ? tv(t.category) : 'หลายรายการ') + '</td>' +
           '<td style="white-space:nowrap;font-weight:600;">' + formatTHB(t.net_amount || t.amount) + '</td>' +
           '<td>' + (t.guest_or_vendor || '') + '</td>' +
           '<td>' + (t.notes || '') + '</td>' +
@@ -1140,20 +1140,20 @@
       if (!t) return;
       document.getElementById('del-txn-id').value = txnId;
       document.getElementById('del-txn-details').innerHTML =
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Date</span><span>' + (t.txn_date || '-') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Type</span><span>' + (t.direction === 'IN' ? 'Revenue' : 'Expense') + ' · ' + (t.category || 'Multiple') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Room</span><span>' + (t.room_id || '-') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">Guest/Vendor</span><span>' + escapeHtml(t.guest_or_vendor || '-') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;"><span class="muted">Amount</span><span>' + formatTHB(t.net_amount || t.amount) + '</span></div>';
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">วันที่</span><span>' + (t.txn_date || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">ประเภท</span><span>' + (t.direction === 'IN' ? 'รายรับ' : 'รายจ่าย') + ' · ' + (t.category ? tv(t.category) : 'หลายรายการ') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">ห้อง</span><span>' + (t.room_id || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">ผู้เข้าพัก/ผู้ขาย</span><span>' + escapeHtml(t.guest_or_vendor || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;"><span class="muted">จำนวนเงิน</span><span>' + formatTHB(t.net_amount || t.amount) + '</span></div>';
       show('delete-txn-modal');
     }
     function closeDeleteTxn() { hide('delete-txn-modal'); }
     function confirmDeleteTxn() {
       var txnId = document.getElementById('del-txn-id').value;
       var btn = document.getElementById('del-txn-confirm');
-      btn.disabled = true; btn.textContent = 'Deleting…';
+      btn.disabled = true; btn.textContent = 'กำลังลบ…';
       callApi('financeDeleteTransaction', [session.token, txnId]).then(function(res) {
-        btn.disabled = false; btn.textContent = 'Delete Permanently';
+        btn.disabled = false; btn.textContent = 'ลบถาวร';
         closeDeleteTxn();
         if (!res.ok) { alert(res.error); return; }
         loadFinanceData();
@@ -1176,8 +1176,8 @@
       editingTxnId = null;
       document.getElementById('fm-company-banner').classList.add('hidden');
       financeModalMode = mode;
-      document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? '+ Add Revenue' : '+ Add Expense';
-      document.querySelector('label[for="fm-paid-by"]').textContent = mode === 'revenue' ? 'Received By' : 'Paid By';
+      document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? '+ เพิ่มรายรับ' : '+ เพิ่มรายจ่าย';
+      document.querySelector('label[for="fm-paid-by"]').textContent = mode === 'revenue' ? 'ผู้รับเงิน' : 'ผู้จ่ายเงิน';
 
       var requiredRole = mode === 'revenue' ? 'revenue' : 'expense';
       var filtered = EMPLOYEES.filter(function (e) {
@@ -1239,20 +1239,20 @@
 
       hide('finance-modal-error');
       if (CURRENT_ITEMS.length === 0) {
-        document.getElementById('finance-modal-error').textContent = 'Add at least one item.';
+        document.getElementById('finance-modal-error').textContent = 'เพิ่มอย่างน้อยหนึ่งรายการ';
         show('finance-modal-error');
         return;
       }
-      
+
       var invalidItem = CURRENT_ITEMS.find(i => !i.description || !(parseFloat(i.amount) > 0));
       if (invalidItem) {
-        document.getElementById('finance-modal-error').textContent = 'All items must have a description and an amount > 0.';
+        document.getElementById('finance-modal-error').textContent = 'ทุกรายการต้องมีรายละเอียดและจำนวนเงินมากกว่า 0';
         show('finance-modal-error');
         return;
       }
-      
+
       if (!txnDate) {
-        document.getElementById('finance-modal-error').textContent = 'Select a date.';
+        document.getElementById('finance-modal-error').textContent = 'เลือกวันที่';
         show('finance-modal-error');
         return;
       }
@@ -1296,11 +1296,11 @@
       }
 
       var btn = document.getElementById('finance-modal-save');
-      btn.disabled = true; btn.textContent = 'Saving...';
+      btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
 
       callApi(action, params)
         .then(function (res) {
-          btn.disabled = false; btn.textContent = 'Save';
+          btn.disabled = false; btn.textContent = 'บันทึก';
           if (res.ok) {
             hide('finance-modal');
             loadFinanceData();
@@ -1309,8 +1309,8 @@
             show('finance-modal-error');
           }
         }).catch(function (err) {
-          btn.disabled = false; btn.textContent = 'Save';
-          document.getElementById('finance-modal-error').textContent = 'Connection error: ' + err.message;
+          btn.disabled = false; btn.textContent = 'บันทึก';
+          document.getElementById('finance-modal-error').textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
           show('finance-modal-error');
         });
     }
@@ -1332,7 +1332,7 @@
         titleEl.textContent = title;
         var line = escapeHtml(name);
         if (branch) line += ' — ' + escapeHtml(branch);
-        if (taxId) line += ' · Tax ID ' + escapeHtml(taxId);
+        if (taxId) line += ' · เลขผู้เสียภาษี ' + escapeHtml(taxId);
         bodyEl.innerHTML = line;
         banner.classList.remove('hidden');
       }
@@ -1341,13 +1341,13 @@
       if (receiptNos.length > 0) {
         callApi('financeGetReceipt', [session.token, receiptNos[0]]).then(function(res){
           if (res && res.ok && res.receipt && res.receipt.company_name) {
-            paint('Billed to company (on issued receipt)', res.receipt.company_name, res.receipt.company_tax_id, res.receipt.company_branch);
+            paint('วางบิลในนามบริษัท (บนใบเสร็จที่ออกแล้ว)', res.receipt.company_name, res.receipt.company_tax_id, res.receipt.company_branch);
           }
         }).catch(function(){});
       } else {
         callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(res){
           if (res && res.ok && res.company) {
-            paint('This receipt will be billed to company', res.company.name, res.company.tax_id, res.company.branch);
+            paint('ใบเสร็จนี้จะวางบิลในนามบริษัท', res.company.name, res.company.tax_id, res.company.branch);
           }
         }).catch(function(){});
       }
@@ -1357,7 +1357,7 @@
     function editTransaction(txnId) {
       var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
       if (!t) {
-        alert('Transaction details not found locally.');
+        alert('ไม่พบรายละเอียดรายการในเครื่อง');
         return;
       }
 
@@ -1365,7 +1365,7 @@
       renderCompanyBanner(t);
       financeModalMode = t.direction === 'IN' ? 'revenue' : 'expense';
 
-      document.getElementById('finance-modal-title').textContent = financeModalMode === 'revenue' ? 'Edit Revenue' : 'Edit Expense';
+      document.getElementById('finance-modal-title').textContent = financeModalMode === 'revenue' ? 'แก้ไขรายรับ' : 'แก้ไขรายจ่าย';
 
       if (financeModalMode === 'revenue') {
         hide('fm-expense-extras');
@@ -1409,7 +1409,7 @@
 
       if (CURRENT_ITEMS.length === 0) {
         CURRENT_ITEMS.push({
-          description: t.notes || t.category || 'Legacy Transaction',
+          description: t.notes || t.category || 'รายการเดิม',
           category: t.category,
           units: '',
           unit_price: '',
@@ -1451,7 +1451,7 @@
               btn.style.marginRight = '12px';
               btn.style.borderColor = '#0284C7';
               btn.style.color = '#0284C7';
-              btn.innerHTML = '🖨️ Print Receipt (' + rNo + ')';
+              btn.innerHTML = '🖨️ พิมพ์ใบเสร็จ (' + rNo + ')';
               btn.onclick = function(e) {
                 e.preventDefault();
                 window.open('receipt.html?receipt_no=' + encodeURIComponent(rNo), '_blank');
@@ -1485,9 +1485,9 @@
 
           var genBtn = document.getElementById('fm-generate-receipt-btn');
           if (hasRent && hasDeposit) {
-            genBtn.textContent = 'Generate Receipt (Except Deposit)';
+            genBtn.textContent = 'ออกใบเสร็จ (ยกเว้นมัดจำ)';
           } else {
-            genBtn.textContent = 'Generate Receipt';
+            genBtn.textContent = 'ออกใบเสร็จ';
           }
 
           var splitBtn = document.getElementById('fm-split-receipts-btn');
@@ -1499,25 +1499,25 @@
               var errorEl = document.getElementById('fm-receipt-error');
               errorEl.classList.add('hidden');
               if (!rDate) {
-                errorEl.textContent = 'Please select a receipt date.';
+                errorEl.textContent = 'กรุณาเลือกวันที่ใบเสร็จ';
                 errorEl.classList.remove('hidden');
                 return;
               }
               splitBtn.disabled = true;
-              splitBtn.textContent = 'Splitting...';
+              splitBtn.textContent = 'กำลังแยก...';
               callApi('financeGenerateReceipt', [session.token, t.txn_id, 'RR', rDate]).then(function(res1) {
                 if (!res1.ok) {
                   splitBtn.disabled = false;
-                  splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
-                  errorEl.textContent = 'Rent Receipt Error: ' + res1.error;
+                  splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                  errorEl.textContent = 'ใบเสร็จค่าเช่าผิดพลาด: ' + res1.error;
                   errorEl.classList.remove('hidden');
                   return;
                 }
                 callApi('financeGenerateReceipt', [session.token, t.txn_id, 'RA', rDate]).then(function(res2) {
                   splitBtn.disabled = false;
-                  splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
+                  splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
                   if (res2.ok) {
-                    alert('Receipts generated and split successfully:\nRent: ' + res1.receipt_no + '\nDeposit: ' + res2.receipt_no);
+                    alert('ออกและแยกใบเสร็จสำเร็จ:\nค่าเช่า: ' + res1.receipt_no + '\nมัดจำ: ' + res2.receipt_no);
                     callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
                       if (txnRes.ok) {
                         var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
@@ -1527,19 +1527,19 @@
                       loadFinanceData();
                     });
                   } else {
-                    errorEl.textContent = 'Deposit Receipt Error: ' + res2.error;
+                    errorEl.textContent = 'ใบเสร็จมัดจำผิดพลาด: ' + res2.error;
                     errorEl.classList.remove('hidden');
                   }
                 }).catch(function(err) {
                   splitBtn.disabled = false;
-                  splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
-                  errorEl.textContent = 'Deposit Receipt Connection Error: ' + err.message;
+                  splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                  errorEl.textContent = 'การเชื่อมต่อใบเสร็จมัดจำผิดพลาด: ' + err.message;
                   errorEl.classList.remove('hidden');
                 });
               }).catch(function(err) {
                 splitBtn.disabled = false;
-                splitBtn.textContent = 'Generate & Split (Rent + Deposit)';
-                errorEl.textContent = 'Rent Receipt Connection Error: ' + err.message;
+                splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                errorEl.textContent = 'การเชื่อมต่อใบเสร็จค่าเช่าผิดพลาด: ' + err.message;
                 errorEl.classList.remove('hidden');
               });
             };
@@ -1555,20 +1555,20 @@
             errorEl.classList.add('hidden');
 
             if (!date) {
-              errorEl.textContent = 'Please select a receipt date.';
+              errorEl.textContent = 'กรุณาเลือกวันที่ใบเสร็จ';
               errorEl.classList.remove('hidden');
               return;
             }
 
             var genBtn = document.getElementById('fm-generate-receipt-btn');
             genBtn.disabled = true;
-            genBtn.textContent = 'Generating...';
+            genBtn.textContent = 'กำลังออก...';
 
             callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date]).then(function(res) {
               genBtn.disabled = false;
-              genBtn.textContent = (hasRent && hasDeposit) ? 'Generate Receipt (Except Deposit)' : 'Generate Receipt';
+              genBtn.textContent = (hasRent && hasDeposit) ? 'ออกใบเสร็จ (ยกเว้นมัดจำ)' : 'ออกใบเสร็จ';
               if (res.ok) {
-                alert('Receipt generated successfully: ' + res.receipt_no);
+                alert('ออกใบเสร็จสำเร็จ: ' + res.receipt_no);
                 callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
                   if (txnRes.ok) {
                     var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
@@ -1585,8 +1585,8 @@
               }
             }).catch(function(err) {
               genBtn.disabled = false;
-              genBtn.textContent = (hasRent && hasDeposit) ? 'Generate Receipt (Except Deposit)' : 'Generate Receipt';
-              errorEl.textContent = 'Connection error: ' + err.message;
+              genBtn.textContent = (hasRent && hasDeposit) ? 'ออกใบเสร็จ (ยกเว้นมัดจำ)' : 'ออกใบเสร็จ';
+              errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
               errorEl.classList.remove('hidden');
             });
           };
@@ -1609,20 +1609,20 @@
             errorEl.classList.add('hidden');
 
             if (!date) {
-              errorEl.textContent = 'Please select an invoice date.';
+              errorEl.textContent = 'กรุณาเลือกวันที่ใบแจ้งหนี้';
               errorEl.classList.remove('hidden');
               return;
             }
 
             var genBtn = document.getElementById('fm-generate-invoice-btn');
             genBtn.disabled = true;
-            genBtn.textContent = 'Generating...';
+            genBtn.textContent = 'กำลังออก...';
 
             callApi('financeGenerateInvoice', [session.token, t.txn_id, date]).then(function(res) {
               genBtn.disabled = false;
-              genBtn.textContent = 'Generate Full Invoice';
+              genBtn.textContent = 'ออกใบแจ้งหนี้แบบเต็ม';
               if (res.ok) {
-                alert('Invoice generated successfully: ' + res.invoice_no);
+                alert('ออกใบแจ้งหนี้สำเร็จ: ' + res.invoice_no);
                 callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
                   if (txnRes.ok) {
                     var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
@@ -1637,8 +1637,8 @@
               }
             }).catch(function(err) {
               genBtn.disabled = false;
-              genBtn.textContent = 'Generate Full Invoice';
-              errorEl.textContent = 'Connection error: ' + err.message;
+              genBtn.textContent = 'ออกใบแจ้งหนี้แบบเต็ม';
+              errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
               errorEl.classList.remove('hidden');
             });
           };
@@ -1653,13 +1653,13 @@
       var propertyId = document.getElementById('finance-property').value;
       show('unrefunded-modal');
       var tbody = document.getElementById('unrefunded-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>';
 
       callApi('financeGetUnrefundedDeposits', [session.token, propertyId]).then(function(res) {
         if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="error">'+escapeHtml(res.error)+'</td></tr>'; return; }
         var list = res.deposits || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">No unrefunded deposits for this property.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">ไม่มีเงินมัดจำค้างคืนสำหรับอาคารนี้</td></tr>';
           return;
         }
         var html = '';
@@ -1669,7 +1669,7 @@
             '<td>'+escapeHtml(d.room_id || '-')+'</td>' +
             '<td>'+escapeHtml(d.guest_or_vendor || '-')+'</td>' +
             '<td><b>'+formatTHB(d.deposit_amount)+'</b></td>' +
-            '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+', '+(d.card_deposit || 0)+', '+(d.card_deposit_qty || 0)+')">Refund</button></td>' +
+            '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+', '+(d.card_deposit || 0)+', '+(d.card_deposit_qty || 0)+')">คืนเงิน</button></td>' +
             '</tr>';
         });
         tbody.innerHTML = html;
@@ -1680,13 +1680,13 @@
       var propertyId = document.getElementById('finance-property').value;
       show('reservations-modal');
       var tbody = document.getElementById('reservations-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>';
 
       callApi('financeGetPendingReservations', [session.token, propertyId]).then(function(res) {
         if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="error">'+escapeHtml(res.error)+'</td></tr>'; return; }
         var list = res.reservations || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">No pending reservations waiting for check-in.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">ไม่มีการจองที่รอเช็คอิน</td></tr>';
           return;
         }
         var html = '';
@@ -1696,8 +1696,8 @@
             '<td>'+escapeHtml(r.room_id || '-')+'</td>' +
             '<td>'+escapeHtml(r.guest_name || '-')+'</td>' +
             '<td><b>'+formatTHB(r.reservation_deposit || 0)+'</b></td>' +
-            '<td style="text-transform:capitalize;">'+escapeHtml(r.booking_type || '-')+'</td>' +
-            '<td style="text-align:center;"><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="window.location.href=\'rooms.html?booking_id=' + escapeHtml(r.booking_id) + '\'">Check-in</button></td>' +
+            '<td>'+escapeHtml(r.booking_type ? tv(r.booking_type) : '-')+'</td>' +
+            '<td style="text-align:center;"><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="window.location.href=\'rooms.html?booking_id=' + escapeHtml(r.booking_id) + '\'">เช็คอิน</button></td>' +
             '</tr>';
         });
         tbody.innerHTML = html;
@@ -1705,7 +1705,7 @@
     }
 
     async function markDepositRefunded(txnId) {
-      if (!(await confirmDialog('Mark this deposit as refunded? Ensure you also add an Expense transaction for the cash returned.', {title:'Mark deposit refunded', confirmText:'Mark refunded'}))) return;
+      if (!(await confirmDialog('ทำเครื่องหมายว่าคืนเงินมัดจำแล้ว? อย่าลืมเพิ่มรายการรายจ่ายสำหรับเงินสดที่คืนไปด้วย', {title:'ยืนยันการคืนเงินมัดจำ', confirmText:'ทำเครื่องหมายว่าคืนแล้ว'}))) return;
       callApi('financeMarkDepositRefunded', [session.token, txnId]).then(function(res) {
         if (!res.ok) { alert(res.error); return; }
         openUnrefundedModal();
@@ -1751,12 +1751,12 @@
 
       var lost = MO_CARD_QTY - returned;
       var foundIdx = MO_ITEMS.findIndex(function(item) {
-        return item.description.indexOf('Unreturned Key Card') === 0;
+        return item.description.indexOf('คีย์การ์ดที่ไม่ได้คืน') === 0;
       });
 
       if (lost > 0) {
         var amt = lost * MO_CARD_DEP;
-        var desc = 'Unreturned Key Card (' + lost + ' card' + (lost > 1 ? 's' : '') + ')';
+        var desc = 'คีย์การ์ดที่ไม่ได้คืน (' + lost + ' ใบ)';
         var newItem = {
           description: desc,
           category: 'other',
@@ -1792,22 +1792,22 @@
         if (item.category && mCats.indexOf(item.category) === -1) {
           mCats.push(item.category);
         }
-        var catOpts = mCats.map(c => '<option value="'+c+'" '+(item.category === c ? 'selected' : '')+'>'+c+'</option>').join('');
+        var catOpts = mCats.map(c => '<option value="'+c+'" '+(item.category === c ? 'selected' : '')+'>'+tv(c)+'</option>').join('');
         html += '<div class="item-row" style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">' +
-          '<input type="text" placeholder="Description (e.g. Water)" value="'+escapeHtml(item.description)+'" onchange="MO_ITEMS['+index+'].description=this.value" style="flex:2;">' +
+          '<input type="text" placeholder="รายละเอียด (เช่น ค่าน้ำ)" value="'+escapeHtml(item.description)+'" onchange="MO_ITEMS['+index+'].description=this.value" style="flex:2;">' +
           '<select onchange="MO_ITEMS['+index+'].category=this.value" style="flex:1;">' +
             catOpts +
           '</select>' +
-          '<input type="number" placeholder="Units" value="'+item.units+'" onchange="MO_ITEMS['+index+'].units=this.value; calcMoRow('+index+')" id="mo-u-'+index+'" style="width:60px;">' +
-          '<input type="number" placeholder="Price" value="'+item.unit_price+'" onchange="MO_ITEMS['+index+'].unit_price=this.value; calcMoRow('+index+')" id="mo-p-'+index+'" style="width:80px;">' +
-          '<input type="number" placeholder="Amount" value="'+item.amount+'" onchange="MO_ITEMS['+index+'].amount=this.value; calcMoTotal()" id="mo-a-'+index+'" style="width:100px;">' +
+          '<input type="number" placeholder="จำนวน" value="'+item.units+'" onchange="MO_ITEMS['+index+'].units=this.value; calcMoRow('+index+')" id="mo-u-'+index+'" style="width:60px;">' +
+          '<input type="number" placeholder="ราคา" value="'+item.unit_price+'" onchange="MO_ITEMS['+index+'].unit_price=this.value; calcMoRow('+index+')" id="mo-p-'+index+'" style="width:80px;">' +
+          '<input type="number" placeholder="จำนวนเงิน" value="'+item.amount+'" onchange="MO_ITEMS['+index+'].amount=this.value; calcMoTotal()" id="mo-a-'+index+'" style="width:100px;">' +
           '<button class="mx" style="font-size:18px;" onclick="MO_ITEMS.splice('+index+',1); renderMoveOutItems();">&times;</button>' +
         '</div>';
       });
       document.getElementById('mo-items-container').innerHTML = html;
 
       var hasLostCardItem = MO_ITEMS.some(function(item) {
-        return item.description.indexOf('Unreturned Key Card') === 0;
+        return item.description.indexOf('คีย์การ์ดที่ไม่ได้คืน') === 0;
       });
       if (!hasLostCardItem && MO_CARD_QTY > 0) {
         document.getElementById('mo-cards-returned').value = MO_CARD_QTY;
@@ -1835,11 +1835,11 @@
       document.getElementById('mo-total-deductions').textContent = formatTHB(deductions);
 
       if (net >= 0) {
-        document.getElementById('mo-net-label').textContent = 'Cash to Return to Guest:';
+        document.getElementById('mo-net-label').textContent = 'เงินสดที่ต้องคืนผู้เข้าพัก:';
         document.getElementById('mo-net-amount').textContent = formatTHB(net);
         document.getElementById('mo-net-amount').style.color = 'var(--go)';
       } else {
-        document.getElementById('mo-net-label').textContent = 'Guest Owes You:';
+        document.getElementById('mo-net-label').textContent = 'ผู้เข้าพักค้างชำระ:';
         document.getElementById('mo-net-amount').textContent = formatTHB(Math.abs(net));
         document.getElementById('mo-net-amount').style.color = 'var(--warn)';
       }
@@ -1852,10 +1852,10 @@
       var validItems = MO_ITEMS.filter(i => i.description && (parseFloat(i.amount) > 0));
 
       var btn = this;
-      btn.textContent = 'Processing...'; btn.disabled = true;
+      btn.textContent = 'กำลังดำเนินการ...'; btn.disabled = true;
 
       callApi('financeProcessMoveOut', [session.token, txnId, validItems]).then(function(res) {
-        btn.textContent = 'Confirm Move-Out'; btn.disabled = false;
+        btn.textContent = 'ยืนยันการย้ายออก'; btn.disabled = false;
         if (!res.ok) {
           document.getElementById('moveout-error').textContent = res.error;
           show('moveout-error');
@@ -1867,7 +1867,7 @@
     });
 
     function exportFinanceCsv() {
-      var rows = [['Date', 'Direction', 'Property', 'Room', 'Category', 'Amount', 'Guest/Vendor', 'Note']];
+      var rows = [['วันที่', 'ประเภท', 'อาคาร', 'ห้อง', 'หมวด', 'จำนวนเงิน', 'ผู้เข้าพัก/ผู้ขาย', 'หมายเหตุ']];
       document.querySelectorAll('#finance-table-body tr').forEach(function (tr) {
         if (tr.classList.contains('items-expand-row')) return;
         var cells = [];
@@ -1913,17 +1913,17 @@
         
         var html = '<td colspan="10" style="background:#fcfbf9;padding:12px 24px;border-bottom:1px solid var(--line);">';
         if (!t.items || t.items.length === 0) {
-          html += '<div style="color:var(--muted);font-style:italic;font-size:12px;">No items found for this transaction.</div>';
+          html += '<div style="color:var(--muted);font-style:italic;font-size:12px;">ไม่พบรายการย่อยของรายการนี้</div>';
         } else {
           html += '<table style="width:100%;border-collapse:collapse;margin:4px 0;background:#ffffff;border:1px solid var(--line);font-size:13px;border-radius:6px;overflow:hidden;">';
-          html += '<thead><tr style="border-bottom:1px solid var(--line);background:#f3f1ec;"><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;background:#f3f1ec;">Description</th><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:150px;background:#f3f1ec;">Category</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:80px;background:#f3f1ec;">Units</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">Price</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">Amount</th></tr></thead>';
+          html += '<thead><tr style="border-bottom:1px solid var(--line);background:#f3f1ec;"><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;background:#f3f1ec;">รายละเอียด</th><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:150px;background:#f3f1ec;">หมวด</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:80px;background:#f3f1ec;">จำนวน</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">ราคา</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">จำนวนเงิน</th></tr></thead>';
           html += '<tbody>';
           t.items.forEach(function(item) {
             var unitsText = item.units != null ? item.units : '—';
             var priceText = item.unit_price != null ? formatTHB(item.unit_price) : '—';
             html += '<tr style="border-bottom:1px solid var(--line);">';
             html += '<td style="padding:8px 12px;text-align:left;color:var(--ink);">' + escapeHtml(item.description) + '</td>';
-            html += '<td style="padding:8px 12px;text-align:left;color:var(--ink);text-transform:capitalize;">' + escapeHtml(item.category || 'other') + '</td>';
+            html += '<td style="padding:8px 12px;text-align:left;color:var(--ink);">' + escapeHtml(tv(item.category || 'other')) + '</td>';
             html += '<td style="padding:8px 12px;text-align:right;color:var(--ink);">' + unitsText + '</td>';
             html += '<td style="padding:8px 12px;text-align:right;color:var(--ink);">' + priceText + '</td>';
             html += '<td style="padding:8px 12px;text-align:right;color:var(--ink);font-weight:600;">' + formatTHB(item.amount) + '</td>';
@@ -1935,10 +1935,10 @@
         if (t.vat_type && t.vat_type !== 'none' || t.wht_percent > 0) {
           var details = [];
           if (t.vat_type && t.vat_type !== 'none') {
-            details.push('VAT (' + (t.vat_type === 'include' ? 'Included' : 'Excluded') + '): ' + formatTHB(t.vat_amount));
+            details.push('VAT (' + (t.vat_type === 'include' ? 'รวมภาษี' : 'แยกภาษี') + '): ' + formatTHB(t.vat_amount));
           }
           if (t.wht_percent > 0) {
-            details.push('WHT (' + t.wht_percent + '%): -' + formatTHB(t.wht_amount));
+            details.push('หัก ณ ที่จ่าย (' + t.wht_percent + '%): -' + formatTHB(t.wht_amount));
           }
           html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;">' + details.join(' &nbsp;|&nbsp; ') + '</div>';
         }
@@ -1992,9 +1992,9 @@
       // Set title dynamically
       var titleText = '';
       if (approvingActionType === 'verify') {
-        titleText = 'Confirm & Verify Transaction';
+        titleText = 'ยืนยันและตรวจสอบรายการ';
       } else {
-        titleText = t.direction === 'IN' ? 'Confirm & Approve Revenue' : 'Confirm & Approve Expense';
+        titleText = t.direction === 'IN' ? 'ยืนยันและอนุมัติรายรับ' : 'ยืนยันและอนุมัติรายจ่าย';
       }
       document.getElementById('am-title-display').textContent = titleText;
 
@@ -2024,9 +2024,9 @@
 
       var confirmBtn = document.getElementById('approveBtn');
       if (approvingActionType === 'verify') {
-        confirmBtn.textContent = 'Confirm & Verify';
+        confirmBtn.textContent = 'ยืนยันและตรวจสอบ';
       } else {
-        confirmBtn.textContent = 'Confirm Receipt';
+        confirmBtn.textContent = 'ยืนยันการรับเงิน';
       }
 
       document.getElementById('approve-modal-error').classList.add('hidden');
@@ -2048,8 +2048,8 @@
       
       var isApp = true;
       var isVer = approvingActionType === 'verify';
-      var actionText = isVer ? 'Verifying...' : 'Approving...';
-      var defaultText = isVer ? 'Confirm & Verify' : 'Confirm Receipt';
+      var actionText = isVer ? 'กำลังตรวจสอบ...' : 'กำลังอนุมัติ...';
+      var defaultText = isVer ? 'ยืนยันและตรวจสอบ' : 'ยืนยันการรับเงิน';
 
       btn.disabled = true; btn.textContent = actionText;
       callApi('financeUpdateTransaction', [session.token, approvingTxnId, isApp, isVer, channel, ref, receivedBy]).then(function(res) {
@@ -2065,7 +2065,7 @@
       }).catch(function(err) {
         btn.disabled = false; btn.textContent = defaultText;
         var errEl = document.getElementById('approve-modal-error');
-        errEl.textContent = 'Connection error: ' + err.message;
+        errEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
         errEl.classList.remove('hidden');
       });
     }
@@ -2077,14 +2077,14 @@
 
     function renderVendorsTable() {
       var tbody = document.getElementById('vendors-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>';
       callApi('financeGetVendors', [session.token]).then(function(res) {
-        if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;color:var(--warn);">Error: ' + escapeHtml(res.error) + '</td></tr>'; return; }
+        if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;color:var(--warn);">ข้อผิดพลาด: ' + escapeHtml(res.error) + '</td></tr>'; return; }
         VENDORS = res.vendors || [];
         document.getElementById('fm-vendor-list').innerHTML = VENDORS.map(function(v) { return '<option value="'+escapeHtml(v.name || v)+'">'; }).join('');
 
         if (VENDORS.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">No vendors found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">ไม่พบผู้ขาย</td></tr>';
           return;
         }
 
@@ -2096,8 +2096,8 @@
           html += '<td>' + escapeHtml(v.tax_id || '-') + '</td>';
           html += '<td>' + escapeHtml(v.branch || 'Head Office') + '</td>';
           html += '<td>';
-          html += '<button class="row-action-btn" style="margin-right:8px;" onclick="editVendor('+v.vendor_id+')">Edit</button>';
-          html += '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="deleteVendor('+v.vendor_id+')">Delete</button>';
+          html += '<button class="row-action-btn" style="margin-right:8px;" onclick="editVendor('+v.vendor_id+')">แก้ไข</button>';
+          html += '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="deleteVendor('+v.vendor_id+')">ลบ</button>';
           html += '</td>';
           html += '</tr>';
         });
@@ -2108,14 +2108,14 @@
     function openVendorForm(vendor) {
       document.getElementById('vendor-form-error').classList.add('hidden');
       if (vendor) {
-        document.getElementById('vendor-form-title').textContent = 'Edit Vendor';
+        document.getElementById('vendor-form-title').textContent = 'แก้ไขผู้ขาย';
         document.getElementById('vf-id').value = vendor.vendor_id;
         document.getElementById('vf-name').value = vendor.name || '';
         document.getElementById('vf-address').value = vendor.address || '';
         document.getElementById('vf-tax').value = vendor.tax_id || '';
         document.getElementById('vf-branch').value = vendor.branch || 'Head Office';
       } else {
-        document.getElementById('vendor-form-title').textContent = 'Add Vendor';
+        document.getElementById('vendor-form-title').textContent = 'เพิ่มผู้ขาย';
         document.getElementById('vf-id').value = '';
         document.getElementById('vf-name').value = '';
         document.getElementById('vf-address').value = '';
@@ -2131,9 +2131,9 @@
     };
 
     window.deleteVendor = async function(id) {
-      if (!(await confirmDialog('Delete this vendor?', {title:'Delete vendor', confirmText:'Delete', danger:true}))) return;
+      if (!(await confirmDialog('ลบผู้ขายรายนี้?', {title:'ลบผู้ขาย', confirmText:'ลบ', danger:true}))) return;
       callApi('financeDeleteVendor', [session.token, id]).then(function(res) {
-        if (!res.ok) alert('Error: ' + res.error);
+        if (!res.ok) alert('ข้อผิดพลาด: ' + res.error);
         else renderVendorsTable();
       });
     };
@@ -2147,7 +2147,7 @@
 
       if (!name) {
         var err = document.getElementById('vendor-form-error');
-        err.textContent = 'Vendor Name is required.';
+        err.textContent = 'ต้องระบุชื่อผู้ขาย';
         err.classList.remove('hidden');
         return;
       }
@@ -2170,37 +2170,37 @@
 
   <div class="modal-overlay hidden" id="approve-modal-bg" onclick="closeApproveMod(event)">
     <div class="modal-box" onclick="event.stopPropagation()" style="width:400px;max-width:90vw;">
-      <div class="mhdr"><div class="mtitle" id="am-title-display">Confirm & Approve Revenue</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
+      <div class="mhdr"><div class="mtitle" id="am-title-display">ยืนยันและอนุมัติรายรับ</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
       <div class="fg">
-        <label class="fl">Amount Due</label>
+        <label class="fl">ยอดที่ต้องชำระ</label>
         <div id="am-amount-display" style="font-size:20px;font-weight:700;color:var(--go);margin:8px 0;">฿0</div>
       </div>
       <div class="fg">
-        <label class="fl">Payment Channel</label>
+        <label class="fl">ช่องทางชำระเงิน</label>
         <div class="custom-select" id="am-channel-select">
-          <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('am-channel-select')">💵 Cash <span class="arrow">▼</span></div>
+          <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('am-channel-select')">💵 เงินสด <span class="arrow">▼</span></div>
           <div class="custom-select-options">
-            <div class="custom-select-option" data-value="cash">💵 Cash</div>
+            <div class="custom-select-option" data-value="cash">💵 เงินสด</div>
             <div class="custom-select-option" data-value="kb">💳 KB</div>
             <div class="custom-select-option" data-value="scb">💳 SCB</div>
-            <div class="custom-select-option" data-value="maemanee">📱 Mae Manee</div>
+            <div class="custom-select-option" data-value="maemanee">📱 แม่มณี</div>
             <div class="custom-select-option" data-value="kshop">📱 Kshop</div>
           </div>
           <input type="hidden" id="am-channel" value="cash" />
         </div>
       </div>
       <div class="fg">
-        <label class="fl" for="am-received-by">Received By</label>
+        <label class="fl" for="am-received-by">ผู้รับเงิน</label>
         <select class="fs" id="am-received-by" style="width:100%;"></select>
       </div>
       <div class="fg">
-        <label class="fl">Transfer Reference</label>
-        <input class="fi" type="text" id="am-ref" placeholder="e.g. Txn ID, bank reference…">
+        <label class="fl">เลขอ้างอิงการโอน</label>
+        <input class="fi" type="text" id="am-ref" placeholder="เช่น เลขรายการ หรือ อ้างอิงธนาคาร…">
       </div>
       <div class="error hidden" id="approve-modal-error"></div>
       <div style="display:flex;gap:9px;margin-top:16px">
-        <button class="btn-secondary" style="flex:1" onclick="closeApproveMod()">Cancel</button>
-        <button class="btn-primary" style="flex:2" id="approveBtn" onclick="submitApproval()">Confirm Receipt</button>
+        <button class="btn-secondary" style="flex:1" onclick="closeApproveMod()">ยกเลิก</button>
+        <button class="btn-primary" style="flex:2" id="approveBtn" onclick="submitApproval()">ยืนยันการรับเงิน</button>
       </div>
     </div>
   </div>
