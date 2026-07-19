@@ -641,9 +641,9 @@ if (session) {
   if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner')) {
     document.getElementById('link-dashboard').classList.remove('hidden');
-    document.getElementById('link-hr').classList.remove('hidden');
     document.getElementById('link-setting').classList.remove('hidden');
   }
+  if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-hr').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner', 'frontdesk')) {
     document.getElementById('link-report').classList.remove('hidden');
   }
