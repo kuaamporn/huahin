@@ -612,9 +612,9 @@
         // Reveal nav links the user has access to, alongside this page's own content.
         if (HuaHinSession.hasRole('owner')) {
           show('link-dashboard');
+          show('link-hr');
           show('link-setting');
         }
-        if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-hr');
         if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) {
