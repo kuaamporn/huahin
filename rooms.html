@@ -323,6 +323,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
           <div class="fg" style="flex:1"><label class="fl">อีเมล</label><input class="fi" type="text" id="ncEmail"></div>
         </div>
         <div class="fg"><label class="fl">ผู้ติดต่อ</label><input class="fi" type="text" id="ncContact"></div>
+        <label style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="ncWht" style="width:16px;height:16px;"> หักภาษี ณ ที่จ่าย 5% (ค่าเช่าห้อง)</label>
         <div id="ncWarn" style="display:none;color:var(--stop,#c0392b);font-size:12px;margin-bottom:6px;"></div>
         <button class="btn btn-m" type="button" onclick="saveNewCompany()" style="padding:8px 14px;font-size:13px;">✓ บันทึกบริษัท</button>
       </div>
@@ -375,6 +376,9 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div class="frow">
       <div class="fg"><label class="fl">ค่ามัดจำคีย์การ์ด (฿)</label><input class="fi" type="number" id="mCardDepPrice" min="0" value="500" oninput="calcP()"></div>
       <div class="fg"><label class="fl">จำนวนคีย์การ์ด</label><input class="fi" type="number" id="mCardDepQty" min="0" value="0" oninput="calcP()"></div>
+    </div>
+    <div class="frow hidden" id="mFurnWrapper">
+      <div class="fg"><label class="fl">ค่าเฟอร์นิเจอร์ (฿/เดือน)</label><input class="fi" type="number" id="mFurn" min="0" value="0"></div>
     </div>
     <div class="fg"><label class="fl">หมายเหตุ</label><textarea class="fta" id="mNotes"></textarea></div>
     <div class="pbox" id="pbox">
@@ -470,6 +474,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
         <div class="fg" style="flex:1"><label class="fl">อีเมล</label><input class="fi" type="text" id="coEmail"></div>
       </div>
       <div class="fg"><label class="fl">ผู้ติดต่อ</label><input class="fi" type="text" id="coContact"></div>
+      <label style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="coWht" style="width:16px;height:16px;"> หักภาษี ณ ที่จ่าย 5% (ค่าเช่าห้อง)</label>
       <div id="coWarn" style="display:none;color:var(--stop,#c0392b);font-size:12px;margin-bottom:6px;"></div>
       <div style="display:flex;gap:9px;">
         <button class="btn btn-o" style="flex:1" onclick="closeCompanyEdit()">ยกเลิก</button>
@@ -641,9 +646,9 @@ if (session) {
   if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner')) {
     document.getElementById('link-dashboard').classList.remove('hidden');
-    document.getElementById('link-hr').classList.remove('hidden');
     document.getElementById('link-setting').classList.remove('hidden');
   }
+  if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-hr').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner', 'frontdesk')) {
     document.getElementById('link-report').classList.remove('hidden');
   }
@@ -1006,6 +1011,15 @@ function selType(t, el){
     otaWrapper.classList.add('hidden');
     document.getElementById('mOtaBookingId').value = '';
   }
+
+  // Furniture rent applies only to monthly tenants (grandfathered furniture).
+  var furnWrapper = document.getElementById('mFurnWrapper');
+  if (selBT === 'monthly') {
+    furnWrapper.classList.remove('hidden');
+  } else {
+    furnWrapper.classList.add('hidden');
+    document.getElementById('mFurn').value = '0';
+  }
 }
 
 function toggleResDep() {
@@ -1160,7 +1174,9 @@ function saveBook(){
     return;
   }
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId, companyId]).then(function(res){
+  var furnitureRent = selBT === 'monthly' ? (parseFloat(document.getElementById('mFurn').value) || 0) : 0;
+
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId, companyId, furnitureRent]).then(function(res){
     btn.disabled=false; btn.textContent='✓ ยืนยันการจอง';
     if(res.ok){
       closeMod();
@@ -1193,6 +1209,7 @@ function resetCompanyPanel(){
   ['ncName','ncTaxId','ncBranch','ncAddress','ncPhone','ncEmail','ncContact'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.value = '';
   });
+  document.getElementById('ncWht').checked = false;
   var w = document.getElementById('ncWarn'); if (w) { w.style.display='none'; w.textContent=''; }
 }
 
@@ -1262,7 +1279,8 @@ window.saveNewCompany = function(){
     document.getElementById('ncAddress').value.trim(),
     document.getElementById('ncPhone').value.trim(),
     document.getElementById('ncEmail').value.trim(),
-    document.getElementById('ncContact').value.trim(), ''];
+    document.getElementById('ncContact').value.trim(), '',
+    document.getElementById('ncWht').checked ? 1 : 0];
   callApi('companyCreate', params).then(function(res){
     if (res.ok) {
       showToast('สร้างบริษัทเรียบร้อย', 'ok');
@@ -1325,6 +1343,7 @@ window.editCompany = function(companyId){
   document.getElementById('coPhone').value = c.phone || '';
   document.getElementById('coEmail').value = c.email || '';
   document.getElementById('coContact').value = c.contact_person || '';
+  document.getElementById('coWht').checked = !!c.wht_applicable;
   document.getElementById('coWarn').style.display = 'none';
   document.getElementById('coEditForm').classList.remove('hidden');
 };
@@ -1343,7 +1362,8 @@ window.saveCompanyEdit = function(){
     document.getElementById('coAddress').value.trim(),
     document.getElementById('coPhone').value.trim(),
     document.getElementById('coEmail').value.trim(),
-    document.getElementById('coContact').value.trim(), ''];
+    document.getElementById('coContact').value.trim(), '',
+    document.getElementById('coWht').checked ? 1 : 0];
   callApi('companyUpdate', params).then(function(res){
     if (!res.ok) { warn.textContent = res.error || 'อัปเดตไม่สำเร็จ'; warn.style.display='block'; return; }
     showToast('อัปเดตบริษัทเรียบร้อย', 'ok');

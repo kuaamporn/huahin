@@ -160,6 +160,20 @@
         var t = data.transaction;
         var b = data.booking || null;
 
+        // WHT deduction shows on the INVOICE only (the tenant pays net). The
+        // receipt shows gross with no WHT line — see docs/design-vat-wht-doctypes.md.
+        var whtAmt = Number(t.wht_amount) || 0;
+        var netPayable = (t.net_amount != null) ? Number(t.net_amount) : Number(t.amount);
+        var whtRowsHtml = whtAmt > 0 ?
+          '<div class="grand-total" style="font-weight:normal;">' +
+            '<div style="flex:1; padding: 4px; border-right: 2px solid #000;">หัก ณ ที่จ่าย 5% / Withholding Tax</div>' +
+            '<div style="flex:1; padding: 4px; text-align: right;">-฿' + whtAmt.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
+          '</div>' +
+          '<div class="grand-total">' +
+            '<div style="flex:1; padding: 4px; border-right: 2px solid #000;">ยอดชำระสุทธิ / Net Payable</div>' +
+            '<div style="flex:1; padding: 4px; text-align: right;">฿' + netPayable.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
+          '</div>' : '';
+
         var displayInvNo = '';
         if (invoiceNo) {
           displayInvNo = invoiceNo;
@@ -250,6 +264,7 @@
                   '<div style="flex:1; padding: 4px; border-right: 2px solid #000;">Grand Total</div>' +
                   '<div style="flex:1; padding: 4px; text-align: right;">฿' + t.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>' +
                 '</div>' +
+                whtRowsHtml +
                 '<div class="sig-space">Approved by / ผู้อนุมัติ</div>' +
               '</div>' +
             '</div>' +
