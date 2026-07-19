@@ -129,12 +129,23 @@
       <div style="background:#F8FAFC;border-radius:16px;padding:16px;margin:16px 0;">
         <h3 style="font-size:15px;margin-bottom:12px;">Import New Payout Report</h3>
         <div class="import-box">
-          <select id="ota-platform">
+          <select id="ota-platform" onchange="toggleAsMode()">
             <option value="Booking.com">Booking.com (CSV — Payout ID col 16)</option>
             <option value="Expedia">Expedia (CSV — from PDF extractor)</option>
+            <option value="AS">AS (monthly transfer — select pending bookings)</option>
           </select>
           <input type="file" id="ota-file" accept=".csv">
           <button class="btn btn-primary" onclick="parseAndImportOta()">Import Payout</button>
+        </div>
+        <div id="as-import-box" style="display:none;margin-top:12px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+            <input type="text" id="as-payout-ref" placeholder="Transfer reference (e.g. AS-2026-07)" style="flex:1;min-width:180px;padding:8px;border:1px solid var(--line);border-radius:8px;">
+            <input type="date" id="as-payout-date" style="padding:8px;border:1px solid var(--line);border-radius:8px;">
+          </div>
+          <div id="as-pending-list" style="max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;">
+            <p style="color:var(--muted);">Loading pending AS transactions…</p>
+          </div>
+          <button class="btn btn-primary" style="margin-top:10px;" onclick="importAsPayout()">Create AS Payout Batch</button>
         </div>
         <div id="ota-import-status"></div>
       </div>
@@ -402,8 +413,57 @@
       }
     }
 
+    async function toggleAsMode() {
+      const isAs = document.getElementById('ota-platform').value === 'AS';
+      document.getElementById('as-import-box').style.display = isAs ? 'block' : 'none';
+      document.getElementById('ota-file').style.display = isAs ? 'none' : '';
+      if (isAs) loadAsPending();
+    }
+
+    async function loadAsPending() {
+      const el = document.getElementById('as-pending-list');
+      const r = await api('reconcileGetPendingAgentRent', [sessionToken]);
+      if (!r.ok) { el.innerHTML = '<p style="color:var(--err);">' + (r.error || 'Failed to load.') + '</p>'; return; }
+      if (!r.transactions.length) { el.innerHTML = '<p style="color:var(--muted);">No pending AS transactions.</p>'; return; }
+      el.innerHTML = r.transactions.map(t =>
+        '<label style="display:flex;gap:8px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer;">' +
+        '<input type="checkbox" class="as-pending-cb" data-txn=\'' + JSON.stringify(t).replace(/'/g, '&#39;') + '\' checked>' +
+        '<span style="flex:1;"><b>' + (t.ota_booking_id || t.booking_id) + '</b> · ' + (t.guest_or_vendor || '') + ' · ' + t.checkin_date + ' → ' + t.checkout_date + '</span>' +
+        '<span style="font-weight:600;">฿' + Number(t.amount).toLocaleString() + '</span></label>'
+      ).join('');
+    }
+
+    async function importAsPayout() {
+      const payoutRef = document.getElementById('as-payout-ref').value.trim();
+      const payoutDate = document.getElementById('as-payout-date').value;
+      if (!payoutRef || !payoutDate) return alert('Enter the transfer reference and date.');
+      const items = [...document.querySelectorAll('.as-pending-cb:checked')].map(cb => {
+        const t = JSON.parse(cb.dataset.txn);
+        return {
+          reservation_ref: t.ota_booking_id || t.booking_id,
+          guest_name: t.guest_or_vendor || '',
+          check_in_date: t.checkin_date,
+          check_out_date: t.checkout_date,
+          gross_amount: t.amount,
+          commission_amount: 0,
+          net_amount: t.amount
+        };
+      });
+      if (!items.length) return alert('Select at least one transaction.');
+      const statusEl = document.getElementById('ota-import-status');
+      const r = await api('reconcileImportOtaPayout', [sessionToken, 'AS', payoutRef, payoutDate, items]);
+      if (r.ok) {
+        statusEl.innerHTML = '<p style="color:var(--go);font-weight:600;">Imported AS payout ' + payoutRef + ' — ' + r.itemsImported + ' bookings, ฿' + Number(r.netTotal).toLocaleString() + '.' + (r.bankMatchFound ? ' Bank deposit matched.' : ' No matching SCB deposit yet.') + '</p>';
+        loadAsPending();
+        loadOtaBatches();
+      } else {
+        statusEl.innerHTML = '<p style="color:var(--err);">' + (r.error || 'Import failed.') + '</p>';
+      }
+    }
+
     async function parseAndImportOta() {
       const platform = document.getElementById('ota-platform').value;
+      if (platform === 'AS') return alert('Use the AS section below: select pending bookings and click "Create AS Payout Batch".');
       const file = document.getElementById('ota-file').files[0];
       if (!file) return alert('Please select a CSV file.');
 

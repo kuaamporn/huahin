@@ -198,6 +198,7 @@
           <option value="verified">ตรวจสอบแล้วเท่านั้น</option>
         </select>
         <input id="finance-search" type="text" placeholder="ค้นหารายการ..." style="max-width:250px;" />
+        <button id="btn-tt-batch-receipt" class="hidden btn-secondary" style="font-weight:600;border-color:#0F766E;color:#0F766E;" onclick="openTtBatchReceipt()">🧾 ใบเสร็จรวม Thai Tour</button>
         <button id="finance-export-csv-btn" style="margin-left:auto;">ส่งออก CSV</button>
       </div>
 
@@ -419,6 +420,27 @@
     </div>
   </div>
 
+  <!-- ===================== THAI TOUR BATCH RECEIPT MODAL ===================== -->
+  <div id="tt-batch-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 560px;">
+      <div class="mhdr">
+        <h2 class="mtitle">Thai Tour Batch Receipt</h2>
+        <button class="mx" onclick="closeTtBatchReceipt()">×</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">One consolidated receipt for the selected unreceipted Thai Tour rent transactions of this month (total nights × rate).</p>
+      <div id="tt-batch-list" style="max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:12px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--muted);">Receipt Date</label>
+        <input type="date" id="tt-batch-date" style="padding:6px;border:1px solid var(--line);border-radius:8px;">
+        <span id="tt-batch-total" style="margin-left:auto;font-weight:700;"></span>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;">
+        <button class="btn-secondary" onclick="closeTtBatchReceipt()" style="padding:8px 16px;">Cancel</button>
+        <button onclick="confirmTtBatchReceipt()" style="padding:8px 16px;background:var(--go);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;">Generate Receipt</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== PENDING RESERVATIONS MODAL ===================== -->
   <div id="reservations-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 650px;">
@@ -603,6 +625,7 @@
         var canAddRevenue = HuaHinSession.hasRole('owner', 'revenue');
         var canAddExpense = HuaHinSession.hasRole('owner', 'expense');
         if (canAddRevenue) show('btn-add-revenue');
+        if (canAddRevenue) show('btn-tt-batch-receipt');
         if (canAddExpense) {
           show('btn-add-expense');
           show('btn-manage-vendors');
@@ -1147,6 +1170,46 @@
         '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;"><span class="muted">จำนวนเงิน</span><span>' + formatTHB(t.net_amount || t.amount) + '</span></div>';
       show('delete-txn-modal');
     }
+    // Thai Tour consolidated receipt: unreceipted paid 'tt rent' txns of the
+    // loaded month -> one batch receipt (financeGenerateBatchReceipt).
+    function openTtBatchReceipt() {
+      var candidates = (TRANSACTIONS || []).filter(function (t) {
+        return t.category === 'tt rent' && t.status === 'paid' && !t.receipt_no;
+      });
+      var listEl = document.getElementById('tt-batch-list');
+      if (!candidates.length) {
+        listEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px;">No unreceipted Thai Tour rent transactions this month. Load the right month first.</p>';
+      } else {
+        listEl.innerHTML = candidates.map(function (t) {
+          return '<label style="display:flex;gap:8px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer;">' +
+            '<input type="checkbox" class="tt-batch-cb" data-txn-id="' + t.txn_id + '" data-amount="' + (t.amount || 0) + '" checked onchange="updateTtBatchTotal()">' +
+            '<span style="flex:1;">' + (t.guest_or_vendor || '') + ' · ' + (t.txn_date || '') + '</span>' +
+            '<span style="font-weight:600;">' + formatTHB(t.amount || 0) + '</span></label>';
+        }).join('');
+      }
+      document.getElementById('tt-batch-date').value = new Date().toISOString().slice(0, 10);
+      updateTtBatchTotal();
+      show('tt-batch-modal');
+    }
+    function updateTtBatchTotal() {
+      var total = 0;
+      document.querySelectorAll('.tt-batch-cb:checked').forEach(function (cb) { total += parseFloat(cb.dataset.amount) || 0; });
+      document.getElementById('tt-batch-total').textContent = 'Total: ' + formatTHB(total);
+    }
+    function closeTtBatchReceipt() { hide('tt-batch-modal'); }
+    function confirmTtBatchReceipt() {
+      var txnIds = Array.prototype.map.call(document.querySelectorAll('.tt-batch-cb:checked'), function (cb) { return cb.dataset.txnId; });
+      if (!txnIds.length) { alert('Select at least one transaction.'); return; }
+      var rDate = document.getElementById('tt-batch-date').value;
+      if (!rDate) { alert('Pick a receipt date.'); return; }
+      callApi('financeGenerateBatchReceipt', [session.token, txnIds, 'RR', rDate]).then(function (res) {
+        if (!res.ok) { alert(res.error || 'Failed to generate receipt.'); return; }
+        closeTtBatchReceipt();
+        window.open('receipt.html?receipt_no=' + encodeURIComponent(res.receipt_no), '_blank');
+        loadFinanceData();
+      });
+    }
+
     function closeDeleteTxn() { hide('delete-txn-modal'); }
     function confirmDeleteTxn() {
       var txnId = document.getElementById('del-txn-id').value;

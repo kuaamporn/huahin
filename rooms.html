@@ -124,6 +124,8 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .bar.commercial{background:linear-gradient(90deg,#9F1239,#E11D48)}
 .bar.booking-com{background:linear-gradient(90deg,#003580,#0071C2);color:#fff}
 .bar.expedia-com{background:linear-gradient(90deg,#C89200,#FBAF00);color:#1a1a1a;text-shadow:none}
+.bar.as{background:linear-gradient(90deg,#5B21B6,#8B5CF6);color:#fff}
+.bar.thai-tour{background:linear-gradient(90deg,#0F766E,#14B8A6);color:#fff}
 .bar.pending-checkin{border:1.5px dashed rgba(255,255,255,0.7) !important;}
 .bar.pending-checkin::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.15),rgba(255,255,255,0.15) 6px,transparent 6px,transparent 12px);pointer-events:none}
 .ov-bar{position:absolute;top:3px;bottom:3px;left:1px;right:1px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;color:#fff}
@@ -253,6 +255,8 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div class="leg"><div class="ld" style="background:#8B5CF6"></div>เชิงพาณิชย์</div>
     <div class="leg"><div class="ld" style="background:#0071C2"></div>Booking.com</div>
     <div class="leg"><div class="ld" style="background:#FBAF00"></div>Expedia.com</div>
+    <div class="leg"><div class="ld" style="background:#8B5CF6"></div>AS</div>
+    <div class="leg"><div class="ld" style="background:#14B8A6"></div>Thai Tour</div>
   </div>
 </div>
 
@@ -330,11 +334,13 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
         <div class="tbtn" data-bt="walkin" onclick="selType('walkin',this)">🚶 รายวัน</div>
         <div class="tbtn" data-bt="Booking.com" onclick="selType('Booking.com',this)">🌐 Booking.com</div>
         <div class="tbtn" data-bt="Expedia.com" onclick="selType('Expedia.com',this)">🌐 Expedia.com</div>
+        <div class="tbtn" data-bt="AS" onclick="selType('AS',this)">🤝 AS</div>
+        <div class="tbtn" data-bt="Thai Tour" onclick="selType('Thai Tour',this)">🤝 Thai Tour</div>
       </div>
     </div>
     <div class="fg hidden" id="mOtaBookingIdWrapper" style="margin-top: 10px;">
-      <label class="fl">รหัสการจอง OTA *</label>
-      <input class="fi" type="text" id="mOtaBookingId" placeholder="กรอกรหัสการจอง Booking.com หรือ Expedia...">
+      <label class="fl">รหัสการจอง *</label>
+      <input class="fi" type="text" id="mOtaBookingId" placeholder="กรอกรหัสการจอง Booking.com / Expedia / AS / Thai Tour...">
     </div>
     <div class="fg" style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
       <input type="checkbox" id="mReservation" style="width:18px; height:18px;" onchange="toggleResDep(); calcP()" />
@@ -826,7 +832,7 @@ function render(){
           var endCoord = (cout.getTime() <= WIN_E.getTime()) ? (numDays + 0.5) : (dd(d, WIN_E) + 1.0);
           var left = startCoord * colWidth;
           var w = (endCoord - startCoord) * colWidth - 2;
-          var bt = (b.bookingType || '').replace(/\./g, '-').toLowerCase();
+          var bt = (b.bookingType || '').replace(/[.\s]/g, '-').toLowerCase();
           if (b.status === 'CONFIRMED') { bt += ' pending-checkin'; }
           var guestLabel = (b.status === 'CONFIRMED' ? '🕒 ' : '') + escapeHtml(b.guestName || '');
           var detailTitle = escapeHtml(b.guestName || '') + ' (' + b.checkinDate + ' ถึง ' + b.checkoutDate + ', ' + dd(cin, cout) + ' คืน, ' + tv(b.bookingType) + ')';
@@ -981,9 +987,12 @@ function selType(t, el){
   el.classList.add('sel');
 
   // Default values based on selected booking type
-  if (t === 'walkin' || t === 'Booking.com' || t === 'Expedia.com') {
+  if (t === 'walkin' || t === 'Booking.com' || t === 'Expedia.com' || t === 'AS' || t === 'Thai Tour') {
     document.getElementById('mDep').value = '0';
     document.getElementById('mCardDepQty').value = '1';
+    if ((t === 'AS' || t === 'Thai Tour') && !parseFloat(document.getElementById('mRate').value)) {
+      document.getElementById('mRate').value = '600';
+    }
   } else if (t === 'monthly') {
     document.getElementById('mDep').value = '8000';
     document.getElementById('mCardDepQty').value = '1';
@@ -991,7 +1000,7 @@ function selType(t, el){
   calcP();
 
   var otaWrapper = document.getElementById('mOtaBookingIdWrapper');
-  if (selBT === 'Booking.com' || selBT === 'Expedia.com') {
+  if (selBT === 'Booking.com' || selBT === 'Expedia.com' || selBT === 'AS' || selBT === 'Thai Tour') {
     otaWrapper.classList.remove('hidden');
   } else {
     otaWrapper.classList.add('hidden');
@@ -1133,9 +1142,9 @@ function saveBook(){
   if(cardPrice < 0 || cardQty < 0){ showToast('ค่ามัดจำคีย์การ์ดต้องไม่ต่ำกว่า 0','err'); return; }
 
   var otaBookingId = '';
-  if (selBT === 'Booking.com' || selBT === 'Expedia.com') {
+  if (selBT === 'Booking.com' || selBT === 'Expedia.com' || selBT === 'AS' || selBT === 'Thai Tour') {
     otaBookingId = document.getElementById('mOtaBookingId').value.trim();
-    if (!otaBookingId) { showToast('กรุณากรอกรหัสการจอง OTA', 'err'); return; }
+    if (!otaBookingId) { showToast('กรุณากรอกรหัสการจอง', 'err'); return; }
   }
 
   var btn=document.getElementById('saveBtn');
