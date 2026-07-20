@@ -341,27 +341,6 @@
       var formattedReceiptDate = formatBE(r.receipt_date);
       var roomDisp = t.room_name || '-';
 
-      // VAT (The Moment tax invoices): RM and daily RD carry 7% VAT. See
-      // docs/design-vat-wht-doctypes.md.
-      var vatProp = (prop === 'moment');
-      var isTaxInvoice = vatProp && (r.receipt_type === 'RM' || r.receipt_type === 'RD');
-      var vatRegNo = settings.moment_vat_reg_no || '';
-
-      // Show only the line items that belong to THIS receipt type, matching the
-      // worker's split (RR=rent, RM=utilities/furniture, RA=deposits).
-      function itemInReceipt(item) {
-        var cat = (item.category || '').toLowerCase();
-        var isDeposit = cat.indexOf('deposit') >= 0;
-        var isRoomRent = cat === 'monthly rent';
-        if (r.receipt_type === 'RA') return isDeposit;
-        if (r.receipt_type === 'RM') return !isDeposit && !isRoomRent;
-        if (r.receipt_type === 'RR') return vatProp ? (!isDeposit && isRoomRent) : !isDeposit;
-        if (r.receipt_type === 'RD') return !isDeposit;
-        return true;
-      }
-      var shownItems = (t.items || []).filter(itemInReceipt);
-      if (shownItems.length === 0) shownItems = t.items || [];
-
       // Buyer block: if this receipt was billed to a company, use the frozen
       // company snapshot; otherwise fall back to the individual customer.
       var isCompany = !!(r && r.company_name);
@@ -376,7 +355,7 @@
       var rowsHtml = '';
       var itemIndex = 1;
 
-      shownItems.forEach(function(item) {
+      t.items.forEach(function(item) {
         var description = escapeHtml(item.description);
         var subRowsHtml = '';
         var unitLabel = 'รายการ';
@@ -457,11 +436,10 @@
         '      <div class="company-address" style="margin-top:4px; font-weight:bold;">',
         '        เลขประจำตัวผู้เสียภาษี/ Tax No. ' + escapeHtml(compTaxId) + ' &nbsp;&nbsp;&nbsp;&nbsp; โทร./ Tel. ' + escapeHtml(compTel),
         '      </div>',
-        (isTaxInvoice && vatRegNo ? '      <div class="company-address" style="font-weight:bold;">เลขทะเบียนภาษีมูลค่าเพิ่ม / VAT Reg. No. ' + escapeHtml(vatRegNo) + '</div>' : ''),
         '    </div>',
         '  </div>',
         '',
-        '  <div class="receipt-title-bar">' + (isTaxInvoice ? title.replace('ใบเสร็จรับเงิน', 'ใบกำกับภาษี/ใบเสร็จรับเงิน').replace('Receipt', 'Tax Invoice/Receipt') : title) + '</div>',
+        '  <div class="receipt-title-bar">' + title + '</div>',
         '',
         '  <div class="meta-grid">',
         '    <div class="meta-left">',
@@ -515,10 +493,6 @@
         '  <div class="summary-section">',
         '    <div class="baht-text-box">(' + totalTextThai + ')</div>',
         '    <div class="total-box">',
-        (isTaxInvoice && (Number(r.vat_amount) || 0) > 0 ?
-          '      <div style="display:flex; justify-content:space-between; gap:20px; font-weight:normal;"><span>มูลค่าก่อนภาษี / Before VAT:</span><span>' + (totalVal - Number(r.vat_amount)).toLocaleString(undefined, {minimumFractionDigits: 2}) + '</span></div>' +
-          '      <div style="display:flex; justify-content:space-between; gap:20px; font-weight:normal;"><span>ภาษีมูลค่าเพิ่ม 7% / VAT:</span><span>' + Number(r.vat_amount).toLocaleString(undefined, {minimumFractionDigits: 2}) + '</span></div>'
-          : ''),
         '      <div>รวม / Total:</div>',
         '      <div class="double-underline">' + totalVal.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div>',
         '    </div>',

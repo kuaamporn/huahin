@@ -336,12 +336,11 @@
                 <th>Guest Name</th>
                 <th>Type</th>
                 <th style="text-align:right;">Amount</th>
-                <th style="text-align:right;">VAT 7%</th>
                 <th style="text-align:center;">Action</th>
               </tr>
             </thead>
             <tbody id="receipts-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading receipt data...</td></tr>
+              <tr><td colspan="8" class="muted" style="text-align:center;padding:24px;">Loading receipt data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -449,13 +448,11 @@
                 <th>Guest Name</th>
                 <th>Ref Transaction</th>
                 <th style="text-align:right;">Amount</th>
-                <th style="text-align:right;">WHT 5%</th>
-                <th style="text-align:right;">Net Payable</th>
                 <th style="text-align:center;">Action</th>
               </tr>
             </thead>
             <tbody id="full-invoices-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading full invoice data...</td></tr>
+              <tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">Loading full invoice data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -658,11 +655,11 @@
       if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner')) {
         document.getElementById('link-dashboard').classList.remove('hidden');
+        document.getElementById('link-hr').classList.remove('hidden');
         document.getElementById('link-setting').classList.remove('hidden');
         document.getElementById('tab-revenue').classList.remove('hidden');
         document.getElementById('tab-expense').classList.remove('hidden');
       }
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-hr').classList.remove('hidden');
       document.getElementById('link-report').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
     }
@@ -986,17 +983,17 @@
       updateReceiptSelection();
 
       var tbody = document.getElementById('receipts-table-body');
-      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading receipts...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px;">Loading receipts...</td></tr>';
 
       callApi('reportsListReceipts', [sessionToken, prop, sDate, eDate, q]).then(function(res) {
         if (!res.ok) {
-          tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
           return;
         }
 
         var list = res.receipts || [];
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No receipts found matching filters.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px;">No receipts found matching filters.</td></tr>';
           return;
         }
 
@@ -1020,7 +1017,6 @@
             '<td>' + escapeHtml(r.guest_or_vendor || '—') + '</td>' +
             '<td>' + escapeHtml(r.receipt_type) + '</td>' +
             '<td style="text-align:right; font-weight:600; ' + nameStyle + '">฿' + r.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
-            '<td style="text-align:right; ' + nameStyle + '">' + ((Number(r.vat_amount) || 0) > 0 ? '฿' + Number(r.vat_amount).toLocaleString(undefined, {minimumFractionDigits: 2}) : '—') + '</td>' +
             '<td style="text-align:center;">' +
               '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(r.receipt_no) + '" target="_blank">Print</a>' +
               cancelLink +
@@ -1029,7 +1025,7 @@
         });
         tbody.innerHTML = html;
       }).catch(function(err) {
-        tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
       });
     }
 
@@ -1188,20 +1184,16 @@
 
       callApi('reportsListFullInvoices', [session.token, prop, sDate, eDate, q]).then(function(res) {
         if (!res.ok) {
-          tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="error" style="text-align:center;padding:24px;">Error: ' + escapeHtml(res.error) + '</td></tr>';
           return;
         }
         var list = res.invoices || [];
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No full invoices found matching filters.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">No full invoices found matching filters.</td></tr>';
           return;
         }
         var html = '';
-        var whtTotal = 0;
         list.forEach(function(inv) {
-          var wht = Number(inv.wht_amount) || 0;
-          var net = (inv.net_amount != null) ? Number(inv.net_amount) : Number(inv.amount);
-          whtTotal += wht;
           html += '<tr>' +
             '<td><strong style="font-family:monospace;">' + escapeHtml(inv.invoice_no) + '</strong></td>' +
             '<td>' + fmtDate(inv.invoice_date) + '</td>' +
@@ -1209,18 +1201,12 @@
             '<td>' + escapeHtml(inv.guest_or_vendor || '—') + '</td>' +
             '<td><span style="font-family:monospace; font-size:11px;">' + escapeHtml(inv.transaction_id) + '</span></td>' +
             '<td style="text-align:right; font-weight:600;">฿' + inv.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
-            '<td style="text-align:right; color:' + (wht > 0 ? 'var(--warn,#b45309)' : 'var(--muted)') + ';">' + (wht > 0 ? '฿' + wht.toLocaleString(undefined, {minimumFractionDigits: 2}) : '—') + '</td>' +
-            '<td style="text-align:right; font-weight:600;">฿' + net.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
             '<td style="text-align:center; white-space:nowrap;"><a class="action-link" href="invoice.html?invoice_no=' + escapeHtml(inv.invoice_no) + '" target="_blank">Print Full Invoice</a></td>' +
           '</tr>';
         });
-        if (whtTotal > 0) {
-          html += '<tr style="border-top:2px solid var(--line);"><td colspan="6" style="text-align:right; font-weight:700;">Total WHT withheld</td>' +
-            '<td style="text-align:right; font-weight:700; color:var(--warn,#b45309);">฿' + whtTotal.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td><td colspan="2"></td></tr>';
-        }
         tbody.innerHTML = html;
       }).catch(function(err) {
-        tbody.innerHTML = '<tr><td colspan="9" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="error" style="text-align:center;padding:24px;">Connection error: ' + escapeHtml(err.message) + '</td></tr>';
       });
     }
 
@@ -1355,11 +1341,11 @@
       var cols = res.columns || [];
       var head = '<tr><th>Receipt No.</th><th>Date</th><th>Customer</th>' +
         cols.map(function(c) { return '<th style="text-align:right;">' + escapeHtml(c.label) + '</th>'; }).join('') +
-        '<th style="text-align:right;">หักณที่จ่าย</th><th style="text-align:right;">รวม</th></tr>';
+        '<th style="text-align:right;">VAT</th><th style="text-align:right;">หักณที่จ่าย</th><th style="text-align:right;">รวม</th></tr>';
       document.getElementById('revenue-ledger-head').innerHTML = head;
 
       if (!res.ledger.length) {
-        document.getElementById('revenue-ledger-body').innerHTML = '<tr><td colspan="' + (cols.length + 5) + '" class="muted" style="text-align:center;padding:24px;">No revenue receipts this month.</td></tr>';
+        document.getElementById('revenue-ledger-body').innerHTML = '<tr><td colspan="' + (cols.length + 6) + '" class="muted" style="text-align:center;padding:24px;">No revenue receipts this month.</td></tr>';
         document.getElementById('revenue-ledger-foot').innerHTML = '';
         return;
       }
@@ -1368,6 +1354,7 @@
           '<td>' + fmtDate(r.receipt_date) + '</td>' +
           '<td>' + escapeHtml(r.customer || '-') + '</td>' +
           cols.map(function(c) { return '<td style="text-align:right;">' + (r.cats[c.key] ? Number(r.cats[c.key]).toLocaleString() : '-') + '</td>'; }).join('') +
+          '<td style="text-align:right;">' + (r.vat ? Number(r.vat).toLocaleString() : '-') + '</td>' +
           '<td style="text-align:right;">' + (r.wht ? Number(r.wht).toLocaleString() : '-') + '</td>' +
           '<td style="text-align:right;"><strong>' + Number(r.total).toLocaleString() + '</strong></td></tr>';
       }).join('');
@@ -1377,6 +1364,7 @@
       document.getElementById('revenue-ledger-foot').innerHTML = '<tr style="border-top:2px solid var(--line);font-weight:700;">' +
         '<td colspan="3">Total</td>' +
         cols.map(function(c) { return '<td style="text-align:right;">' + Number(t.cats[c.key] || 0).toLocaleString() + '</td>'; }).join('') +
+        '<td style="text-align:right;">' + Number(t.vat || 0).toLocaleString() + '</td>' +
         '<td style="text-align:right;">' + Number(t.wht).toLocaleString() + '</td>' +
         '<td style="text-align:right;">' + Number(t.total).toLocaleString() + '</td></tr>';
     }
@@ -1408,12 +1396,12 @@
       if (!REVENUE_DATA) { alert('Load the report first.'); return; }
       var res = REVENUE_DATA, cols = res.columns;
       var month = document.getElementById('filter-revenue-month').value;
-      var rows = [['Receipt No.', 'Date', 'Customer'].concat(cols.map(function(c) { return c.label; })).concat(['หักณที่จ่าย', 'รวม'])];
+      var rows = [['Receipt No.', 'Date', 'Customer'].concat(cols.map(function(c) { return c.label; })).concat(['VAT', 'หักณที่จ่าย', 'รวม'])];
       res.ledger.forEach(function(r) {
-        rows.push([r.receipt_no, fmtDate(r.receipt_date), r.customer].concat(cols.map(function(c) { return r.cats[c.key] || 0; })).concat([r.wht, r.total]));
+        rows.push([r.receipt_no, fmtDate(r.receipt_date), r.customer].concat(cols.map(function(c) { return r.cats[c.key] || 0; })).concat([r.vat, r.wht, r.total]));
       });
       var t = res.totals;
-      rows.push(['Total', '', ''].concat(cols.map(function(c) { return t.cats[c.key] || 0; })).concat([t.wht, t.total]));
+      rows.push(['Total', '', ''].concat(cols.map(function(c) { return t.cats[c.key] || 0; })).concat([t.vat, t.wht, t.total]));
       rows.push([]);
       rows.push(['เงินประกัน (Deposits)']);
       rows.push(['Receipt No.', 'Date', 'Customer', 'Deposit', 'Returned', 'Balance']);

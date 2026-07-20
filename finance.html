@@ -612,9 +612,9 @@
         // Reveal nav links the user has access to, alongside this page's own content.
         if (HuaHinSession.hasRole('owner')) {
           show('link-dashboard');
+          show('link-hr');
           show('link-setting');
         }
-        if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-hr');
         if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) {
@@ -1536,39 +1536,26 @@
             typeSelect.value = 'RR';
           }
 
-          var hasRent = false, hasDeposit = false, hasOther = false;
+          var hasRent = false;
+          var hasDeposit = false;
           if (t.items && t.items.length > 0) {
             t.items.forEach(function(item) {
-              var ic = (item.category || '').toLowerCase();
-              if (ic.indexOf('deposit') >= 0) hasDeposit = true;
-              else if (ic === 'monthly rent') hasRent = true;
-              else hasOther = true;
+              var cat = (item.category || '').toLowerCase();
+              if (cat.indexOf('rent') >= 0) hasRent = true;
+              if (cat.indexOf('deposit') >= 0) hasDeposit = true;
             });
           }
 
-          // Doc types to issue for this transaction. At The Moment (VAT) the
-          // rent (RR, exempt) and the utilities/furniture (RM, tax invoice) split
-          // into separate documents; deposits are always RA. At The Precious
-          // (no VAT) RR carries rent + other. See docs/design-vat-wht-doctypes.md.
-          var isMoment = (t.property_id === 'moment');
-          var splitTypes = [];
-          if (isMoment) {
-            if (hasRent) splitTypes.push('RR');
-            if (hasOther) splitTypes.push('RM');
-            if (hasDeposit) splitTypes.push('RA');
+          var genBtn = document.getElementById('fm-generate-receipt-btn');
+          if (hasRent && hasDeposit) {
+            genBtn.textContent = 'ออกใบเสร็จ (ยกเว้นมัดจำ)';
           } else {
-            if (hasRent || hasOther) splitTypes.push('RR');
-            if (hasDeposit) splitTypes.push('RA');
+            genBtn.textContent = 'ออกใบเสร็จ';
           }
 
-          var genBtn = document.getElementById('fm-generate-receipt-btn');
-          genBtn.textContent = (splitTypes.length > 1) ? 'ออกใบเสร็จ (เฉพาะประเภทที่เลือก)' : 'ออกใบเสร็จ';
-
           var splitBtn = document.getElementById('fm-split-receipts-btn');
-          if (splitTypes.length > 1) {
-            var splitLabel = 'ออกและแยกใบเสร็จ (' + splitTypes.join(' + ') + ')';
+          if (hasRent && hasDeposit) {
             splitBtn.classList.remove('hidden');
-            splitBtn.textContent = splitLabel;
             splitBtn.onclick = function(e) {
               e.preventDefault();
               var rDate = document.getElementById('fm-receipt-date').value;
@@ -1581,30 +1568,41 @@
               }
               splitBtn.disabled = true;
               splitBtn.textContent = 'กำลังแยก...';
-              (async function() {
-                var issued = [];
-                for (var i = 0; i < splitTypes.length; i++) {
-                  var rr = await callApi('financeGenerateReceipt', [session.token, t.txn_id, splitTypes[i], rDate]);
-                  if (!rr.ok) {
-                    splitBtn.disabled = false; splitBtn.textContent = splitLabel;
-                    errorEl.textContent = 'ใบเสร็จ ' + splitTypes[i] + ' ผิดพลาด: ' + rr.error;
+              callApi('financeGenerateReceipt', [session.token, t.txn_id, 'RR', rDate]).then(function(res1) {
+                if (!res1.ok) {
+                  splitBtn.disabled = false;
+                  splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                  errorEl.textContent = 'ใบเสร็จค่าเช่าผิดพลาด: ' + res1.error;
+                  errorEl.classList.remove('hidden');
+                  return;
+                }
+                callApi('financeGenerateReceipt', [session.token, t.txn_id, 'RA', rDate]).then(function(res2) {
+                  splitBtn.disabled = false;
+                  splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                  if (res2.ok) {
+                    alert('ออกและแยกใบเสร็จสำเร็จ:\nค่าเช่า: ' + res1.receipt_no + '\nมัดจำ: ' + res2.receipt_no);
+                    callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
+                      if (txnRes.ok) {
+                        var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
+                        if (localIdx >= 0) TRANSACTIONS[localIdx] = txnRes.transaction;
+                        editTransaction(t.txn_id);
+                      }
+                      loadFinanceData();
+                    });
+                  } else {
+                    errorEl.textContent = 'ใบเสร็จมัดจำผิดพลาด: ' + res2.error;
                     errorEl.classList.remove('hidden');
-                    return;
                   }
-                  issued.push(splitTypes[i] + ': ' + rr.receipt_no);
-                }
-                splitBtn.disabled = false; splitBtn.textContent = splitLabel;
-                alert('ออกและแยกใบเสร็จสำเร็จ:\n' + issued.join('\n'));
-                var txnRes = await callApi('financeGetTransaction', [session.token, t.txn_id]);
-                if (txnRes.ok) {
-                  var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
-                  if (localIdx >= 0) TRANSACTIONS[localIdx] = txnRes.transaction;
-                  editTransaction(t.txn_id);
-                }
-                loadFinanceData();
-              })().catch(function(err) {
-                splitBtn.disabled = false; splitBtn.textContent = splitLabel;
-                errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
+                }).catch(function(err) {
+                  splitBtn.disabled = false;
+                  splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                  errorEl.textContent = 'การเชื่อมต่อใบเสร็จมัดจำผิดพลาด: ' + err.message;
+                  errorEl.classList.remove('hidden');
+                });
+              }).catch(function(err) {
+                splitBtn.disabled = false;
+                splitBtn.textContent = 'ออกและแยก (ค่าเช่า + มัดจำ)';
+                errorEl.textContent = 'การเชื่อมต่อใบเสร็จค่าเช่าผิดพลาด: ' + err.message;
                 errorEl.classList.remove('hidden');
               });
             };
