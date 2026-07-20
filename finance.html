@@ -1583,8 +1583,17 @@
               splitBtn.textContent = 'กำลังแยก...';
               (async function() {
                 var issued = [];
+                var confirmBackdate = false;
                 for (var i = 0; i < splitTypes.length; i++) {
-                  var rr = await callApi('financeGenerateReceipt', [session.token, t.txn_id, splitTypes[i], rDate]);
+                  var rr = await callApi('financeGenerateReceipt', [session.token, t.txn_id, splitTypes[i], rDate, confirmBackdate]);
+                  if (rr.needsConfirm) {
+                    if (!(await confirmDialog(rr.warning, {title:'วันที่ใบเสร็จย้อนหลัง', confirmText:'ออกใบเสร็จต่อ', danger:true}))) {
+                      splitBtn.disabled = false; splitBtn.textContent = splitLabel;
+                      return;
+                    }
+                    confirmBackdate = true;  // confirm once, apply to the rest of the set
+                    rr = await callApi('financeGenerateReceipt', [session.token, t.txn_id, splitTypes[i], rDate, true]);
+                  }
                   if (!rr.ok) {
                     splitBtn.disabled = false; splitBtn.textContent = splitLabel;
                     errorEl.textContent = 'ใบเสร็จ ' + splitTypes[i] + ' ผิดพลาด: ' + rr.error;
@@ -1626,31 +1635,37 @@
             }
 
             var genBtn = document.getElementById('fm-generate-receipt-btn');
+            var restoreLabel = (hasRent && hasDeposit) ? 'ออกใบเสร็จ (ยกเว้นมัดจำ)' : 'ออกใบเสร็จ';
             genBtn.disabled = true;
             genBtn.textContent = 'กำลังออก...';
 
-            callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date]).then(function(res) {
+            (async function() {
+              var res = await callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date]);
+              if (res.needsConfirm) {
+                if (!(await confirmDialog(res.warning, {title:'วันที่ใบเสร็จย้อนหลัง', confirmText:'ออกใบเสร็จต่อ', danger:true}))) {
+                  genBtn.disabled = false; genBtn.textContent = restoreLabel;
+                  return;
+                }
+                res = await callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date, true]);
+              }
               genBtn.disabled = false;
-              genBtn.textContent = (hasRent && hasDeposit) ? 'ออกใบเสร็จ (ยกเว้นมัดจำ)' : 'ออกใบเสร็จ';
+              genBtn.textContent = restoreLabel;
               if (res.ok) {
                 alert('ออกใบเสร็จสำเร็จ: ' + res.receipt_no);
-                callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
-                  if (txnRes.ok) {
-                    var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
-                    if (localIdx >= 0) {
-                      TRANSACTIONS[localIdx] = txnRes.transaction;
-                    }
-                    editTransaction(t.txn_id);
-                  }
-                  loadFinanceData();
-                });
+                var txnRes = await callApi('financeGetTransaction', [session.token, t.txn_id]);
+                if (txnRes.ok) {
+                  var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
+                  if (localIdx >= 0) TRANSACTIONS[localIdx] = txnRes.transaction;
+                  editTransaction(t.txn_id);
+                }
+                loadFinanceData();
               } else {
                 errorEl.textContent = res.error;
                 errorEl.classList.remove('hidden');
               }
-            }).catch(function(err) {
+            })().catch(function(err) {
               genBtn.disabled = false;
-              genBtn.textContent = (hasRent && hasDeposit) ? 'ออกใบเสร็จ (ยกเว้นมัดจำ)' : 'ออกใบเสร็จ';
+              genBtn.textContent = restoreLabel;
               errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
               errorEl.classList.remove('hidden');
             });
