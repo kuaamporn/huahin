@@ -304,18 +304,27 @@
 
                 if (checkoutDateStr >= monthEndTarget) return '';
 
+                // Prorate by ACTUAL days in the billing month (28/30/31), applied to
+                // both room rent and furniture rent. ponytail: the "+1 month" link
+                // reuses the same daysInMonth divisor across the span — a strict
+                // improvement over the old fixed /30; exact cross-month split TBD.
+                var furn = r.furniture_rent || 0;
                 var curD = new Date(checkoutDateStr);
                 var nightsToMonthEnd = Math.round((new Date(monthEndTarget) - curD) / 86400000);
-                var proRateMonthEnd = Math.round((r.rent / 30) * nightsToMonthEnd);
+                var proRentEnd = Math.round((r.rent / lastDay) * nightsToMonthEnd);
+                var proFurnEnd = Math.round((furn / lastDay) * nightsToMonthEnd);
 
                 var nightsToNextMonthEnd = Math.round((new Date(nextMonthEndTarget) - curD) / 86400000);
-                var proRateNextMonthEnd = Math.round((r.rent / 30) * nightsToNextMonthEnd);
+                var proRentNext = Math.round((r.rent / lastDay) * nightsToNextMonthEnd);
+                var proFurnNext = Math.round((furn / lastDay) * nightsToNextMonthEnd);
 
                 return '<div style="font-size:10px; margin-top:4px; line-height:1.2; text-align:left;">' +
-                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateMonthEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">ปรับถึงสิ้นเดือน (฿' + proRateMonthEnd.toLocaleString() + ')</a><br>' +
-                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRateNextMonthEnd + ', \'' + nextMonthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">ปรับ +1 เดือน (฿' + proRateNextMonthEnd.toLocaleString() + ')</a>' +
+                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRentEnd + ', ' + proFurnEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">ปรับถึงสิ้นเดือน (฿' + proRentEnd.toLocaleString() + ')</a><br>' +
+                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRentNext + ', ' + proFurnNext + ', \'' + nextMonthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">ปรับ +1 เดือน (฿' + proRentNext.toLocaleString() + ')</a>' +
                 '</div>';
               })() +
+              '<div style="font-size:10px; margin-top:4px; text-align:left; color:var(--muted);">เฟอร์นิเจอร์' +
+                '<input type="number" min="0" class="grid-input" id="furn_' + idx + '" value="' + (r.furniture_rent || 0) + '" style="width:70px; margin-left:4px;" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')" onchange="saveFurniture(' + idx + ')"></div>' +
             '</td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" placeholder="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
@@ -365,10 +374,23 @@
       window.open('batch-invoice.html?ids=' + txnIds.join(','), '_blank');
     };
 
-    window.applyGridProRate = function(idx, amount, targetDate) {
-      document.getElementById('rent_' + idx).value = amount;
+    window.applyGridProRate = function(idx, rentAmount, furnAmount, targetDate) {
+      document.getElementById('rent_' + idx).value = rentAmount;
+      var furnEl = document.getElementById('furn_' + idx);
+      if (furnEl) furnEl.value = furnAmount;
       loadedRooms[idx].newCheckoutDate = targetDate;
       calcRow(idx);
+    };
+
+    // Persist the furniture-rent base back to the booking (so it pre-fills next
+    // month). The prorated value applied for a partial month is NOT persisted —
+    // only an explicit edit of the field is, mirroring how room rent works.
+    window.saveFurniture = function(idx) {
+      var r = loadedRooms[idx];
+      var amt = parseFloat(document.getElementById('furn_' + idx).value) || 0;
+      r.furniture_rent = amt;
+      var session = HuaHinSession.getSession();
+      apiCall('billingSetFurnitureRent', [session ? session.token : null, r.booking_id, amt]);
     };
 
     function calcRow(idx) {
@@ -401,9 +423,13 @@
       }
       document.getElementById('add_tot_' + idx).textContent = '฿' + add;
 
-      var total = rent + eAmt + wAmt + add;
+      var furnEl = document.getElementById('furn_' + idx);
+      var furn = furnEl ? (parseFloat(furnEl.value) || 0) : 0;
+
+      var total = rent + furn + eAmt + wAmt + add;
       document.getElementById('tot_' + idx).textContent = '฿' + total;
 
+      r.furnitureLineAmt = furn;
       r.rent = rent;
       r.currentElec = currE; r.currentWater = currW;
       r.prevElecCalc = prevE; r.prevWaterCalc = prevW;
@@ -500,6 +526,7 @@
         var r = loadedRooms[idx];
         return {
           roomId: r.room_id, bookingId: r.booking_id, guestName: r.guest_name, rent: r.rent,
+          furnitureRent: r.furnitureLineAmt || 0,
           newCheckoutDate: r.newCheckoutDate || null,
           prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt, elecRate: r.elecRate,
           prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt, waterRate: r.waterRate,
