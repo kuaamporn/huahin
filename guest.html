@@ -1085,7 +1085,9 @@
       });
     }
 
-    function loadAvailability(startDate, endDate) {
+    var LINE_URL = 'https://line.me/ti/p/~the.precious';
+
+    function loadAvailability(startDate, endDate, onDone) {
       var controller = new AbortController();
       var timer = setTimeout(function () { controller.abort(); }, 5000);
       fetch(WORKER_API_URL, {
@@ -1095,7 +1097,7 @@
         signal: controller.signal
       }).then(function (res) { return res.json(); }).then(function (r) {
         clearTimeout(timer);
-        if (!r.ok || !r.availability) return;
+        if (!r.ok || !r.availability) { if (onDone) onDone(null); return; }
         // One card per room type: sum vacancy across bands (monthly + daily).
         var agg = {};
         r.availability.forEach(function (g) {
@@ -1103,9 +1105,11 @@
           agg[k] = (agg[k] || 0) + g.vacant;
         });
         Object.keys(agg).forEach(function (k) { setBadge(k, agg[k]); });
+        if (onDone) onDone(agg);
       }).catch(function () {
         /* API unreachable — hide badges, page remains a brochure */
         document.querySelectorAll('.availability.is-loading').forEach(function (el) { el.remove(); });
+        if (onDone) onDone(null);
       });
     }
 
@@ -1117,12 +1121,27 @@
         note.textContent = 'Please choose an arrival date and a later departure date.';
         return;
       }
-      note.textContent = 'Availability for ' + start + ' — ' + end + '.';
+      note.textContent = 'Checking ' + start + ' — ' + end + ' …';
       document.querySelectorAll('.room-card[data-key^="' + prop + '|"] .availability').forEach(function (el) {
         el.className = 'availability is-loading';
         el.querySelector('.txt').textContent = 'Checking';
       });
-      loadAvailability(start, end);
+      loadAvailability(start, end, function (agg) {
+        var line = '<a href="' + LINE_URL + '" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600;border-bottom:1px solid var(--gold);">message us on LINE</a>';
+        if (!agg) {
+          note.innerHTML = 'We couldn\'t check live availability just now — ' + line + ' and we\'ll confirm your dates right away.';
+          return;
+        }
+        var open = Object.keys(agg).filter(function (k) { return k.indexOf(prop + '|') === 0 && agg[k] > 0; }).length;
+        if (open > 0) {
+          note.innerHTML = '✨ Good news — ' + open + (open > 1 ? ' room types are' : ' room type is')
+            + ' open for <strong>' + start + ' – ' + end + '</strong> (highlighted below). Rooms for these dates get taken quickly — '
+            + line + ' now to secure yours before someone else does.';
+        } else {
+          note.innerHTML = 'Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often. '
+            + line + ' and we\'ll watch for a cancellation; if you\'re set on staying with us, we can usually arrange a room for you, including a short room-swap during your stay.';
+        }
+      });
     }
 
     loadAvailability(null, null);
