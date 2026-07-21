@@ -1156,8 +1156,11 @@
             + line + ' now to secure yours before someone else does.❞</p>'
             + div;
         } else {
-          note.innerHTML = 'Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often. '
-            + line + ' and we\'ll watch for a cancellation; if you\'re set on staying with us, please contact us to discuss your stay plan with us.';
+          var div = '<div style="color:var(--gold);letter-spacing:2px;">────୨ৎ────</div>';
+          note.innerHTML = div
+            + '<p style="margin:10px 0;">❝Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often.❞</p>'
+            + '<p style="margin:10px 0;">❝' + line + ' and we\'ll watch for a cancellation; if you\'re set on staying with us, please contact us to discuss your stay plan with us.❞</p>'
+            + div;
         }
       });
     }
