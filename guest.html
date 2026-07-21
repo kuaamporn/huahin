@@ -369,6 +369,29 @@
       display: flex; align-items: center; justify-content: center;
     }
     .facility .ic svg { width: 44px; height: 44px; }
+    /* Facility photo carousel (built by JS when photos exist) */
+    .facility-photo .fp-slides { display: flex; height: 100%; width: 100%; transition: transform .45s cubic-bezier(.65,0,.35,1); }
+    .facility-photo .fp-slide { flex: 0 0 100%; height: 100%; position: relative; }
+    .facility-photo .fp-slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .facility-photo .fp-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+      width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(20,19,15,0.4); color: #F5EFE3;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s ease, background .2s ease; font-size: 15px; line-height: 1;
+    }
+    .facility:hover .fp-nav, .facility-photo .fp-nav:focus-visible { opacity: 1; }
+    @media (hover: none) { .facility-photo .fp-nav { opacity: 1; } }
+    .facility-photo .fp-nav:hover { background: rgba(20,19,15,0.65); }
+    .facility-photo .fp-nav.prev { left: 10px; }
+    .facility-photo .fp-nav.next { right: 10px; }
+    .facility-photo .fp-dots { position: absolute; bottom: 10px; right: 12px; z-index: 3; display: flex; gap: 5px; }
+    .facility-photo .fp-dots button {
+      width: 5px; height: 5px; border-radius: 50%; border: none; cursor: pointer; padding: 0;
+      background: rgba(255,255,255,0.45); transition: background .2s, width .2s;
+    }
+    .facility-photo .fp-dots button[aria-current="true"] { background: #F5EFE3; width: 14px; border-radius: 3px; }
+    @media (prefers-reduced-motion: reduce) { .facility-photo .fp-slides { transition: none; } }
     .facility .facility-body { padding: 26px 26px 30px; }
     .facility h3 { font-size: 24px; font-weight: 500; }
     .facility p { margin-top: 8px; color: var(--ink-soft); font-weight: 300; font-size: 14px; }
@@ -641,9 +664,8 @@
     <h2>Facilities &amp; Comforts</h2>
     <div class="facility-grid">
       <div class="facility">
-        <div class="facility-photo">
+        <div class="facility-photo" data-fkey="pool" data-falt="Swimming pool">
           <div class="ic"><svg aria-hidden="true"><use href="#ic-pool"/></svg></div>
-          <img src="images/guest/facility-pool.jpg" alt="Swimming pool" loading="lazy" onerror="this.remove()">
         </div>
         <div class="facility-body">
           <h3>Swimming Pool</h3>
@@ -651,9 +673,8 @@
         </div>
       </div>
       <div class="facility">
-        <div class="facility-photo">
+        <div class="facility-photo" data-fkey="fitness" data-falt="Fitness room">
           <div class="ic"><svg aria-hidden="true"><use href="#ic-fitness"/></svg></div>
-          <img src="images/guest/facility-fitness.jpg" alt="Fitness room" loading="lazy" onerror="this.remove()">
         </div>
         <div class="facility-body">
           <h3>Fitness Room</h3>
@@ -661,9 +682,8 @@
         </div>
       </div>
       <div class="facility">
-        <div class="facility-photo">
+        <div class="facility-photo" data-fkey="carpark" data-falt="Car park">
           <div class="ic"><svg aria-hidden="true"><use href="#ic-car"/></svg></div>
-          <img src="images/guest/facility-carpark.jpg" alt="Car park" loading="lazy" onerror="this.remove()">
         </div>
         <div class="facility-body">
           <h3>Car Park</h3>
@@ -760,18 +780,82 @@
     /* Location + Google. Set PLACE_ID once you have the Google Place ID for the
        exact listing; the map + review links upgrade to that pin automatically.
        Until then everything falls back to a name search — no API key needed. */
-    var PLACE_ID = 'ChIJ5UCssqer_TARJ3mN0TOAJoM';   // Google Place ID for the listing
+    var PLACE_ID = 'ChIJ5UCssqer_TARJ3mN0TOAJoM';   // Google Place ID (review links)
+    // Map center. Set MAP_LATLNG to the exact pin (right-click the marker in
+    // Google Maps → click the lat,lng to copy) for a precise pin; until then the
+    // name search below still centers on Hua Hin. MAP_ZOOM: higher = closer.
+    var MAP_LATLNG = '';                              // e.g. '12.5684,99.9577'
+    var MAP_QUERY  = 'The Precious Moment Hua Hin';
+    var MAP_ZOOM   = 16;
 
     (function () {
-      // Keyless embed pinned to the exact place. (embed/v1 requires an API key.)
+      // Keyless embed. Legacy embed ignores a place_id: query (drops to world
+      // view), so we center by coordinates when known, else a name search + zoom.
       var iframe = document.querySelector('.map-wrap iframe');
-      if (iframe) iframe.src = 'https://maps.google.com/maps?q=place_id:' + PLACE_ID + '&output=embed';
+      if (iframe) {
+        var base = MAP_LATLNG
+          ? 'https://maps.google.com/maps?ll=' + MAP_LATLNG + '&q=' + MAP_LATLNG
+          : 'https://maps.google.com/maps?q=' + encodeURIComponent(MAP_QUERY);
+        iframe.src = base + '&z=' + MAP_ZOOM + '&output=embed';
+      }
 
       var read = document.getElementById('reviews-read');
       var write = document.getElementById('reviews-write');
       if (read)  read.href  = 'https://search.google.com/local/reviews?placeid=' + PLACE_ID;
       if (write) write.href = 'https://search.google.com/local/writereview?placeid=' + PLACE_ID;
     })();
+
+    /* Facility photos: probe images/guest/facility-{key}.jpg and
+       facility-{key}-1..8.jpg; build a carousel from whichever exist.
+       No files → the gold icon stays. Two pools later: add
+       facility-pool-1.jpg + facility-pool-2.jpg and both show. */
+    (function () {
+      document.querySelectorAll('.facility-photo[data-fkey]').forEach(function (box) {
+        var key = box.getAttribute('data-fkey');
+        var alt = box.getAttribute('data-falt') || '';
+        var names = ['images/guest/facility-' + key + '.jpg'];
+        for (var i = 1; i <= 8; i++) names.push('images/guest/facility-' + key + '-' + i + '.jpg');
+        Promise.all(names.map(function (src) {
+          return new Promise(function (resolve) {
+            var im = new Image();
+            im.onload = function () { resolve(src); };
+            im.onerror = function () { resolve(null); };
+            im.src = src;
+          });
+        })).then(function (results) {
+          var found = results.filter(Boolean);
+          if (found.length) buildFacilityCarousel(box, found, alt);
+        });
+      });
+    })();
+
+    function buildFacilityCarousel(box, srcs, alt) {
+      box.innerHTML =
+        '<div class="fp-slides">' + srcs.map(function (s) {
+          return '<div class="fp-slide"><img src="' + escAttr(s) + '" alt="' + escAttr(alt) + '"></div>';
+        }).join('') + '</div>'
+        + (srcs.length > 1
+          ? '<button class="fp-nav prev" aria-label="Previous photo">‹</button>'
+            + '<button class="fp-nav next" aria-label="Next photo">›</button>'
+            + '<div class="fp-dots">' + srcs.map(function (_, i) {
+                return '<button aria-label="Photo ' + (i + 1) + '"' + (i === 0 ? ' aria-current="true"' : '') + '></button>';
+              }).join('') + '</div>'
+          : '');
+      if (srcs.length < 2) return;
+      var idx = 0;
+      var slides = box.querySelector('.fp-slides');
+      var dots = box.querySelectorAll('.fp-dots button');
+      function go(i) {
+        idx = (i + srcs.length) % srcs.length;
+        slides.style.transform = 'translateX(-' + (idx * 100) + '%)';
+        dots.forEach(function (d, di) {
+          if (di === idx) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+        });
+      }
+      box.querySelector('.fp-nav.prev').addEventListener('click', function () { go(idx - 1); });
+      box.querySelector('.fp-nav.next').addEventListener('click', function () { go(idx + 1); });
+      dots.forEach(function (d, di) { d.addEventListener('click', function () { go(di); }); });
+    }
 
     /* Hero photo: fades in only if the image exists */
     (function () {
