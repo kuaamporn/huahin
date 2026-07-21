@@ -909,11 +909,32 @@
     var MAP_LATLNG = '12.559915659144083,99.94940192738832';  // exact pin
     var MAP_QUERY  = 'The Precious Moment Hua Hin';
     var MAP_ZOOM   = 14;   // 13 ≈ district · 15 ≈ neighborhood · 17 ≈ building
+    // Optional: a Google "Maps Static API" key. With it, the map renders as a
+    // clean single-pin image with all other businesses/POIs hidden. Without it,
+    // the free interactive embed is used (which always shows other POIs).
+    var MAPS_API_KEY = '';
 
     (function () {
-      // Keyless embed. Passing the coordinates as the query both centers the map
-      // and drops the marker on that exact point (a place_id: query would not).
-      var iframe = document.querySelector('.map-wrap iframe');
+      var wrap = document.querySelector('.map-wrap');
+      if (!wrap) return;
+
+      if (MAPS_API_KEY && MAP_LATLNG) {
+        // Static map: hide all POIs + transit so only our marker shows.
+        var styles = ['feature:poi|visibility:off', 'feature:transit|visibility:off']
+          .map(function (s) { return '&style=' + encodeURIComponent(s); }).join('');
+        var img = 'https://maps.googleapis.com/maps/api/staticmap?center=' + MAP_LATLNG
+          + '&zoom=' + MAP_ZOOM + '&size=640x420&scale=2'
+          + '&markers=' + encodeURIComponent('color:0xA16207|' + MAP_LATLNG)
+          + styles + '&key=' + MAPS_API_KEY;
+        wrap.innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query='
+          + MAP_LATLNG + '&query_place_id=' + PLACE_ID + '" target="_blank" rel="noopener">'
+          + '<img src="' + img + '" alt="Map showing The Precious Moment, Hua Hin" '
+          + 'style="width:100%;height:100%;object-fit:cover;display:block;"></a>';
+        return;
+      }
+
+      // Keyless interactive embed (shows Google POIs — no way to hide them keyless).
+      var iframe = wrap.querySelector('iframe');
       if (iframe) {
         var q = MAP_LATLNG || encodeURIComponent(MAP_QUERY);
         iframe.src = 'https://maps.google.com/maps?q=' + q + '&z=' + MAP_ZOOM + '&output=embed';
