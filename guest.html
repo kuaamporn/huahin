@@ -682,6 +682,19 @@
         <p>The Moment is on its way — preview the room types below, and stay tuned. Message us to register your interest and be first to know when reservations open.</p>
       </div>
 
+      <div class="datebox" id="moment-datebox" hidden>
+        <div class="field">
+          <label for="date-in-moment">Arrival</label>
+          <input type="date" id="date-in-moment">
+        </div>
+        <div class="field">
+          <label for="date-out-moment">Departure</label>
+          <input type="date" id="date-out-moment">
+        </div>
+        <button class="btn btn-gold" onclick="checkDates('moment')">Check Availability</button>
+        <div class="note" id="date-note-moment">Showing availability for tonight — choose your dates to check a specific stay.</div>
+      </div>
+
       <div class="rooms">
         <article class="room-card" data-key="moment|A1">
           <div class="photo"><span class="ph-label">Studio</span><img src="images/guest/moment-studio.jpg" alt="Studio at The Moment" loading="lazy" onerror="this.remove()"></div>
@@ -1144,6 +1157,26 @@
       });
     }
 
+    /* Flip to true when The Moment opens (mid 2027): the preview banner + static
+       "Opening 2027" tags are swapped for the live date checker and availability
+       badges — same persuasive checkDates() treatment as The Precious. */
+    var MOMENT_LIVE = false;
+
+    function enableMomentBooking() {
+      var panel = document.getElementById('panel-moment');
+      if (!panel) return;
+      var banner = panel.querySelector('.coming-soon');
+      if (banner) banner.hidden = true;
+      var datebox = document.getElementById('moment-datebox');
+      if (datebox) datebox.hidden = false;
+      var tabNote = document.querySelector('#tabbtn-moment .tab-note');
+      if (tabNote) tabNote.textContent = 'Monthly & Daily Stays';
+      panel.querySelectorAll('.room-card[data-key^="moment|"] .soon-badge').forEach(function (soon) {
+        soon.outerHTML = '<span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>';
+      });
+    }
+
+    if (MOMENT_LIVE) enableMomentBooking();
     loadAvailability(null, null);
 
     /* ══════════════════════════════════════════════════════════════
