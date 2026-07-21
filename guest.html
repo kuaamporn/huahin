@@ -1100,6 +1100,7 @@
     }
 
     var LINE_URL = 'https://line.me/ti/p/~the.precious';
+    var FB_URL = 'https://www.facebook.com/precious.huahin';
 
     function loadAvailability(startDate, endDate, onDone) {
       var controller = new AbortController();
@@ -1141,26 +1142,28 @@
         el.querySelector('.txt').textContent = 'Checking';
       });
       loadAvailability(start, end, function (agg) {
-        var line = '<a href="' + LINE_URL + '" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600;border-bottom:1px solid var(--gold);">message us on LINE</a>';
+        var contact = '<a href="' + LINE_URL + '" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600;border-bottom:1px solid var(--gold);">LINE</a>'
+          + ' or <a href="' + FB_URL + '" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600;border-bottom:1px solid var(--gold);">Facebook</a>';
         if (!agg) {
-          note.innerHTML = 'We couldn\'t check live availability just now — ' + line + ' and we\'ll confirm your dates right away.';
+          note.innerHTML = 'We couldn\'t check live availability just now — message us on ' + contact + ' and we\'ll confirm your dates right away.';
           return;
         }
-        var open = Object.keys(agg).filter(function (k) { return k.indexOf(prop + '|') === 0 && agg[k] > 0; }).length;
-        if (open > 0) {
-          var div = '<div style="color:var(--gold);letter-spacing:2px;">────୨ৎ────</div>';
-          note.innerHTML = div
-            + '<p style="margin:10px 0;">❝ ' + open + (open > 1 ? ' room types are' : ' room type is')
-            + ' open for <strong>' + start + ' – ' + end + '</strong>.❞</p>'
-            + '<p style="margin:10px 0;">❝Rooms for these dates get taken quickly — '
-            + line + ' now to secure yours before someone else does.❞</p>'
-            + div;
+        var openKeys = Object.keys(agg).filter(function (k) { return k.indexOf(prop + '|') === 0 && agg[k] > 0; });
+        if (openKeys.length > 0) {
+          var names = openKeys.map(function (k) {
+            var card = document.querySelector('.room-card[data-key="' + k + '"] h3');
+            return card ? card.textContent.trim() : k.split('|')[1];
+          });
+          var list = names.length > 1
+            ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1]
+            : names[0];
+          note.innerHTML = '<p style="margin:10px 0;">' + list + (names.length > 1 ? ' room types are' : ' room type is')
+            + ' open for <strong>' + start + ' – ' + end + '</strong>.</p>'
+            + '<p style="margin:10px 0;">Rooms for these dates get taken quickly — message us on '
+            + contact + ' now to secure yours before someone else does.</p>';
         } else {
-          var div = '<div style="color:var(--gold);letter-spacing:2px;">────୨ৎ────</div>';
-          note.innerHTML = div
-            + '<p style="margin:10px 0;">❝Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often.❞</p>'
-            + '<p style="margin:10px 0;">❝' + line + ' and we\'ll watch for a cancellation; if you\'re set on staying with us, please contact us to discuss your stay plan with us.❞</p>'
-            + div;
+          note.innerHTML = '<p style="margin:10px 0;">Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often.</p>'
+            + '<p style="margin:10px 0;">Message us on ' + contact + ' and we\'ll watch for a cancellation; if you\'re set on staying with us, please contact us to discuss your stay plan with us.</p>';
         }
       });
     }
