@@ -465,6 +465,9 @@
       transition: background-color .2s ease;
     }
     .ttd-list a:hover { background: var(--cream); }
+    .ttd-left { display: inline-flex; align-items: center; gap: 14px; min-width: 0; }
+    .ttd-ic { flex: none; width: 22px; height: 22px; color: var(--gold-soft); display: flex; align-items: center; justify-content: center; }
+    .ttd-ic svg { width: 22px; height: 22px; }
     .ttd-name { font-family: 'Cormorant', serif; font-size: 22px; font-weight: 500; }
     .ttd-dist {
       display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
@@ -530,6 +533,24 @@
       </symbol>
       <symbol id="ic-star" viewBox="0 0 24 24">
         <path fill="currentColor" d="M12 2.5l2.9 5.9 6.5.95-4.7 4.6 1.1 6.5L12 17.9 6.1 21l1.1-6.5-4.7-4.6 6.5-.95z"/>
+      </symbol>
+      <symbol id="ic-store" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4 9l1.2-4h13.6L20 9M4 9v10h16V9M4 9h16M10 19v-5h4v5"/>
+      </symbol>
+      <symbol id="ic-train" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 4h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM5 11h14M9 8h6M9 16l-2 3M15 16l2 3"/>
+      </symbol>
+      <symbol id="ic-lantern" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M12 2.5V4M12 20v1.5M9.5 4h5M9.5 20h5M9.3 4C7.9 8 7.9 16 9.3 20M14.7 4C16.1 8 16.1 16 14.7 20M8 12h8"/>
+      </symbol>
+      <symbol id="ic-bag" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M6 8h12l-1 12H7L6 8zM9 8V6a3 3 0 0 1 6 0v2"/>
+      </symbol>
+      <symbol id="ic-beach" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M12 3c-4 0-7 3-7 7h14c0-4-3-7-7-7zM12 3v12M4 20c1.4 0 1.4-1 2.7-1s1.3 1 2.7 1 1.3-1 2.6-1 1.4 1 2.7 1 1.3-1 2.6-1"/>
+      </symbol>
+      <symbol id="ic-mall" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4 21V8l8-4 8 4v13M3 21h18M9 21v-5h6v5M8.5 11h.01M12 11h.01M15.5 11h.01"/>
       </symbol>
     </defs>
   </svg>
@@ -790,27 +811,27 @@
     <h2>Things to Do Around</h2>
     <ul class="ttd-list">
       <li><a href="https://www.google.com/maps/search/7-Eleven/@12.559916,99.949402,16z" target="_blank" rel="noopener">
-        <span class="ttd-name">Nearest 7-Eleven</span>
+        <span class="ttd-left"><span class="ttd-ic"><svg aria-hidden="true"><use href="#ic-store"/></svg></span><span class="ttd-name">Nearest 7-Eleven</span></span>
         <span class="ttd-dist">approx 82 m <span class="arr" aria-hidden="true">›</span></span>
       </a></li>
       <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Hua+Hin+Railway+Station" target="_blank" rel="noopener">
-        <span class="ttd-name">Hua Hin Train Station</span>
+        <span class="ttd-left"><span class="ttd-ic"><svg aria-hidden="true"><use href="#ic-train"/></svg></span><span class="ttd-name">Hua Hin Train Station</span></span>
         <span class="ttd-dist">approx 1.6 km <span class="arr" aria-hidden="true">›</span></span>
       </a></li>
       <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Hua+Hin+Night+Market" target="_blank" rel="noopener">
-        <span class="ttd-name">Hua Hin Night Market</span>
+        <span class="ttd-left"><span class="ttd-ic"><svg aria-hidden="true"><use href="#ic-lantern"/></svg></span><span class="ttd-name">Hua Hin Night Market</span></span>
         <span class="ttd-dist">approx 2.2 km <span class="arr" aria-hidden="true">›</span></span>
       </a></li>
       <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Market+Village+Hua+Hin" target="_blank" rel="noopener">
-        <span class="ttd-name">Market Village Hua Hin</span>
+        <span class="ttd-left"><span class="ttd-ic"><svg aria-hidden="true"><use href="#ic-bag"/></svg></span><span class="ttd-name">Market Village Hua Hin</span></span>
         <span class="ttd-dist">approx 2.4 km <span class="arr" aria-hidden="true">›</span></span>
       </a></li>
       <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Hua+Hin+Beach" target="_blank" rel="noopener">
-        <span class="ttd-name">Hua Hin Beach</span>
+        <span class="ttd-left"><span class="ttd-ic"><svg aria-hidden="true"><use href="#ic-beach"/></svg></span><span class="ttd-name">Hua Hin Beach</span></span>
         <span class="ttd-dist">approx 2.4 km <span class="arr" aria-hidden="true">›</span></span>
       </a></li>
       <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Bluport+Hua+Hin+Resort+Mall" target="_blank" rel="noopener">
-        <span class="ttd-name">Bluport Hua Hin</span>
+        <span class="ttd-left"><span class="ttd-ic"><svg aria-hidden="true"><use href="#ic-mall"/></svg></span><span class="ttd-name">Bluport Hua Hin</span></span>
         <span class="ttd-dist">approx 3.2 km <span class="arr" aria-hidden="true">›</span></span>
       </a></li>
     </ul>
