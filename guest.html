@@ -477,6 +477,26 @@
     .ttd-list a:hover .arr { transform: translateX(4px); }
     .things .note { margin-top: 16px; text-align: center; font-size: 12px; color: var(--ink-soft); font-weight: 300; }
 
+    /* ── Coming-soon (The Moment) ────────────── */
+    .coming-soon {
+      text-align: center; margin: 0 0 38px;
+      background: linear-gradient(135deg, rgba(161,98,7,0.07), rgba(176,141,87,0.05));
+      border: 1px solid var(--hairline); padding: 30px 26px;
+    }
+    .cs-tag {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+      padding: 7px 16px; border: 1px solid var(--gold-soft);
+    }
+    .coming-soon p {
+      margin: 14px auto 0; max-width: 520px;
+      color: var(--ink-soft); font-weight: 300; font-size: 14.5px;
+    }
+    .soon-badge {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold); display: inline-flex; align-items: center;
+    }
+
     /* ── Contact section ─────────────────────── */
     .contact {
       margin-top: 88px;
@@ -595,7 +615,7 @@
       </button>
       <button class="tab-btn" id="tabbtn-moment" role="tab" aria-selected="false" aria-controls="panel-moment" onclick="showTab('moment')">
         The Moment
-        <span class="tab-note">Monthly &amp; Daily Stays</span>
+        <span class="tab-note">Opening Mid 2027</span>
       </button>
     </div>
 
@@ -655,19 +675,11 @@
 
     <!-- PANEL: THE MOMENT -->
     <section class="tab-panel" id="panel-moment" role="tabpanel" aria-labelledby="tabbtn-moment">
-      <p class="panel-desc">A modern seven-floor building with five room types — from bright studios to step-free deluxe corner units. Monthly residences and daily stays; breakfast on request.</p>
+      <p class="panel-desc">A modern seven-floor building with five room types — from bright studios to step-free deluxe corner units.</p>
 
-      <div class="datebox">
-        <div class="field">
-          <label for="date-in-moment">Arrival</label>
-          <input type="date" id="date-in-moment">
-        </div>
-        <div class="field">
-          <label for="date-out-moment">Departure</label>
-          <input type="date" id="date-out-moment">
-        </div>
-        <button class="btn btn-gold" onclick="checkDates('moment')">Check Availability</button>
-        <div class="note" id="date-note-moment">Showing availability for tonight — choose your dates to check a specific stay.</div>
+      <div class="coming-soon">
+        <span class="cs-tag">Opening Mid 2027</span>
+        <p>The Moment is on its way — preview the room types below, and stay tuned. Message us to register your interest and be first to know when reservations open.</p>
       </div>
 
       <div class="rooms">
@@ -677,7 +689,7 @@
             <h3>Studio</h3>
             <p class="desc">A bright, modern studio on the upper floors (6–7) — simple living done well.</p>
             <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <span class="soon-badge">Opening 2027</span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
@@ -688,7 +700,7 @@
             <h3>Studio Suite</h3>
             <p class="desc">A roomier studio with a kitchen pantry (floors 2–5), made for comfortable long stays.</p>
             <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <span class="soon-badge">Opening 2027</span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
@@ -699,7 +711,7 @@
             <h3>One-Bedroom</h3>
             <p class="desc">A separate bedroom and living space (floors 2–4) — room to live, work, and unwind.</p>
             <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <span class="soon-badge">Opening 2027</span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
@@ -710,7 +722,7 @@
             <h3>Scenic One-Bedroom</h3>
             <p class="desc">Our upper-floor one-bedroom (5–7) with a reoriented layout for wider views.</p>
             <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <span class="soon-badge">Opening 2027</span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
@@ -721,7 +733,7 @@
             <h3>Deluxe</h3>
             <p class="desc">Premium corner units (floors 2–7) with a step-free, wheelchair-accessible layout.</p>
             <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <span class="soon-badge">Opening 2027</span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
