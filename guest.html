@@ -415,12 +415,31 @@
     .reviews .ic svg { width: 44px; height: 44px; }
     .reviews h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 400; margin-top: 12px; }
     .reviews .rating-line { margin-top: 12px; color: var(--ink-soft); font-weight: 300; font-size: 14px; }
-    .review-quotes { margin-top: 24px; display: flex; flex-direction: column; gap: 18px; text-align: left; }
-    .review-quote { border-top: 1px solid var(--hairline); padding-top: 18px; }
-    .review-quote:first-child { border-top: none; padding-top: 0; }
-    .review-quote .rq-stars { color: var(--gold); font-size: 13px; letter-spacing: 2px; }
-    .review-quote .rq-text { margin-top: 8px; font-family: 'Cormorant', serif; font-size: 18px; font-style: italic; line-height: 1.5; color: var(--ink); }
-    .review-quote .rq-name { margin-top: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+    .review-carousel { margin-top: 22px; }
+    .rc-viewport { overflow: hidden; }
+    .rc-track { display: flex; transition: transform .5s cubic-bezier(.65,0,.35,1); align-items: stretch; }
+    .rc-slide { flex: 0 0 100%; text-align: left; padding: 0 2px; }
+    .rc-stars { color: var(--gold); font-size: 13px; letter-spacing: 2px; }
+    .rc-text {
+      margin-top: 10px; font-family: 'Cormorant', serif; font-size: 17px; font-style: italic;
+      line-height: 1.55; color: var(--ink);
+      display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .rc-name { margin-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+    .rc-controls { margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 16px; }
+    .rc-nav {
+      width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--hairline);
+      background: #FFF; color: var(--ink); font-size: 17px; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: border-color .2s ease;
+    }
+    .rc-nav:hover { border-color: var(--gold-soft); }
+    .rc-dots { display: flex; gap: 6px; }
+    .rc-dots button {
+      width: 6px; height: 6px; border-radius: 50%; border: none; padding: 0; cursor: pointer;
+      background: var(--hairline); transition: background .2s, width .2s;
+    }
+    .rc-dots button[aria-current="true"] { background: var(--gold); width: 16px; border-radius: 3px; }
+    @media (prefers-reduced-motion: reduce) { .rc-track { transition: none; } }
     .reviews .cta-row { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
     .review-write-link {
       display: inline-block; margin-top: 16px; font-size: 11px; font-weight: 600;
@@ -748,7 +767,14 @@
         <div class="kicker">Guest Reviews</div>
         <h2>What Our Guests Say</h2>
         <p class="rating-line">Read what residents and daily guests say about their stay on Google.</p>
-        <div class="review-quotes" id="review-quotes" hidden></div>
+        <div class="review-carousel" id="review-carousel" hidden>
+          <div class="rc-viewport"><div class="rc-track" id="rc-track"></div></div>
+          <div class="rc-controls">
+            <button class="rc-nav" id="rc-prev" aria-label="Previous review">‹</button>
+            <div class="rc-dots" id="rc-dots"></div>
+            <button class="rc-nav" id="rc-next" aria-label="Next review">›</button>
+          </div>
+        </div>
         <div class="cta-row">
           <a class="btn btn-google" id="reviews-read" href="#" target="_blank" rel="noopener">
             <svg aria-hidden="true"><use href="#ic-star"/></svg> Read Reviews
@@ -875,23 +901,49 @@
       if (write) write.href = 'https://search.google.com/local/writereview?placeid=' + PLACE_ID;
     })();
 
-    /* Hand-picked guest reviews. Add real, approved 5-star quotes here and they
-       render above the buttons. Leave empty and the block just links to Google.
-       { text: '...', name: 'First L.', stars: 5 } */
-    var GUEST_REVIEWS = [];
+    /* Real, approved 5-star guest reviews (from the Google listing). Add more as
+       { text: '...', name: 'First L.', stars: 5 } — the carousel adapts. */
+    var GUEST_REVIEWS = [
+      { stars: 5, name: 'Tom DeWitt', text: "We have stayed at The Precious two years in a row now, for multiple months each time. Having secured the same room each year, we've found the rooms to be very spacious, comfortable, and clean. There is plenty of room in the wardrobe for clothes and storage, a full size couch, a king size bed, and a full size refrigerator. There's even a counter and a sink on the balcony. The management and staff have always been tremendously helpful and friendly. The hotel itself is just far enough out of the way that you're not in the hustle and bustle of the main road in Hua Hin, but within an easy walk of all the restaurants and groceries you'll need during your stay and the Market Village Mall, where we spend time each day. We love The Precious and wouldn't stay anywhere else in Hua Hin. It's a tremendous value for your money." },
+      { stars: 5, name: 'Thanakrit Thavorn-amornsri', text: "ห้องสะอาด เตียงใหญ่ นอนสบาย มีสระว่ายน้ำใหญ่ บรรยากาศเงียบสงบ เหมาะสำหรับมาตากอากาศ พักผ่อนจากการทำงาน มีพนักงานต้อนรับ ให้ข้อมูลโอเค ที่จอดรถเยอะ มีสองโซน ค่อนข้างสะดวกเพราะอยู่ใกล้ร้านค้าหลายร้าน" },
+      { stars: 5, name: 'Luis from Texas', text: "Very nice place. Rooms are spacious. The gym is very nice and clean. Swimming pool is a good place to relax and get to know your neighbors. The staff are very friendly and very helpful. The Precious is in a nice location. Many places to eat and very close to many other attractions." },
+      { stars: 5, name: 'Graeme Blakers', text: "This is the 4th time i have stayed at The Precious in 2 years. Every time is the same. Amazing friendly staff, big clean rooms, good location for me with 7/11, restaurants, bars and laundry near the hotel. I 100% recommend you stay here and i will be staying next time im here." }
+    ];
 
     (function () {
-      var box = document.getElementById('review-quotes');
-      if (!box || !GUEST_REVIEWS.length) return;
-      box.hidden = false;
-      box.innerHTML = GUEST_REVIEWS.map(function (r) {
+      var wrap = document.getElementById('review-carousel');
+      if (!wrap || !GUEST_REVIEWS.length) return;
+      wrap.hidden = false;
+      var track = document.getElementById('rc-track');
+      var dotsBox = document.getElementById('rc-dots');
+      track.innerHTML = GUEST_REVIEWS.map(function (r) {
         var n = Math.max(0, Math.min(5, r.stars || 5));
-        return '<div class="review-quote">'
-          + '<div class="rq-stars" aria-label="' + n + ' out of 5 stars">' + '★'.repeat(n) + '</div>'
-          + '<p class="rq-text">' + esc(r.text) + '</p>'
-          + '<div class="rq-name">' + esc(r.name) + '</div>'
+        return '<div class="rc-slide">'
+          + '<div class="rc-stars" aria-label="' + n + ' out of 5 stars">' + '★'.repeat(n) + '</div>'
+          + '<p class="rc-text">' + esc(r.text) + '</p>'
+          + '<div class="rc-name">' + esc(r.name) + '</div>'
           + '</div>';
       }).join('');
+      dotsBox.innerHTML = GUEST_REVIEWS.map(function (_, i) {
+        return '<button aria-label="Review ' + (i + 1) + '"' + (i === 0 ? ' aria-current="true"' : '') + '></button>';
+      }).join('');
+      var dots = dotsBox.querySelectorAll('button');
+      var idx = 0, timer = null;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function go(i) {
+        idx = (i + GUEST_REVIEWS.length) % GUEST_REVIEWS.length;
+        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+        dots.forEach(function (d, di) {
+          if (di === idx) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+        });
+      }
+      function restart() { if (timer) clearInterval(timer); if (!reduce) timer = setInterval(function () { go(idx + 1); }, 7000); }
+      document.getElementById('rc-prev').addEventListener('click', function () { go(idx - 1); restart(); });
+      document.getElementById('rc-next').addEventListener('click', function () { go(idx + 1); restart(); });
+      dots.forEach(function (d, di) { d.addEventListener('click', function () { go(di); restart(); }); });
+      wrap.addEventListener('mouseenter', function () { if (timer) clearInterval(timer); });
+      wrap.addEventListener('mouseleave', restart);
+      restart();
     })();
 
     /* Facility photos: probe images/guest/facility-{key}.jpg and
