@@ -602,8 +602,22 @@
     <!-- PANEL: THE PRECIOUS -->
     <section class="tab-panel active" id="panel-precious" role="tabpanel" aria-labelledby="tabbtn-precious">
       <p class="panel-desc">An seven-floor residence of 79 rooms — from welcoming standard studios to a penthouse that crowns the building. Designed for those who stay a while.</p>
+
+      <div class="datebox">
+        <div class="field">
+          <label for="date-in-precious">Arrival</label>
+          <input type="date" id="date-in-precious">
+        </div>
+        <div class="field">
+          <label for="date-out-precious">Departure</label>
+          <input type="date" id="date-out-precious">
+        </div>
+        <button class="btn btn-gold" onclick="checkDates('precious')">Check Availability</button>
+        <div class="note" id="date-note-precious">Showing availability for tonight — choose your dates to check a specific stay.</div>
+      </div>
+
       <div class="rooms">
-        <article class="room-card" data-key="precious|Standard|monthly">
+        <article class="room-card" data-key="precious|Standard">
           <div class="photo"><span class="ph-label">Standard Room</span><img src="images/guest/precious-standard.jpg" alt="Standard room at The Precious" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Standard</h3>
@@ -614,7 +628,7 @@
             </div>
           </div>
         </article>
-        <article class="room-card" data-key="precious|Deluxe|monthly">
+        <article class="room-card" data-key="precious|Deluxe">
           <div class="photo"><span class="ph-label">Deluxe Room</span><img src="images/guest/precious-deluxe.jpg" alt="Deluxe room at The Precious" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Deluxe</h3>
@@ -625,7 +639,7 @@
             </div>
           </div>
         </article>
-        <article class="room-card" data-key="precious|Penthouse|monthly">
+        <article class="room-card" data-key="precious|Penthouse">
           <div class="photo"><span class="ph-label">Penthouse</span><img src="images/guest/precious-penthouse.jpg" alt="Penthouse at The Precious" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Penthouse</h3>
@@ -641,86 +655,71 @@
 
     <!-- PANEL: THE MOMENT -->
     <section class="tab-panel" id="panel-moment" role="tabpanel" aria-labelledby="tabbtn-moment">
-      <p class="panel-desc">A modern seven-floor building. Monthly residences on floors two to five; flexible daily stays on floors six and seven, with breakfast on request.</p>
+      <p class="panel-desc">A modern seven-floor building with five room types — from bright studios to step-free deluxe corner units. Monthly residences and daily stays; breakfast on request.</p>
 
-      <div class="band-head"><span>Monthly Residences</span></div>
-      <div class="rooms">
-        <article class="room-card" data-key="moment|A2|monthly">
-          <div class="photo"><span class="ph-label">Studio</span><img src="images/guest/moment-studio-monthly.jpg" alt="Monthly studio at The Moment" loading="lazy" onerror="this.remove()"></div>
-          <div class="body">
-            <h3>Studio</h3>
-            <p class="desc">A bright, modern studio — ideal for long-stay residents who want simplicity done well.</p>
-            <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
-              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
-            </div>
-          </div>
-        </article>
-        <article class="room-card" data-key="moment|B|monthly">
-          <div class="photo"><span class="ph-label">One-Bedroom</span><img src="images/guest/moment-1br-monthly.jpg" alt="One-bedroom at The Moment" loading="lazy" onerror="this.remove()"></div>
-          <div class="body">
-            <h3>One-Bedroom</h3>
-            <p class="desc">A separate bedroom and living space — room to live, work, and unwind.</p>
-            <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
-              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
-            </div>
-          </div>
-        </article>
-        <article class="room-card" data-key="moment|C|monthly">
-          <div class="photo"><span class="ph-label">Deluxe</span><img src="images/guest/moment-deluxe-monthly.jpg" alt="Deluxe unit at The Moment" loading="lazy" onerror="this.remove()"></div>
-          <div class="body">
-            <h3>Deluxe</h3>
-            <p class="desc">Premium corner units with the best light and the most generous layout.</p>
-            <div class="meta-row">
-              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
-              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="band-head"><span>Daily Stays · Floors 6–7</span></div>
       <div class="datebox">
         <div class="field">
-          <label for="date-in">Arrival</label>
-          <input type="date" id="date-in">
+          <label for="date-in-moment">Arrival</label>
+          <input type="date" id="date-in-moment">
         </div>
         <div class="field">
-          <label for="date-out">Departure</label>
-          <input type="date" id="date-out">
+          <label for="date-out-moment">Departure</label>
+          <input type="date" id="date-out-moment">
         </div>
-        <button class="btn btn-gold" onclick="checkDates()">Check Availability</button>
-        <div class="note" id="date-note">Showing availability for tonight — choose your dates to check a specific stay.</div>
+        <button class="btn btn-gold" onclick="checkDates('moment')">Check Availability</button>
+        <div class="note" id="date-note-moment">Showing availability for tonight — choose your dates to check a specific stay.</div>
       </div>
+
       <div class="rooms">
-        <article class="room-card" data-key="moment|A1|daily">
-          <div class="photo"><span class="ph-label">Studio</span><img src="images/guest/moment-studio-daily.jpg" alt="Daily studio at The Moment" loading="lazy" onerror="this.remove()"></div>
+        <article class="room-card" data-key="moment|A1">
+          <div class="photo"><span class="ph-label">Studio</span><img src="images/guest/moment-studio.jpg" alt="Studio at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Studio</h3>
-            <p class="desc">A hotel-style studio for short visits. Breakfast available on request.</p>
+            <p class="desc">A bright, modern studio on the upper floors (6–7) — simple living done well.</p>
             <div class="meta-row">
               <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
         </article>
-        <article class="room-card" data-key="moment|B|daily">
-          <div class="photo"><span class="ph-label">One-Bedroom</span><img src="images/guest/moment-1br-daily.jpg" alt="Daily one-bedroom at The Moment" loading="lazy" onerror="this.remove()"></div>
+        <article class="room-card" data-key="moment|A2">
+          <div class="photo"><span class="ph-label">Studio Suite</span><img src="images/guest/moment-studio-suite.jpg" alt="Studio Suite at The Moment" loading="lazy" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Studio Suite</h3>
+            <p class="desc">A roomier studio with a kitchen pantry (floors 2–5), made for comfortable long stays.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
+          </div>
+        </article>
+        <article class="room-card" data-key="moment|B">
+          <div class="photo"><span class="ph-label">One-Bedroom</span><img src="images/guest/moment-1br.jpg" alt="One-bedroom at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>One-Bedroom</h3>
-            <p class="desc">Extra space for families and longer short-stays.</p>
+            <p class="desc">A separate bedroom and living space (floors 2–4) — room to live, work, and unwind.</p>
             <div class="meta-row">
               <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
             </div>
           </div>
         </article>
-        <article class="room-card" data-key="moment|C|daily">
-          <div class="photo"><span class="ph-label">Deluxe</span><img src="images/guest/moment-deluxe-daily.jpg" alt="Daily deluxe at The Moment" loading="lazy" onerror="this.remove()"></div>
+        <article class="room-card" data-key="moment|BS">
+          <div class="photo"><span class="ph-label">Scenic One-Bedroom</span><img src="images/guest/moment-1br-scenic.jpg" alt="Scenic one-bedroom at The Moment" loading="lazy" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Scenic One-Bedroom</h3>
+            <p class="desc">Our upper-floor one-bedroom (5–7) with a reoriented layout for wider views.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
+          </div>
+        </article>
+        <article class="room-card" data-key="moment|C">
+          <div class="photo"><span class="ph-label">Deluxe</span><img src="images/guest/moment-deluxe.jpg" alt="Deluxe unit at The Moment" loading="lazy" onerror="this.remove()"></div>
           <div class="body">
             <h3>Deluxe</h3>
-            <p class="desc">Top-floor premium units for a stay worth remembering.</p>
+            <p class="desc">Premium corner units (floors 2–7) with a step-free, wheelchair-accessible layout.</p>
             <div class="meta-row">
               <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
               <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
@@ -1074,7 +1073,7 @@
       });
     }
 
-    function loadAvailability(startDate, endDate, dailyOnly) {
+    function loadAvailability(startDate, endDate) {
       var controller = new AbortController();
       var timer = setTimeout(function () { controller.abort(); }, 5000);
       fetch(WORKER_API_URL, {
@@ -1085,33 +1084,36 @@
       }).then(function (res) { return res.json(); }).then(function (r) {
         clearTimeout(timer);
         if (!r.ok || !r.availability) return;
+        // One card per room type: sum vacancy across bands (monthly + daily).
+        var agg = {};
         r.availability.forEach(function (g) {
-          if (dailyOnly && g.band !== 'daily') return;
-          setBadge(g.property + '|' + g.type + '|' + g.band, g.vacant);
+          var k = g.property + '|' + g.type;
+          agg[k] = (agg[k] || 0) + g.vacant;
         });
+        Object.keys(agg).forEach(function (k) { setBadge(k, agg[k]); });
       }).catch(function () {
         /* API unreachable — hide badges, page remains a brochure */
         document.querySelectorAll('.availability.is-loading').forEach(function (el) { el.remove(); });
       });
     }
 
-    function checkDates() {
-      var start = document.getElementById('date-in').value;
-      var end = document.getElementById('date-out').value;
-      var note = document.getElementById('date-note');
+    function checkDates(prop) {
+      var start = document.getElementById('date-in-' + prop).value;
+      var end = document.getElementById('date-out-' + prop).value;
+      var note = document.getElementById('date-note-' + prop);
       if (!start || !end || end <= start) {
         note.textContent = 'Please choose an arrival date and a later departure date.';
         return;
       }
-      note.textContent = 'Daily-stay availability for ' + start + ' — ' + end + '.';
-      document.querySelectorAll('.room-card[data-key$="|daily"] .availability').forEach(function (el) {
+      note.textContent = 'Availability for ' + start + ' — ' + end + '.';
+      document.querySelectorAll('.room-card[data-key^="' + prop + '|"] .availability').forEach(function (el) {
         el.className = 'availability is-loading';
         el.querySelector('.txt').textContent = 'Checking';
       });
-      loadAvailability(start, end, true);
+      loadAvailability(start, end);
     }
 
-    loadAvailability(null, null, false);
+    loadAvailability(null, null);
 
     /* ══════════════════════════════════════════════════════════════
        Room details enhancement — photos / facts / amenities / modal.
