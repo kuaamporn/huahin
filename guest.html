@@ -415,12 +415,45 @@
     .reviews .ic svg { width: 44px; height: 44px; }
     .reviews h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 400; margin-top: 12px; }
     .reviews .rating-line { margin-top: 12px; color: var(--ink-soft); font-weight: 300; font-size: 14px; }
+    .review-quotes { margin-top: 24px; display: flex; flex-direction: column; gap: 18px; text-align: left; }
+    .review-quote { border-top: 1px solid var(--hairline); padding-top: 18px; }
+    .review-quote:first-child { border-top: none; padding-top: 0; }
+    .review-quote .rq-stars { color: var(--gold); font-size: 13px; letter-spacing: 2px; }
+    .review-quote .rq-text { margin-top: 8px; font-family: 'Cormorant', serif; font-size: 18px; font-style: italic; line-height: 1.5; color: var(--ink); }
+    .review-quote .rq-name { margin-top: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
     .reviews .cta-row { margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .review-write-link {
+      display: inline-block; margin-top: 16px; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
+      text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px;
+      transition: border-color .25s ease; align-self: center;
+    }
+    .review-write-link:hover { border-bottom-color: var(--gold); }
     .btn-google { background: #FFF; color: var(--ink); border-color: var(--hairline); }
     .btn-google:hover { border-color: var(--gold-soft); }
     @media (max-width: 780px) {
       .locale-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── Things to do around ─────────────────── */
+    .things { max-width: 820px; margin: 88px auto 0; padding: 0 24px; }
+    .things .kicker { display: block; text-align: center; color: var(--gold); }
+    .things h2 { text-align: center; font-size: clamp(30px, 4.5vw, 44px); font-weight: 400; margin-top: 14px; }
+    .ttd-list { list-style: none; margin-top: 40px; border-top: 1px solid var(--hairline); }
+    .ttd-list a {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 20px 6px; border-bottom: 1px solid var(--hairline); text-decoration: none;
+      transition: background-color .2s ease;
+    }
+    .ttd-list a:hover { background: var(--cream); }
+    .ttd-name { font-family: 'Cormorant', serif; font-size: 22px; font-weight: 500; }
+    .ttd-dist {
+      display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
+      color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .ttd-dist .arr { transition: transform .2s ease; font-size: 15px; }
+    .ttd-list a:hover .arr { transform: translateX(4px); }
+    .things .note { margin-top: 16px; text-align: center; font-size: 12px; color: var(--ink-soft); font-weight: 300; }
 
     /* ── Contact section ─────────────────────── */
     .contact {
@@ -715,14 +748,44 @@
         <div class="kicker">Guest Reviews</div>
         <h2>What Our Guests Say</h2>
         <p class="rating-line">Read what residents and daily guests say about their stay on Google.</p>
+        <div class="review-quotes" id="review-quotes" hidden></div>
         <div class="cta-row">
           <a class="btn btn-google" id="reviews-read" href="#" target="_blank" rel="noopener">
             <svg aria-hidden="true"><use href="#ic-star"/></svg> Read Reviews
           </a>
-          <a class="btn btn-gold" id="reviews-write" href="#" target="_blank" rel="noopener">Write a Review</a>
         </div>
+        <a class="review-write-link" id="reviews-write" href="#" target="_blank" rel="noopener">Write a review ›</a>
       </div>
     </div>
+  </section>
+
+  <!-- THINGS TO DO -->
+  <section class="things" id="things">
+    <div class="kicker">Explore Hua Hin</div>
+    <h2>Things to Do Around</h2>
+    <ul class="ttd-list">
+      <li><a href="https://www.google.com/maps/search/7-Eleven/@12.559916,99.949402,16z" target="_blank" rel="noopener">
+        <span class="ttd-name">Nearest 7-Eleven</span>
+        <span class="ttd-dist">approx 0.6 km <span class="arr" aria-hidden="true">›</span></span>
+      </a></li>
+      <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Market+Village+Hua+Hin" target="_blank" rel="noopener">
+        <span class="ttd-name">Hua Hin Market Village</span>
+        <span class="ttd-dist">approx 1.7 km <span class="arr" aria-hidden="true">›</span></span>
+      </a></li>
+      <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Hua+Hin+Beach" target="_blank" rel="noopener">
+        <span class="ttd-name">Hua Hin Beach</span>
+        <span class="ttd-dist">approx 2.4 km <span class="arr" aria-hidden="true">›</span></span>
+      </a></li>
+      <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Hua+Hin+Railway+Station" target="_blank" rel="noopener">
+        <span class="ttd-name">Hua Hin Train Station</span>
+        <span class="ttd-dist">approx 2.8 km <span class="arr" aria-hidden="true">›</span></span>
+      </a></li>
+      <li><a href="https://www.google.com/maps/dir/?api=1&origin=12.559916,99.949402&destination=Bluport+Hua+Hin+Resort+Mall" target="_blank" rel="noopener">
+        <span class="ttd-name">Bluport Department Store</span>
+        <span class="ttd-dist">approx 3.2 km <span class="arr" aria-hidden="true">›</span></span>
+      </a></li>
+    </ul>
+    <p class="note">Distances are approximate — tap any place for live directions on Google Maps.</p>
   </section>
 
   <!-- CONTACT -->
@@ -793,25 +856,42 @@
     // Map center. Set MAP_LATLNG to the exact pin (right-click the marker in
     // Google Maps → click the lat,lng to copy) for a precise pin; until then the
     // name search below still centers on Hua Hin. MAP_ZOOM: higher = closer.
-    var MAP_LATLNG = '';                              // e.g. '12.5684,99.9577'
+    var MAP_LATLNG = '12.559915659144083,99.94940192738832';  // exact pin
     var MAP_QUERY  = 'The Precious Moment Hua Hin';
-    var MAP_ZOOM   = 16;
+    var MAP_ZOOM   = 14;   // 13 ≈ district · 15 ≈ neighborhood · 17 ≈ building
 
     (function () {
-      // Keyless embed. Legacy embed ignores a place_id: query (drops to world
-      // view), so we center by coordinates when known, else a name search + zoom.
+      // Keyless embed. Passing the coordinates as the query both centers the map
+      // and drops the marker on that exact point (a place_id: query would not).
       var iframe = document.querySelector('.map-wrap iframe');
       if (iframe) {
-        var base = MAP_LATLNG
-          ? 'https://maps.google.com/maps?ll=' + MAP_LATLNG + '&q=' + MAP_LATLNG
-          : 'https://maps.google.com/maps?q=' + encodeURIComponent(MAP_QUERY);
-        iframe.src = base + '&z=' + MAP_ZOOM + '&output=embed';
+        var q = MAP_LATLNG || encodeURIComponent(MAP_QUERY);
+        iframe.src = 'https://maps.google.com/maps?q=' + q + '&z=' + MAP_ZOOM + '&output=embed';
       }
 
       var read = document.getElementById('reviews-read');
       var write = document.getElementById('reviews-write');
       if (read)  read.href  = 'https://search.google.com/local/reviews?placeid=' + PLACE_ID;
       if (write) write.href = 'https://search.google.com/local/writereview?placeid=' + PLACE_ID;
+    })();
+
+    /* Hand-picked guest reviews. Add real, approved 5-star quotes here and they
+       render above the buttons. Leave empty and the block just links to Google.
+       { text: '...', name: 'First L.', stars: 5 } */
+    var GUEST_REVIEWS = [];
+
+    (function () {
+      var box = document.getElementById('review-quotes');
+      if (!box || !GUEST_REVIEWS.length) return;
+      box.hidden = false;
+      box.innerHTML = GUEST_REVIEWS.map(function (r) {
+        var n = Math.max(0, Math.min(5, r.stars || 5));
+        return '<div class="review-quote">'
+          + '<div class="rq-stars" aria-label="' + n + ' out of 5 stars">' + '★'.repeat(n) + '</div>'
+          + '<p class="rq-text">' + esc(r.text) + '</p>'
+          + '<div class="rq-name">' + esc(r.name) + '</div>'
+          + '</div>';
+      }).join('');
     })();
 
     /* Facility photos: probe images/guest/facility-{key}.jpg and
