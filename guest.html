@@ -1148,9 +1148,13 @@
         }
         var open = Object.keys(agg).filter(function (k) { return k.indexOf(prop + '|') === 0 && agg[k] > 0; }).length;
         if (open > 0) {
-          note.innerHTML = '✨ Good news — ' + open + (open > 1 ? ' room types are' : ' room type is')
-            + ' open for <strong>' + start + ' – ' + end + '</strong> (highlighted below). Rooms for these dates get taken quickly — '
-            + line + ' now to secure yours before someone else does.';
+          var div = '<div style="color:var(--gold);letter-spacing:2px;">────୨ৎ────</div>';
+          note.innerHTML = div
+            + '<p style="margin:10px 0;">❝ ' + open + (open > 1 ? ' room types are' : ' room type is')
+            + ' open for <strong>' + start + ' – ' + end + '</strong>.❞</p>'
+            + '<p style="margin:10px 0;">❝Rooms for these dates get taken quickly — '
+            + line + ' now to secure yours before someone else does.❞</p>'
+            + div;
         } else {
           note.innerHTML = 'Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often. '
             + line + ' and we\'ll watch for a cancellation; if you\'re set on staying with us, please contact us to discuss your stay plan with us.';
