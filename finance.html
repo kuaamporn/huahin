@@ -2301,9 +2301,9 @@
         <div id="slip-ref" style="font-family:monospace;font-size:13px;color:var(--ink);word-break:break-all;">—</div>
       </div>
       <div class="fg">
-        <label class="fl" for="slip-amount">จำนวนเงินในสลิป (บาท) — ตรวจสอบก่อนค้นหา</label>
+        <label class="fl" for="slip-amount">จำนวนเงิน (ตรวจสอบจากธนาคารอัตโนมัติ · แก้ไขได้หากตรวจไม่สำเร็จ)</label>
         <div style="display:flex;gap:8px;">
-          <input class="fi" type="number" step="0.01" id="slip-amount" style="flex:1;" oninput="runSlipMatch()" placeholder="เช่น 8000.00">
+          <input class="fi" type="number" step="0.01" id="slip-amount" style="flex:1;" oninput="runSlipMatch()" placeholder="ยอดจะเติมอัตโนมัติหลังตรวจสอบสลิป">
           <button class="btn-secondary" style="white-space:nowrap;" onclick="runSlipMatch()">ค้นหา</button>
         </div>
       </div>
@@ -2314,10 +2314,11 @@
 
   <script>
     // ===================== Slip-assisted approve =====================
-    // Trusted-staff convenience (no fraud API, no image stored): decode the
-    // slip QR in-browser to prove a valid slip + pull เลขที่รายการ, OCR the
-    // amount to pre-fill, then shortlist unapproved txns matching net_amount
-    // for one-click approve via the existing approve modal.
+    // Decode the slip QR in-browser (jsQR), send the payload to the Worker
+    // (financeVerifySlip → EasySlip, token kept server-side) for the bank-
+    // verified amount + ref, then shortlist unapproved txns matching net_amount
+    // for one-click approve via the existing approve modal. No image stored.
+    // Verification unreliable/unavailable → staff can type the amount as fallback.
     // Design + decision log: docs/design-slip-verify.md
     var slipRefValue = '', slipBankChannel = '';
     // Thai bank codes seen on slips → payment channel option in the approve modal.
@@ -2374,14 +2375,14 @@
       if (!f) return;
       var statusEl = document.getElementById('slip-status');
       document.getElementById('slip-matches').innerHTML = '';
+      document.getElementById('slip-amount').value = '';
       statusEl.textContent = 'กำลังอ่าน QR...';
       var img = new Image();
       img.onload = function () {
         var c = document.createElement('canvas');
         c.width = img.naturalWidth; c.height = img.naturalHeight;
-        var ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        var id = ctx.getImageData(0, 0, c.width, c.height);
+        c.getContext('2d').drawImage(img, 0, 0);
+        var id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
         loadScriptOnce('vendor/jsQR.js', 'jsqr').then(function () {
           var code = window.jsQR(id.data, id.width, id.height);
           if (!code) { statusEl.textContent = '❌ ไม่พบ QR ในสลิป — ใช้รูปที่ชัดขึ้น'; return; }
@@ -2389,54 +2390,29 @@
           slipRefValue = p.ref;
           slipBankChannel = p.bank ? p.bank.channel : '';
           document.getElementById('slip-ref').textContent = (p.bank ? p.bank.name + ' · ' : '') + p.ref;
-          statusEl.textContent = '✅ อ่าน QR สำเร็จ · กำลังอ่านจำนวนเงิน (OCR)…';
-          runSlipOcr(c, statusEl);
+          statusEl.textContent = '⏳ กำลังตรวจสอบสลิปกับธนาคาร (EasySlip)…';
+          // Verify server-side (token is a Worker secret). Reliable amount across banks.
+          callApi('financeVerifySlip', [session.token, code.data]).then(function (res) {
+            if (res.ok && res.amount != null) {
+              if (res.ref) slipRefValue = res.ref;
+              document.getElementById('slip-ref').textContent =
+                (p.bank ? p.bank.name + ' · ' : '') + slipRefValue +
+                (res.senderName ? ' · จาก ' + res.senderName : '');
+              document.getElementById('slip-amount').value = res.amount;
+              statusEl.innerHTML = '✅ ตรวจสอบสลิปสำเร็จ · ยอด <b>' + formatTHB(res.amount) + '</b>' +
+                (res.receiverName ? ' · เข้าบัญชี ' + escapeHtml(res.receiverName) : '');
+              runSlipMatch();
+            } else {
+              // Verify failed (quota/unknown slip/not configured) → keep QR ref, staff types amount.
+              statusEl.textContent = '⚠️ ' + (res.error || 'ตรวจสอบสลิปไม่สำเร็จ') + ' — กรอกจำนวนเงินเอง';
+            }
+          }).catch(function () {
+            statusEl.textContent = '⚠️ เชื่อมต่อบริการตรวจสอบไม่สำเร็จ — กรอกจำนวนเงินเอง';
+          });
         }).catch(function () { statusEl.textContent = 'โหลดตัวอ่าน QR ไม่สำเร็จ'; });
       };
       img.onerror = function () { statusEl.textContent = 'เปิดรูปไม่สำเร็จ'; };
       img.src = URL.createObjectURL(f);
-    }
-
-    function runSlipOcr(canvas, statusEl) {
-      // ponytail: OCR only the bottom-left money band (จำนวน + ค่าธรรมเนียม lines),
-      // not the whole slip — the account/ref/graphic zones produce spurious
-      // decimals that beat the real amount. QR sits bottom-right, so left 66% skips it.
-      var W = canvas.width, H = canvas.height;
-      var crop = document.createElement('canvas');
-      var cw = Math.round(W * 0.66), cy = Math.round(H * 0.72), ch = Math.round(H * 0.26);
-      crop.width = cw; crop.height = ch;
-      crop.getContext('2d').drawImage(canvas, 0, cy, cw, ch, 0, 0, cw, ch);
-      loadScriptOnce('vendor/tesseract/tesseract.min.js', 'tesseract').then(function () {
-        return Tesseract.createWorker('eng', 1, {
-          workerPath: 'vendor/tesseract/worker.min.js',
-          corePath: 'vendor/tesseract/',
-          langPath: 'vendor/tesseract/'
-        });
-      }).then(function (worker) {
-        return worker.setParameters({ tessedit_char_whitelist: '0123456789.,' })
-          .then(function () { return worker.recognize(crop); })
-          .then(function (r) { worker.terminate(); return r.data.text; });
-      }).then(function (text) {
-        var amt = extractSlipAmount(text);
-        if (amt != null) {
-          document.getElementById('slip-amount').value = amt;
-          statusEl.textContent = '✅ อ่านจำนวนเงินได้ ' + formatTHB(amt) + ' — ตรวจสอบแล้วเลือกรายการ';
-        } else {
-          statusEl.textContent = 'อ่านจำนวนเงินอัตโนมัติไม่ได้ — กรอกเอง';
-        }
-        runSlipMatch();
-      }).catch(function () {
-        statusEl.textContent = 'OCR ไม่สำเร็จ — กรอกจำนวนเงินเอง';
-      });
-    }
-
-    // ponytail: naive "largest number with 2 decimals" heuristic. Works on these
-    // digital slips (amount is the biggest X.XX; fee 0.00 loses, refs/accounts
-    // have no decimals). Upgrade to region-crop OCR if it misreads on real use.
-    function extractSlipAmount(text) {
-      var nums = (text.match(/\d[\d,]*\.\d{2}/g) || []).map(function (x) { return parseFloat(x.replace(/,/g, '')); });
-      if (!nums.length) return null;
-      return Math.max.apply(null, nums);
     }
 
     function runSlipMatch() {
