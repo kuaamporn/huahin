@@ -2437,11 +2437,12 @@
         return;
       }
       var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr>' +
-        '<th style="text-align:left;padding:4px;">ผู้เข้าพัก</th><th style="padding:4px;">ห้อง</th>' +
+        '<th style="text-align:left;padding:4px;">วันที่</th><th style="text-align:left;padding:4px;">ผู้เข้าพัก</th><th style="padding:4px;">ห้อง</th>' +
         '<th style="padding:4px;">ยอดระบบ</th><th style="padding:4px;">ยอดสลิป</th><th></th></tr></thead><tbody>';
       matches.forEach(function (t) {
         var net = Number(t.net_amount != null ? t.net_amount : t.amount);
         html += '<tr style="border-top:1px solid var(--line);">' +
+          '<td style="padding:6px 4px;white-space:nowrap;">' + (t.txn_date || '-') + '</td>' +
           '<td style="padding:6px 4px;">' + escapeHtml(t.guest_or_vendor || '-') + '</td>' +
           '<td style="text-align:center;padding:6px 4px;">' + (t.room_id || '-') + '</td>' +
           '<td style="text-align:right;padding:6px 4px;">' + formatTHB(net) + '</td>' +
