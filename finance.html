@@ -191,6 +191,7 @@
         <button id="btn-add-revenue" class="hidden" style="background:var(--go);color:#fff;border:none;font-weight:600;">+ รายรับ</button>
         <button id="btn-add-expense" class="hidden" style="background:var(--warn);color:#fff;border:none;font-weight:600;">+ รายจ่าย</button>
         <button id="btn-manage-vendors" class="hidden btn-secondary" style="font-weight:600;">จัดการผู้ขาย</button>
+        <button id="btn-slip-approve" class="hidden btn-secondary" style="font-weight:600;border-color:#0b5ed7;color:#0b5ed7;" onclick="openSlipModal()">📷 ยืนยันด้วยสลิป</button>
         <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;">ตั้งค่า</button>
         <select id="finance-status-filter" style="max-width:250px; padding:10px 14px; border:1px solid var(--line); border-radius:12px; font-family:inherit; font-size:13px; background:#fff; outline:none; cursor:pointer; font-weight:600; color:var(--ink);">
           <option value="all">ทุกสถานะ</option>
@@ -632,6 +633,7 @@
           show('btn-manage-vendors');
         }
         if (HuaHinSession.hasRole('owner')) show('btn-settings');
+        if (canAddRevenue || canAddExpense) show('btn-slip-approve');
 
         loadRoomsAndBookingsCache();
         initFinancePage();
@@ -2285,5 +2287,212 @@
       </div>
     </div>
   </div>
+
+  <!-- ===================== SLIP-ASSISTED APPROVE MODAL ===================== -->
+  <div class="modal-overlay hidden" id="slip-modal-bg" onclick="closeSlipModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="width:520px;max-width:94vw;">
+      <div class="mhdr"><div class="mtitle">📷 ยืนยันด้วยสลิป</div><button class="mx" onclick="closeSlipModal()">✕</button></div>
+      <div class="fg">
+        <label class="fl">อัปโหลด/ถ่ายรูปสลิปโอนเงิน</label>
+        <input class="fi" type="file" id="slip-file" accept="image/*" capture="environment" onchange="handleSlipFile(this)">
+      </div>
+      <div class="fg">
+        <label class="fl">เลขที่รายการ (จาก QR)</label>
+        <div id="slip-ref" style="font-family:monospace;font-size:13px;color:var(--ink);word-break:break-all;">—</div>
+      </div>
+      <div class="fg">
+        <label class="fl" for="slip-amount">จำนวนเงินในสลิป (บาท) — ตรวจสอบก่อนค้นหา</label>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" type="number" step="0.01" id="slip-amount" style="flex:1;" oninput="runSlipMatch()" placeholder="เช่น 8000.00">
+          <button class="btn-secondary" style="white-space:nowrap;" onclick="runSlipMatch()">ค้นหา</button>
+        </div>
+      </div>
+      <div id="slip-status" class="muted" style="font-size:13px;min-height:18px;margin:4px 0;"></div>
+      <div id="slip-matches" style="margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===================== Slip-assisted approve =====================
+    // Trusted-staff convenience (no fraud API, no image stored): decode the
+    // slip QR in-browser to prove a valid slip + pull เลขที่รายการ, OCR the
+    // amount to pre-fill, then shortlist unapproved txns matching net_amount
+    // for one-click approve via the existing approve modal.
+    // Design + decision log: docs/design-slip-verify.md
+    var slipRefValue = '', slipBankChannel = '';
+    // Thai bank codes seen on slips → payment channel option in the approve modal.
+    var SLIP_BANK_CODES = { '004': { name: 'KBANK', channel: 'kb' }, '014': { name: 'SCB', channel: 'scb' } };
+
+    function loadScriptOnce(src, flagKey) {
+      if (window['_loaded_' + flagKey]) return Promise.resolve();
+      return new Promise(function (res, rej) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function () { window['_loaded_' + flagKey] = true; res(); };
+        s.onerror = function () { rej(new Error('load failed: ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+
+    function openSlipModal() {
+      slipRefValue = ''; slipBankChannel = '';
+      document.getElementById('slip-file').value = '';
+      document.getElementById('slip-ref').textContent = '—';
+      document.getElementById('slip-amount').value = '';
+      document.getElementById('slip-status').textContent = '';
+      document.getElementById('slip-matches').innerHTML = '';
+      show('slip-modal-bg');
+    }
+    function closeSlipModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      hide('slip-modal-bg');
+    }
+
+    // EMVCo/ITMX TLV walk. Thai slip QR: tag 00 → sub 01 = bank code, sub 02 = เลขที่รายการ.
+    function slipTlv(s) {
+      var o = {}, i = 0;
+      while (i + 4 <= s.length) {
+        var tag = s.slice(i, i + 2), len = parseInt(s.slice(i + 2, i + 4), 10);
+        if (isNaN(len)) break;
+        o[tag] = s.slice(i + 4, i + 4 + len);
+        i += 4 + len;
+      }
+      return o;
+    }
+    function parseSlipQr(str) {
+      var top = slipTlv(str), ref = str, bank = null; // fallback: raw string as ref
+      if (top['00']) {
+        var sub = slipTlv(top['00']);
+        if (sub['02']) ref = sub['02'];
+        if (sub['01']) bank = SLIP_BANK_CODES[sub['01']] || { name: '(' + sub['01'] + ')', channel: '' };
+      }
+      return { ref: ref, bank: bank };
+    }
+
+    function handleSlipFile(input) {
+      var f = input.files && input.files[0];
+      if (!f) return;
+      var statusEl = document.getElementById('slip-status');
+      document.getElementById('slip-matches').innerHTML = '';
+      statusEl.textContent = 'กำลังอ่าน QR...';
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        var ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        var id = ctx.getImageData(0, 0, c.width, c.height);
+        loadScriptOnce('vendor/jsQR.js', 'jsqr').then(function () {
+          var code = window.jsQR(id.data, id.width, id.height);
+          if (!code) { statusEl.textContent = '❌ ไม่พบ QR ในสลิป — ใช้รูปที่ชัดขึ้น'; return; }
+          var p = parseSlipQr(code.data);
+          slipRefValue = p.ref;
+          slipBankChannel = p.bank ? p.bank.channel : '';
+          document.getElementById('slip-ref').textContent = (p.bank ? p.bank.name + ' · ' : '') + p.ref;
+          statusEl.textContent = '✅ อ่าน QR สำเร็จ · กำลังอ่านจำนวนเงิน (OCR)…';
+          runSlipOcr(c, statusEl);
+        }).catch(function () { statusEl.textContent = 'โหลดตัวอ่าน QR ไม่สำเร็จ'; });
+      };
+      img.onerror = function () { statusEl.textContent = 'เปิดรูปไม่สำเร็จ'; };
+      img.src = URL.createObjectURL(f);
+    }
+
+    function runSlipOcr(canvas, statusEl) {
+      // ponytail: OCR only the bottom-left money band (จำนวน + ค่าธรรมเนียม lines),
+      // not the whole slip — the account/ref/graphic zones produce spurious
+      // decimals that beat the real amount. QR sits bottom-right, so left 66% skips it.
+      var W = canvas.width, H = canvas.height;
+      var crop = document.createElement('canvas');
+      var cw = Math.round(W * 0.66), cy = Math.round(H * 0.72), ch = Math.round(H * 0.26);
+      crop.width = cw; crop.height = ch;
+      crop.getContext('2d').drawImage(canvas, 0, cy, cw, ch, 0, 0, cw, ch);
+      loadScriptOnce('vendor/tesseract/tesseract.min.js', 'tesseract').then(function () {
+        return Tesseract.createWorker('eng', 1, {
+          workerPath: 'vendor/tesseract/worker.min.js',
+          corePath: 'vendor/tesseract/',
+          langPath: 'vendor/tesseract/'
+        });
+      }).then(function (worker) {
+        return worker.setParameters({ tessedit_char_whitelist: '0123456789.,' })
+          .then(function () { return worker.recognize(crop); })
+          .then(function (r) { worker.terminate(); return r.data.text; });
+      }).then(function (text) {
+        var amt = extractSlipAmount(text);
+        if (amt != null) {
+          document.getElementById('slip-amount').value = amt;
+          statusEl.textContent = '✅ อ่านจำนวนเงินได้ ' + formatTHB(amt) + ' — ตรวจสอบแล้วเลือกรายการ';
+        } else {
+          statusEl.textContent = 'อ่านจำนวนเงินอัตโนมัติไม่ได้ — กรอกเอง';
+        }
+        runSlipMatch();
+      }).catch(function () {
+        statusEl.textContent = 'OCR ไม่สำเร็จ — กรอกจำนวนเงินเอง';
+      });
+    }
+
+    // ponytail: naive "largest number with 2 decimals" heuristic. Works on these
+    // digital slips (amount is the biggest X.XX; fee 0.00 loses, refs/accounts
+    // have no decimals). Upgrade to region-crop OCR if it misreads on real use.
+    function extractSlipAmount(text) {
+      var nums = (text.match(/\d[\d,]*\.\d{2}/g) || []).map(function (x) { return parseFloat(x.replace(/,/g, '')); });
+      if (!nums.length) return null;
+      return Math.max.apply(null, nums);
+    }
+
+    function runSlipMatch() {
+      var box = document.getElementById('slip-matches');
+      var amt = parseFloat(String(document.getElementById('slip-amount').value).replace(/,/g, ''));
+      if (isNaN(amt)) { box.innerHTML = '<div class="muted">กรอกจำนวนเงินก่อน</div>'; return; }
+      var target = Math.round(amt * 100);
+      var prop = document.getElementById('finance-property').value;
+      var canIN = HuaHinSession.hasRole('owner', 'revenue');
+      var canOUT = HuaHinSession.hasRole('owner', 'expense');
+      var matches = (TRANSACTIONS || []).filter(function (t) {
+        if (t.is_approved || t.status === 'pending') return false;
+        if (prop && t.property_id !== prop) return false;
+        if (t.direction === 'IN' && !canIN) return false;
+        if (t.direction === 'OUT' && !canOUT) return false;
+        var net = Number(t.net_amount != null ? t.net_amount : t.amount);
+        return Math.round(net * 100) === target;
+      });
+      if (!matches.length) {
+        box.innerHTML = '<div class="muted" style="padding:8px 0;">ไม่พบรายการที่ยอดตรงกัน (' + formatTHB(amt) + ')</div>' +
+          '<button class="btn-secondary" onclick="showAllPendingFromSlip()">แสดงรายการรออนุมัติทั้งหมด</button>';
+        return;
+      }
+      var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr>' +
+        '<th style="text-align:left;padding:4px;">ผู้เข้าพัก</th><th style="padding:4px;">ห้อง</th>' +
+        '<th style="padding:4px;">ยอดระบบ</th><th style="padding:4px;">ยอดสลิป</th><th></th></tr></thead><tbody>';
+      matches.forEach(function (t) {
+        var net = Number(t.net_amount != null ? t.net_amount : t.amount);
+        html += '<tr style="border-top:1px solid var(--line);">' +
+          '<td style="padding:6px 4px;">' + escapeHtml(t.guest_or_vendor || '-') + '</td>' +
+          '<td style="text-align:center;padding:6px 4px;">' + (t.room_id || '-') + '</td>' +
+          '<td style="text-align:right;padding:6px 4px;">' + formatTHB(net) + '</td>' +
+          '<td style="text-align:right;padding:6px 4px;">' + formatTHB(amt) + '</td>' +
+          '<td style="text-align:right;padding:6px 4px;"><button class="btn-primary" style="padding:4px 10px;" onclick="selectSlipMatch(\'' + t.txn_id + '\')">✔ อนุมัติ</button></td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+    }
+
+    function showAllPendingFromSlip() {
+      closeSlipModal();
+      document.getElementById('finance-status-filter').value = 'pending-approval';
+      renderFinanceTable();
+    }
+
+    // Hand off to the existing approve modal, pre-filling ref + bank channel from the slip.
+    function selectSlipMatch(txnId) {
+      closeSlipModal();
+      openApproveModal(txnId, 'approve');
+      if (slipRefValue) document.getElementById('am-ref').value = slipRefValue;
+      if (slipBankChannel) {
+        document.getElementById('am-channel').value = slipBankChannel;
+        initCustomSelect('am-channel-select');
+      }
+    }
+  </script>
 </body>
 </html>
