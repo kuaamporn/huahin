@@ -1436,6 +1436,12 @@ window.rdEdit = function(roomType){
 
 window.rdRenderAmenities = function(selected){
   var all = RD_AMENITY_PRESETS.slice();
+  // Custom amenities are saved per room type; union every type's list so a chip
+  // added on one type is offered on all of them (property-scoped).
+  rdTypes.forEach(function(t){
+    var saved = []; try { saved = JSON.parse(t.amenities || '[]') || []; } catch(e){}
+    saved.forEach(function(a){ if (all.indexOf(a) < 0) all.push(a); });
+  });
   selected.forEach(function(a){ if (all.indexOf(a) < 0) all.push(a); });
   document.getElementById('rdAmenities').innerHTML = all.map(function(a){
     var on = selected.indexOf(a) >= 0;
