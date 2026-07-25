@@ -508,7 +508,8 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
         <div class="fg" style="flex:1"><label class="fl">จำนวนผู้พักสูงสุด</label><input class="fi" type="number" min="1" max="20" id="rdOcc" placeholder="เว้นว่างเพื่อซ่อน"></div>
       </div>
       <div class="fg"><label class="fl">รูปแบบเตียง</label><input class="fi" type="text" id="rdBed" placeholder="เช่น เตียงควีน / คิง 1 + โซฟาเบด"></div>
-      <div class="fg"><label class="fl">รายละเอียด (แสดงให้ลูกค้าเห็น)</label><textarea class="fta" id="rdDesc" style="min-height:56px;"></textarea></div>
+      <div class="fg"><label class="fl">รายละเอียด อังกฤษ (แสดงบนหน้าลูกค้า)</label><textarea class="fta" id="rdDesc" style="min-height:56px;"></textarea></div>
+      <div class="fg"><label class="fl">รายละเอียด ไทย (แสดงบนหน้า /th/ เว้นว่างเพื่อใช้ภาษาอังกฤษ)</label><textarea class="fta" id="rdDescTh" style="min-height:56px;"></textarea></div>
       <div class="fg"><label class="fl">สิ่งอำนวยความสะดวก</label>
         <div id="rdAmenities" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
         <div style="display:flex;gap:6px;margin-top:6px;">
@@ -1427,6 +1428,7 @@ window.rdEdit = function(roomType){
   document.getElementById('rdOcc').value = t.max_occupancy || '';
   document.getElementById('rdBed').value = t.bed_config || '';
   document.getElementById('rdDesc').value = t.description || '';
+  document.getElementById('rdDescTh').value = t.description_th || '';
   var amen = []; try { amen = JSON.parse(t.amenities || '[]') || []; } catch(e){}
   rdRenderAmenities(amen);
   rdRenderPhotos();
@@ -1474,7 +1476,8 @@ window.rdSaveDetails = function(){
     document.getElementById('rdOcc').value || null,
     document.getElementById('rdBed').value.trim() || null,
     document.getElementById('rdDesc').value.trim() || null,
-    rdCollectAmenities()];
+    rdCollectAmenities(),
+    document.getElementById('rdDescTh').value.trim() || null];
   callApi('roomsUpdateTypeDetails', params).then(function(res){
     if (!res.ok) { warn.textContent = res.error || 'บันทึกไม่สำเร็จ'; warn.style.display = 'block'; return; }
     showToast('บันทึกข้อมูลห้องแล้ว', 'ok');
