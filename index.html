@@ -69,6 +69,13 @@
       font-family: 'Source Sans 3', sans-serif;
     }
     input:focus { outline: 2px solid var(--go); outline-offset: 1px; }
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle {
+      position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+      width: auto; margin-top: 0; padding: 6px 8px; background: none; border: none;
+      font-size: 18px; line-height: 1; cursor: pointer;
+    }
     button {
       width: 100%;
       padding: 14px;
@@ -113,7 +120,10 @@
         <label for="username">ชื่อผู้ใช้</label>
         <input id="username" type="text" autocomplete="username" />
         <label for="password">รหัสผ่าน</label>
-        <input id="password" type="password" autocomplete="current-password" />
+        <div class="pw-wrap">
+          <input id="password" type="password" autocomplete="current-password" />
+          <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'password')" aria-label="แสดง/ซ่อนรหัสผ่าน">👁</button>
+        </div>
         <button class="btn-primary" id="login-btn">เข้าสู่ระบบ</button>
         <div class="error hidden" id="login-error"></div>
       </div>
@@ -636,6 +646,13 @@
         }
       });
     };
+
+    function togglePasswordVisibility(btn, inputId) {
+      var input = document.getElementById(inputId);
+      var showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? '👁' : '🙈';
+    }
 
     // ---------- LOGIN ----------
     document.getElementById('login-btn').addEventListener('click', function() {
