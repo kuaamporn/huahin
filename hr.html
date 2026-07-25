@@ -4,7 +4,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>The Precious Moment HR</title>
+  <title>บุคคล — The Precious Moment</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     @import url('app.css');
@@ -108,214 +108,214 @@
   <div id="dash-screen" class="wrap">
     <div class="dash-topbar">
       <div class="topbar-header">
-        <h1>The Precious Moment HR</h1>
-        <a href="#" id="logout-link" class="btn-signout signout">Sign out</a>
+        <h1>บุคคล</h1>
+        <a href="#" id="logout-link" class="btn-signout signout">ออกจากระบบ</a>
       </div>
       <div class="dash-nav-links">
-        <a href="index.html">Check-in</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
-        <a href="finance.html" id="link-finance" class="hidden">Finance</a>
-        <a href="billing.html" id="link-billing" class="hidden">Billing</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
-        <a href="report.html" id="link-report" class="hidden">Reports</a>
-        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">Reconcile</a>
+        <a href="index.html">ลงเวลา</a>
+        <a href="rooms.html" id="link-rooms" class="hidden">ผังห้องพัก</a>
+        <a href="finance.html" id="link-finance" class="hidden">การเงิน</a>
+        <a href="billing.html" id="link-billing" class="hidden">วางบิล</a>
+        <a href="dashboard.html" id="link-dashboard" class="hidden">แดชบอร์ด</a>
+        <a href="report.html" id="link-report" class="hidden">รายงาน</a>
+        <a href="setting.html" id="link-setting" class="hidden">ตั้งค่า</a>
+        <a href="reconcile.html" id="link-reconcile" class="hidden">กระทบยอด</a>
       </div>
     </div>
     <div class="navbar">
       <div class="nav-tabs">
-        <button class="nav-tab active" id="tab-checkins">Today's Check-ins</button>
-        <button class="nav-tab" id="tab-attendance">Attendance</button>
-        <button class="nav-tab" id="tab-monthly">Monthly Report</button>
-        <button class="nav-tab" id="tab-employees">Employees</button>
-        <button class="nav-tab hidden" id="tab-leaves">Leave &amp; Swap Approvals</button>
-        <button class="nav-tab" id="tab-account">My Account</button>
-        <button class="nav-tab hidden" id="tab-roles">Roles</button>
-        <button class="nav-tab hidden" id="tab-notices">Complaints &amp; Notices</button>
+        <button class="nav-tab active" id="tab-checkins">ลงเวลาวันนี้</button>
+        <button class="nav-tab" id="tab-attendance">การเข้างาน</button>
+        <button class="nav-tab" id="tab-monthly">รายงานประจำเดือน</button>
+        <button class="nav-tab" id="tab-employees">พนักงาน</button>
+        <button class="nav-tab hidden" id="tab-leaves">อนุมัติการลา &amp; สลับวันหยุด</button>
+        <button class="nav-tab" id="tab-account">บัญชีของฉัน</button>
+        <button class="nav-tab hidden" id="tab-roles">บทบาท</button>
+        <button class="nav-tab hidden" id="tab-notices">ข้อร้องเรียน &amp; ใบเตือน</button>
       </div>
     </div>
 
     <!-- ===================== TODAY'S CHECK-INS ===================== -->
     <div id="panel-checkins">
-      <h1>Today's check-ins</h1>
+      <h1>การลงเวลาวันนี้</h1>
       <div class="sub" id="date-label"></div>
 
       <div class="summary">
-        <div class="stat"><div class="n" id="stat-total">0</div><div class="l">Total logs</div></div>
-        <div class="stat"><div class="n" id="stat-ok">0</div><div class="l">Normal</div></div>
-        <div class="stat"><div class="n" id="stat-flagged" style="color:var(--warn);">0</div><div class="l">Flagged</div></div>
+        <div class="stat"><div class="n" id="stat-total">0</div><div class="l">รายการทั้งหมด</div></div>
+        <div class="stat"><div class="n" id="stat-ok">0</div><div class="l">ปกติ</div></div>
+        <div class="stat"><div class="n" id="stat-flagged" style="color:var(--warn);">0</div><div class="l">ผิดปกติ</div></div>
       </div>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>Time</th><th>Employee</th><th>Type</th><th>Office</th><th>Status</th></tr>
+          <tr><th>เวลา</th><th>พนักงาน</th><th>ประเภท</th><th>สำนักงาน</th><th>สถานะ</th></tr>
         </thead>
         <tbody id="log-rows"></tbody>
       </table>
       </div>
 
-      <div class="muted" id="empty-msg" style="margin-top:14px;">No check-ins recorded yet today.</div>
+      <div class="muted" id="empty-msg" style="margin-top:14px;">ยังไม่มีการลงเวลาในวันนี้</div>
 
       <div style="margin-top:24px;">
-        <button id="refresh-btn">Refresh</button>
+        <button id="refresh-btn">รีเฟรช</button>
       </div>
     </div>
 
     <!-- ===================== ATTENDANCE ===================== -->
     <div id="panel-attendance" class="hidden">
-      <h1>Attendance</h1>
-      <div class="sub">Daily attendance status. Manual overrides (leave, etc.) always take priority over auto-detected status.</div>
+      <h1>การเข้างาน</h1>
+      <div class="sub">สถานะการเข้างานประจำวัน การปรับสถานะด้วยมือ (ลา ฯลฯ) จะมีความสำคัญกว่าสถานะที่ระบบตรวจจับอัตโนมัติเสมอ</div>
 
       <div class="card-section">
-        <label for="attendance-date">Date</label>
+        <label for="attendance-date">วันที่</label>
         <input id="attendance-date" type="date" style="max-width:220px;" />
-        <button id="attendance-load-btn" style="margin-top:10px;width:auto;padding:10px 16px;">Load</button>
+        <button id="attendance-load-btn" style="margin-top:10px;width:auto;padding:10px 16px;">โหลด</button>
       </div>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>Employee</th><th>Status</th><th>Note</th><th>Action</th></tr>
+          <tr><th>พนักงาน</th><th>สถานะ</th><th>หมายเหตุ</th><th>การจัดการ</th></tr>
         </thead>
         <tbody id="attendance-rows"></tbody>
       </table>
       </div>
-      <div class="muted" id="attendance-empty-msg" style="margin-top:14px;">No employees found.</div>
+      <div class="muted" id="attendance-empty-msg" style="margin-top:14px;">ไม่พบพนักงาน</div>
     </div>
 
     <!-- ===================== MONTHLY REPORT ===================== -->
     <div id="panel-monthly" class="hidden">
-      <h1>Monthly Report</h1>
-      <div class="sub">Attendance summary for a full month. Click a row to see the day-by-day breakdown.</div>
+      <h1>รายงานประจำเดือน</h1>
+      <div class="sub">สรุปการเข้างานรายเดือน คลิกแถวเพื่อดูรายละเอียดแต่ละวัน</div>
 
       <div class="card-section">
         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
           <div>
-            <label for="monthly-type">Report Type</label>
+            <label for="monthly-type">ประเภทรายงาน</label>
             <select id="monthly-type" onchange="toggleReportTypeFields()" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
+              <option value="monthly">รายเดือน</option>
+              <option value="yearly">รายปี</option>
             </select>
           </div>
           <div>
-            <label for="monthly-year">Year</label>
+            <label for="monthly-year">ปี</label>
             <input id="monthly-year" type="number" style="max-width:120px;" />
           </div>
           <div id="monthly-month-group">
-            <label for="monthly-month">Month</label>
+            <label for="monthly-month">เดือน</label>
             <select id="monthly-month" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
+              <option value="1">มกราคม</option>
+              <option value="2">กุมภาพันธ์</option>
+              <option value="3">มีนาคม</option>
+              <option value="4">เมษายน</option>
+              <option value="5">พฤษภาคม</option>
+              <option value="6">มิถุนายน</option>
+              <option value="7">กรกฎาคม</option>
+              <option value="8">สิงหาคม</option>
+              <option value="9">กันยายน</option>
+              <option value="10">ตุลาคม</option>
+              <option value="11">พฤศจิกายน</option>
+              <option value="12">ธันวาคม</option>
             </select>
           </div>
-          <button id="monthly-load-btn" style="width:auto;padding:10px 16px;margin-top:0;">Load</button>
-          <button id="monthly-export-btn" style="width:auto;padding:10px 16px;margin-top:0;">Export CSV</button>
+          <button id="monthly-load-btn" style="width:auto;padding:10px 16px;margin-top:0;">โหลด</button>
+          <button id="monthly-export-btn" style="width:auto;padding:10px 16px;margin-top:0;">ส่งออก CSV</button>
         </div>
       </div>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>Employee</th><th>Present</th><th>Late</th><th>Absent</th><th>Leave</th><th></th></tr>
+          <tr><th>พนักงาน</th><th>มาทำงาน</th><th>มาสาย</th><th>ขาดงาน</th><th>ลา</th><th></th></tr>
         </thead>
         <tbody id="monthly-summary-rows"></tbody>
       </table>
       </div>
-      <div class="muted" id="monthly-empty-msg" style="margin-top:14px;">No data for this month yet.</div>
+      <div class="muted" id="monthly-empty-msg" style="margin-top:14px;">ยังไม่มีข้อมูลสำหรับเดือนนี้</div>
 
       <div class="card-section hidden" id="monthly-grid-section" style="margin-top:20px;overflow-x:auto;">
-        <h2 id="monthly-grid-title">Daily breakdown</h2>
+        <h2 id="monthly-grid-title">รายละเอียดรายวัน</h2>
         <table id="monthly-grid-table" style="min-width:900px;"></table>
       </div>
     </div>
 
     <!-- ===================== EMPLOYEES ===================== -->
     <div id="panel-employees" class="hidden">
-      <h1>Employees</h1>
-      <div class="sub">Add new employees, or reset a forgotten password.</div>
+      <h1>พนักงาน</h1>
+      <div class="sub">เพิ่มพนักงานใหม่ หรือรีเซ็ตรหัสผ่านที่ลืม</div>
 
       <div class="card-section">
-        <h2>Add new employee</h2>
-        <label for="new-emp-name">Full name</label>
-        <input id="new-emp-name" type="text" placeholder="e.g. Somchai Jaidee" />
-        <label for="new-emp-username">Username</label>
-        <input id="new-emp-username" type="text" placeholder="e.g. somchai" autocapitalize="none" />
-        <label for="new-emp-password">Temporary password</label>
-        <input id="new-emp-password" type="text" placeholder="e.g. Welcome123!" />
+        <h2>เพิ่มพนักงานใหม่</h2>
+        <label for="new-emp-name">ชื่อ-นามสกุล</label>
+        <input id="new-emp-name" type="text" placeholder="เช่น สมชาย ใจดี" />
+        <label for="new-emp-username">ชื่อผู้ใช้</label>
+        <input id="new-emp-username" type="text" placeholder="เช่น somchai" autocapitalize="none" />
+        <label for="new-emp-password">รหัสผ่านชั่วคราว</label>
+        <input id="new-emp-password" type="text" placeholder="เช่น Welcome123!" />
         <label style="display:flex;align-items:center;gap:8px;margin-top:12px;">
           <input id="new-emp-admin" type="checkbox" style="width:auto;" />
-          <span style="font-size:13px;color:var(--ink);">Grant dashboard/admin access</span>
+          <span style="font-size:13px;color:var(--ink);">ให้สิทธิ์เข้าถึงแดชบอร์ด/ผู้ดูแลระบบ</span>
         </label>
-        <button class="btn-primary" id="add-employee-btn">Add employee</button>
+        <button class="btn-primary" id="add-employee-btn">เพิ่มพนักงาน</button>
         <div class="error hidden" id="add-employee-error"></div>
         <div class="success hidden" id="add-employee-success"></div>
       </div>
 
       <div class="card-section">
-        <h2>Existing employees</h2>
-        <button id="refresh-employees-btn" style="margin-bottom:12px;">Refresh list</button>
+        <h2>พนักงานทั้งหมด</h2>
+        <button id="refresh-employees-btn" style="margin-bottom:12px;">รีเฟรชรายการ</button>
         <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Reset password</th></tr>
+            <tr><th>ชื่อ</th><th>ชื่อผู้ใช้</th><th>ตำแหน่ง</th><th>สถานะ</th><th>รีเซ็ตรหัสผ่าน</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
         </div>
-        <div class="muted" id="employees-empty-msg" style="margin-top:14px;">No employees yet.</div>
+        <div class="muted" id="employees-empty-msg" style="margin-top:14px;">ยังไม่มีพนักงาน</div>
       </div>
     </div>
 
     <!-- ===================== LEAVE & SWAP APPROVALS ===================== -->
     <div id="panel-leaves" class="hidden">
-      <h1>Leave &amp; Swap Approvals</h1>
-      <div class="sub">Requests submitted by staff via the check-in portal. You cannot approve your own requests.</div>
+      <h1>อนุมัติการลาและสลับวันหยุด</h1>
+      <div class="sub">คำขอที่พนักงานส่งมาจากหน้าลงเวลา คุณไม่สามารถอนุมัติคำขอของตัวเองได้</div>
 
       <div class="card-section">
-        <h2 style="margin-top:0;">Pending Leave Requests</h2>
+        <h2 style="margin-top:0;">คำขอลาที่รออนุมัติ</h2>
         <table>
           <thead>
-            <tr><th>Employee</th><th>Date</th><th>Type</th><th>Reason</th><th>Evidence</th><th>Action</th></tr>
+            <tr><th>พนักงาน</th><th>วันที่</th><th>ประเภท</th><th>เหตุผล</th><th>หลักฐาน</th><th>การจัดการ</th></tr>
           </thead>
-          <tbody id="leave-requests-rows"><tr><td colspan="6" class="muted">Loading...</td></tr></tbody>
+          <tbody id="leave-requests-rows"><tr><td colspan="6" class="muted">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
 
       <div class="card-section" style="margin-top:20px;">
-        <h2 style="margin-top:0;">Pending Day-Off Swaps</h2>
+        <h2 style="margin-top:0;">คำขอสลับวันหยุดที่รออนุมัติ</h2>
         <table>
           <thead>
-            <tr><th>Employee</th><th>Original Date</th><th>New Date</th><th>Action</th></tr>
+            <tr><th>พนักงาน</th><th>วันเดิม</th><th>วันใหม่</th><th>การจัดการ</th></tr>
           </thead>
-          <tbody id="swap-requests-rows"><tr><td colspan="4" class="muted">Loading...</td></tr></tbody>
+          <tbody id="swap-requests-rows"><tr><td colspan="4" class="muted">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
     </div>
 
     <!-- ===================== MY ACCOUNT ===================== -->
     <div id="panel-account" class="hidden">
-      <h1>My Account</h1>
-      <div class="sub">Change your own dashboard password.</div>
+      <h1>บัญชีของฉัน</h1>
+      <div class="sub">เปลี่ยนรหัสผ่านของคุณเอง</div>
 
       <div class="card-section">
-        <label for="change-old-password">Current password</label>
+        <label for="change-old-password">รหัสผ่านปัจจุบัน</label>
         <input id="change-old-password" type="password" />
-        <label for="change-new-password">New password</label>
+        <label for="change-new-password">รหัสผ่านใหม่</label>
         <input id="change-new-password" type="password" />
-        <label for="change-new-password-confirm">Confirm new password</label>
+        <label for="change-new-password-confirm">ยืนยันรหัสผ่านใหม่</label>
         <input id="change-new-password-confirm" type="password" />
-        <button class="btn-primary" id="change-password-btn">Change password</button>
+        <button class="btn-primary" id="change-password-btn">เปลี่ยนรหัสผ่าน</button>
         <div class="error hidden" id="change-password-error"></div>
         <div class="success hidden" id="change-password-success"></div>
       </div>
@@ -323,29 +323,29 @@
 
     <!-- ===================== ROLES ===================== -->
     <div id="panel-roles" class="hidden">
-      <h1>Employee Roles</h1>
+      <h1>บทบาทพนักงาน</h1>
       <div class="sub">
-        Assign multiple roles per employee to control access:
+        กำหนดหลายบทบาทให้พนักงานแต่ละคนเพื่อควบคุมสิทธิ์การเข้าถึง:
         <ul style="margin-top: 8px; margin-bottom: 16px; padding-left: 20px;">
-          <li><b>owner</b>: Full access, view finance, and can edit verified transactions.</li>
-          <li><b>frontdesk</b>: Can add and manage rooms bookings.</li>
-          <li><b>technician</b>: Can view room status and resolve maintenance tasks.</li>
-          <li><b>housekeeping</b> / <b>housekeeping_precious</b> / <b>housekeeping_moment</b>: Can view room status and mark rooms as cleaned. (All, Precious only, or Moment only).</li>
-          <li><b>revenue</b>: Can add revenue records.</li>
-          <li><b>expense</b>: Can add expense records.</li>
-          <li><b>accountant</b>: Can view finance summaries and lists.</li>
+          <li><b>เจ้าของ (owner)</b>: เข้าถึงได้ทั้งหมด ดูข้อมูลการเงิน และแก้ไขรายการที่ตรวจสอบแล้วได้</li>
+          <li><b>หน้าเคาน์เตอร์ (frontdesk)</b>: เพิ่มและจัดการการจองห้องได้</li>
+          <li><b>ช่างซ่อม (technician)</b>: ดูสถานะห้องและจัดการงานซ่อมได้</li>
+          <li><b>แม่บ้าน (housekeeping / housekeeping_precious / housekeeping_moment)</b>: ดูสถานะห้องและทำเครื่องหมายว่าทำความสะอาดแล้วได้ (ทั้งหมด, เฉพาะเดอะเพรเชียส หรือเฉพาะเดอะโมเมนต์)</li>
+          <li><b>รายรับ (revenue)</b>: เพิ่มรายการรายรับได้</li>
+          <li><b>รายจ่าย (expense)</b>: เพิ่มรายการรายจ่ายได้</li>
+          <li><b>บัญชี (accountant)</b>: ดูสรุปและรายการทางการเงินได้</li>
         </ul>
       </div>
 
-      <button id="roles-refresh-btn" style="margin-bottom:12px;">Refresh list</button>
+      <button id="roles-refresh-btn" style="margin-bottom:12px;">รีเฟรชรายการ</button>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>Name</th><th>Username</th><th>Roles</th><th>Action</th></tr>
+          <tr><th>ชื่อ</th><th>ชื่อผู้ใช้</th><th>บทบาท</th><th>การจัดการ</th></tr>
         </thead>
         <tbody id="roles-table-body">
-          <tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">No employees loaded yet.</td></tr>
+          <tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">ยังไม่โหลดข้อมูลพนักงาน</td></tr>
         </tbody>
       </table>
       </div>
@@ -353,56 +353,56 @@
 
     <!-- ===================== COMPLAINTS & NOTICES ===================== -->
     <div id="panel-notices" class="hidden">
-      <h1>Customer Complaints &amp; Warnings</h1>
-      <div class="sub">Log guest complaints, upload picture evidence, and assign to employees as written warnings under Thai Labor Law.</div>
+      <h1>ข้อร้องเรียนลูกค้า &amp; ใบเตือน</h1>
+      <div class="sub">บันทึกข้อร้องเรียนของลูกค้า อัปโหลดรูปหลักฐาน และออกใบเตือนเป็นลายลักษณ์อักษรให้พนักงานตามกฎหมายแรงงานไทย</div>
 
       <div class="grid-2">
         <!-- Form Card -->
         <div class="card-section" style="margin-bottom:0;">
-          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--go); border-bottom:1px solid var(--line); padding-bottom:8px;">Log Customer Complaint</h3>
+          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--go); border-bottom:1px solid var(--line); padding-bottom:8px;">บันทึกข้อร้องเรียนลูกค้า</h3>
 
-          <label>Incident Date</label>
+          <label>วันที่เกิดเหตุ</label>
           <input type="date" id="notice-incident-date" />
 
-          <label>Mistake Category</label>
+          <label>หมวดข้อผิดพลาด</label>
           <select id="notice-category" style="width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; font-family: inherit; margin-bottom: 12px; outline: none; background:#fff;">
-            <option value="">-- Select Category --</option>
+            <option value="">-- เลือกหมวด --</option>
           </select>
 
-          <label>Employees Responsible</label>
+          <label>พนักงานที่เกี่ยวข้อง</label>
           <div id="notice-employee-checkboxes" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 12px; background:#fff; display:flex; flex-direction:column; gap:8px;">
             <!-- Javascript loaded -->
           </div>
 
-          <label>Incident Description</label>
+          <label>รายละเอียดเหตุการณ์</label>
           <textarea id="notice-description" style="width: 100%; height: 80px; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; font-family: inherit; margin-bottom: 12px; outline: none; resize:vertical;"></textarea>
 
-          <label>Attach Picture Evidence</label>
+          <label>แนบรูปหลักฐาน</label>
           <input type="file" id="notice-file-input" accept="image/*" style="margin-bottom:12px; font-size:13px;" />
           <canvas id="notice-compress-canvas" style="display:none;"></canvas>
 
           <div style="display:flex; gap:12px; align-items:center;">
-            <button class="btn-primary" id="btn-save-notice" style="margin-top:0;">Log &amp; Send Notice</button>
+            <button class="btn-primary" id="btn-save-notice" style="margin-top:0;">บันทึกและส่งใบเตือน</button>
             <div id="notice-save-status"></div>
           </div>
         </div>
 
         <!-- History Card -->
         <div class="card-section" style="margin-bottom:0; display:flex; flex-direction:column;">
-          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px;">Complaints Log</h3>
+          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px;">ประวัติข้อร้องเรียน</h3>
           <div style="overflow-x:auto; flex:1;">
             <table style="min-width: 500px;">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Category</th>
-                  <th>Description</th>
-                  <th>Evidence</th>
-                  <th>Assignments &amp; Status</th>
+                  <th>วันที่</th>
+                  <th>หมวด</th>
+                  <th>รายละเอียด</th>
+                  <th>หลักฐาน</th>
+                  <th>การมอบหมาย &amp; สถานะ</th>
                 </tr>
               </thead>
               <tbody id="notices-table-body">
-                <tr><td colspan="5" class="muted" style="text-align:center;">No complaints logged yet.</td></tr>
+                <tr><td colspan="5" class="muted" style="text-align:center;">ยังไม่มีข้อร้องเรียน</td></tr>
               </tbody>
             </table>
           </div>
@@ -422,13 +422,13 @@
   <!-- ===================== RESET PASSWORD MODAL ===================== -->
   <div id="reset-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;">Reset password</h2>
+      <h2 style="margin-top:0;">รีเซ็ตรหัสผ่าน</h2>
       <div class="sub" id="reset-modal-employee-name"></div>
-      <label for="reset-new-password">New temporary password</label>
-      <input id="reset-new-password" type="text" placeholder="e.g. Welcome123!" />
+      <label for="reset-new-password">รหัสผ่านชั่วคราวใหม่</label>
+      <input id="reset-new-password" type="text" placeholder="เช่น Welcome123!" />
       <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="reset-modal-cancel" style="margin-top:0;">Cancel</button>
-        <button class="btn-primary" id="reset-modal-confirm" style="margin-top:0;">Reset</button>
+        <button class="btn-secondary" id="reset-modal-cancel" style="margin-top:0;">ยกเลิก</button>
+        <button class="btn-primary" id="reset-modal-confirm" style="margin-top:0;">รีเซ็ต</button>
       </div>
       <div class="error hidden" id="reset-modal-error"></div>
     </div>
@@ -437,29 +437,29 @@
   <!-- ===================== ATTENDANCE OVERRIDE MODAL ===================== -->
   <div id="override-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;">Set attendance status</h2>
+      <h2 style="margin-top:0;">ตั้งสถานะการเข้างาน</h2>
       <div class="sub" id="override-modal-employee-name"></div>
 
-      <label for="override-status">Status</label>
+      <label for="override-status">สถานะ</label>
       <select id="override-status" style="width:100%;padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
-        <option value="PRESENT">Present</option>
-        <option value="ABSENT">Absent</option>
-        <option value="MEDICAL_LEAVE">Medical Leave</option>
-        <option value="VACATION_LEAVE">Vacation Leave</option>
+        <option value="PRESENT">มาทำงาน</option>
+        <option value="ABSENT">ขาดงาน</option>
+        <option value="MEDICAL_LEAVE">ลาป่วย</option>
+        <option value="VACATION_LEAVE">ลาพักร้อน</option>
       </select>
 
-      <label for="override-start-date">From date</label>
+      <label for="override-start-date">จากวันที่</label>
       <input id="override-start-date" type="date" />
-      <label for="override-end-date">To date</label>
+      <label for="override-end-date">ถึงวันที่</label>
       <input id="override-end-date" type="date" />
-      <div class="muted" style="margin-top:6px;">Use the same date for both fields for a single day.</div>
+      <div class="muted" style="margin-top:6px;">ใช้วันที่เดียวกันทั้งสองช่องสำหรับวันเดียว</div>
 
-      <label for="override-note">Note (optional)</label>
-      <input id="override-note" type="text" placeholder="e.g. Doctor's appointment" />
+      <label for="override-note">หมายเหตุ (ถ้ามี)</label>
+      <input id="override-note" type="text" placeholder="เช่น นัดหมอ" />
 
       <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="override-modal-cancel" style="margin-top:0;">Cancel</button>
-        <button class="btn-primary" id="override-modal-confirm" style="margin-top:0;">Save</button>
+        <button class="btn-secondary" id="override-modal-cancel" style="margin-top:0;">ยกเลิก</button>
+        <button class="btn-primary" id="override-modal-confirm" style="margin-top:0;">บันทึก</button>
       </div>
       <div class="error hidden" id="override-modal-error"></div>
     </div>
@@ -468,21 +468,21 @@
   <!-- ===================== ROLES EDIT MODAL ===================== -->
   <div id="roles-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;" id="roles-modal-title">Edit Roles</h2>
+      <h2 style="margin-top:0;" id="roles-modal-title">แก้ไขบทบาท</h2>
       <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="owner" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Owner</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="frontdesk" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Front Desk</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="technician" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Technician</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping (All)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_precious" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping (Precious)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_moment" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Housekeeping (Moment)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="revenue" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Revenue</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="expense" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Expense</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="accountant" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">Accountant</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="owner" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">เจ้าของ</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="frontdesk" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">หน้าเคาน์เตอร์</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="technician" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">ช่างซ่อม</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (ทั้งหมด)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_precious" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (เดอะเพรเชียส)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_moment" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (เดอะโมเมนต์)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="revenue" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">รายรับ</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="expense" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">รายจ่าย</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="accountant" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">บัญชี</span></label>
       </div>
       <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="roles-modal-cancel" style="margin-top:0;">Cancel</button>
-        <button class="btn-primary" id="roles-modal-save" style="margin-top:0;">Save</button>
+        <button class="btn-secondary" id="roles-modal-cancel" style="margin-top:0;">ยกเลิก</button>
+        <button class="btn-primary" id="roles-modal-save" style="margin-top:0;">บันทึก</button>
       </div>
       <div class="error hidden" id="roles-modal-error"></div>
     </div>
@@ -564,8 +564,8 @@
           res.rows.forEach(function(row) {
             var tr = document.createElement('tr');
             var statusHtml = row.flagStatus === 'FLAGGED'
-              ? '<span class="pill flag">Flagged</span><div class="reason">' + row.flagReason + '</div>'
-              : '<span class="pill ok">OK</span>';
+              ? '<span class="pill flag">ผิดปกติ</span><div class="reason">' + row.flagReason + '</div>'
+              : '<span class="pill ok">ปกติ</span>';
             tr.innerHTML =
               '<td>' + row.timestamp + '</td>' +
               '<td>' + row.employeeName + '</td>' +
@@ -576,7 +576,7 @@
           });
         }
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
@@ -646,29 +646,29 @@
       hide('add-employee-success');
 
       if (!name || !username || !password) {
-        document.getElementById('add-employee-error').textContent = 'Fill in name, username, and a temporary password.';
+        document.getElementById('add-employee-error').textContent = 'กรุณากรอกชื่อ ชื่อผู้ใช้ และรหัสผ่านชั่วคราว';
         show('add-employee-error');
         return;
       }
       if (password.length < 6) {
-        document.getElementById('add-employee-error').textContent = 'Temporary password should be at least 6 characters.';
+        document.getElementById('add-employee-error').textContent = 'รหัสผ่านชั่วคราวควรมีอย่างน้อย 6 ตัวอักษร';
         show('add-employee-error');
         return;
       }
 
       var btn = document.getElementById('add-employee-btn');
       btn.disabled = true;
-      btn.textContent = 'Adding...';
+      btn.textContent = 'กำลังเพิ่ม...';
 
       clientHashPassword(password).then(function(hashedPassword) {
         return callApi('adminAddEmployee', [token, name, username, hashedPassword, isAdmin]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'Add employee';
+        btn.textContent = 'เพิ่มพนักงาน';
         if (res.ok) {
           document.getElementById('add-employee-success').textContent =
-            'Added ' + name + '. Username: ' + username + '  Temporary password: ' + password +
-            '  — share these with the employee directly; they are not shown again.';
+            'เพิ่ม ' + name + ' แล้ว ชื่อผู้ใช้: ' + username + '  รหัสผ่านชั่วคราว: ' + password +
+            '  — กรุณาแจ้งข้อมูลนี้ให้พนักงานโดยตรง จะไม่แสดงอีก';
           show('add-employee-success');
           document.getElementById('new-emp-name').value = '';
           document.getElementById('new-emp-username').value = '';
@@ -681,8 +681,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'Add employee';
-        document.getElementById('add-employee-error').textContent = 'Connection error: ' + err.message;
+        btn.textContent = 'เพิ่มพนักงาน';
+        document.getElementById('add-employee-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
         show('add-employee-error');
       });
     });
@@ -697,34 +697,35 @@
         renderLeaveRequestRows(res.leaveRequests || []);
         renderSwapRequestRows(res.swapRequests || []);
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
     function renderLeaveRequestRows(rows) {
       var tbody = document.getElementById('leave-requests-rows');
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="muted">No pending leave requests.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="muted">ไม่มีคำขอลาที่รออนุมัติ</td></tr>';
         return;
       }
       tbody.innerHTML = '';
+      var LEAVE_TYPE_TH = { MEDICAL: 'ลาป่วย', VACATION: 'ลาพักร้อน' };
       rows.forEach(function(r) {
         var tr = document.createElement('tr');
-        var evidenceCell = '<span class="muted">n/a</span>';
+        var evidenceCell = '<span class="muted">ไม่มี</span>';
         if (r.type === 'MEDICAL') {
           evidenceCell = r.evidenceVerified
-            ? '<span class="pill ok">Verified</span>'
-            : '<button class="row-action-btn" onclick="verifyEvidence(\'' + r.requestId + '\')">Mark Verified</button>';
+            ? '<span class="pill ok">ยืนยันแล้ว</span>'
+            : '<button class="row-action-btn" onclick="verifyEvidence(\'' + r.requestId + '\')">ยืนยันหลักฐาน</button>';
         }
         tr.innerHTML =
           '<td>' + escapeHtml(r.employeeName) + '</td>' +
           '<td>' + r.leaveDate + '</td>' +
-          '<td>' + r.type + '</td>' +
+          '<td>' + (LEAVE_TYPE_TH[r.type] || r.type) + '</td>' +
           '<td>' + escapeHtml(r.reason || '-') + '</td>' +
           '<td>' + evidenceCell + '</td>' +
           '<td>' +
-            '<button class="row-action-btn" onclick="processLeave(\'' + r.requestId + '\', \'APPROVED\')">Approve</button> ' +
-            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processLeave(\'' + r.requestId + '\', \'REJECTED\')">Reject</button>' +
+            '<button class="row-action-btn" onclick="processLeave(\'' + r.requestId + '\', \'APPROVED\')">อนุมัติ</button> ' +
+            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processLeave(\'' + r.requestId + '\', \'REJECTED\')">ไม่อนุมัติ</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -733,7 +734,7 @@
     function renderSwapRequestRows(rows) {
       var tbody = document.getElementById('swap-requests-rows');
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="muted">No pending swap requests.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="muted">ไม่มีคำขอสลับวันหยุดที่รออนุมัติ</td></tr>';
         return;
       }
       tbody.innerHTML = '';
@@ -744,8 +745,8 @@
           '<td>' + r.originalDate + '</td>' +
           '<td>' + r.newDate + '</td>' +
           '<td>' +
-            '<button class="row-action-btn" onclick="processSwap(\'' + r.swapId + '\', \'APPROVED\')">Approve</button> ' +
-            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processSwap(\'' + r.swapId + '\', \'REJECTED\')">Reject</button>' +
+            '<button class="row-action-btn" onclick="processSwap(\'' + r.swapId + '\', \'APPROVED\')">อนุมัติ</button> ' +
+            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processSwap(\'' + r.swapId + '\', \'REJECTED\')">ไม่อนุมัติ</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -786,20 +787,20 @@
           hide('employees-empty-msg');
           res.employees.forEach(function(emp) {
             var tr = document.createElement('tr');
-            var roleLabel = emp.isAdmin ? 'Admin' : 'Employee';
+            var roleLabel = emp.isAdmin ? 'ผู้ดูแลระบบ' : 'พนักงาน';
             var statusLabel = emp.active
-              ? '<span class="pill ok">Active</span>'
-              : '<span class="pill flag">Deactivated</span>';
+              ? '<span class="pill ok">ใช้งาน</span>'
+              : '<span class="pill flag">ปิดใช้งาน</span>';
             var tdAction = document.createElement('td');
             var resetBtn = document.createElement('button');
             resetBtn.className = 'row-action-btn';
-            resetBtn.textContent = 'Reset password';
+            resetBtn.textContent = 'รีเซ็ตรหัสผ่าน';
             resetBtn.addEventListener('click', function() {
               openResetModal(emp.employeeId, emp.name);
             });
             tdAction.appendChild(resetBtn);
 
-            var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ Termination Warning</span>' : '';
+            var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ คำเตือนก่อนเลิกจ้าง</span>' : '';
             tr.innerHTML =
               '<td>' + emp.name + warningBadge + '</td>' +
               '<td>' + emp.username + '</td>' +
@@ -810,7 +811,7 @@
           });
         }
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
@@ -821,7 +822,7 @@
 
     function openResetModal(employeeId, employeeName) {
       resetTargetEmployeeId = employeeId;
-      document.getElementById('reset-modal-employee-name').textContent = 'For: ' + employeeName;
+      document.getElementById('reset-modal-employee-name').textContent = 'สำหรับ: ' + employeeName;
       document.getElementById('reset-new-password').value = '';
       hide('reset-modal-error');
       show('reset-modal');
@@ -839,22 +840,22 @@
       hide('reset-modal-error');
 
       if (!newPassword || newPassword.length < 6) {
-        document.getElementById('reset-modal-error').textContent = 'Enter a new password of at least 6 characters.';
+        document.getElementById('reset-modal-error').textContent = 'กรอกรหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร';
         show('reset-modal-error');
         return;
       }
 
       var btn = document.getElementById('reset-modal-confirm');
       btn.disabled = true;
-      btn.textContent = 'Resetting...';
+      btn.textContent = 'กำลังรีเซ็ต...';
 
       clientHashPassword(newPassword).then(function(hashedPassword) {
         return callApi('adminResetPassword', [token, resetTargetEmployeeId, hashedPassword]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'Reset';
+        btn.textContent = 'รีเซ็ต';
         if (res.ok) {
-          alert('Password reset. New temporary password: ' + newPassword + ' — share this with the employee directly.');
+          alert('รีเซ็ตรหัสผ่านแล้ว รหัสผ่านชั่วคราวใหม่: ' + newPassword + ' — กรุณาแจ้งให้พนักงานโดยตรง');
           closeResetModal();
         } else {
           document.getElementById('reset-modal-error').textContent = res.error;
@@ -862,8 +863,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'Reset';
-        document.getElementById('reset-modal-error').textContent = 'Connection error: ' + err.message;
+        btn.textContent = 'รีเซ็ต';
+        document.getElementById('reset-modal-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
         show('reset-modal-error');
       });
     });
@@ -878,32 +879,32 @@
       hide('change-password-success');
 
       if (!oldPassword || !newPassword) {
-        document.getElementById('change-password-error').textContent = 'Fill in both your current and new password.';
+        document.getElementById('change-password-error').textContent = 'กรุณากรอกรหัสผ่านปัจจุบันและรหัสผ่านใหม่';
         show('change-password-error');
         return;
       }
       if (newPassword.length < 6) {
-        document.getElementById('change-password-error').textContent = 'New password should be at least 6 characters.';
+        document.getElementById('change-password-error').textContent = 'รหัสผ่านใหม่ควรมีอย่างน้อย 6 ตัวอักษร';
         show('change-password-error');
         return;
       }
       if (newPassword !== confirmPassword) {
-        document.getElementById('change-password-error').textContent = 'New password and confirmation do not match.';
+        document.getElementById('change-password-error').textContent = 'รหัสผ่านใหม่และการยืนยันไม่ตรงกัน';
         show('change-password-error');
         return;
       }
 
       var btn = document.getElementById('change-password-btn');
       btn.disabled = true;
-      btn.textContent = 'Changing...';
+      btn.textContent = 'กำลังเปลี่ยน...';
 
       Promise.all([clientHashPassword(oldPassword), clientHashPassword(newPassword)]).then(function(hashes) {
         return callApi('changeOwnPassword', [token, hashes[0], hashes[1]]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'Change password';
+        btn.textContent = 'เปลี่ยนรหัสผ่าน';
         if (res.ok) {
-          document.getElementById('change-password-success').textContent = 'Password changed successfully.';
+          document.getElementById('change-password-success').textContent = 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว';
           show('change-password-success');
           document.getElementById('change-old-password').value = '';
           document.getElementById('change-new-password').value = '';
@@ -914,8 +915,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'Change password';
-        document.getElementById('change-password-error').textContent = 'Connection error: ' + err.message;
+        btn.textContent = 'เปลี่ยนรหัสผ่าน';
+        document.getElementById('change-password-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
         show('change-password-error');
       });
     });
@@ -935,12 +936,12 @@
     }
 
     var STATUS_LABELS = {
-      PRESENT: 'Present',
-      LATE: 'Late',
-      ABSENT: 'Absent',
-      NOT_YET_CHECKED_IN: 'Not yet checked in',
-      MEDICAL_LEAVE: 'Medical Leave',
-      VACATION_LEAVE: 'Vacation Leave',
+      PRESENT: 'มาทำงาน',
+      LATE: 'มาสาย',
+      ABSENT: 'ขาดงาน',
+      NOT_YET_CHECKED_IN: 'ยังไม่ลงเวลา',
+      MEDICAL_LEAVE: 'ลาป่วย',
+      VACATION_LEAVE: 'ลาพักร้อน',
     };
     var STATUS_PILL_CLASS = {
       PRESENT: 'ok',
@@ -976,7 +977,7 @@
             var tdAction = document.createElement('td');
             var setBtn = document.createElement('button');
             setBtn.className = 'row-action-btn';
-            setBtn.textContent = row.isOverride ? 'Edit' : 'Set status';
+            setBtn.textContent = row.isOverride ? 'แก้ไข' : 'ตั้งสถานะ';
             setBtn.addEventListener('click', function() {
               openOverrideModal(row.employeeId, row.name, dateStr);
             });
@@ -986,7 +987,7 @@
               var clearBtn = document.createElement('button');
               clearBtn.className = 'row-action-btn';
               clearBtn.style.marginLeft = '6px';
-              clearBtn.textContent = 'Clear';
+              clearBtn.textContent = 'ล้าง';
               clearBtn.addEventListener('click', function() {
                 clearOverride(row.employeeId, dateStr);
               });
@@ -1002,7 +1003,7 @@
           });
         }
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
@@ -1011,7 +1012,7 @@
 
     function openOverrideModal(employeeId, employeeName, dateStr) {
       overrideTargetEmployeeId = employeeId;
-      document.getElementById('override-modal-employee-name').textContent = 'For: ' + employeeName;
+      document.getElementById('override-modal-employee-name').textContent = 'สำหรับ: ' + employeeName;
       document.getElementById('override-status').value = 'PRESENT';
       document.getElementById('override-start-date').value = dateStr;
       document.getElementById('override-end-date').value = dateStr;
@@ -1036,24 +1037,24 @@
       hide('override-modal-error');
 
       if (!startDate || !endDate) {
-        document.getElementById('override-modal-error').textContent = 'Choose both a start and end date.';
+        document.getElementById('override-modal-error').textContent = 'เลือกวันที่เริ่มต้นและสิ้นสุด';
         show('override-modal-error');
         return;
       }
       if (startDate > endDate) {
-        document.getElementById('override-modal-error').textContent = 'From date must be on or before the to date.';
+        document.getElementById('override-modal-error').textContent = 'วันที่เริ่มต้นต้องอยู่ก่อนหรือเท่ากับวันที่สิ้นสุด';
         show('override-modal-error');
         return;
       }
 
       var btn = document.getElementById('override-modal-confirm');
       btn.disabled = true;
-      btn.textContent = 'Saving...';
+      btn.textContent = 'กำลังบันทึก...';
 
       callApi('adminSetAttendanceOverride', [token, overrideTargetEmployeeId, startDate, endDate, status, note])
         .then(function(res) {
           btn.disabled = false;
-          btn.textContent = 'Save';
+          btn.textContent = 'บันทึก';
           if (res.ok) {
             closeOverrideModal();
             loadAttendance();
@@ -1063,14 +1064,14 @@
           }
         }).catch(function(err) {
           btn.disabled = false;
-          btn.textContent = 'Save';
-          document.getElementById('override-modal-error').textContent = 'Connection error: ' + err.message;
+          btn.textContent = 'บันทึก';
+          document.getElementById('override-modal-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
           show('override-modal-error');
         });
     });
 
     async function clearOverride(employeeId, dateStr) {
-      if (!(await confirmDialog('Clear the manual status for this date? It will go back to auto-detected status.', {title:'Clear manual status', confirmText:'Clear'}))) return;
+      if (!(await confirmDialog('ล้างสถานะที่ตั้งเองสำหรับวันนี้? จะกลับไปใช้สถานะที่ระบบตรวจจับอัตโนมัติ', {title:'ล้างสถานะที่ตั้งเอง', confirmText:'ล้าง'}))) return;
       callApi('adminClearAttendanceOverride', [token, employeeId, dateStr]).then(function(res) {
         if (res.ok) {
           loadAttendance();
@@ -1078,7 +1079,7 @@
           alert(res.error);
         }
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
@@ -1099,7 +1100,7 @@
       hide('monthly-grid-section');
 
       var tbody = document.getElementById('monthly-summary-rows');
-      tbody.innerHTML = '<tr><td colspan="6" class="muted">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="muted">กำลังโหลด...</td></tr>';
 
       var apiName = type === 'yearly' ? 'dashboardGetYearlyReport' : 'dashboardGetMonthlyReport';
       var args = type === 'yearly' ? [token, year] : [token, year, month];
@@ -1112,7 +1113,7 @@
         currentMonthlyData = res;
         renderMonthlySummary(res);
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
@@ -1138,7 +1139,7 @@
           '<td>' + counts.LATE + '</td>' +
           '<td>' + counts.ABSENT + '</td>' +
           '<td>' + leaveCount + '</td>' +
-          '<td class="muted">' + (expandedEmployeeId === emp.employeeId ? '▲ Hide' : '▼ Details') + '</td>';
+          '<td class="muted">' + (expandedEmployeeId === emp.employeeId ? '▲ ซ่อน' : '▼ รายละเอียด') + '</td>';
         tr.addEventListener('click', function() {
           if (expandedEmployeeId === emp.employeeId) {
             expandedEmployeeId = null;
@@ -1167,7 +1168,7 @@
     };
 
     function renderMonthlyGrid(emp, data) {
-      document.getElementById('monthly-grid-title').textContent = 'Daily breakdown — ' + emp.name;
+      document.getElementById('monthly-grid-title').textContent = 'รายละเอียดรายวัน — ' + emp.name;
       var table = document.getElementById('monthly-grid-table');
       table.innerHTML = '';
 
@@ -1200,22 +1201,22 @@
     }
 
     function renderYearlyGrid(emp) {
-      document.getElementById('monthly-grid-title').textContent = 'Monthly breakdown — ' + emp.name;
+      document.getElementById('monthly-grid-title').textContent = 'สรุปรายเดือน — ' + emp.name;
       var table = document.getElementById('monthly-grid-table');
       table.innerHTML =
         '<thead>' +
           '<tr>' +
-            '<th>Month</th>' +
-            '<th>Present</th>' +
-            '<th>Late</th>' +
-            '<th>Absent / Unpaid</th>' +
-            '<th>Vacation Leave</th>' +
-            '<th>Medical Leave</th>' +
+            '<th>เดือน</th>' +
+            '<th>มาทำงาน</th>' +
+            '<th>มาสาย</th>' +
+            '<th>ขาดงาน/ไม่รับค่าจ้าง</th>' +
+            '<th>ลาพักร้อน</th>' +
+            '<th>ลาป่วย</th>' +
           '</tr>' +
         '</thead>' +
         '<tbody>' +
           emp.months.map(function(m) {
-            var monthName = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m.month - 1];
+            var monthName = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][m.month - 1];
             return '<tr>' +
               '<td>' + monthName + '</td>' +
               '<td>' + m.PRESENT + '</td>' +
@@ -1231,7 +1232,7 @@
 
     document.getElementById('monthly-export-btn').addEventListener('click', function() {
       if (!currentMonthlyData) {
-        alert('Load a report first.');
+        alert('โหลดรายงานก่อน');
         return;
       }
       var type = document.getElementById('monthly-type').value;
@@ -1251,13 +1252,13 @@
       var lines = [];
 
       // Header row: Name, Username, then one column per day of the month.
-      var headerCols = ['Name', 'Username'];
+      var headerCols = ['ชื่อ', 'ชื่อผู้ใช้'];
       if (data.employees.length > 0) {
         data.employees[0].dailyStatuses.forEach(function(day) {
           headerCols.push(day.date);
         });
       }
-      headerCols.push('Present', 'Late', 'Absent', 'Medical Leave', 'Vacation Leave');
+      headerCols.push('มาทำงาน', 'มาสาย', 'ขาดงาน', 'ลาป่วย', 'ลาพักร้อน');
       lines.push(headerCols.map(csvEscape).join(','));
 
       data.employees.forEach(function(emp) {
@@ -1283,9 +1284,9 @@
 
     function exportYearlyReportCsv(data) {
       var lines = [];
-      var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-      lines.push(['Name', 'Month', 'Present', 'Late', 'Absent / Unpaid', 'Vacation Leave', 'Medical Leave'].map(csvEscape).join(','));
+      lines.push(['ชื่อ', 'เดือน', 'มาทำงาน', 'มาสาย', 'ขาดงาน/ไม่รับค่าจ้าง', 'ลาพักร้อน', 'ลาป่วย'].map(csvEscape).join(','));
 
       data.employees.forEach(function(emp) {
         emp.months.forEach(function(m) {
@@ -1329,7 +1330,7 @@
         var tbody = document.getElementById('roles-table-body');
         var list = res.employees || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">No employees found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">ไม่พบพนักงาน</td></tr>';
           return;
         }
         tbody.innerHTML = '';
@@ -1339,7 +1340,7 @@
           var tdAction = document.createElement('td');
           var editBtn = document.createElement('button');
           editBtn.className = 'row-action-btn';
-          editBtn.textContent = 'Edit roles';
+          editBtn.textContent = 'แก้ไขบทบาท';
           editBtn.addEventListener('click', function() {
             openRolesModal(emp.employeeId, emp.name, emp.roles || []);
           });
@@ -1353,13 +1354,13 @@
           tbody.appendChild(tr);
         });
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert('เชื่อมต่อผิดพลาด: ' + err.message);
       });
     }
 
     function openRolesModal(employeeId, employeeName, currentRoles) {
       rolesEditingEmployeeId = employeeId;
-      document.getElementById('roles-modal-title').textContent = 'Edit Roles — ' + employeeName;
+      document.getElementById('roles-modal-title').textContent = 'แก้ไขบทบาท — ' + employeeName;
       hide('roles-modal-error');
       document.querySelectorAll('.role-cb').forEach(function(cb) {
         cb.checked = currentRoles.indexOf(cb.value) >= 0;
@@ -1383,7 +1384,7 @@
 
       var allRoles = ['owner', 'frontdesk', 'technician', 'housekeeping', 'housekeeping_precious', 'housekeeping_moment', 'revenue', 'expense', 'accountant'];
       var btn = document.getElementById('roles-modal-save');
-      btn.disabled = true; btn.textContent = 'Saving...';
+      btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
 
       var chain = Promise.resolve();
       allRoles.forEach(function(role) {
@@ -1394,14 +1395,14 @@
       });
 
       chain.then(function() {
-        btn.disabled = false; btn.textContent = 'Save';
+        btn.disabled = false; btn.textContent = 'บันทึก';
         hide('roles-modal');
         rolesEditingEmployeeId = null;
         loadRolesList();
         fetchUserRoles();
       }).catch(function(err) {
-        btn.disabled = false; btn.textContent = 'Save';
-        document.getElementById('roles-modal-error').textContent = 'Failed to save: ' + err.message;
+        btn.disabled = false; btn.textContent = 'บันทึก';
+        document.getElementById('roles-modal-error').textContent = 'บันทึกไม่สำเร็จ: ' + err.message;
         show('roles-modal-error');
       });
     });
@@ -1464,7 +1465,7 @@
         tbody.innerHTML = '';
         var list = res.complaints || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px;">No complaints logged yet.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px;">ยังไม่มีข้อร้องเรียน</td></tr>';
           return;
         }
         list.forEach(function(c) {
@@ -1491,8 +1492,8 @@
 
           var assignDivs = c.assignments.map(function(a) {
             var badgeClass = a.acknowledgedAt ? 'pill ok' : 'pill flag';
-            var badgeText = a.acknowledgedAt ? 'Acknowledged' : 'Pending';
-            var ackTime = a.acknowledgedAt ? '<div class="muted" style="font-size:10px;">At: ' + a.acknowledgedAt.slice(0, 16).replace('T', ' ') + '</div>' : '';
+            var badgeText = a.acknowledgedAt ? 'รับทราบแล้ว' : 'รอรับทราบ';
+            var ackTime = a.acknowledgedAt ? '<div class="muted" style="font-size:10px;">เมื่อ: ' + a.acknowledgedAt.slice(0, 16).replace('T', ' ') + '</div>' : '';
             return '<div style="margin-bottom:8px;">' +
               '<strong>' + escapeHtml(a.employeeName) + '</strong> ' +
               '<span class="' + badgeClass + '" style="font-size:10px; padding:2px 6px;">' + badgeText + '</span>' +
@@ -1508,7 +1509,7 @@
           tr.appendChild(imgTd);
 
           var assignTd = document.createElement('td');
-          assignTd.innerHTML = assignDivs || '<span class="muted">No assignments</span>';
+          assignTd.innerHTML = assignDivs || '<span class="muted">ไม่มีการมอบหมาย</span>';
           tr.appendChild(assignTd);
 
           tbody.appendChild(tr);
@@ -1529,20 +1530,20 @@
       });
 
       if (!date || !cat || !desc || !empIds.length) {
-        statusEl.textContent = 'Please fill out date, category, description, and select at least one employee.';
+        statusEl.textContent = 'กรุณากรอกวันที่ หมวด รายละเอียด และเลือกพนักงานอย่างน้อยหนึ่งคน';
         statusEl.className = 'error';
         show('notice-save-status');
         return;
       }
 
-      statusEl.textContent = 'Saving complaint...';
+      statusEl.textContent = 'กำลังบันทึกข้อร้องเรียน...';
       statusEl.className = 'success';
       show('notice-save-status');
 
       var proceedSave = function(base64Data) {
         callApi('ownerCreateComplaint', [token, date, cat, desc, base64Data, empIds]).then(function(res) {
           if (res.ok) {
-            statusEl.textContent = 'Complaint logged and warning sent successfully!';
+            statusEl.textContent = 'บันทึกข้อร้องเรียนและส่งใบเตือนเรียบร้อยแล้ว!';
             statusEl.className = 'success';
             document.getElementById('notice-incident-date').value = '';
             document.getElementById('notice-category').value = '';
@@ -1552,11 +1553,11 @@
             loadComplaints();
             setTimeout(function() { hide('notice-save-status'); }, 3000);
           } else {
-            statusEl.textContent = 'Error: ' + res.error;
+            statusEl.textContent = 'ข้อผิดพลาด: ' + res.error;
             statusEl.className = 'error';
           }
         }).catch(function(e) {
-          statusEl.textContent = 'Connection error: ' + e.message;
+          statusEl.textContent = 'เชื่อมต่อผิดพลาด: ' + e.message;
           statusEl.className = 'error';
         });
       };
