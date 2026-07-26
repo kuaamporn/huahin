@@ -974,10 +974,10 @@
     function localTaskTitle(task) {
       var room = task.displayName || task.roomId || '';
       if (task.type === 'housekeeping') return t('index.task_clean_room', room);
-      var t = task.title || '';
-      if (/closed/i.test(t)) return t('index.task_closed_room', room);
-      if (/maintenance/i.test(t)) return t('index.task_maintenance', room);
-      return t;
+      var title = task.title || '';
+      if (/closed/i.test(title)) return t('index.task_closed_room', room);
+      if (/maintenance/i.test(title)) return t('index.task_maintenance', room);
+      return title;
     }
     function localTaskDesc(d) {
       if (!d) return d;
