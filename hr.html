@@ -4,7 +4,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>บุคคล — The Precious Moment</title>
+  <title data-i18n="hr.title">บุคคล — The Precious Moment</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     @import url('app.css');
@@ -108,205 +108,205 @@
   <div id="dash-screen" class="wrap">
     <div class="dash-topbar">
       <div class="topbar-header">
-        <h1>บุคคล</h1>
-        <a href="#" id="logout-link" class="btn-signout signout">ออกจากระบบ</a>
+        <h1 data-i18n="hr.h1">บุคคล</h1>
+        <a href="#" id="logout-link" class="btn-signout signout" data-i18n="nav.signout">ออกจากระบบ</a>
       </div>
       <div class="dash-nav-links" id="hh-nav" data-page="hr"></div>
     </div>
     <div class="navbar">
       <div class="nav-tabs">
-        <button class="nav-tab active" id="tab-checkins">ลงเวลาวันนี้</button>
-        <button class="nav-tab" id="tab-attendance">การเข้างาน</button>
-        <button class="nav-tab" id="tab-monthly">รายงานประจำเดือน</button>
-        <button class="nav-tab" id="tab-employees">พนักงาน</button>
-        <button class="nav-tab hidden" id="tab-leaves">อนุมัติการลา &amp; สลับวันหยุด</button>
-        <button class="nav-tab" id="tab-account">บัญชีของฉัน</button>
-        <button class="nav-tab hidden" id="tab-roles">บทบาท</button>
-        <button class="nav-tab hidden" id="tab-notices">ข้อร้องเรียน &amp; ใบเตือน</button>
+        <button class="nav-tab active" id="tab-checkins" data-i18n="hr.tab_checkins">ลงเวลาวันนี้</button>
+        <button class="nav-tab" id="tab-attendance" data-i18n="hr.tab_attendance">การเข้างาน</button>
+        <button class="nav-tab" id="tab-monthly" data-i18n="hr.tab_monthly">รายงานประจำเดือน</button>
+        <button class="nav-tab" id="tab-employees" data-i18n="hr.tab_employees">พนักงาน</button>
+        <button class="nav-tab hidden" id="tab-leaves" data-i18n="hr.tab_leaves">อนุมัติการลา &amp; สลับวันหยุด</button>
+        <button class="nav-tab" id="tab-account" data-i18n="hr.tab_account">บัญชีของฉัน</button>
+        <button class="nav-tab hidden" id="tab-roles" data-i18n="hr.tab_roles">บทบาท</button>
+        <button class="nav-tab hidden" id="tab-notices" data-i18n="hr.tab_notices">ข้อร้องเรียน &amp; ใบเตือน</button>
       </div>
     </div>
 
     <!-- ===================== TODAY'S CHECK-INS ===================== -->
     <div id="panel-checkins">
-      <h1>การลงเวลาวันนี้</h1>
+      <h1 data-i18n="hr.checkins_h1">การลงเวลาวันนี้</h1>
       <div class="sub" id="date-label"></div>
 
       <div class="summary">
-        <div class="stat"><div class="n" id="stat-total">0</div><div class="l">รายการทั้งหมด</div></div>
-        <div class="stat"><div class="n" id="stat-ok">0</div><div class="l">ปกติ</div></div>
-        <div class="stat"><div class="n" id="stat-flagged" style="color:var(--warn);">0</div><div class="l">ผิดปกติ</div></div>
+        <div class="stat"><div class="n" id="stat-total">0</div><div class="l" data-i18n="hr.stat_total">รายการทั้งหมด</div></div>
+        <div class="stat"><div class="n" id="stat-ok">0</div><div class="l" data-i18n="hr.stat_ok">ปกติ</div></div>
+        <div class="stat"><div class="n" id="stat-flagged" style="color:var(--warn);">0</div><div class="l" data-i18n="hr.stat_flagged">ผิดปกติ</div></div>
       </div>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>เวลา</th><th>พนักงาน</th><th>ประเภท</th><th>สำนักงาน</th><th>สถานะ</th></tr>
+          <tr><th data-i18n="hr.col_time">เวลา</th><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.col_type">ประเภท</th><th data-i18n="hr.col_office">สำนักงาน</th><th data-i18n="hr.col_status">สถานะ</th></tr>
         </thead>
         <tbody id="log-rows"></tbody>
       </table>
       </div>
 
-      <div class="muted" id="empty-msg" style="margin-top:14px;">ยังไม่มีการลงเวลาในวันนี้</div>
+      <div class="muted" id="empty-msg" style="margin-top:14px;" data-i18n="hr.no_checkins">ยังไม่มีการลงเวลาในวันนี้</div>
 
       <div style="margin-top:24px;">
-        <button id="refresh-btn">รีเฟรช</button>
+        <button id="refresh-btn" data-i18n="hr.refresh">รีเฟรช</button>
       </div>
     </div>
 
     <!-- ===================== ATTENDANCE ===================== -->
     <div id="panel-attendance" class="hidden">
-      <h1>การเข้างาน</h1>
-      <div class="sub">สถานะการเข้างานประจำวัน การปรับสถานะด้วยมือ (ลา ฯลฯ) จะมีความสำคัญกว่าสถานะที่ระบบตรวจจับอัตโนมัติเสมอ</div>
+      <h1 data-i18n="hr.tab_attendance">การเข้างาน</h1>
+      <div class="sub" data-i18n="hr.att_sub">สถานะการเข้างานประจำวัน การปรับสถานะด้วยมือ (ลา ฯลฯ) จะมีความสำคัญกว่าสถานะที่ระบบตรวจจับอัตโนมัติเสมอ</div>
 
       <div class="card-section">
-        <label for="attendance-date">วันที่</label>
+        <label for="attendance-date" data-i18n="hr.date">วันที่</label>
         <input id="attendance-date" type="date" style="max-width:220px;" />
-        <button id="attendance-load-btn" style="margin-top:10px;width:auto;padding:10px 16px;">โหลด</button>
+        <button id="attendance-load-btn" style="margin-top:10px;width:auto;padding:10px 16px;" data-i18n="hr.load">โหลด</button>
       </div>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>พนักงาน</th><th>สถานะ</th><th>หมายเหตุ</th><th>การจัดการ</th></tr>
+          <tr><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.col_note">หมายเหตุ</th><th data-i18n="hr.col_actions">การจัดการ</th></tr>
         </thead>
         <tbody id="attendance-rows"></tbody>
       </table>
       </div>
-      <div class="muted" id="attendance-empty-msg" style="margin-top:14px;">ไม่พบพนักงาน</div>
+      <div class="muted" id="attendance-empty-msg" style="margin-top:14px;" data-i18n="hr.no_employees_found">ไม่พบพนักงาน</div>
     </div>
 
     <!-- ===================== MONTHLY REPORT ===================== -->
     <div id="panel-monthly" class="hidden">
-      <h1>รายงานประจำเดือน</h1>
-      <div class="sub">สรุปการเข้างานรายเดือน คลิกแถวเพื่อดูรายละเอียดแต่ละวัน</div>
+      <h1 data-i18n="hr.tab_monthly">รายงานประจำเดือน</h1>
+      <div class="sub" data-i18n="hr.monthly_sub">สรุปการเข้างานรายเดือน คลิกแถวเพื่อดูรายละเอียดแต่ละวัน</div>
 
       <div class="card-section">
         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
           <div>
-            <label for="monthly-type">ประเภทรายงาน</label>
+            <label for="monthly-type" data-i18n="hr.report_type">ประเภทรายงาน</label>
             <select id="monthly-type" onchange="toggleReportTypeFields()" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
-              <option value="monthly">รายเดือน</option>
-              <option value="yearly">รายปี</option>
+              <option value="monthly" data-i18n="hr.report_monthly">รายเดือน</option>
+              <option value="yearly" data-i18n="hr.report_yearly">รายปี</option>
             </select>
           </div>
           <div>
-            <label for="monthly-year">ปี</label>
+            <label for="monthly-year" data-i18n="hr.year">ปี</label>
             <input id="monthly-year" type="number" style="max-width:120px;" />
           </div>
           <div id="monthly-month-group">
-            <label for="monthly-month">เดือน</label>
+            <label for="monthly-month" data-i18n="hr.month">เดือน</label>
             <select id="monthly-month" style="padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
-              <option value="1">มกราคม</option>
-              <option value="2">กุมภาพันธ์</option>
-              <option value="3">มีนาคม</option>
-              <option value="4">เมษายน</option>
-              <option value="5">พฤษภาคม</option>
-              <option value="6">มิถุนายน</option>
-              <option value="7">กรกฎาคม</option>
-              <option value="8">สิงหาคม</option>
-              <option value="9">กันยายน</option>
-              <option value="10">ตุลาคม</option>
-              <option value="11">พฤศจิกายน</option>
-              <option value="12">ธันวาคม</option>
+              <option value="1" data-i18n="month.1">มกราคม</option>
+              <option value="2" data-i18n="month.2">กุมภาพันธ์</option>
+              <option value="3" data-i18n="month.3">มีนาคม</option>
+              <option value="4" data-i18n="month.4">เมษายน</option>
+              <option value="5" data-i18n="month.5">พฤษภาคม</option>
+              <option value="6" data-i18n="month.6">มิถุนายน</option>
+              <option value="7" data-i18n="month.7">กรกฎาคม</option>
+              <option value="8" data-i18n="month.8">สิงหาคม</option>
+              <option value="9" data-i18n="month.9">กันยายน</option>
+              <option value="10" data-i18n="month.10">ตุลาคม</option>
+              <option value="11" data-i18n="month.11">พฤศจิกายน</option>
+              <option value="12" data-i18n="month.12">ธันวาคม</option>
             </select>
           </div>
-          <button id="monthly-load-btn" style="width:auto;padding:10px 16px;margin-top:0;">โหลด</button>
-          <button id="monthly-export-btn" style="width:auto;padding:10px 16px;margin-top:0;">ส่งออก CSV</button>
+          <button id="monthly-load-btn" style="width:auto;padding:10px 16px;margin-top:0;" data-i18n="hr.load">โหลด</button>
+          <button id="monthly-export-btn" style="width:auto;padding:10px 16px;margin-top:0;" data-i18n="hr.export_csv">ส่งออก CSV</button>
         </div>
       </div>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>พนักงาน</th><th>มาทำงาน</th><th>มาสาย</th><th>ขาดงาน</th><th>ลา</th><th></th></tr>
+          <tr><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.st_present">มาทำงาน</th><th data-i18n="hr.st_late">มาสาย</th><th data-i18n="hr.st_absent">ขาดงาน</th><th data-i18n="hr.st_leave">ลา</th><th></th></tr>
         </thead>
         <tbody id="monthly-summary-rows"></tbody>
       </table>
       </div>
-      <div class="muted" id="monthly-empty-msg" style="margin-top:14px;">ยังไม่มีข้อมูลสำหรับเดือนนี้</div>
+      <div class="muted" id="monthly-empty-msg" style="margin-top:14px;" data-i18n="hr.no_month_data">ยังไม่มีข้อมูลสำหรับเดือนนี้</div>
 
       <div class="card-section hidden" id="monthly-grid-section" style="margin-top:20px;overflow-x:auto;">
-        <h2 id="monthly-grid-title">รายละเอียดรายวัน</h2>
+        <h2 id="monthly-grid-title" data-i18n="hr.daily_detail">รายละเอียดรายวัน</h2>
         <table id="monthly-grid-table" style="min-width:900px;"></table>
       </div>
     </div>
 
     <!-- ===================== EMPLOYEES ===================== -->
     <div id="panel-employees" class="hidden">
-      <h1>พนักงาน</h1>
-      <div class="sub">เพิ่มพนักงานใหม่ หรือรีเซ็ตรหัสผ่านที่ลืม</div>
+      <h1 data-i18n="hr.tab_employees">พนักงาน</h1>
+      <div class="sub" data-i18n="hr.emp_sub">เพิ่มพนักงานใหม่ หรือรีเซ็ตรหัสผ่านที่ลืม</div>
 
       <div class="card-section">
-        <h2>เพิ่มพนักงานใหม่</h2>
-        <label for="new-emp-name">ชื่อ-นามสกุล</label>
-        <input id="new-emp-name" type="text" placeholder="เช่น สมชาย ใจดี" />
-        <label for="new-emp-username">ชื่อผู้ใช้</label>
-        <input id="new-emp-username" type="text" placeholder="เช่น somchai" autocapitalize="none" />
-        <label for="new-emp-password">รหัสผ่านชั่วคราว</label>
-        <input id="new-emp-password" type="text" placeholder="เช่น Welcome123!" />
+        <h2 data-i18n="hr.emp_add_h2">เพิ่มพนักงานใหม่</h2>
+        <label for="new-emp-name" data-i18n="hr.emp_fullname">ชื่อ-นามสกุล</label>
+        <input id="new-emp-name" type="text" placeholder="เช่น สมชาย ใจดี" data-i18n-attr="placeholder:hr.emp_name_ph" />
+        <label for="new-emp-username" data-i18n="hr.emp_username">ชื่อผู้ใช้</label>
+        <input id="new-emp-username" type="text" placeholder="เช่น somchai" data-i18n-attr="placeholder:hr.emp_username_ph" autocapitalize="none" />
+        <label for="new-emp-password" data-i18n="hr.emp_temp_pw">รหัสผ่านชั่วคราว</label>
+        <input id="new-emp-password" type="text" placeholder="เช่น Welcome123!" data-i18n-attr="placeholder:hr.emp_pw_ph" />
         <label style="display:flex;align-items:center;gap:8px;margin-top:12px;">
           <input id="new-emp-admin" type="checkbox" style="width:auto;" />
-          <span style="font-size:13px;color:var(--ink);">ให้สิทธิ์เข้าถึงแดชบอร์ด/ผู้ดูแลระบบ</span>
+          <span style="font-size:13px;color:var(--ink);" data-i18n="hr.emp_admin_access">ให้สิทธิ์เข้าถึงแดชบอร์ด/ผู้ดูแลระบบ</span>
         </label>
-        <button class="btn-primary" id="add-employee-btn">เพิ่มพนักงาน</button>
+        <button class="btn-primary" id="add-employee-btn" data-i18n="hr.emp_add_btn">เพิ่มพนักงาน</button>
         <div class="error hidden" id="add-employee-error"></div>
         <div class="success hidden" id="add-employee-success"></div>
       </div>
 
       <div class="card-section">
-        <h2>พนักงานทั้งหมด</h2>
-        <button id="refresh-employees-btn" style="margin-bottom:12px;">รีเฟรชรายการ</button>
+        <h2 data-i18n="hr.emp_all_h2">พนักงานทั้งหมด</h2>
+        <button id="refresh-employees-btn" style="margin-bottom:12px;" data-i18n="hr.refresh_list">รีเฟรชรายการ</button>
         <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th>ชื่อ</th><th>ชื่อผู้ใช้</th><th>ตำแหน่ง</th><th>สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th>รีเซ็ตรหัสผ่าน</th></tr>
+            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
         </div>
-        <div class="muted" id="employees-empty-msg" style="margin-top:14px;">ยังไม่มีพนักงาน</div>
+        <div class="muted" id="employees-empty-msg" style="margin-top:14px;" data-i18n="hr.no_employees">ยังไม่มีพนักงาน</div>
       </div>
     </div>
 
     <!-- ===================== LEAVE & SWAP APPROVALS ===================== -->
     <div id="panel-leaves" class="hidden">
-      <h1>อนุมัติการลาและสลับวันหยุด</h1>
-      <div class="sub">คำขอที่พนักงานส่งมาจากหน้าลงเวลา คุณไม่สามารถอนุมัติคำขอของตัวเองได้</div>
+      <h1 data-i18n="hr.leaves_h1">อนุมัติการลาและสลับวันหยุด</h1>
+      <div class="sub" data-i18n="hr.leaves_sub">คำขอที่พนักงานส่งมาจากหน้าลงเวลา คุณไม่สามารถอนุมัติคำขอของตัวเองได้</div>
 
       <div class="card-section">
-        <h2 style="margin-top:0;">คำขอลาที่รออนุมัติ</h2>
+        <h2 style="margin-top:0;" data-i18n="hr.leaves_pending_h2">คำขอลาที่รออนุมัติ</h2>
         <table>
           <thead>
-            <tr><th>พนักงาน</th><th>วันที่</th><th>ประเภท</th><th>เหตุผล</th><th>หลักฐาน</th><th>การจัดการ</th></tr>
+            <tr><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.col_date">วันที่</th><th data-i18n="hr.col_type">ประเภท</th><th data-i18n="hr.col_reason">เหตุผล</th><th data-i18n="hr.col_evidence">หลักฐาน</th><th data-i18n="hr.col_actions">การจัดการ</th></tr>
           </thead>
-          <tbody id="leave-requests-rows"><tr><td colspan="6" class="muted">กำลังโหลด...</td></tr></tbody>
+          <tbody id="leave-requests-rows"><tr><td colspan="6" class="muted" data-i18n="hr.loading">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
 
       <div class="card-section" style="margin-top:20px;">
-        <h2 style="margin-top:0;">คำขอสลับวันหยุดที่รออนุมัติ</h2>
+        <h2 style="margin-top:0;" data-i18n="hr.swaps_pending_h2">คำขอสลับวันหยุดที่รออนุมัติ</h2>
         <table>
           <thead>
-            <tr><th>พนักงาน</th><th>วันเดิม</th><th>วันใหม่</th><th>การจัดการ</th></tr>
+            <tr><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.col_old_day">วันเดิม</th><th data-i18n="hr.col_new_day">วันใหม่</th><th data-i18n="hr.col_actions">การจัดการ</th></tr>
           </thead>
-          <tbody id="swap-requests-rows"><tr><td colspan="4" class="muted">กำลังโหลด...</td></tr></tbody>
+          <tbody id="swap-requests-rows"><tr><td colspan="4" class="muted" data-i18n="hr.loading">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
     </div>
 
     <!-- ===================== MY ACCOUNT ===================== -->
     <div id="panel-account" class="hidden">
-      <h1>บัญชีของฉัน</h1>
-      <div class="sub">เปลี่ยนรหัสผ่านของคุณเอง</div>
+      <h1 data-i18n="hr.tab_account">บัญชีของฉัน</h1>
+      <div class="sub" data-i18n="hr.acct_sub">เปลี่ยนรหัสผ่านของคุณเอง</div>
 
       <div class="card-section">
-        <label for="change-old-password">รหัสผ่านปัจจุบัน</label>
+        <label for="change-old-password" data-i18n="hr.pw_current">รหัสผ่านปัจจุบัน</label>
         <input id="change-old-password" type="password" />
-        <label for="change-new-password">รหัสผ่านใหม่</label>
+        <label for="change-new-password" data-i18n="hr.pw_new">รหัสผ่านใหม่</label>
         <input id="change-new-password" type="password" />
-        <label for="change-new-password-confirm">ยืนยันรหัสผ่านใหม่</label>
+        <label for="change-new-password-confirm" data-i18n="hr.pw_confirm">ยืนยันรหัสผ่านใหม่</label>
         <input id="change-new-password-confirm" type="password" />
-        <button class="btn-primary" id="change-password-btn">เปลี่ยนรหัสผ่าน</button>
+        <button class="btn-primary" id="change-password-btn" data-i18n="hr.pw_change_btn">เปลี่ยนรหัสผ่าน</button>
         <div class="error hidden" id="change-password-error"></div>
         <div class="success hidden" id="change-password-success"></div>
       </div>
@@ -314,27 +314,27 @@
 
     <!-- ===================== ROLES ===================== -->
     <div id="panel-roles" class="hidden">
-      <h1>บทบาทพนักงาน</h1>
+      <h1 data-i18n="hr.roles_h1">บทบาทพนักงาน</h1>
       <div class="sub">
-        กำหนดหลายบทบาทให้พนักงานแต่ละคนเพื่อควบคุมสิทธิ์การเข้าถึง:
+        <span data-i18n="hr.roles_intro">กำหนดหลายบทบาทให้พนักงานแต่ละคนเพื่อควบคุมสิทธิ์การเข้าถึง:</span>
         <ul style="margin-top: 8px; margin-bottom: 16px; padding-left: 20px;">
-          <li><b>เจ้าของ (owner)</b>: เข้าถึงได้ทั้งหมด ดูข้อมูลการเงิน และแก้ไขรายการที่ตรวจสอบแล้วได้</li>
-          <li><b>หน้าเคาน์เตอร์ (frontdesk)</b>: เพิ่มและจัดการการจองห้องได้</li>
-          <li><b>ช่างซ่อม (technician)</b>: ดูสถานะห้องและจัดการงานซ่อมได้</li>
-          <li><b>แม่บ้าน (housekeeping / housekeeping_precious / housekeeping_moment)</b>: ดูสถานะห้องและทำเครื่องหมายว่าทำความสะอาดแล้วได้ (ทั้งหมด, เฉพาะเดอะเพรเชียส หรือเฉพาะเดอะโมเมนต์)</li>
-          <li><b>บัญชี (accountant)</b>: ดูสรุปและรายการทางการเงิน เพิ่มและอนุมัติรายการรายรับและรายจ่ายได้ (เจ้าของเป็นผู้ตรวจสอบยืนยัน)</li>
+          <li><b data-i18n="hr.role_owner">เจ้าของ (owner)</b>: <span data-i18n="hr.role_owner_desc">เข้าถึงได้ทั้งหมด ดูข้อมูลการเงิน และแก้ไขรายการที่ตรวจสอบแล้วได้</span></li>
+          <li><b data-i18n="hr.role_frontdesk">หน้าเคาน์เตอร์ (frontdesk)</b>: <span data-i18n="hr.role_frontdesk_desc">เพิ่มและจัดการการจองห้องได้</span></li>
+          <li><b data-i18n="hr.role_technician">ช่างซ่อม (technician)</b>: <span data-i18n="hr.role_technician_desc">ดูสถานะห้องและจัดการงานซ่อมได้</span></li>
+          <li><b data-i18n="hr.role_housekeeping">แม่บ้าน (housekeeping / housekeeping_precious / housekeeping_moment)</b>: <span data-i18n="hr.role_housekeeping_desc">ดูสถานะห้องและทำเครื่องหมายว่าทำความสะอาดแล้วได้ (ทั้งหมด, เฉพาะเดอะเพรเชียส หรือเฉพาะเดอะโมเมนต์)</span></li>
+          <li><b data-i18n="hr.role_accountant">บัญชี (accountant)</b>: <span data-i18n="hr.role_accountant_desc">ดูสรุปและรายการทางการเงิน เพิ่มและอนุมัติรายการรายรับและรายจ่ายได้ (เจ้าของเป็นผู้ตรวจสอบยืนยัน)</span></li>
         </ul>
       </div>
 
-      <button id="roles-refresh-btn" style="margin-bottom:12px;">รีเฟรชรายการ</button>
+      <button id="roles-refresh-btn" style="margin-bottom:12px;" data-i18n="hr.refresh_list">รีเฟรชรายการ</button>
 
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th>ชื่อ</th><th>ชื่อผู้ใช้</th><th>บทบาท</th><th>การจัดการ</th></tr>
+          <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_roles">บทบาท</th><th data-i18n="hr.col_actions">การจัดการ</th></tr>
         </thead>
         <tbody id="roles-table-body">
-          <tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">ยังไม่โหลดข้อมูลพนักงาน</td></tr>
+          <tr><td colspan="4" class="muted" style="text-align:center;padding:20px;" data-i18n="hr.roles_not_loaded">ยังไม่โหลดข้อมูลพนักงาน</td></tr>
         </tbody>
       </table>
       </div>
@@ -342,56 +342,56 @@
 
     <!-- ===================== COMPLAINTS & NOTICES ===================== -->
     <div id="panel-notices" class="hidden">
-      <h1>ข้อร้องเรียนลูกค้า &amp; ใบเตือน</h1>
-      <div class="sub">บันทึกข้อร้องเรียนของลูกค้า อัปโหลดรูปหลักฐาน และออกใบเตือนเป็นลายลักษณ์อักษรให้พนักงานตามกฎหมายแรงงานไทย</div>
+      <h1 data-i18n="hr.notices_h1">ข้อร้องเรียนลูกค้า &amp; ใบเตือน</h1>
+      <div class="sub" data-i18n="hr.notices_sub">บันทึกข้อร้องเรียนของลูกค้า อัปโหลดรูปหลักฐาน และออกใบเตือนเป็นลายลักษณ์อักษรให้พนักงานตามกฎหมายแรงงานไทย</div>
 
       <div class="grid-2">
         <!-- Form Card -->
         <div class="card-section" style="margin-bottom:0;">
-          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--go); border-bottom:1px solid var(--line); padding-bottom:8px;">บันทึกข้อร้องเรียนลูกค้า</h3>
+          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--go); border-bottom:1px solid var(--line); padding-bottom:8px;" data-i18n="hr.notice_form_h3">บันทึกข้อร้องเรียนลูกค้า</h3>
 
-          <label>วันที่เกิดเหตุ</label>
+          <label data-i18n="hr.notice_date">วันที่เกิดเหตุ</label>
           <input type="date" id="notice-incident-date" />
 
-          <label>หมวดข้อผิดพลาด</label>
+          <label data-i18n="hr.notice_category">หมวดข้อผิดพลาด</label>
           <select id="notice-category" style="width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; font-family: inherit; margin-bottom: 12px; outline: none; background:#fff;">
-            <option value="">-- เลือกหมวด --</option>
+            <option value="" data-i18n="hr.notice_pick_cat">-- เลือกหมวด --</option>
           </select>
 
-          <label>พนักงานที่เกี่ยวข้อง</label>
+          <label data-i18n="hr.notice_employees">พนักงานที่เกี่ยวข้อง</label>
           <div id="notice-employee-checkboxes" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 12px; background:#fff; display:flex; flex-direction:column; gap:8px;">
             <!-- Javascript loaded -->
           </div>
 
-          <label>รายละเอียดเหตุการณ์</label>
+          <label data-i18n="hr.notice_desc">รายละเอียดเหตุการณ์</label>
           <textarea id="notice-description" style="width: 100%; height: 80px; padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; font-family: inherit; margin-bottom: 12px; outline: none; resize:vertical;"></textarea>
 
-          <label>แนบรูปหลักฐาน</label>
+          <label data-i18n="hr.notice_attach">แนบรูปหลักฐาน</label>
           <input type="file" id="notice-file-input" accept="image/*" style="margin-bottom:12px; font-size:13px;" />
           <canvas id="notice-compress-canvas" style="display:none;"></canvas>
 
           <div style="display:flex; gap:12px; align-items:center;">
-            <button class="btn-primary" id="btn-save-notice" style="margin-top:0;">บันทึกและส่งใบเตือน</button>
+            <button class="btn-primary" id="btn-save-notice" style="margin-top:0;" data-i18n="hr.notice_save_btn">บันทึกและส่งใบเตือน</button>
             <div id="notice-save-status"></div>
           </div>
         </div>
 
         <!-- History Card -->
         <div class="card-section" style="margin-bottom:0; display:flex; flex-direction:column;">
-          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px;">ประวัติข้อร้องเรียน</h3>
+          <h3 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px;" data-i18n="hr.notice_history_h3">ประวัติข้อร้องเรียน</h3>
           <div style="overflow-x:auto; flex:1;">
             <table style="min-width: 500px;">
               <thead>
                 <tr>
-                  <th>วันที่</th>
-                  <th>หมวด</th>
-                  <th>รายละเอียด</th>
-                  <th>หลักฐาน</th>
-                  <th>การมอบหมาย &amp; สถานะ</th>
+                  <th data-i18n="hr.col_date">วันที่</th>
+                  <th data-i18n="hr.col_category">หมวด</th>
+                  <th data-i18n="hr.col_details">รายละเอียด</th>
+                  <th data-i18n="hr.col_evidence">หลักฐาน</th>
+                  <th data-i18n="hr.col_assign_status">การมอบหมาย &amp; สถานะ</th>
                 </tr>
               </thead>
               <tbody id="notices-table-body">
-                <tr><td colspan="5" class="muted" style="text-align:center;">ยังไม่มีข้อร้องเรียน</td></tr>
+                <tr><td colspan="5" class="muted" style="text-align:center;" data-i18n="hr.no_notices">ยังไม่มีข้อร้องเรียน</td></tr>
               </tbody>
             </table>
           </div>
@@ -411,13 +411,13 @@
   <!-- ===================== RESET PASSWORD MODAL ===================== -->
   <div id="reset-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;">รีเซ็ตรหัสผ่าน</h2>
+      <h2 style="margin-top:0;" data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</h2>
       <div class="sub" id="reset-modal-employee-name"></div>
-      <label for="reset-new-password">รหัสผ่านชั่วคราวใหม่</label>
-      <input id="reset-new-password" type="text" placeholder="เช่น Welcome123!" />
+      <label for="reset-new-password" data-i18n="hr.new_temp_pw">รหัสผ่านชั่วคราวใหม่</label>
+      <input id="reset-new-password" type="text" placeholder="เช่น Welcome123!" data-i18n-attr="placeholder:hr.emp_pw_ph" />
       <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="reset-modal-cancel" style="margin-top:0;">ยกเลิก</button>
-        <button class="btn-primary" id="reset-modal-confirm" style="margin-top:0;">รีเซ็ต</button>
+        <button class="btn-secondary" id="reset-modal-cancel" style="margin-top:0;" data-i18n="hr.cancel">ยกเลิก</button>
+        <button class="btn-primary" id="reset-modal-confirm" style="margin-top:0;" data-i18n="hr.reset">รีเซ็ต</button>
       </div>
       <div class="error hidden" id="reset-modal-error"></div>
     </div>
@@ -426,29 +426,29 @@
   <!-- ===================== ATTENDANCE OVERRIDE MODAL ===================== -->
   <div id="override-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;">ตั้งสถานะการเข้างาน</h2>
+      <h2 style="margin-top:0;" data-i18n="hr.override_h2">ตั้งสถานะการเข้างาน</h2>
       <div class="sub" id="override-modal-employee-name"></div>
 
-      <label for="override-status">สถานะ</label>
+      <label for="override-status" data-i18n="hr.col_status">สถานะ</label>
       <select id="override-status" style="width:100%;padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:7px;">
-        <option value="PRESENT">มาทำงาน</option>
-        <option value="ABSENT">ขาดงาน</option>
-        <option value="MEDICAL_LEAVE">ลาป่วย</option>
-        <option value="VACATION_LEAVE">ลาพักร้อน</option>
+        <option value="PRESENT" data-i18n="hr.st_present">มาทำงาน</option>
+        <option value="ABSENT" data-i18n="hr.st_absent">ขาดงาน</option>
+        <option value="MEDICAL_LEAVE" data-i18n="hr.st_medical">ลาป่วย</option>
+        <option value="VACATION_LEAVE" data-i18n="hr.st_vacation">ลาพักร้อน</option>
       </select>
 
-      <label for="override-start-date">จากวันที่</label>
+      <label for="override-start-date" data-i18n="hr.date_from">จากวันที่</label>
       <input id="override-start-date" type="date" />
-      <label for="override-end-date">ถึงวันที่</label>
+      <label for="override-end-date" data-i18n="hr.date_to">ถึงวันที่</label>
       <input id="override-end-date" type="date" />
-      <div class="muted" style="margin-top:6px;">ใช้วันที่เดียวกันทั้งสองช่องสำหรับวันเดียว</div>
+      <div class="muted" style="margin-top:6px;" data-i18n="hr.same_day_hint">ใช้วันที่เดียวกันทั้งสองช่องสำหรับวันเดียว</div>
 
-      <label for="override-note">หมายเหตุ (ถ้ามี)</label>
-      <input id="override-note" type="text" placeholder="เช่น นัดหมอ" />
+      <label for="override-note" data-i18n="hr.note_optional">หมายเหตุ (ถ้ามี)</label>
+      <input id="override-note" type="text" placeholder="เช่น นัดหมอ" data-i18n-attr="placeholder:hr.note_ph" />
 
       <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="override-modal-cancel" style="margin-top:0;">ยกเลิก</button>
-        <button class="btn-primary" id="override-modal-confirm" style="margin-top:0;">บันทึก</button>
+        <button class="btn-secondary" id="override-modal-cancel" style="margin-top:0;" data-i18n="hr.cancel">ยกเลิก</button>
+        <button class="btn-primary" id="override-modal-confirm" style="margin-top:0;" data-i18n="hr.save">บันทึก</button>
       </div>
       <div class="error hidden" id="override-modal-error"></div>
     </div>
@@ -457,19 +457,19 @@
   <!-- ===================== ROLES EDIT MODAL ===================== -->
   <div id="roles-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 style="margin-top:0;" id="roles-modal-title">แก้ไขบทบาท</h2>
+      <h2 style="margin-top:0;" id="roles-modal-title" data-i18n="hr.roles_edit_h2">แก้ไขบทบาท</h2>
       <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="owner" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">เจ้าของ</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="frontdesk" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">หน้าเคาน์เตอร์</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="technician" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">ช่างซ่อม</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (ทั้งหมด)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_precious" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (เดอะเพรเชียส)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_moment" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (เดอะโมเมนต์)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="accountant" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">บัญชี</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="owner" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_owner_short">เจ้าของ</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="frontdesk" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_frontdesk_short">หน้าเคาน์เตอร์</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="technician" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_technician_short">ช่างซ่อม</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_hk_all">แม่บ้าน (ทั้งหมด)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_precious" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_hk_precious">แม่บ้าน (เดอะเพรเชียส)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_moment" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_hk_moment">แม่บ้าน (เดอะโมเมนต์)</span></label>
+        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="accountant" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;" data-i18n="hr.role_accountant_short">บัญชี</span></label>
       </div>
       <div style="display:flex;gap:10px;margin-top:14px;">
-        <button class="btn-secondary" id="roles-modal-cancel" style="margin-top:0;">ยกเลิก</button>
-        <button class="btn-primary" id="roles-modal-save" style="margin-top:0;">บันทึก</button>
+        <button class="btn-secondary" id="roles-modal-cancel" style="margin-top:0;" data-i18n="hr.cancel">ยกเลิก</button>
+        <button class="btn-primary" id="roles-modal-save" style="margin-top:0;" data-i18n="hr.save">บันทึก</button>
       </div>
       <div class="error hidden" id="roles-modal-error"></div>
     </div>
@@ -544,8 +544,8 @@
           res.rows.forEach(function(row) {
             var tr = document.createElement('tr');
             var statusHtml = row.flagStatus === 'FLAGGED'
-              ? '<span class="pill flag">ผิดปกติ</span><div class="reason">' + row.flagReason + '</div>'
-              : '<span class="pill ok">ปกติ</span>';
+              ? '<span class="pill flag">' + t('hr.stat_flagged') + '</span><div class="reason">' + row.flagReason + '</div>'
+              : '<span class="pill ok">' + t('hr.stat_ok') + '</span>';
             tr.innerHTML =
               '<td>' + row.timestamp + '</td>' +
               '<td>' + row.employeeName + '</td>' +
@@ -556,15 +556,23 @@
           });
         }
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
     document.getElementById('refresh-btn').addEventListener('click', loadToday);
 
+    // Static text re-renders itself via data-i18n; table rows are built in JS,
+    // so redraw whichever tab is on screen to pick up the new language.
+    HuaHinI18n.onLangChange(function() {
+      if (activeTab === 'checkins') loadToday(); else switchTab(activeTab);
+    });
+
     // ===================== TAB SWITCHING =====================
     var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', leaves: 'panel-leaves', account: 'panel-account', roles: 'panel-roles', notices: 'panel-notices' };
     var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles', notices: 'tab-notices' };
+
+    var activeTab = 'checkins';
 
     function switchTab(name) {
       if ((name === 'employees' || name === 'roles' || name === 'notices') && !hasRole('owner')) {
@@ -575,6 +583,7 @@
         switchTab('checkins');
         return;
       }
+      activeTab = name;
       Object.keys(panels).forEach(function(key) {
         document.getElementById(panels[key]).classList.toggle('hidden', key !== name);
         document.getElementById(tabs[key]).classList.toggle('active', key === name);
@@ -626,29 +635,29 @@
       hide('add-employee-success');
 
       if (!name || !username || !password) {
-        document.getElementById('add-employee-error').textContent = 'กรุณากรอกชื่อ ชื่อผู้ใช้ และรหัสผ่านชั่วคราว';
+        document.getElementById('add-employee-error').textContent = t('hr.err_need_fields');
         show('add-employee-error');
         return;
       }
       if (password.length < 6) {
-        document.getElementById('add-employee-error').textContent = 'รหัสผ่านชั่วคราวควรมีอย่างน้อย 6 ตัวอักษร';
+        document.getElementById('add-employee-error').textContent = t('hr.err_pw_min');
         show('add-employee-error');
         return;
       }
 
       var btn = document.getElementById('add-employee-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังเพิ่ม...';
+      btn.textContent = t('hr.adding');
 
       clientHashPassword(password).then(function(hashedPassword) {
         return callApi('adminAddEmployee', [token, name, username, hashedPassword, isAdmin]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'เพิ่มพนักงาน';
+        btn.textContent = t('hr.emp_add_btn');
         if (res.ok) {
           document.getElementById('add-employee-success').textContent =
-            'เพิ่ม ' + name + ' แล้ว ชื่อผู้ใช้: ' + username + '  รหัสผ่านชั่วคราว: ' + password +
-            '  — กรุณาแจ้งข้อมูลนี้ให้พนักงานโดยตรง จะไม่แสดงอีก';
+            t('hr.added_prefix') + name + t('hr.added_username') + username + t('hr.added_temp_pw') + password +
+            t('hr.added_warn');
           show('add-employee-success');
           document.getElementById('new-emp-name').value = '';
           document.getElementById('new-emp-username').value = '';
@@ -661,8 +670,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'เพิ่มพนักงาน';
-        document.getElementById('add-employee-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+        btn.textContent = t('hr.emp_add_btn');
+        document.getElementById('add-employee-error').textContent = t('hr.err_network') + err.message;
         show('add-employee-error');
       });
     });
@@ -677,25 +686,25 @@
         renderLeaveRequestRows(res.leaveRequests || []);
         renderSwapRequestRows(res.swapRequests || []);
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
     function renderLeaveRequestRows(rows) {
       var tbody = document.getElementById('leave-requests-rows');
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="muted">ไม่มีคำขอลาที่รออนุมัติ</td></tr>';
+        tbody.innerHTML = t('hr.no_pending_leaves_row');
         return;
       }
       tbody.innerHTML = '';
-      var LEAVE_TYPE_TH = { MEDICAL: 'ลาป่วย', VACATION: 'ลาพักร้อน' };
+      var LEAVE_TYPE_TH = { MEDICAL: t('hr.st_medical'), VACATION: t('hr.st_vacation') };
       rows.forEach(function(r) {
         var tr = document.createElement('tr');
-        var evidenceCell = '<span class="muted">ไม่มี</span>';
+        var evidenceCell = t('hr.none_row');
         if (r.type === 'MEDICAL') {
           evidenceCell = r.evidenceVerified
-            ? '<span class="pill ok">ยืนยันแล้ว</span>'
-            : '<button class="row-action-btn" onclick="verifyEvidence(\'' + r.requestId + '\')">ยืนยันหลักฐาน</button>';
+            ? t('hr.verified_pill')
+            : '<button class="row-action-btn" onclick="verifyEvidence(\'' + r.requestId + '\')">' + t('hr.verify_evidence') + '</button>';
         }
         tr.innerHTML =
           '<td>' + escapeHtml(r.employeeName) + '</td>' +
@@ -704,8 +713,8 @@
           '<td>' + escapeHtml(r.reason || '-') + '</td>' +
           '<td>' + evidenceCell + '</td>' +
           '<td>' +
-            '<button class="row-action-btn" onclick="processLeave(\'' + r.requestId + '\', \'APPROVED\')">อนุมัติ</button> ' +
-            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processLeave(\'' + r.requestId + '\', \'REJECTED\')">ไม่อนุมัติ</button>' +
+            '<button class="row-action-btn" onclick="processLeave(\'' + r.requestId + '\', \'APPROVED\')">' + t('hr.approve') + '</button> ' +
+            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processLeave(\'' + r.requestId + '\', \'REJECTED\')">' + t('hr.reject') + '</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -714,7 +723,7 @@
     function renderSwapRequestRows(rows) {
       var tbody = document.getElementById('swap-requests-rows');
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="muted">ไม่มีคำขอสลับวันหยุดที่รออนุมัติ</td></tr>';
+        tbody.innerHTML = t('hr.no_pending_swaps_row');
         return;
       }
       tbody.innerHTML = '';
@@ -725,8 +734,8 @@
           '<td>' + r.originalDate + '</td>' +
           '<td>' + r.newDate + '</td>' +
           '<td>' +
-            '<button class="row-action-btn" onclick="processSwap(\'' + r.swapId + '\', \'APPROVED\')">อนุมัติ</button> ' +
-            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processSwap(\'' + r.swapId + '\', \'REJECTED\')">ไม่อนุมัติ</button>' +
+            '<button class="row-action-btn" onclick="processSwap(\'' + r.swapId + '\', \'APPROVED\')">' + t('hr.approve') + '</button> ' +
+            '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="processSwap(\'' + r.swapId + '\', \'REJECTED\')">' + t('hr.reject') + '</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -767,14 +776,14 @@
           hide('employees-empty-msg');
           res.employees.forEach(function(emp) {
             var tr = document.createElement('tr');
-            var roleLabel = emp.isAdmin ? 'ผู้ดูแลระบบ' : 'พนักงาน';
+            var roleLabel = emp.isAdmin ? t('hr.role_admin') : t('hr.role_staff');
             var statusLabel = emp.active
-              ? '<span class="pill ok">ใช้งาน</span>'
-              : '<span class="pill flag">ปิดใช้งาน</span>';
+              ? t('hr.active_pill')
+              : t('hr.inactive_pill');
             var tdAction = document.createElement('td');
             var resetBtn = document.createElement('button');
             resetBtn.className = 'row-action-btn';
-            resetBtn.textContent = 'รีเซ็ตรหัสผ่าน';
+            resetBtn.textContent = t('hr.reset_pw');
             resetBtn.addEventListener('click', function() {
               openResetModal(emp.employeeId, emp.name);
             });
@@ -782,13 +791,13 @@
 
             // HR's default UI language for this employee (migration_27). It only
             // seeds a new hire or a device that has never chosen — the employee's
-            // own EN/ไทย toggle outranks it, so changing this does not override
+            // own EN/TH toggle outranks it, so changing this does not override
             // anyone who has already picked.
             var tdLang = document.createElement('td');
             var langSel = document.createElement('select');
             langSel.style.padding = '4px 6px';
             langSel.setAttribute('aria-label', t('hr.emp_lang') + ' — ' + emp.name);
-            [['', t('hr.emp_lang_none')], ['th', 'ไทย'], ['en', 'English']].forEach(function(o) {
+            [['', t('hr.emp_lang_none')], ['th', t('nav.lang_th')], ['en', t('nav.lang_en')]].forEach(function(o) {
               var opt = document.createElement('option');
               opt.value = o[0];
               opt.textContent = o[1];
@@ -803,12 +812,12 @@
                   if (!res.ok) { langSel.value = prev; alert(res.error); return; }
                   emp.lang = res.lang;
                 })
-                .catch(function(err) { langSel.value = prev; alert('เชื่อมต่อผิดพลาด: ' + err.message); })
+                .catch(function(err) { langSel.value = prev; alert(t('hr.err_network') + err.message); })
                 .then(function() { langSel.disabled = false; });
             });
             tdLang.appendChild(langSel);
 
-            var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ คำเตือนก่อนเลิกจ้าง</span>' : '';
+            var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ ' + t('hr.termination_warning') + '</span>' : '';
             tr.innerHTML =
               '<td>' + emp.name + warningBadge + '</td>' +
               '<td>' + emp.username + '</td>' +
@@ -820,7 +829,7 @@
           });
         }
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
@@ -831,7 +840,7 @@
 
     function openResetModal(employeeId, employeeName) {
       resetTargetEmployeeId = employeeId;
-      document.getElementById('reset-modal-employee-name').textContent = 'สำหรับ: ' + employeeName;
+      document.getElementById('reset-modal-employee-name').textContent = t('hr.for_prefix') + employeeName;
       document.getElementById('reset-new-password').value = '';
       hide('reset-modal-error');
       show('reset-modal');
@@ -849,22 +858,22 @@
       hide('reset-modal-error');
 
       if (!newPassword || newPassword.length < 6) {
-        document.getElementById('reset-modal-error').textContent = 'กรอกรหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร';
+        document.getElementById('reset-modal-error').textContent = t('hr.err_new_pw_min');
         show('reset-modal-error');
         return;
       }
 
       var btn = document.getElementById('reset-modal-confirm');
       btn.disabled = true;
-      btn.textContent = 'กำลังรีเซ็ต...';
+      btn.textContent = t('hr.resetting');
 
       clientHashPassword(newPassword).then(function(hashedPassword) {
         return callApi('adminResetPassword', [token, resetTargetEmployeeId, hashedPassword]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'รีเซ็ต';
+        btn.textContent = t('hr.reset');
         if (res.ok) {
-          alert('รีเซ็ตรหัสผ่านแล้ว รหัสผ่านชั่วคราวใหม่: ' + newPassword + ' — กรุณาแจ้งให้พนักงานโดยตรง');
+          alert(t('hr.reset_done_prefix') + newPassword + t('hr.reset_done_suffix'));
           closeResetModal();
         } else {
           document.getElementById('reset-modal-error').textContent = res.error;
@@ -872,8 +881,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'รีเซ็ต';
-        document.getElementById('reset-modal-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+        btn.textContent = t('hr.reset');
+        document.getElementById('reset-modal-error').textContent = t('hr.err_network') + err.message;
         show('reset-modal-error');
       });
     });
@@ -888,32 +897,32 @@
       hide('change-password-success');
 
       if (!oldPassword || !newPassword) {
-        document.getElementById('change-password-error').textContent = 'กรุณากรอกรหัสผ่านปัจจุบันและรหัสผ่านใหม่';
+        document.getElementById('change-password-error').textContent = t('hr.err_need_pw');
         show('change-password-error');
         return;
       }
       if (newPassword.length < 6) {
-        document.getElementById('change-password-error').textContent = 'รหัสผ่านใหม่ควรมีอย่างน้อย 6 ตัวอักษร';
+        document.getElementById('change-password-error').textContent = t('hr.err_new_pw_min6');
         show('change-password-error');
         return;
       }
       if (newPassword !== confirmPassword) {
-        document.getElementById('change-password-error').textContent = 'รหัสผ่านใหม่และการยืนยันไม่ตรงกัน';
+        document.getElementById('change-password-error').textContent = t('hr.err_pw_mismatch');
         show('change-password-error');
         return;
       }
 
       var btn = document.getElementById('change-password-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังเปลี่ยน...';
+      btn.textContent = t('hr.changing');
 
       Promise.all([clientHashPassword(oldPassword), clientHashPassword(newPassword)]).then(function(hashes) {
         return callApi('changeOwnPassword', [token, hashes[0], hashes[1]]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'เปลี่ยนรหัสผ่าน';
+        btn.textContent = t('hr.pw_change_btn');
         if (res.ok) {
-          document.getElementById('change-password-success').textContent = 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว';
+          document.getElementById('change-password-success').textContent = t('hr.pw_changed_ok');
           show('change-password-success');
           document.getElementById('change-old-password').value = '';
           document.getElementById('change-new-password').value = '';
@@ -924,8 +933,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'เปลี่ยนรหัสผ่าน';
-        document.getElementById('change-password-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+        btn.textContent = t('hr.pw_change_btn');
+        document.getElementById('change-password-error').textContent = t('hr.err_network') + err.message;
         show('change-password-error');
       });
     });
@@ -944,13 +953,13 @@
       return y + '-' + m + '-' + day;
     }
 
-    var STATUS_LABELS = {
-      PRESENT: 'มาทำงาน',
-      LATE: 'มาสาย',
-      ABSENT: 'ขาดงาน',
-      NOT_YET_CHECKED_IN: 'ยังไม่ลงเวลา',
-      MEDICAL_LEAVE: 'ลาป่วย',
-      VACATION_LEAVE: 'ลาพักร้อน',
+    var STATUS_LABEL_KEYS = {
+      PRESENT: 'hr.st_present',
+      LATE: 'hr.st_late',
+      ABSENT: 'hr.st_absent',
+      NOT_YET_CHECKED_IN: 'hr.st_not_checked_in',
+      MEDICAL_LEAVE: 'hr.st_medical',
+      VACATION_LEAVE: 'hr.st_vacation',
     };
     var STATUS_PILL_CLASS = {
       PRESENT: 'ok',
@@ -981,12 +990,12 @@
           res.rows.forEach(function(row) {
             var tr = document.createElement('tr');
             var pillClass = STATUS_PILL_CLASS[row.status] || 'pending';
-            var label = STATUS_LABELS[row.status] || row.status;
+            var label = STATUS_LABEL_KEYS[row.status] ? t(STATUS_LABEL_KEYS[row.status]) : row.status;
 
             var tdAction = document.createElement('td');
             var setBtn = document.createElement('button');
             setBtn.className = 'row-action-btn';
-            setBtn.textContent = row.isOverride ? 'แก้ไข' : 'ตั้งสถานะ';
+            setBtn.textContent = row.isOverride ? t('hr.edit') : t('hr.set_status');
             setBtn.addEventListener('click', function() {
               openOverrideModal(row.employeeId, row.name, dateStr);
             });
@@ -996,7 +1005,7 @@
               var clearBtn = document.createElement('button');
               clearBtn.className = 'row-action-btn';
               clearBtn.style.marginLeft = '6px';
-              clearBtn.textContent = 'ล้าง';
+              clearBtn.textContent = t('hr.clear');
               clearBtn.addEventListener('click', function() {
                 clearOverride(row.employeeId, dateStr);
               });
@@ -1012,7 +1021,7 @@
           });
         }
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
@@ -1021,7 +1030,7 @@
 
     function openOverrideModal(employeeId, employeeName, dateStr) {
       overrideTargetEmployeeId = employeeId;
-      document.getElementById('override-modal-employee-name').textContent = 'สำหรับ: ' + employeeName;
+      document.getElementById('override-modal-employee-name').textContent = t('hr.for_prefix') + employeeName;
       document.getElementById('override-status').value = 'PRESENT';
       document.getElementById('override-start-date').value = dateStr;
       document.getElementById('override-end-date').value = dateStr;
@@ -1046,24 +1055,24 @@
       hide('override-modal-error');
 
       if (!startDate || !endDate) {
-        document.getElementById('override-modal-error').textContent = 'เลือกวันที่เริ่มต้นและสิ้นสุด';
+        document.getElementById('override-modal-error').textContent = t('hr.err_pick_dates');
         show('override-modal-error');
         return;
       }
       if (startDate > endDate) {
-        document.getElementById('override-modal-error').textContent = 'วันที่เริ่มต้นต้องอยู่ก่อนหรือเท่ากับวันที่สิ้นสุด';
+        document.getElementById('override-modal-error').textContent = t('hr.err_date_order');
         show('override-modal-error');
         return;
       }
 
       var btn = document.getElementById('override-modal-confirm');
       btn.disabled = true;
-      btn.textContent = 'กำลังบันทึก...';
+      btn.textContent = t('hr.saving');
 
       callApi('adminSetAttendanceOverride', [token, overrideTargetEmployeeId, startDate, endDate, status, note])
         .then(function(res) {
           btn.disabled = false;
-          btn.textContent = 'บันทึก';
+          btn.textContent = t('hr.save');
           if (res.ok) {
             closeOverrideModal();
             loadAttendance();
@@ -1073,14 +1082,14 @@
           }
         }).catch(function(err) {
           btn.disabled = false;
-          btn.textContent = 'บันทึก';
-          document.getElementById('override-modal-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+          btn.textContent = t('hr.save');
+          document.getElementById('override-modal-error').textContent = t('hr.err_network') + err.message;
           show('override-modal-error');
         });
     });
 
     async function clearOverride(employeeId, dateStr) {
-      if (!(await confirmDialog('ล้างสถานะที่ตั้งเองสำหรับวันนี้? จะกลับไปใช้สถานะที่ระบบตรวจจับอัตโนมัติ', {title:'ล้างสถานะที่ตั้งเอง', confirmText:'ล้าง'}))) return;
+      if (!(await confirmDialog(t('hr.clear_confirm_msg'), {title:t('hr.clear_confirm_title'), confirmText: t('hr.clear')}))) return;
       callApi('adminClearAttendanceOverride', [token, employeeId, dateStr]).then(function(res) {
         if (res.ok) {
           loadAttendance();
@@ -1088,7 +1097,7 @@
           alert(res.error);
         }
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
@@ -1109,7 +1118,7 @@
       hide('monthly-grid-section');
 
       var tbody = document.getElementById('monthly-summary-rows');
-      tbody.innerHTML = '<tr><td colspan="6" class="muted">กำลังโหลด...</td></tr>';
+      tbody.innerHTML = t('hr.loading_row6');
 
       var apiName = type === 'yearly' ? 'dashboardGetYearlyReport' : 'dashboardGetMonthlyReport';
       var args = type === 'yearly' ? [token, year] : [token, year, month];
@@ -1122,7 +1131,7 @@
         currentMonthlyData = res;
         renderMonthlySummary(res);
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
@@ -1148,7 +1157,7 @@
           '<td>' + counts.LATE + '</td>' +
           '<td>' + counts.ABSENT + '</td>' +
           '<td>' + leaveCount + '</td>' +
-          '<td class="muted">' + (expandedEmployeeId === emp.employeeId ? '▲ ซ่อน' : '▼ รายละเอียด') + '</td>';
+          '<td class="muted">' + (expandedEmployeeId === emp.employeeId ? '▲ ' + t('hr.hide') : '▼ ' + t('hr.details')) + '</td>';
         tr.addEventListener('click', function() {
           if (expandedEmployeeId === emp.employeeId) {
             expandedEmployeeId = null;
@@ -1177,7 +1186,7 @@
     };
 
     function renderMonthlyGrid(emp, data) {
-      document.getElementById('monthly-grid-title').textContent = 'รายละเอียดรายวัน — ' + emp.name;
+      document.getElementById('monthly-grid-title').textContent = t('hr.daily_detail') + ' — ' + emp.name;
       var table = document.getElementById('monthly-grid-table');
       table.innerHTML = '';
 
@@ -1210,22 +1219,22 @@
     }
 
     function renderYearlyGrid(emp) {
-      document.getElementById('monthly-grid-title').textContent = 'สรุปรายเดือน — ' + emp.name;
+      document.getElementById('monthly-grid-title').textContent = t('hr.monthly_summary_dash') + emp.name;
       var table = document.getElementById('monthly-grid-table');
       table.innerHTML =
         '<thead>' +
           '<tr>' +
-            '<th>เดือน</th>' +
-            '<th>มาทำงาน</th>' +
-            '<th>มาสาย</th>' +
-            '<th>ขาดงาน/ไม่รับค่าจ้าง</th>' +
-            '<th>ลาพักร้อน</th>' +
-            '<th>ลาป่วย</th>' +
+            '<th>' + t('hr.month') + '</th>' +
+            '<th>' + t('hr.st_present') + '</th>' +
+            '<th>' + t('hr.st_late') + '</th>' +
+            '<th>' + t('hr.st_absent_unpaid') + '</th>' +
+            '<th>' + t('hr.st_vacation') + '</th>' +
+            '<th>' + t('hr.st_medical') + '</th>' +
           '</tr>' +
         '</thead>' +
         '<tbody>' +
           emp.months.map(function(m) {
-            var monthName = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][m.month - 1];
+            var monthName = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(n) { return t('month.short.' + n); })[m.month - 1];
             return '<tr>' +
               '<td>' + monthName + '</td>' +
               '<td>' + m.PRESENT + '</td>' +
@@ -1241,7 +1250,7 @@
 
     document.getElementById('monthly-export-btn').addEventListener('click', function() {
       if (!currentMonthlyData) {
-        alert('โหลดรายงานก่อน');
+        alert(t('hr.err_load_first'));
         return;
       }
       var type = document.getElementById('monthly-type').value;
@@ -1261,13 +1270,13 @@
       var lines = [];
 
       // Header row: Name, Username, then one column per day of the month.
-      var headerCols = ['ชื่อ', 'ชื่อผู้ใช้'];
+      var headerCols = [t('hr.col_name'), t('hr.col_username')];
       if (data.employees.length > 0) {
         data.employees[0].dailyStatuses.forEach(function(day) {
           headerCols.push(day.date);
         });
       }
-      headerCols.push('มาทำงาน', 'มาสาย', 'ขาดงาน', 'ลาป่วย', 'ลาพักร้อน');
+      headerCols.push(t('hr.st_present'), t('hr.st_late'), t('hr.st_absent'), t('hr.st_medical'), t('hr.st_vacation'));
       lines.push(headerCols.map(csvEscape).join(','));
 
       data.employees.forEach(function(emp) {
@@ -1293,9 +1302,9 @@
 
     function exportYearlyReportCsv(data) {
       var lines = [];
-      var monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      var monthNames = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(n) { return t('month.short.' + n); });
 
-      lines.push(['ชื่อ', 'เดือน', 'มาทำงาน', 'มาสาย', 'ขาดงาน/ไม่รับค่าจ้าง', 'ลาพักร้อน', 'ลาป่วย'].map(csvEscape).join(','));
+      lines.push([t('hr.col_name'), t('hr.month'), t('hr.st_present'), t('hr.st_late'), t('hr.st_absent_unpaid'), t('hr.st_vacation'), t('hr.st_medical')].map(csvEscape).join(','));
 
       data.employees.forEach(function(emp) {
         emp.months.forEach(function(m) {
@@ -1339,7 +1348,7 @@
         var tbody = document.getElementById('roles-table-body');
         var list = res.employees || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">ไม่พบพนักงาน</td></tr>';
+          tbody.innerHTML = t('hr.no_employees_found_row');
           return;
         }
         tbody.innerHTML = '';
@@ -1349,7 +1358,7 @@
           var tdAction = document.createElement('td');
           var editBtn = document.createElement('button');
           editBtn.className = 'row-action-btn';
-          editBtn.textContent = 'แก้ไขบทบาท';
+          editBtn.textContent = t('hr.roles_edit_h2');
           editBtn.addEventListener('click', function() {
             openRolesModal(emp.employeeId, emp.name, emp.roles || []);
           });
@@ -1363,13 +1372,13 @@
           tbody.appendChild(tr);
         });
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('hr.err_network') + err.message);
       });
     }
 
     function openRolesModal(employeeId, employeeName, currentRoles) {
       rolesEditingEmployeeId = employeeId;
-      document.getElementById('roles-modal-title').textContent = 'แก้ไขบทบาท — ' + employeeName;
+      document.getElementById('roles-modal-title').textContent = t('hr.roles_edit_h2') + ' — ' + employeeName;
       hide('roles-modal-error');
       document.querySelectorAll('.role-cb').forEach(function(cb) {
         cb.checked = currentRoles.indexOf(cb.value) >= 0;
@@ -1393,7 +1402,7 @@
 
       var allRoles = ['owner', 'frontdesk', 'technician', 'housekeeping', 'housekeeping_precious', 'housekeeping_moment', 'accountant'];
       var btn = document.getElementById('roles-modal-save');
-      btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+      btn.disabled = true; btn.textContent = t('hr.saving');
 
       var chain = Promise.resolve();
       allRoles.forEach(function(role) {
@@ -1404,14 +1413,14 @@
       });
 
       chain.then(function() {
-        btn.disabled = false; btn.textContent = 'บันทึก';
+        btn.disabled = false; btn.textContent = t('hr.save');
         hide('roles-modal');
         rolesEditingEmployeeId = null;
         loadRolesList();
         fetchUserRoles();
       }).catch(function(err) {
-        btn.disabled = false; btn.textContent = 'บันทึก';
-        document.getElementById('roles-modal-error').textContent = 'บันทึกไม่สำเร็จ: ' + err.message;
+        btn.disabled = false; btn.textContent = t('hr.save');
+        document.getElementById('roles-modal-error').textContent = t('hr.err_save_failed') + err.message;
         show('roles-modal-error');
       });
     });
@@ -1474,7 +1483,7 @@
         tbody.innerHTML = '';
         var list = res.complaints || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px;">ยังไม่มีข้อร้องเรียน</td></tr>';
+          tbody.innerHTML = t('hr.no_notices_row');
           return;
         }
         list.forEach(function(c) {
@@ -1501,8 +1510,8 @@
 
           var assignDivs = c.assignments.map(function(a) {
             var badgeClass = a.acknowledgedAt ? 'pill ok' : 'pill flag';
-            var badgeText = a.acknowledgedAt ? 'รับทราบแล้ว' : 'รอรับทราบ';
-            var ackTime = a.acknowledgedAt ? '<div class="muted" style="font-size:10px;">เมื่อ: ' + a.acknowledgedAt.slice(0, 16).replace('T', ' ') + '</div>' : '';
+            var badgeText = a.acknowledgedAt ? t('hr.acknowledged') : t('hr.pending_ack');
+            var ackTime = a.acknowledgedAt ? '<div class="muted" style="font-size:10px;">' + t('hr.at_prefix') + a.acknowledgedAt.slice(0, 16).replace('T', ' ') + '</div>' : '';
             return '<div style="margin-bottom:8px;">' +
               '<strong>' + escapeHtml(a.employeeName) + '</strong> ' +
               '<span class="' + badgeClass + '" style="font-size:10px; padding:2px 6px;">' + badgeText + '</span>' +
@@ -1518,7 +1527,7 @@
           tr.appendChild(imgTd);
 
           var assignTd = document.createElement('td');
-          assignTd.innerHTML = assignDivs || '<span class="muted">ไม่มีการมอบหมาย</span>';
+          assignTd.innerHTML = assignDivs || t('hr.no_assignment_row');
           tr.appendChild(assignTd);
 
           tbody.appendChild(tr);
@@ -1539,20 +1548,20 @@
       });
 
       if (!date || !cat || !desc || !empIds.length) {
-        statusEl.textContent = 'กรุณากรอกวันที่ หมวด รายละเอียด และเลือกพนักงานอย่างน้อยหนึ่งคน';
+        statusEl.textContent = t('hr.err_notice_fields');
         statusEl.className = 'error';
         show('notice-save-status');
         return;
       }
 
-      statusEl.textContent = 'กำลังบันทึกข้อร้องเรียน...';
+      statusEl.textContent = t('hr.saving_notice');
       statusEl.className = 'success';
       show('notice-save-status');
 
       var proceedSave = function(base64Data) {
         callApi('ownerCreateComplaint', [token, date, cat, desc, base64Data, empIds]).then(function(res) {
           if (res.ok) {
-            statusEl.textContent = 'บันทึกข้อร้องเรียนและส่งใบเตือนเรียบร้อยแล้ว!';
+            statusEl.textContent = t('hr.notice_saved_ok');
             statusEl.className = 'success';
             document.getElementById('notice-incident-date').value = '';
             document.getElementById('notice-category').value = '';
@@ -1562,11 +1571,11 @@
             loadComplaints();
             setTimeout(function() { hide('notice-save-status'); }, 3000);
           } else {
-            statusEl.textContent = 'ข้อผิดพลาด: ' + res.error;
+            statusEl.textContent = t('hr.err_prefix') + res.error;
             statusEl.className = 'error';
           }
         }).catch(function(e) {
-          statusEl.textContent = 'เชื่อมต่อผิดพลาด: ' + e.message;
+          statusEl.textContent = t('hr.err_network') + e.message;
           statusEl.className = 'error';
         });
       };
