@@ -124,16 +124,7 @@
         </div>
         <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
       </div>
-      <div class="toplinks">
-        <a href="index.html" id="link-checkin">ลงเวลา</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">ผังห้องพัก</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">แดชบอร์ด</a>
-        <a href="hr.html" id="link-hr" class="hidden">บุคคล</a>
-        <a href="billing.html" id="link-billing" class="hidden">วางบิล</a>
-        <a href="report.html" id="link-report" class="hidden">รายงาน</a>
-        <a href="setting.html" id="link-setting" class="hidden">ตั้งค่า</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">กระทบยอด</a>
-      </div>
+      <div class="toplinks" id="hh-nav" data-page="finance"></div>
     </div>
 
     <div id="access-denied" class="card-section hidden">
@@ -568,7 +559,9 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="session.js"></script>
+  <script src="nav.js"></script>
   <script src="ui.js"></script>
   <script>
     // =====================================================================
@@ -612,17 +605,6 @@
         var token = session.token;
 
         // Reveal nav links the user has access to, alongside this page's own content.
-        if (HuaHinSession.hasRole('owner')) {
-          show('link-dashboard');
-          show('link-setting');
-        }
-        if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-hr');
-        if (HuaHinSession.hasRole('owner', 'accountant')) show('link-billing');
-        if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
-        if (HuaHinSession.hasRole('owner', 'frontdesk')) {
-          document.getElementById('link-report').classList.remove('hidden');
-        }
-        if (HuaHinSession.hasRole('owner', 'accountant')) show('link-reconcile');
 
         var canAddRevenue = HuaHinSession.hasRole('owner', 'accountant');
         var canAddExpense = HuaHinSession.hasRole('owner', 'accountant');

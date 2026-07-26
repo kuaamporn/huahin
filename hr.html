@@ -111,16 +111,7 @@
         <h1>บุคคล</h1>
         <a href="#" id="logout-link" class="btn-signout signout">ออกจากระบบ</a>
       </div>
-      <div class="dash-nav-links">
-        <a href="index.html">ลงเวลา</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">ผังห้องพัก</a>
-        <a href="finance.html" id="link-finance" class="hidden">การเงิน</a>
-        <a href="billing.html" id="link-billing" class="hidden">วางบิล</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">แดชบอร์ด</a>
-        <a href="report.html" id="link-report" class="hidden">รายงาน</a>
-        <a href="setting.html" id="link-setting" class="hidden">ตั้งค่า</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">กระทบยอด</a>
-      </div>
+      <div class="dash-nav-links" id="hh-nav" data-page="hr"></div>
     </div>
     <div class="navbar">
       <div class="nav-tabs">
@@ -268,7 +259,7 @@
         <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th>ชื่อ</th><th>ชื่อผู้ใช้</th><th>ตำแหน่ง</th><th>สถานะ</th><th>รีเซ็ตรหัสผ่าน</th></tr>
+            <tr><th>ชื่อ</th><th>ชื่อผู้ใช้</th><th>ตำแหน่ง</th><th>สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th>รีเซ็ตรหัสผ่าน</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
@@ -484,7 +475,9 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="session.js"></script>
+  <script src="nav.js"></script>
   <script src="ui.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
@@ -522,15 +515,6 @@
     var currentUserRoles = _session ? (_session.roles || []) : [];
 
     if (_session) {
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-billing').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner')) document.getElementById('link-dashboard').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
-        document.getElementById('link-report').classList.remove('hidden');
-      }
-      if (HuaHinSession.hasRole('owner')) document.getElementById('link-setting').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
       loadToday();
       applyRoleVisibility();
     }
@@ -796,12 +780,41 @@
             });
             tdAction.appendChild(resetBtn);
 
+            // HR's default UI language for this employee (migration_27). It only
+            // seeds a new hire or a device that has never chosen — the employee's
+            // own EN/ไทย toggle outranks it, so changing this does not override
+            // anyone who has already picked.
+            var tdLang = document.createElement('td');
+            var langSel = document.createElement('select');
+            langSel.style.padding = '4px 6px';
+            langSel.setAttribute('aria-label', t('hr.emp_lang') + ' — ' + emp.name);
+            [['', t('hr.emp_lang_none')], ['th', 'ไทย'], ['en', 'English']].forEach(function(o) {
+              var opt = document.createElement('option');
+              opt.value = o[0];
+              opt.textContent = o[1];
+              if ((emp.lang || '') === o[0]) opt.selected = true;
+              langSel.appendChild(opt);
+            });
+            langSel.addEventListener('change', function() {
+              var prev = emp.lang || '';
+              langSel.disabled = true;
+              callApi('adminSetEmployeeLang', [token, emp.employeeId, langSel.value || null])
+                .then(function(res) {
+                  if (!res.ok) { langSel.value = prev; alert(res.error); return; }
+                  emp.lang = res.lang;
+                })
+                .catch(function(err) { langSel.value = prev; alert('เชื่อมต่อผิดพลาด: ' + err.message); })
+                .then(function() { langSel.disabled = false; });
+            });
+            tdLang.appendChild(langSel);
+
             var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ คำเตือนก่อนเลิกจ้าง</span>' : '';
             tr.innerHTML =
               '<td>' + emp.name + warningBadge + '</td>' +
               '<td>' + emp.username + '</td>' +
               '<td>' + roleLabel + '</td>' +
               '<td>' + statusLabel + '</td>';
+            tr.appendChild(tdLang);
             tr.appendChild(tdAction);
             tbody.appendChild(tr);
           });

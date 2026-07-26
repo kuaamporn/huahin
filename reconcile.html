@@ -48,16 +48,7 @@
   </style>
 </head>
 <body>
-  <div class="nav">
-    <a href="index.html">Check-in</a>
-    <a href="rooms.html">Rooms</a>
-    <a href="finance.html">Finance</a>
-    <a href="billing.html">Billing</a>
-    <a href="reconcile.html" class="active">Reconcile</a>
-    <a href="hr.html">HR</a>
-    <a href="report.html">Reports</a>
-    <a href="dashboard.html">Dashboard</a>
-  </div>
+  <div class="nav" id="hh-nav" data-page="reconcile"></div>
 
   <div class="page-header">
     <h1>Bank Reconciliation & Payment Matching</h1>
@@ -178,7 +169,9 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="session.js"></script>
+  <script src="nav.js"></script>
   <script src="ui.js"></script>
   <script>
     const WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';

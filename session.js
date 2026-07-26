@@ -9,7 +9,12 @@
       employeeId: loginResponse.employeeId,
       name: loginResponse.name,
       isAdmin: !!loginResponse.isAdmin,
-      roles: roles || []
+      roles: roles || [],
+      // HR's default language (migration_27). i18n.js reads this only when the
+      // employee has made no choice of their own on this device. Deliberately NOT
+      // the store for their choice — logout() clears the session, and logging out
+      // must not reset someone's language back to Thai.
+      lang: loginResponse.lang || null
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));

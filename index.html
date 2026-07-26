@@ -139,18 +139,7 @@
           </div>
           <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
         </div>
-        <div class="userbar-nav">
-          <a href="rooms.html" class="toplink hidden" id="rooms-link">ห้องพัก</a>
-          <a href="finance.html" class="toplink hidden" id="finance-link">การเงิน</a>
-          <a href="dashboard.html" class="toplink hidden" id="dashboard-link">แดชบอร์ด</a>
-          <a href="hr.html" class="toplink hidden" id="hr-link">บุคคล</a>
-          <a href="billing.html" class="toplink hidden" id="billing-link">วางบิล</a>
-          <a href="report.html" class="toplink hidden" id="report-link">รายงาน</a>
-          <a href="setting.html" class="toplink hidden" id="setting-link">ตั้งค่า</a>
-          <a href="reconcile.html" class="toplink hidden" id="reconcile-link">กระทบยอด</a>
-          <a href="staff_manual.html" target="_blank" class="toplink" id="manual-link">📖 คู่มือ</a>
-          <a href="#" class="toplink" id="account-link" onclick="toggleAccountCard(); return false;">บัญชีของฉัน</a>
-        </div>
+        <div class="userbar-nav" id="hh-nav" data-page="home" data-link-class="toplink"></div>
       </div>
 
       <!-- MY ACCOUNT CARD (leave requests, day-off swaps, password change) -->
@@ -377,7 +366,9 @@
   </div>
 
   <!-- QR scanning library (lightweight, free, no API key needed) -->
+  <script src="i18n.js"></script>
   <script src="session.js"></script>
+  <script src="nav.js"></script>
   <script src="ui.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
@@ -396,19 +387,11 @@
     function show(id) { document.getElementById(id).classList.remove('hidden'); }
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
+    // The session on this page is established at login, after DOMContentLoaded has
+    // already rendered the nav for a logged-out visitor. Re-render so the links the
+    // employee's roles allow appear without a reload.
     function applyNavLinkVisibility() {
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) show('rooms-link');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) show('finance-link');
-      if (HuaHinSession.hasRole('owner')) {
-        show('dashboard-link');
-      }
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) show('hr-link');
-      if (HuaHinSession.hasRole('owner', 'accountant')) show('billing-link');
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
-        show('report-link');
-      }
-      if (HuaHinSession.hasRole('owner')) show('setting-link');
-      if (HuaHinSession.hasRole('owner', 'accountant')) show('reconcile-link');
+      if (window.HuaHinNav) HuaHinNav.renderNav();
     }
 
     var session = HuaHinSession.getSession();

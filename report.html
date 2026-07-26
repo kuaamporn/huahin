@@ -102,17 +102,7 @@
         </div>
         <a href="#" class="btn-signout" id="logout-link">Sign out</a>
       </div>
-      <div class="toplinks">
-        <a href="index.html" id="link-checkin">Check-in</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">Rooms</a>
-        <a href="finance.html" id="link-finance" class="hidden">Finance</a>
-        <a href="billing.html" id="link-billing" class="hidden">Billing</a>
-        <a href="hr.html" id="link-hr" class="hidden">HR</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">Dashboard</a>
-        <a href="report.html" id="link-report" class="hidden" style="color:var(--go);font-weight:600;">Reports</a>
-        <a href="setting.html" id="link-setting" class="hidden">Settings</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">Reconcile</a>
-      </div>
+      <div class="toplinks" id="hh-nav" data-page="reports"></div>
     </div>
 
     <div class="ftabs">
@@ -637,7 +627,9 @@
 
   </div>
 
+  <script src="i18n.js"></script>
   <script src="session.js"></script>
+  <script src="nav.js"></script>
   <script src="ui.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
@@ -654,18 +646,10 @@
     var sessionToken = session ? session.token : null;
 
     if (session) {
-      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-billing').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner')) {
-        document.getElementById('link-dashboard').classList.remove('hidden');
-        document.getElementById('link-setting').classList.remove('hidden');
         document.getElementById('tab-revenue').classList.remove('hidden');
         document.getElementById('tab-expense').classList.remove('hidden');
       }
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-hr').classList.remove('hidden');
-      document.getElementById('link-report').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
     }
 
     document.getElementById('logout-link').addEventListener('click', function(e) {

@@ -199,16 +199,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div class="topbar-main">
       <div class="topbar-brand-section">
         <h1 class="topbar-brand">ผังห้องพัก</h1>
-        <div class="topbar-links">
-          <a href="index.html" class="nav-link">ลงเวลา</a>
-          <a href="finance.html" class="nav-link hidden" id="link-finance">การเงิน</a>
-          <a href="dashboard.html" class="nav-link hidden" id="link-dashboard">แดชบอร์ด</a>
-          <a href="hr.html" class="nav-link hidden" id="link-hr">บุคคล</a>
-          <a href="billing.html" class="nav-link hidden" id="link-billing">วางบิล</a>
-          <a href="report.html" class="nav-link hidden" id="link-report">รายงาน</a>
-          <a href="setting.html" class="nav-link hidden" id="link-setting">ตั้งค่า</a>
-          <a href="reconcile.html" class="nav-link hidden" id="link-reconcile">กระทบยอด</a>
-        </div>
+        <div class="topbar-links" id="hh-nav" data-page="rooms" data-link-class="nav-link"></div>
       </div>
       <div class="topbar-user-section">
         <div class="user-badge"><span class="user-name" id="welcome-name"></span></div>
@@ -536,7 +527,9 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="session.js"></script>
+<script src="i18n.js"></script>
+  <script src="session.js"></script>
+  <script src="nav.js"></script>
 <script src="ui.js"></script>
 <script>
 // =====================================================================
@@ -646,17 +639,6 @@ var currentEmployeeName = session ? session.name : null;
 if (session) {
   document.getElementById('welcome-name').textContent = currentEmployeeName;
   document.getElementById('main-screen').classList.remove('hidden');
-  if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
-  if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-billing').classList.remove('hidden');
-  if (HuaHinSession.hasRole('owner')) {
-    document.getElementById('link-dashboard').classList.remove('hidden');
-    document.getElementById('link-setting').classList.remove('hidden');
-  }
-  if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-hr').classList.remove('hidden');
-  if (HuaHinSession.hasRole('owner', 'frontdesk')) {
-    document.getElementById('link-report').classList.remove('hidden');
-  }
-  if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
   // manageCompany roles: owner, frontdesk, revenue, accountant
   if (HuaHinSession.hasRole('owner', 'frontdesk', 'accountant')) document.getElementById('companiesBtn').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('roomDetailsBtn').classList.remove('hidden');

@@ -54,18 +54,7 @@
         </div>
         <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
       </div>
-      <div class="toplinks">
-        <a href="index.html" id="link-checkin">ลงเวลา</a>
-        <a href="rooms.html" id="link-rooms" class="hidden">ผังห้องพัก</a>
-        <a href="dashboard.html" id="link-dashboard" class="hidden">แดชบอร์ด</a>
-        <a href="hr.html" id="link-hr" class="hidden">บุคคล</a>
-        <a href="finance.html" id="link-finance" class="hidden">การเงิน</a>
-        <a href="billing.html" id="link-billing" class="hidden" style="color:var(--go);font-weight:600;">วางบิล</a>
-        <a href="rooms.html#companies" id="link-companies" class="hidden">บริษัท</a>
-        <a href="report.html" id="link-report" class="hidden">รายงาน</a>
-        <a href="setting.html" id="link-setting" class="hidden">ตั้งค่า</a>
-        <a href="reconcile.html" id="link-reconcile" class="hidden">กระทบยอด</a>
-      </div>
+      <div class="toplinks" id="hh-nav" data-page="billing"></div>
     </div>
 
     <div id="access-denied" class="card-section hidden">
@@ -161,7 +150,9 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="session.js"></script>
+  <script src="nav.js"></script>
   <script src="ui.js"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
@@ -175,20 +166,6 @@
     window.onload = function() {
       document.getElementById('logout-link').addEventListener('click', function(e) { e.preventDefault(); HuaHinSession.logout(); });
 
-      if (!HuaHinSession.requireSession()) return;
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
-      if (HuaHinSession.hasRole('owner')) {
-        show('link-dashboard');
-        show('link-hr');
-        show('link-setting');
-      }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) show('link-finance');
-      if (HuaHinSession.hasRole('owner', 'frontdesk')) {
-        document.getElementById('link-report').classList.remove('hidden');
-      }
-      if (HuaHinSession.hasRole('owner', 'accountant')) show('link-billing');
-      if (HuaHinSession.hasRole('owner', 'frontdesk', 'accountant')) show('link-companies');
-      if (HuaHinSession.hasRole('owner', 'accountant')) show('link-reconcile');
 
       if (!HuaHinSession.hasRole('owner', 'accountant')) {
         hide('main-content');
