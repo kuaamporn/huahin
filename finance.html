@@ -4,7 +4,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>การเงิน — The Precious Moment</title>
+  <title data-i18n="fin.title">การเงิน — The Precious Moment</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
     @import url('app.css');
@@ -119,96 +119,96 @@
     <div class="topbar">
       <div class="topbar-header">
         <div>
-          <h1>การเงิน</h1>
-          <div class="sub" style="margin-bottom:0;">ติดตามรายรับ-รายจ่ายแยกตามอาคาร</div>
+          <h1 data-i18n="fin.h1">การเงิน</h1>
+          <div class="sub" style="margin-bottom:0;" data-i18n="fin.sub">ติดตามรายรับ-รายจ่ายแยกตามอาคาร</div>
         </div>
-        <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
+        <a href="#" class="btn-signout" id="logout-link" data-i18n="nav.signout">ออกจากระบบ</a>
       </div>
       <div class="toplinks" id="hh-nav" data-page="finance"></div>
     </div>
 
     <div id="access-denied" class="card-section hidden">
-      <div class="error">คุณไม่มีสิทธิ์เข้าดูหน้าการเงิน กำลังนำทางกลับ…</div>
+      <div class="error" data-i18n="fin.access_denied">คุณไม่มีสิทธิ์เข้าดูหน้าการเงิน กำลังนำทางกลับ…</div>
     </div>
 
     <div id="finance-content">
       <div class="card-section">
         <div class="toolbar">
           <div>
-            <label for="finance-property">อาคาร</label>
+            <label for="finance-property" data-i18n="fin.property">อาคาร</label>
             <select id="finance-property">
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div>
-            <label for="finance-year">ปี</label>
+            <label for="finance-year" data-i18n="fin.year">ปี</label>
             <input id="finance-year" type="number" style="max-width:120px;" />
           </div>
           <div>
-            <label for="finance-month">เดือน</label>
+            <label for="finance-month" data-i18n="fin.month">เดือน</label>
             <select id="finance-month">
-              <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option>
-              <option value="3">มีนาคม</option><option value="4">เมษายน</option>
-              <option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
-              <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option>
-              <option value="9">กันยายน</option><option value="10">ตุลาคม</option>
-              <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+              <option value="1" data-i18n="month.1">มกราคม</option><option value="2" data-i18n="month.2">กุมภาพันธ์</option>
+              <option value="3" data-i18n="month.3">มีนาคม</option><option value="4" data-i18n="month.4">เมษายน</option>
+              <option value="5" data-i18n="month.5">พฤษภาคม</option><option value="6" data-i18n="month.6">มิถุนายน</option>
+              <option value="7" data-i18n="month.7">กรกฎาคม</option><option value="8" data-i18n="month.8">สิงหาคม</option>
+              <option value="9" data-i18n="month.9">กันยายน</option><option value="10" data-i18n="month.10">ตุลาคม</option>
+              <option value="11" data-i18n="month.11">พฤศจิกายน</option><option value="12" data-i18n="month.12">ธันวาคม</option>
             </select>
           </div>
-          <button id="finance-load-btn">โหลด</button>
+          <button id="finance-load-btn" data-i18n="fin.load">โหลด</button>
         </div>
       </div>
 
       <div class="summary">
-        <div class="stat" id="card-revenue"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l">รายรับ</div></div>
-        <div class="stat" id="card-expense"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l">รายจ่าย</div></div>
-        <div class="stat" id="card-net"><div class="n" id="finance-net">฿0</div><div class="l">กำไรสุทธิ</div></div>
+        <div class="stat" id="card-revenue"><div class="n" id="finance-revenue" style="color:var(--go);">฿0</div><div class="l" data-i18n="fin.revenue">รายรับ</div></div>
+        <div class="stat" id="card-expense"><div class="n" id="finance-expense" style="color:var(--warn);">฿0</div><div class="l" data-i18n="fin.expense">รายจ่าย</div></div>
+        <div class="stat" id="card-net"><div class="n" id="finance-net">฿0</div><div class="l" data-i18n="fin.net">กำไรสุทธิ</div></div>
         <div class="stat" style="cursor:pointer;" id="btn-view-unrefunded">
           <div class="n" id="finance-deposits" style="color:var(--muted);">฿0</div>
           <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            เงินมัดจำ <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">ดู</span>
+            <span data-i18n="fin.deposits">เงินมัดจำ</span> <span style="background:var(--go);color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;" data-i18n="fin.view">ดู</span>
           </div>
         </div>
         <div class="stat" style="cursor:pointer;" id="btn-view-reservations">
           <div class="n" id="finance-reservations" style="color:#0284c7;">฿0</div>
           <div class="l" style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            การจอง <span style="background:#0284c7;color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;">ดู</span>
+            <span data-i18n="fin.reservations">การจอง</span> <span style="background:#0284c7;color:#fff;border-radius:4px;padding:2px 6px;font-size:10px;" data-i18n="fin.view">ดู</span>
           </div>
         </div>
       </div>
 
       <div class="actions-row">
-        <button id="btn-add-revenue" class="hidden" style="background:var(--go);color:#fff;border:none;font-weight:600;">+ รายรับ</button>
-        <button id="btn-add-expense" class="hidden" style="background:var(--warn);color:#fff;border:none;font-weight:600;">+ รายจ่าย</button>
-        <button id="btn-manage-vendors" class="hidden btn-secondary" style="font-weight:600;">จัดการผู้ขาย</button>
-        <button id="btn-slip-approve" class="hidden btn-secondary" style="font-weight:600;border-color:#0b5ed7;color:#0b5ed7;" onclick="openSlipModal()">📷 ยืนยันด้วยสลิป</button>
-        <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;">ตั้งค่า</button>
+        <button id="btn-add-revenue" class="hidden" style="background:var(--go);color:#fff;border:none;font-weight:600;" data-i18n="fin.add_revenue">+ รายรับ</button>
+        <button id="btn-add-expense" class="hidden" style="background:var(--warn);color:#fff;border:none;font-weight:600;" data-i18n="fin.add_expense">+ รายจ่าย</button>
+        <button id="btn-manage-vendors" class="hidden btn-secondary" style="font-weight:600;" data-i18n="fin.manage_vendors">จัดการผู้ขาย</button>
+        <button id="btn-slip-approve" class="hidden btn-secondary" style="font-weight:600;border-color:#0b5ed7;color:#0b5ed7;" onclick="openSlipModal()" data-i18n="fin.slip_approve">📷 ยืนยันด้วยสลิป</button>
+        <button id="btn-settings" class="hidden btn-secondary" style="font-weight:600;" data-i18n="fin.settings">ตั้งค่า</button>
         <select id="finance-status-filter" style="max-width:250px; padding:10px 14px; border:1px solid var(--line); border-radius:12px; font-family:inherit; font-size:13px; background:#fff; outline:none; cursor:pointer; font-weight:600; color:var(--ink);">
-          <option value="all">ทุกสถานะ</option>
-          <option value="unverified" id="opt-unverified">รอตรวจสอบ (0)</option>
-          <option value="pending-approval" id="opt-pending-approval">รออนุมัติ (0)</option>
-          <option value="verified">ตรวจสอบแล้วเท่านั้น</option>
+          <option value="all" data-i18n="fin.status_all">ทุกสถานะ</option>
+          <option value="unverified" id="opt-unverified" data-i18n="fin.status_unverified">รอตรวจสอบ (0)</option>
+          <option value="pending-approval" id="opt-pending-approval" data-i18n="fin.status_pending">รออนุมัติ (0)</option>
+          <option value="verified" data-i18n="fin.status_verified">ตรวจสอบแล้วเท่านั้น</option>
         </select>
-        <input id="finance-search" type="text" placeholder="ค้นหารายการ..." style="max-width:250px;" />
-        <button id="btn-tt-batch-receipt" class="hidden btn-secondary" style="font-weight:600;border-color:#0F766E;color:#0F766E;" onclick="openTtBatchReceipt()">🧾 ใบเสร็จรวม Thai Tour</button>
-        <button id="finance-export-csv-btn" style="margin-left:auto;">ส่งออก CSV</button>
+        <input id="finance-search" type="text" data-i18n-attr="placeholder:fin.search_ph" placeholder="ค้นหารายการ..." style="max-width:250px;" />
+        <button id="btn-tt-batch-receipt" class="hidden btn-secondary" style="font-weight:600;border-color:#0F766E;color:#0F766E;" onclick="openTtBatchReceipt()" data-i18n="fin.tt_batch">🧾 ใบเสร็จรวม Thai Tour</button>
+        <button id="finance-export-csv-btn" style="margin-left:auto;" data-i18n="fin.export_csv">ส่งออก CSV</button>
       </div>
 
       <div style="overflow-x: auto;">
       <table style="min-width: 1000px;">
         <thead>
-          <tr><th style="width:40px;"></th><th>วันที่</th><th>ประเภท</th><th>อาคาร</th><th>ห้อง</th><th>หมวด</th><th>จำนวนเงิน</th><th>ผู้เข้าพัก/ผู้ขาย</th><th>หมายเหตุ</th><th>การจัดการ</th></tr>
+          <tr><th style="width:40px;"></th><th data-i18n="fin.col_date">วันที่</th><th data-i18n="fin.col_type">ประเภท</th><th data-i18n="fin.col_property">อาคาร</th><th data-i18n="fin.col_room">ห้อง</th><th data-i18n="fin.col_category">หมวด</th><th data-i18n="fin.col_amount">จำนวนเงิน</th><th data-i18n="fin.col_guest_vendor">ผู้เข้าพัก/ผู้ขาย</th><th data-i18n="fin.col_notes">หมายเหตุ</th><th data-i18n="fin.col_actions">การจัดการ</th></tr>
         </thead>
         <tbody id="finance-table-body">
-          <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">เลือกเดือนแล้วกดโหลด</td></tr>
+          <tr><td colspan="9" class="muted" style="text-align:center;padding:20px;" data-i18n="fin.pick_month">เลือกเดือนแล้วกดโหลด</td></tr>
         </tbody>
       </table>
       </div>
       <div id="finance-pagination" class="no-print" style="display:flex;align-items:center;justify-content:center;gap:15px;margin-top:20px;font-size:13px;font-weight:600;">
-        <button id="btn-page-prev" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">&lt; ก่อนหน้า</button>
-        <span id="page-indicator" style="color:var(--muted);">หน้า 1 จาก 1</span>
-        <button id="btn-page-next" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;">ถัดไป &gt;</button>
+        <button id="btn-page-prev" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;" data-i18n="fin.prev_page">&lt; ก่อนหน้า</button>
+        <span id="page-indicator" style="color:var(--muted);"></span>
+        <button id="btn-page-next" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;" data-i18n="fin.next_page">ถัดไป &gt;</button>
       </div>
     </div>
   </div>
@@ -216,11 +216,11 @@
   <!-- ===================== FINANCE ADD MODAL ===================== -->
   <div id="finance-modal" class="modal-overlay hidden">
     <div class="modal-box">
-      <h2 id="finance-modal-title">+ เพิ่มรายรับ</h2>
+      <h2 id="finance-modal-title" data-i18n="fin.modal_add_revenue">+ เพิ่มรายรับ</h2>
       <div class="modal-grid">
 
         <div>
-          <label for="fm-property">อาคาร</label>
+          <label for="fm-property" data-i18n="fin.property">อาคาร</label>
           <select id="fm-property">
             <option value="precious">The Precious</option>
             <option value="moment">The Moment</option>
@@ -228,9 +228,9 @@
         </div>
 
         <div>
-          <label for="fm-room-search">ห้อง</label>
+          <label for="fm-room-search" data-i18n="fin.room">ห้อง</label>
           <div class="room-combo">
-            <input id="fm-room-search" type="text" placeholder="ค้นหารหัสห้อง เช่น P-110…" autocomplete="off" />
+            <input id="fm-room-search" type="text" data-i18n-attr="placeholder:fin.room_ph" placeholder="ค้นหารหัสห้อง เช่น P-110…" autocomplete="off" />
             <div id="fm-room-results" class="room-combo-results hidden"></div>
           </div>
           <!-- Hidden field actually submitted; null when Walk-in is chosen -->
@@ -241,34 +241,34 @@
         </div>
 
         <div class="full">
-          <label for="fm-guest">ผู้เข้าพัก / ผู้ขาย</label>
-          <input id="fm-guest" type="text" placeholder="กรอกอัตโนมัติจากห้อง หรือพิมพ์เอง" list="fm-vendor-list" />
+          <label for="fm-guest" data-i18n="fin.guest_vendor">ผู้เข้าพัก / ผู้ขาย</label>
+          <input id="fm-guest" type="text" data-i18n-attr="placeholder:fin.guest_ph" placeholder="กรอกอัตโนมัติจากห้อง หรือพิมพ์เอง" list="fm-vendor-list" />
           <datalist id="fm-vendor-list"></datalist>
         </div>
 
         <div class="full hidden" id="fm-company-banner" style="margin-top:8px; padding:10px 12px; background:#EFF6FF; border:1px solid #BFDBFE; border-left:4px solid #2563EB; border-radius:8px; font-size:13px;">
-          <div style="font-weight:600; color:#1E3A8A;">🏢 <span id="fm-company-banner-title">วางบิลในนามบริษัท</span></div>
+          <div style="font-weight:600; color:#1E3A8A;">🏢 <span id="fm-company-banner-title" data-i18n="fin.bill_to_company">วางบิลในนามบริษัท</span></div>
           <div id="fm-company-banner-body" style="color:#1E40AF; margin-top:2px;"></div>
         </div>
 
         <div class="full" style="margin-top: 10px;">
-          <label>รายการ</label>
+          <label data-i18n="fin.items">รายการ</label>
           <div id="fm-items-container"></div>
-          <button class="add-item-btn" id="fm-add-item">+ เพิ่มบรรทัดรายการ</button>
+          <button class="add-item-btn" id="fm-add-item" data-i18n="fin.add_item">+ เพิ่มบรรทัดรายการ</button>
         </div>
 
         <div class="full" id="fm-expense-extras" class="hidden">
           <div class="wht-vat-row">
             <div style="flex:1;">
-              <label>ประเภท VAT</label>
+              <label data-i18n="fin.vat_type">ประเภท VAT</label>
               <select id="fm-vat-type" onchange="calcTotals()">
-                <option value="none">ไม่มี (0%)</option>
-                <option value="include">รวมภาษี (7%)</option>
-                <option value="exclude">แยกภาษี (+7%)</option>
+                <option value="none" data-i18n="fin.vat_none">ไม่มี (0%)</option>
+                <option value="include" data-i18n="fin.vat_include">รวมภาษี (7%)</option>
+                <option value="exclude" data-i18n="fin.vat_exclude">แยกภาษี (+7%)</option>
               </select>
             </div>
             <div style="flex:1;">
-              <label>หัก ณ ที่จ่าย %</label>
+              <label data-i18n="fin.wht_pct">หัก ณ ที่จ่าย %</label>
               <select id="fm-wht-pct" onchange="calcTotals()">
                 <option value="0">0%</option>
                 <option value="1">1%</option>
@@ -280,29 +280,29 @@
           </div>
           <div class="wht-vat-row" style="background:#eaf2e8;">
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;">
-              <span>ยอดรวม:</span><span id="fm-subtotal">฿0.00</span>
+              <span data-i18n="fin.subtotal">ยอดรวม:</span><span id="fm-subtotal">฿0.00</span>
             </div>
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;">
               <span>VAT:</span><span id="fm-vat-amt">฿0.00</span>
             </div>
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;color:var(--warn);">
-              <span>หัก ณ ที่จ่าย:</span><span id="fm-wht-amt">฿0.00</span>
+              <span data-i18n="fin.wht">หัก ณ ที่จ่าย:</span><span id="fm-wht-amt">฿0.00</span>
             </div>
             <div style="flex:1;font-weight:bold;display:flex;justify-content:space-between;color:var(--go);">
-              <span>ยอดจ่ายสุทธิ:</span><span id="fm-net-amt">฿0.00</span>
+              <span data-i18n="fin.net_payable">ยอดจ่ายสุทธิ:</span><span id="fm-net-amt">฿0.00</span>
             </div>
           </div>
         </div>
 
         <div>
-          <label for="fm-channel">ช่องทางชำระเงิน</label>
+          <label for="fm-channel" data-i18n="fin.channel">ช่องทางชำระเงิน</label>
           <div class="custom-select" id="fm-channel-select">
-            <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('fm-channel-select')">💵 เงินสด <span class="arrow">▼</span></div>
+            <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('fm-channel-select')"><span data-i18n="fin.cash">💵 เงินสด</span> <span class="arrow">▼</span></div>
             <div class="custom-select-options">
-              <div class="custom-select-option" data-value="cash">💵 เงินสด</div>
+              <div class="custom-select-option" data-value="cash" data-i18n="fin.cash_opt">💵 เงินสด</div>
               <div class="custom-select-option" data-value="kb">🟢 KB</div>
               <div class="custom-select-option" data-value="scb">🟣 SCB</div>
-              <div class="custom-select-option" data-value="maemanee">🟪 แม่มณี</div>
+              <div class="custom-select-option" data-value="maemanee" data-i18n="fin.maemanee">🟪 แม่มณี</div>
               <div class="custom-select-option" data-value="kshop">🟩 Kshop</div>
             </div>
             <input type="hidden" id="fm-channel" value="cash" />
@@ -310,67 +310,67 @@
         </div>
 
         <div>
-          <label for="fm-paid-by">ผู้จ่าย</label>
+          <label for="fm-paid-by" data-i18n="fin.paid_by">ผู้จ่าย</label>
           <select id="fm-paid-by"></select>
         </div>
 
         <div>
-          <label for="fm-ref">เลขอ้างอิงการโอน (ถ้ามี)</label>
+          <label for="fm-ref" data-i18n="fin.transfer_ref">เลขอ้างอิงการโอน (ถ้ามี)</label>
           <input id="fm-ref" type="text" />
         </div>
 
         <div>
-          <label for="fm-date">วันที่ทำรายการ</label>
+          <label for="fm-date" data-i18n="fin.txn_date">วันที่ทำรายการ</label>
           <input id="fm-date" type="date" />
         </div>
 
         <div class="full">
-          <label for="fm-note">หมายเหตุ (ถ้ามี)</label>
+          <label for="fm-note" data-i18n="fin.note">หมายเหตุ (ถ้ามี)</label>
           <input id="fm-note" type="text" />
         </div>
 
       </div>
 
       <div id="fm-receipt-gen-section" class="hidden" style="margin-top: 15px; padding: 15px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; margin-bottom: 15px;">
-        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">ออกใบเสร็จรับเงิน</h4>
+        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);" data-i18n="fin.issue_receipt_h">ออกใบเสร็จรับเงิน</h4>
         <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 120px;">
-            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">ประเภทใบเสร็จ</label>
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);" data-i18n="fin.receipt_type">ประเภทใบเสร็จ</label>
             <select id="fm-receipt-type" style="width: 100%; padding: 6px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;">
-              <option value="RR">RR (ค่าเช่า/รายเดือน)</option>
-              <option value="RD">RD (รายวัน/Walk-in)</option>
-              <option value="RA">RA (เงินมัดจำ)</option>
+              <option value="RR" data-i18n="fin.rr">RR (ค่าเช่า/รายเดือน)</option>
+              <option value="RD" data-i18n="fin.rd">RD (รายวัน/Walk-in)</option>
+              <option value="RA" data-i18n="fin.ra">RA (เงินมัดจำ)</option>
             </select>
           </div>
           <div style="flex: 1; min-width: 120px;">
-            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">วันที่ใบเสร็จ</label>
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);" data-i18n="fin.receipt_date">วันที่ใบเสร็จ</label>
             <input type="date" id="fm-receipt-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
           </div>
-          <button id="fm-generate-receipt-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">ออกใบเสร็จ</button>
-          <button id="fm-split-receipts-btn" class="btn-primary hidden" style="padding: 7px 12px; font-size: 13px; background: #ea580c; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">ออกและแยก (ค่าเช่า + มัดจำ)</button>
+          <button id="fm-generate-receipt-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;" data-i18n="fin.gen_receipt">ออกใบเสร็จ</button>
+          <button id="fm-split-receipts-btn" class="btn-primary hidden" style="padding: 7px 12px; font-size: 13px; background: #ea580c; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;" data-i18n="fin.gen_split">ออกและแยก (ค่าเช่า + มัดจำ)</button>
         </div>
         <div id="fm-receipt-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
       </div>
 
       <!-- Full Invoice Generation Section -->
       <div id="fm-invoice-gen-section" class="hidden" style="margin-top: 15px; padding: 15px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 15px;">
-        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);">ออกใบแจ้งหนี้แบบเต็ม</h4>
+        <h4 style="margin: 0 0 10px 0; font-family: 'Lexend', sans-serif; color: var(--go);" data-i18n="fin.gen_full_invoice">ออกใบแจ้งหนี้แบบเต็ม</h4>
         <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 120px;">
-            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);">วันที่ใบแจ้งหนี้</label>
+            <label style="margin-bottom: 6px; font-size: 11px; color: var(--muted);" data-i18n="fin.invoice_date">วันที่ใบแจ้งหนี้</label>
             <input type="date" id="fm-invoice-date" style="width: 100%; padding: 5px; font-size: 13px; border: 1px solid var(--line); border-radius: 8px;" />
           </div>
-          <button id="fm-generate-invoice-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;">ออกใบแจ้งหนี้แบบเต็ม</button>
+          <button id="fm-generate-invoice-btn" class="btn-primary" style="padding: 7px 12px; font-size: 13px; background: var(--go); border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: #fff;" data-i18n="fin.gen_full_invoice">ออกใบแจ้งหนี้แบบเต็ม</button>
         </div>
         <div id="fm-invoice-error" class="error hidden" style="margin-top: 8px; font-size: 12px; color: var(--warn);"></div>
       </div>
 
       <div class="modal-footer-row">
-        <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);">🖨️ พิมพ์ใบแจ้งหนี้</button>
-        <button id="fm-print-full-invoice-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0F766E; color:#0F766E;">🖨️ พิมพ์ใบแจ้งหนี้แบบเต็ม</button>
-        <button id="fm-print-receipt-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0284C7; color:#0284C7;">🖨️ พิมพ์ใบเสร็จ</button>
-        <button class="btn-secondary" id="finance-modal-cancel">ยกเลิก</button>
-        <button class="btn-primary" id="finance-modal-save">บันทึก</button>
+        <button id="fm-print-btn" class="btn-secondary hidden" style="margin-right:auto; border-color:var(--go); color:var(--go);" data-i18n="fin.print_invoice">🖨️ พิมพ์ใบแจ้งหนี้</button>
+        <button id="fm-print-full-invoice-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0F766E; color:#0F766E;" data-i18n="fin.print_full_invoice">🖨️ พิมพ์ใบแจ้งหนี้แบบเต็ม</button>
+        <button id="fm-print-receipt-btn" class="btn-secondary hidden" style="margin-right:12px; border-color:#0284C7; color:#0284C7;" data-i18n="fin.print_receipt">🖨️ พิมพ์ใบเสร็จ</button>
+        <button class="btn-secondary" id="finance-modal-cancel" data-i18n="fin.cancel">ยกเลิก</button>
+        <button class="btn-primary" id="finance-modal-save" data-i18n="fin.save">บันทึก</button>
       </div>
       <div class="error hidden" id="finance-modal-error"></div>
     </div>
@@ -380,16 +380,16 @@
   <div id="unrefunded-modal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="mhdr">
-        <h2 class="mtitle">เงินมัดจำที่ยังไม่คืน</h2>
+        <h2 class="mtitle" data-i18n="fin.unrefunded_h">เงินมัดจำที่ยังไม่คืน</h2>
         <button class="mx" id="unrefunded-modal-close">×</button>
       </div>
       <div style="max-height:60vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>วันที่</th><th>ห้อง</th><th>ผู้เข้าพัก</th><th>จำนวนเงิน</th><th>การจัดการ</th></tr>
+            <tr><th data-i18n="fin.col_date">วันที่</th><th data-i18n="fin.col_room">ห้อง</th><th data-i18n="fin.col_guest">ผู้เข้าพัก</th><th data-i18n="fin.col_amount">จำนวนเงิน</th><th data-i18n="fin.col_actions">การจัดการ</th></tr>
           </thead>
           <tbody id="unrefunded-table-body">
-            <tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>
+            <tr><td colspan="5" class="muted" style="text-align:center;" data-i18n="fin.loading">กำลังโหลด...</td></tr>
           </tbody>
         </table>
       </div>
@@ -400,15 +400,15 @@
   <div id="delete-txn-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 420px;">
       <div class="mhdr">
-        <h2 class="mtitle">ลบรายการ</h2>
+        <h2 class="mtitle" data-i18n="fin.delete_txn_h">ลบรายการ</h2>
         <button class="mx" onclick="closeDeleteTxn()">×</button>
       </div>
       <input type="hidden" id="del-txn-id">
       <div id="del-txn-details" style="background:var(--paper);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px;"></div>
-      <p style="font-size:13px;color:var(--warn);margin-bottom:20px;">การลบนี้จะลบรายการและบรรทัดรายการทั้งหมดอย่างถาวร ไม่สามารถกู้คืนได้</p>
+      <p style="font-size:13px;color:var(--warn);margin-bottom:20px;" data-i18n="fin.delete_txn_warn">การลบนี้จะลบรายการและบรรทัดรายการทั้งหมดอย่างถาวร ไม่สามารถกู้คืนได้</p>
       <div style="display:flex;justify-content:flex-end;gap:12px;">
-        <button class="btn-secondary" onclick="closeDeleteTxn()" style="padding:8px 16px;">ยกเลิก</button>
-        <button id="del-txn-confirm" onclick="confirmDeleteTxn()" style="padding:8px 16px;background:var(--warn);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;">ลบถาวร</button>
+        <button class="btn-secondary" onclick="closeDeleteTxn()" style="padding:8px 16px;" data-i18n="fin.cancel">ยกเลิก</button>
+        <button id="del-txn-confirm" onclick="confirmDeleteTxn()" style="padding:8px 16px;background:var(--warn);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;" data-i18n="fin.delete_forever">ลบถาวร</button>
       </div>
     </div>
   </div>
@@ -438,16 +438,16 @@
   <div id="reservations-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 650px;">
       <div class="mhdr">
-        <h2 class="mtitle" style="color:#0284c7;">การจองที่รอเช็คอิน</h2>
+        <h2 class="mtitle" style="color:#0284c7;" data-i18n="fin.reservations_h">การจองที่รอเช็คอิน</h2>
         <button class="mx" id="reservations-modal-close">×</button>
       </div>
       <div style="max-height:60vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>วันเช็คอิน</th><th>ห้อง</th><th>ผู้เข้าพัก</th><th>เงินมัดจำ</th><th>ประเภทการจอง</th><th style="text-align:center;">การจัดการ</th></tr>
+            <tr><th data-i18n="fin.col_checkin">วันเช็คอิน</th><th data-i18n="fin.col_room">ห้อง</th><th data-i18n="fin.col_guest">ผู้เข้าพัก</th><th data-i18n="fin.col_deposit">เงินมัดจำ</th><th data-i18n="fin.col_booking_type">ประเภทการจอง</th><th style="text-align:center;" data-i18n="fin.col_actions">การจัดการ</th></tr>
           </thead>
           <tbody id="reservations-table-body">
-            <tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>
+            <tr><td colspan="5" class="muted" style="text-align:center;" data-i18n="fin.loading">กำลังโหลด...</td></tr>
           </tbody>
         </table>
       </div>
@@ -458,11 +458,11 @@
   <div id="moveout-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 700px;">
       <div class="mhdr">
-        <h2 class="mtitle">ดำเนินการย้ายออก</h2>
+        <h2 class="mtitle" data-i18n="fin.moveout_h">ดำเนินการย้ายออก</h2>
         <button class="mx" id="moveout-modal-close">×</button>
       </div>
       <div class="field" style="background:#f3f1ec; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-        <div style="font-size:12px; color:var(--muted);">เงินมัดจำเดิม</div>
+        <div style="font-size:12px; color:var(--muted);" data-i18n="fin.orig_deposit">เงินมัดจำเดิม</div>
         <div style="font-size:20px; font-weight:bold; color:var(--text);" id="mo-deposit-amount">฿0</div>
         <input type="hidden" id="mo-txn-id">
         <input type="hidden" id="mo-deposit-val">
@@ -471,27 +471,27 @@
       <div id="mo-card-audit-section" class="field" style="background:#f3f1ec; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: none;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="font-size:12px; color:var(--muted);">คีย์การ์ดที่ออกให้</div>
-            <div style="font-size:16px; font-weight:bold; color:var(--text);" id="mo-cards-issued-text">0 ใบ (มัดจำใบละ ฿0)</div>
+            <div style="font-size:12px; color:var(--muted);" data-i18n="fin.cards_issued">คีย์การ์ดที่ออกให้</div>
+            <div style="font-size:16px; font-weight:bold; color:var(--text);" id="mo-cards-issued-text"></div>
           </div>
           <div>
-            <label for="mo-cards-returned" style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">การ์ดที่คืน</label>
+            <label for="mo-cards-returned" style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;" data-i18n="fin.cards_returned">การ์ดที่คืน</label>
             <input type="number" id="mo-cards-returned" min="0" value="0" style="width:70px; padding:6px; border-radius:6px; border:1px solid var(--line); font-weight:bold; text-align:center;" oninput="onMoCardsReturnedChange()">
           </div>
         </div>
       </div>
 
-      <h3>รายการหักเงิน (ค่าน้ำ ค่าไฟ ค่าทำความสะอาด ฯลฯ)</h3>
+      <h3 data-i18n="fin.deductions_h">รายการหักเงิน (ค่าน้ำ ค่าไฟ ค่าทำความสะอาด ฯลฯ)</h3>
       <div class="items-list" id="mo-items-container"></div>
-      <button class="btn-secondary" onclick="addMoveOutItem()" style="margin-bottom:16px; font-size: 11px;">+ เพิ่มรายการหัก</button>
+      <button class="btn-secondary" onclick="addMoveOutItem()" style="margin-bottom:16px; font-size: 11px;" data-i18n="fin.add_deduction">+ เพิ่มรายการหัก</button>
 
       <div style="background:#fcfbf9; padding:12px; border-radius:6px; margin-top:16px; border:1px solid var(--line);">
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <span>รวมรายการหัก:</span>
+          <span data-i18n="fin.total_deductions">รวมรายการหัก:</span>
           <span id="mo-total-deductions" style="font-weight:bold;">฿0</span>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:bold;">
-          <span id="mo-net-label">เงินสดที่ต้องคืนผู้เข้าพัก:</span>
+          <span id="mo-net-label" data-i18n="fin.cash_to_return">เงินสดที่ต้องคืนผู้เข้าพัก:</span>
           <span id="mo-net-amount" style="color:var(--go);">฿0</span>
         </div>
       </div>
@@ -499,8 +499,8 @@
       <div class="error hidden" id="moveout-error" style="margin-top:12px;"></div>
 
       <div class="actions" style="margin-top: 24px; justify-content: flex-end; display:flex; gap:8px;">
-        <button class="btn-secondary" id="moveout-modal-cancel">ยกเลิก</button>
-        <button class="btn-primary" id="moveout-save">ยืนยันการย้ายออก</button>
+        <button class="btn-secondary" id="moveout-modal-cancel" data-i18n="fin.cancel">ยกเลิก</button>
+        <button class="btn-primary" id="moveout-save" data-i18n="fin.confirm_moveout">ยืนยันการย้ายออก</button>
       </div>
     </div>
   </div>
@@ -509,19 +509,19 @@
   <div id="vendors-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 800px;">
       <div class="mhdr">
-        <h2 class="mtitle">จัดการผู้ขาย</h2>
+        <h2 class="mtitle" data-i18n="fin.manage_vendors">จัดการผู้ขาย</h2>
         <button class="mx" id="vendors-modal-close">&times;</button>
       </div>
       <div style="margin-bottom: 16px; display: flex; justify-content: flex-end;">
-         <button class="btn-primary" id="btn-new-vendor">+ เพิ่มผู้ขาย</button>
+         <button class="btn-primary" id="btn-new-vendor" data-i18n="fin.new_vendor">+ เพิ่มผู้ขาย</button>
       </div>
       <div style="max-height:50vh;overflow-y:auto;">
         <table style="width:100%;">
           <thead>
-            <tr><th>ชื่อ</th><th>ที่อยู่</th><th>เลขประจำตัวผู้เสียภาษี</th><th>สาขา</th><th>การจัดการ</th></tr>
+            <tr><th data-i18n="fin.col_name">ชื่อ</th><th data-i18n="fin.col_address">ที่อยู่</th><th data-i18n="fin.col_tax_id">เลขประจำตัวผู้เสียภาษี</th><th data-i18n="fin.col_branch">สาขา</th><th data-i18n="fin.col_actions">การจัดการ</th></tr>
           </thead>
           <tbody id="vendors-table-body">
-            <tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>
+            <tr><td colspan="5" class="muted" style="text-align:center;" data-i18n="fin.loading">กำลังโหลด...</td></tr>
           </tbody>
         </table>
       </div>
@@ -531,29 +531,29 @@
   <!-- ===================== VENDOR FORM MODAL ===================== -->
   <div id="vendor-form-modal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 500px; z-index: 101;">
-      <h2 id="vendor-form-title">เพิ่มผู้ขาย</h2>
+      <h2 id="vendor-form-title" data-i18n="fin.vendor_form_h">เพิ่มผู้ขาย</h2>
       <input type="hidden" id="vf-id" />
       <div class="modal-grid">
         <div class="full">
-          <label for="vf-name">ชื่อผู้ขาย</label>
+          <label for="vf-name" data-i18n="fin.vendor_name">ชื่อผู้ขาย</label>
           <input id="vf-name" type="text" />
         </div>
         <div class="full">
-          <label for="vf-address">ที่อยู่</label>
+          <label for="vf-address" data-i18n="fin.vendor_address">ที่อยู่</label>
           <input id="vf-address" type="text" />
         </div>
         <div class="full">
-          <label for="vf-tax">เลขประจำตัวผู้เสียภาษี</label>
+          <label for="vf-tax" data-i18n="fin.vendor_tax">เลขประจำตัวผู้เสียภาษี</label>
           <input id="vf-tax" type="text" />
         </div>
         <div class="full">
-          <label for="vf-branch">สาขา</label>
-          <input id="vf-branch" type="text" value="Head Office" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" />
+          <label for="vf-branch" data-i18n="fin.vendor_branch">สาขา</label>
+          <input id="vf-branch" type="text" value="Head Office" data-i18n-attr="placeholder:fin.branch_ph" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" />
         </div>
       </div>
       <div class="modal-footer-row">
-        <button class="btn-secondary" id="vendor-form-cancel">ยกเลิก</button>
-        <button class="btn-primary" id="vendor-form-save">บันทึก</button>
+        <button class="btn-secondary" id="vendor-form-cancel" data-i18n="fin.cancel">ยกเลิก</button>
+        <button class="btn-primary" id="vendor-form-save" data-i18n="fin.save">บันทึก</button>
       </div>
       <div class="error hidden" id="vendor-form-error"></div>
     </div>
@@ -678,6 +678,10 @@
           window.location.href = 'setting.html';
         });
       }
+
+      // The transaction table, its status pills and the row actions are built in
+      // JS, so data-i18n cannot re-render them. Redraw on a language switch.
+      HuaHinI18n.onLangChange(function() { renderFinanceTable(); });
 
       document.getElementById('finance-search').addEventListener('input', function() {
         currentPage = 1;
@@ -819,13 +823,13 @@
 
       var html = pool.map(function (r) {
         var booking = activeBookingForRoom(r.roomId);
-        var guestHtml = booking ? '<span class="guest">' + escapeHtml(booking.guestName || '') + '</span>' : '<span class="guest">ว่าง</span>';
+        var guestHtml = booking ? '<span class="guest">' + escapeHtml(booking.guestName || '') + '</span>' : '<span class="guest">' + HuaHinI18n.t('fin.vacant') + '</span>';
         return '<div class="opt" data-room-id="' + escapeHtml(r.roomId) + '" data-guest="' + escapeHtml(booking ? (booking.guestName || '') : '') + '">' +
           '<span class="rid">' + escapeHtml(r.displayName || r.roomId) + '</span>' + guestHtml +
           '</div>';
       }).join('');
 
-      html += '<div class="opt walkin" data-room-id="">Walk-in / ไม่มีห้อง (เช่น ใช้รายวัน ไม่มีการจอง)</div>';
+      html += '<div class="opt walkin" data-room-id="">' + HuaHinI18n.t('fin.walkin_opt') + '</div>';
 
       results.innerHTML = html;
       results.classList.remove('hidden');
@@ -851,7 +855,7 @@
         var guestField = document.getElementById('fm-guest');
         if (!guestField.value && guestName) guestField.value = guestName;
       } else {
-        document.getElementById('fm-room-selected-label').textContent = 'Walk-in (ไม่มีห้อง)';
+        document.getElementById('fm-room-selected-label').textContent = HuaHinI18n.t('fin.walkin_label');
         document.getElementById('fm-room-selected').classList.remove('hidden');
       }
     }
@@ -932,11 +936,11 @@
         }).join('');
 
         html += '<div class="item-row">';
-        html += '<div><label style="font-size:11px;color:#888;">รายละเอียด</label><input type="text" placeholder="รายละเอียดรายการ" list="fm-prev-items" value="'+escapeHtml(item.description)+'" onchange="updateItemField('+i+', \'description\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">หมวด</label><select onchange="updateItemField('+i+', \'category\', this.value)">' + catOptions + '</select></div>';
-        html += '<div><label style="font-size:11px;color:#888;">จำนวน</label><input type="number" placeholder="จำนวน" value="'+escapeHtml(item.units)+'" onchange="updateItemField('+i+', \'units\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">ราคาต่อหน่วย</label><input type="number" placeholder="ราคา" value="'+escapeHtml(item.unit_price)+'" onchange="updateItemField('+i+', \'unit_price\', this.value)"></div>';
-        html += '<div><label style="font-size:11px;color:#888;">จำนวนเงิน</label><input type="number" placeholder="รวม" value="'+escapeHtml(item.amount)+'" onchange="updateItemField('+i+', \'amount\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">' + HuaHinI18n.t('fin.it_description') + '</label><input type="text" placeholder="'+HuaHinI18n.t('fin.it_desc_ph')+'" list="fm-prev-items" value="'+escapeHtml(item.description)+'" onchange="updateItemField('+i+', \'description\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">' + HuaHinI18n.t('fin.it_category') + '</label><select onchange="updateItemField('+i+', \'category\', this.value)">' + catOptions + '</select></div>';
+        html += '<div><label style="font-size:11px;color:#888;">' + HuaHinI18n.t('fin.it_units') + '</label><input type="number" placeholder="'+HuaHinI18n.t('fin.it_units_ph')+'" value="'+escapeHtml(item.units)+'" onchange="updateItemField('+i+', \'units\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">' + HuaHinI18n.t('fin.it_unit_price') + '</label><input type="number" placeholder="'+HuaHinI18n.t('fin.it_price_ph')+'" value="'+escapeHtml(item.unit_price)+'" onchange="updateItemField('+i+', \'unit_price\', this.value)"></div>';
+        html += '<div><label style="font-size:11px;color:#888;">' + HuaHinI18n.t('fin.it_amount') + '</label><input type="number" placeholder="'+HuaHinI18n.t('fin.it_total_ph')+'" value="'+escapeHtml(item.amount)+'" onchange="updateItemField('+i+', \'amount\', this.value)"></div>';
         html += '<div><button class="remove-item-btn" onclick="removeItemLine('+i+')">&#10005;</button></div>';
         html += '</div>';
       });
@@ -1001,8 +1005,8 @@
 
         var unverifiedCount = list.filter(function(t) { return t.status !== 'pending' && t.is_approved && !t.is_verified; }).length;
         var pendingApprovalCount = list.filter(function(t) { return t.status !== 'pending' && !t.is_approved; }).length;
-        document.getElementById('opt-unverified').textContent = 'รอตรวจสอบ (' + unverifiedCount + ')';
-        document.getElementById('opt-pending-approval').textContent = 'รออนุมัติ (' + pendingApprovalCount + ')';
+        document.getElementById('opt-unverified').textContent = HuaHinI18n.t('fin.opt_unverified_n', unverifiedCount);
+        document.getElementById('opt-pending-approval').textContent = HuaHinI18n.t('fin.opt_pending_n', pendingApprovalCount);
 
         currentPage = 1;
         renderFinanceTable();
@@ -1025,12 +1029,12 @@
       if (currentPage > totalPages) currentPage = totalPages;
       if (currentPage < 1) currentPage = 1;
 
-      document.getElementById('page-indicator').textContent = 'หน้า ' + currentPage + ' จาก ' + totalPages + ' (' + filtered.length + ' รายการ)';
+      document.getElementById('page-indicator').textContent = HuaHinI18n.t('fin.page_x_of_y_n', currentPage, totalPages, filtered.length);
       document.getElementById('btn-page-prev').disabled = currentPage === 1;
       document.getElementById('btn-page-next').disabled = currentPage === totalPages;
 
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">ไม่พบรายการ</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px;">' + HuaHinI18n.t('fin.no_rows') + '</td></tr>';
         return;
       }
 
@@ -1044,17 +1048,17 @@
 
         var statusLabel = '';
         if (t.status === 'pending') {
-          statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">การจอง</span>';
+          statusLabel = '<span class="pill" style="background:#0284c7;color:#fff;white-space:nowrap;">' + HuaHinI18n.t('fin.pill_reservation') + '</span>';
         } else if (t.is_verified) {
-          statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">ตรวจสอบแล้ว</span>';
+          statusLabel = '<span class="pill ok" style="background:#157347;color:#fff;white-space:nowrap;">' + HuaHinI18n.t('fin.pill_verified') + '</span>';
         } else if (t.is_approved) {
-          statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">อนุมัติแล้ว</span>';
+          statusLabel = '<span class="pill ok" style="background:#0b5ed7;color:#fff;white-space:nowrap;">' + HuaHinI18n.t('fin.pill_approved') + '</span>';
         } else {
-          statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">รออนุมัติ</span>';
+          statusLabel = '<span class="pill warn" style="background:#b5460a;color:#fff;white-space:nowrap;">' + HuaHinI18n.t('fin.pill_pending') + '</span>';
         }
 
         var dirLabel = '<div style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">' +
-          (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">รายรับ</span>' : '<span class="pill flag" style="white-space:nowrap;">รายจ่าย</span>') +
+          (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">' + HuaHinI18n.t('fin.pill_in') + '</span>' : '<span class="pill flag" style="white-space:nowrap;">' + HuaHinI18n.t('fin.pill_out') + '</span>') +
           statusLabel + '</div>';
         var isOwner = HuaHinSession.hasRole('owner');
         // migration_28 merged the revenue/expense roles into accountant, which now
@@ -1069,31 +1073,31 @@
         var actionHtml = '';
         if (!t.is_approved) {
           if (canApproveRevenue || canApproveExpense) {
-            actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">อนุมัติ</button>';
+            actionHtml += '<button class="row-action-btn" style="background:var(--go);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'approve\')">' + HuaHinI18n.t('fin.act_approve') + '</button>';
           }
         } else if (!t.is_verified) {
           if (canVerify) {
-            actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">ตรวจสอบ</button>';
+            actionHtml += '<button class="row-action-btn" style="background:#198754;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:5px;" onclick="openApproveModal(\''+t.txn_id+'\', \'verify\')">' + HuaHinI18n.t('fin.act_verify') + '</button>';
           }
         }
 
         if (canEdit && !t.is_verified) {
-          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">แก้ไข</button>';
+          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">' + HuaHinI18n.t('fin.act_edit') + '</button>';
         } else if (t.is_verified && isOwner) {
-          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">แก้ไข</button>';
+          actionHtml += '<button class="row-action-btn" onclick="editTransaction(\''+t.txn_id+'\')">' + HuaHinI18n.t('fin.act_edit') + '</button>';
         }
 
         if (isOwner) {
-          actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">ลบ</button>';
+          actionHtml += '<button class="row-action-btn" onclick="deleteTransaction(\''+t.txn_id+'\')" style="color:var(--warn);border-color:var(--warn);margin-left:5px;">' + HuaHinI18n.t('fin.act_delete') + '</button>';
         }
 
         if (actionHtml === '') {
           if (t.is_verified) {
-            actionHtml = '<span class="muted">ตรวจสอบแล้ว</span>';
+            actionHtml = '<span class="muted">' + HuaHinI18n.t('fin.muted_verified') + '</span>';
           } else if (t.is_approved) {
-            actionHtml = '<span class="muted">อนุมัติแล้ว</span>';
+            actionHtml = '<span class="muted">' + HuaHinI18n.t('fin.muted_approved') + '</span>';
           } else {
-            actionHtml = '<span class="muted">รอดำเนินการ</span>';
+            actionHtml = '<span class="muted">' + HuaHinI18n.t('fin.muted_pending') + '</span>';
           }
         }
 
@@ -1103,7 +1107,7 @@
           '<td style="white-space:nowrap;">' + dirLabel + '</td>' +
           '<td>' + (t.property_id || '') + '</td>' +
           '<td>' + (t.room_id || '-') + '</td>' +
-          '<td>' + (t.category ? tv(t.category) : 'หลายรายการ') + '</td>' +
+          '<td>' + (t.category ? tv(t.category) : HuaHinI18n.t('fin.multi_item')) + '</td>' +
           '<td style="white-space:nowrap;font-weight:600;">' + formatTHB(t.net_amount || t.amount) + '</td>' +
           '<td>' + (t.guest_or_vendor || '') + '</td>' +
           '<td>' + (t.notes || '') + '</td>' +
@@ -1149,11 +1153,11 @@
       if (!t) return;
       document.getElementById('del-txn-id').value = txnId;
       document.getElementById('del-txn-details').innerHTML =
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">วันที่</span><span>' + (t.txn_date || '-') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">ประเภท</span><span>' + (t.direction === 'IN' ? 'รายรับ' : 'รายจ่าย') + ' · ' + (t.category ? tv(t.category) : 'หลายรายการ') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">ห้อง</span><span>' + (t.room_id || '-') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">ผู้เข้าพัก/ผู้ขาย</span><span>' + escapeHtml(t.guest_or_vendor || '-') + '</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;"><span class="muted">จำนวนเงิน</span><span>' + formatTHB(t.net_amount || t.amount) + '</span></div>';
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">' + HuaHinI18n.t('fin.m_date') + '</span><span>' + (t.txn_date || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">' + HuaHinI18n.t('fin.m_type') + '</span><span>' + (t.direction === 'IN' ? HuaHinI18n.t('fin.pill_in') : HuaHinI18n.t('fin.pill_out')) + ' · ' + (t.category ? tv(t.category) : HuaHinI18n.t('fin.multi_item')) + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">' + HuaHinI18n.t('fin.m_room') + '</span><span>' + (t.room_id || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span class="muted">' + HuaHinI18n.t('fin.m_guest_vendor') + '</span><span>' + escapeHtml(t.guest_or_vendor || '-') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700;"><span class="muted">' + HuaHinI18n.t('fin.m_amount') + '</span><span>' + formatTHB(t.net_amount || t.amount) + '</span></div>';
       show('delete-txn-modal');
     }
     // Thai Tour consolidated receipt: unreceipted paid 'tt rent' txns of the
@@ -1200,9 +1204,9 @@
     function confirmDeleteTxn() {
       var txnId = document.getElementById('del-txn-id').value;
       var btn = document.getElementById('del-txn-confirm');
-      btn.disabled = true; btn.textContent = 'กำลังลบ…';
+      btn.disabled = true; btn.textContent = HuaHinI18n.t('fin.deleting');
       callApi('financeDeleteTransaction', [session.token, txnId]).then(function(res) {
-        btn.disabled = false; btn.textContent = 'ลบถาวร';
+        btn.disabled = false; btn.textContent = HuaHinI18n.t('fin.delete_forever');
         closeDeleteTxn();
         if (!res.ok) { alert(res.error); return; }
         loadFinanceData();
@@ -1225,8 +1229,8 @@
       editingTxnId = null;
       document.getElementById('fm-company-banner').classList.add('hidden');
       financeModalMode = mode;
-      document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? '+ เพิ่มรายรับ' : '+ เพิ่มรายจ่าย';
-      document.querySelector('label[for="fm-paid-by"]').textContent = mode === 'revenue' ? 'ผู้รับเงิน' : 'ผู้จ่ายเงิน';
+      document.getElementById('finance-modal-title').textContent = mode === 'revenue' ? HuaHinI18n.t('fin.modal_add_revenue') : HuaHinI18n.t('fin.modal_add_expense');
+      document.querySelector('label[for="fm-paid-by"]').textContent = mode === 'revenue' ? HuaHinI18n.t('fin.received_by') : HuaHinI18n.t('fin.paid_out_by');
 
       var requiredRole = mode === 'revenue' ? 'revenue' : 'expense';
       var filtered = EMPLOYEES.filter(function (e) {
@@ -1288,20 +1292,20 @@
 
       hide('finance-modal-error');
       if (CURRENT_ITEMS.length === 0) {
-        document.getElementById('finance-modal-error').textContent = 'เพิ่มอย่างน้อยหนึ่งรายการ';
+        document.getElementById('finance-modal-error').textContent = HuaHinI18n.t('fin.need_one_item');
         show('finance-modal-error');
         return;
       }
 
       var invalidItem = CURRENT_ITEMS.find(i => !i.description || !(parseFloat(i.amount) > 0));
       if (invalidItem) {
-        document.getElementById('finance-modal-error').textContent = 'ทุกรายการต้องมีรายละเอียดและจำนวนเงินมากกว่า 0';
+        document.getElementById('finance-modal-error').textContent = HuaHinI18n.t('fin.items_need_values');
         show('finance-modal-error');
         return;
       }
 
       if (!txnDate) {
-        document.getElementById('finance-modal-error').textContent = 'เลือกวันที่';
+        document.getElementById('finance-modal-error').textContent = HuaHinI18n.t('fin.pick_a_date');
         show('finance-modal-error');
         return;
       }
@@ -1345,11 +1349,11 @@
       }
 
       var btn = document.getElementById('finance-modal-save');
-      btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+      btn.disabled = true; btn.textContent = HuaHinI18n.t('fin.saving');
 
       callApi(action, params)
         .then(function (res) {
-          btn.disabled = false; btn.textContent = 'บันทึก';
+          btn.disabled = false; btn.textContent = HuaHinI18n.t('fin.save');
           if (res.ok) {
             hide('finance-modal');
             loadFinanceData();
@@ -1358,8 +1362,8 @@
             show('finance-modal-error');
           }
         }).catch(function (err) {
-          btn.disabled = false; btn.textContent = 'บันทึก';
-          document.getElementById('finance-modal-error').textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
+          btn.disabled = false; btn.textContent = HuaHinI18n.t('fin.save');
+          document.getElementById('finance-modal-error').textContent = HuaHinI18n.t('fin.conn_error') + err.message;
           show('finance-modal-error');
         });
     }
@@ -1381,7 +1385,7 @@
         titleEl.textContent = title;
         var line = escapeHtml(name);
         if (branch) line += ' — ' + escapeHtml(branch);
-        if (taxId) line += ' · เลขผู้เสียภาษี ' + escapeHtml(taxId);
+        if (taxId) line += HuaHinI18n.t('fin.taxid_inline') + escapeHtml(taxId);
         bodyEl.innerHTML = line;
         banner.classList.remove('hidden');
       }
@@ -1390,13 +1394,13 @@
       if (receiptNos.length > 0) {
         callApi('financeGetReceipt', [session.token, receiptNos[0]]).then(function(res){
           if (res && res.ok && res.receipt && res.receipt.company_name) {
-            paint('วางบิลในนามบริษัท (บนใบเสร็จที่ออกแล้ว)', res.receipt.company_name, res.receipt.company_tax_id, res.receipt.company_branch);
+            paint(HuaHinI18n.t('fin.billed_to_company_done'), res.receipt.company_name, res.receipt.company_tax_id, res.receipt.company_branch);
           }
         }).catch(function(){});
       } else {
         callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(res){
           if (res && res.ok && res.company) {
-            paint('ใบเสร็จนี้จะวางบิลในนามบริษัท', res.company.name, res.company.tax_id, res.company.branch);
+            paint(HuaHinI18n.t('fin.will_bill_company'), res.company.name, res.company.tax_id, res.company.branch);
           }
         }).catch(function(){});
       }
@@ -1406,7 +1410,7 @@
     function editTransaction(txnId) {
       var t = TRANSACTIONS.find(function(txn) { return txn.txn_id === txnId; });
       if (!t) {
-        alert('ไม่พบรายละเอียดรายการในเครื่อง');
+        alert(HuaHinI18n.t('fin.no_local_items'));
         return;
       }
 
@@ -1414,7 +1418,7 @@
       renderCompanyBanner(t);
       financeModalMode = t.direction === 'IN' ? 'revenue' : 'expense';
 
-      document.getElementById('finance-modal-title').textContent = financeModalMode === 'revenue' ? 'แก้ไขรายรับ' : 'แก้ไขรายจ่าย';
+      document.getElementById('finance-modal-title').textContent = financeModalMode === 'revenue' ? HuaHinI18n.t('fin.modal_edit_revenue') : HuaHinI18n.t('fin.modal_edit_expense');
 
       if (financeModalMode === 'revenue') {
         hide('fm-expense-extras');
@@ -1458,7 +1462,7 @@
 
       if (CURRENT_ITEMS.length === 0) {
         CURRENT_ITEMS.push({
-          description: t.notes || t.category || 'รายการเดิม',
+          description: t.notes || t.category || HuaHinI18n.t('fin.existing_item'),
           category: t.category,
           units: '',
           unit_price: '',
@@ -1500,7 +1504,7 @@
               btn.style.marginRight = '12px';
               btn.style.borderColor = '#0284C7';
               btn.style.color = '#0284C7';
-              btn.innerHTML = '🖨️ พิมพ์ใบเสร็จ (' + rNo + ')';
+              btn.innerHTML = HuaHinI18n.t('fin.print_receipt_no', rNo);
               btn.onclick = function(e) {
                 e.preventDefault();
                 window.open('receipt.html?receipt_no=' + encodeURIComponent(rNo), '_blank');
@@ -1548,11 +1552,11 @@
           }
 
           var genBtn = document.getElementById('fm-generate-receipt-btn');
-          genBtn.textContent = (splitTypes.length > 1) ? 'ออกใบเสร็จ (เฉพาะประเภทที่เลือก)' : 'ออกใบเสร็จ';
+          genBtn.textContent = (splitTypes.length > 1) ? HuaHinI18n.t('fin.gen_receipt_only') : HuaHinI18n.t('fin.gen_receipt');
 
           var splitBtn = document.getElementById('fm-split-receipts-btn');
           if (splitTypes.length > 1) {
-            var splitLabel = 'ออกและแยกใบเสร็จ (' + splitTypes.join(' + ') + ')';
+            var splitLabel = HuaHinI18n.t('fin.gen_split_n', splitTypes.join(' + '));
             splitBtn.classList.remove('hidden');
             splitBtn.textContent = splitLabel;
             splitBtn.onclick = function(e) {
@@ -1561,19 +1565,19 @@
               var errorEl = document.getElementById('fm-receipt-error');
               errorEl.classList.add('hidden');
               if (!rDate) {
-                errorEl.textContent = 'กรุณาเลือกวันที่ใบเสร็จ';
+                errorEl.textContent = HuaHinI18n.t('fin.need_receipt_date');
                 errorEl.classList.remove('hidden');
                 return;
               }
               splitBtn.disabled = true;
-              splitBtn.textContent = 'กำลังแยก...';
+              splitBtn.textContent = HuaHinI18n.t('fin.splitting');
               (async function() {
                 var issued = [];
                 var confirmBackdate = false;
                 for (var i = 0; i < splitTypes.length; i++) {
                   var rr = await callApi('financeGenerateReceipt', [session.token, t.txn_id, splitTypes[i], rDate, confirmBackdate]);
                   if (rr.needsConfirm) {
-                    if (!(await confirmDialog(rr.warning, {title:'วันที่ใบเสร็จย้อนหลัง', confirmText:'ออกใบเสร็จต่อ', danger:true}))) {
+                    if (!(await confirmDialog(rr.warning, {title:HuaHinI18n.t('fin.backdated_title'), confirmText:HuaHinI18n.t('fin.issue_anyway'), danger:true}))) {
                       splitBtn.disabled = false; splitBtn.textContent = splitLabel;
                       return;
                     }
@@ -1582,14 +1586,14 @@
                   }
                   if (!rr.ok) {
                     splitBtn.disabled = false; splitBtn.textContent = splitLabel;
-                    errorEl.textContent = 'ใบเสร็จ ' + splitTypes[i] + ' ผิดพลาด: ' + rr.error;
+                    errorEl.textContent = HuaHinI18n.t('fin.receipt_x_failed', splitTypes[i]) + rr.error;
                     errorEl.classList.remove('hidden');
                     return;
                   }
                   issued.push(splitTypes[i] + ': ' + rr.receipt_no);
                 }
                 splitBtn.disabled = false; splitBtn.textContent = splitLabel;
-                alert('ออกและแยกใบเสร็จสำเร็จ:\n' + issued.join('\n'));
+                alert(HuaHinI18n.t('fin.split_ok') + '\n' + issued.join('\n'));
                 var txnRes = await callApi('financeGetTransaction', [session.token, t.txn_id]);
                 if (txnRes.ok) {
                   var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
@@ -1599,7 +1603,7 @@
                 loadFinanceData();
               })().catch(function(err) {
                 splitBtn.disabled = false; splitBtn.textContent = splitLabel;
-                errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
+                errorEl.textContent = HuaHinI18n.t('fin.conn_error') + err.message;
                 errorEl.classList.remove('hidden');
               });
             };
@@ -1615,20 +1619,20 @@
             errorEl.classList.add('hidden');
 
             if (!date) {
-              errorEl.textContent = 'กรุณาเลือกวันที่ใบเสร็จ';
+              errorEl.textContent = HuaHinI18n.t('fin.need_receipt_date');
               errorEl.classList.remove('hidden');
               return;
             }
 
             var genBtn = document.getElementById('fm-generate-receipt-btn');
-            var restoreLabel = (hasRent && hasDeposit) ? 'ออกใบเสร็จ (ยกเว้นมัดจำ)' : 'ออกใบเสร็จ';
+            var restoreLabel = (hasRent && hasDeposit) ? HuaHinI18n.t('fin.gen_receipt_no_dep') : HuaHinI18n.t('fin.gen_receipt');
             genBtn.disabled = true;
-            genBtn.textContent = 'กำลังออก...';
+            genBtn.textContent = HuaHinI18n.t('fin.issuing');
 
             (async function() {
               var res = await callApi('financeGenerateReceipt', [session.token, t.txn_id, type, date]);
               if (res.needsConfirm) {
-                if (!(await confirmDialog(res.warning, {title:'วันที่ใบเสร็จย้อนหลัง', confirmText:'ออกใบเสร็จต่อ', danger:true}))) {
+                if (!(await confirmDialog(res.warning, {title:HuaHinI18n.t('fin.backdated_title'), confirmText:HuaHinI18n.t('fin.issue_anyway'), danger:true}))) {
                   genBtn.disabled = false; genBtn.textContent = restoreLabel;
                   return;
                 }
@@ -1637,7 +1641,7 @@
               genBtn.disabled = false;
               genBtn.textContent = restoreLabel;
               if (res.ok) {
-                alert('ออกใบเสร็จสำเร็จ: ' + res.receipt_no);
+                alert(HuaHinI18n.t('fin.receipt_ok') + res.receipt_no);
                 var txnRes = await callApi('financeGetTransaction', [session.token, t.txn_id]);
                 if (txnRes.ok) {
                   var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
@@ -1652,7 +1656,7 @@
             })().catch(function(err) {
               genBtn.disabled = false;
               genBtn.textContent = restoreLabel;
-              errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
+              errorEl.textContent = HuaHinI18n.t('fin.conn_error') + err.message;
               errorEl.classList.remove('hidden');
             });
           };
@@ -1675,20 +1679,20 @@
             errorEl.classList.add('hidden');
 
             if (!date) {
-              errorEl.textContent = 'กรุณาเลือกวันที่ใบแจ้งหนี้';
+              errorEl.textContent = HuaHinI18n.t('fin.need_invoice_date');
               errorEl.classList.remove('hidden');
               return;
             }
 
             var genBtn = document.getElementById('fm-generate-invoice-btn');
             genBtn.disabled = true;
-            genBtn.textContent = 'กำลังออก...';
+            genBtn.textContent = HuaHinI18n.t('fin.issuing');
 
             callApi('financeGenerateInvoice', [session.token, t.txn_id, date]).then(function(res) {
               genBtn.disabled = false;
-              genBtn.textContent = 'ออกใบแจ้งหนี้แบบเต็ม';
+              genBtn.textContent = HuaHinI18n.t('fin.gen_full_invoice');
               if (res.ok) {
-                alert('ออกใบแจ้งหนี้สำเร็จ: ' + res.invoice_no);
+                alert(HuaHinI18n.t('fin.invoice_ok') + res.invoice_no);
                 callApi('financeGetTransaction', [session.token, t.txn_id]).then(function(txnRes) {
                   if (txnRes.ok) {
                     var localIdx = TRANSACTIONS.findIndex(function(txn) { return txn.txn_id === t.txn_id; });
@@ -1703,8 +1707,8 @@
               }
             }).catch(function(err) {
               genBtn.disabled = false;
-              genBtn.textContent = 'ออกใบแจ้งหนี้แบบเต็ม';
-              errorEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
+              genBtn.textContent = HuaHinI18n.t('fin.gen_full_invoice');
+              errorEl.textContent = HuaHinI18n.t('fin.conn_error') + err.message;
               errorEl.classList.remove('hidden');
             });
           };
@@ -1719,13 +1723,13 @@
       var propertyId = document.getElementById('finance-property').value;
       show('unrefunded-modal');
       var tbody = document.getElementById('unrefunded-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">' + HuaHinI18n.t('fin.loading') + '</td></tr>';
 
       callApi('financeGetUnrefundedDeposits', [session.token, propertyId]).then(function(res) {
         if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="error">'+escapeHtml(res.error)+'</td></tr>'; return; }
         var list = res.deposits || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">ไม่มีเงินมัดจำค้างคืนสำหรับอาคารนี้</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">' + HuaHinI18n.t('fin.no_unrefunded') + '</td></tr>';
           return;
         }
         var html = '';
@@ -1735,7 +1739,7 @@
             '<td>'+escapeHtml(d.room_id || '-')+'</td>' +
             '<td>'+escapeHtml(d.guest_or_vendor || '-')+'</td>' +
             '<td><b>'+formatTHB(d.deposit_amount)+'</b></td>' +
-            '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+', '+(d.card_deposit || 0)+', '+(d.card_deposit_qty || 0)+')">คืนเงิน</button></td>' +
+            '<td><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="openMoveOutModal(\''+d.txn_id+'\', '+d.deposit_amount+', '+(d.card_deposit || 0)+', '+(d.card_deposit_qty || 0)+')">' + HuaHinI18n.t('fin.refund') + '</button></td>' +
             '</tr>';
         });
         tbody.innerHTML = html;
@@ -1746,13 +1750,13 @@
       var propertyId = document.getElementById('finance-property').value;
       show('reservations-modal');
       var tbody = document.getElementById('reservations-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">' + HuaHinI18n.t('fin.loading') + '</td></tr>';
 
       callApi('financeGetPendingReservations', [session.token, propertyId]).then(function(res) {
         if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="error">'+escapeHtml(res.error)+'</td></tr>'; return; }
         var list = res.reservations || [];
         if (!list.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">ไม่มีการจองที่รอเช็คอิน</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">' + HuaHinI18n.t('fin.no_reservations') + '</td></tr>';
           return;
         }
         var html = '';
@@ -1763,7 +1767,7 @@
             '<td>'+escapeHtml(r.guest_name || '-')+'</td>' +
             '<td><b>'+formatTHB(r.reservation_deposit || 0)+'</b></td>' +
             '<td>'+escapeHtml(r.booking_type ? tv(r.booking_type) : '-')+'</td>' +
-            '<td style="text-align:center;"><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="window.location.href=\'rooms.html?booking_id=' + escapeHtml(r.booking_id) + '\'">เช็คอิน</button></td>' +
+            '<td style="text-align:center;"><button class="btn-primary" style="padding:4px 8px;font-size:11px;" onclick="window.location.href=\'rooms.html?booking_id=' + escapeHtml(r.booking_id) + '\'">' + HuaHinI18n.t('fin.checkin_btn') + '</button></td>' +
             '</tr>';
         });
         tbody.innerHTML = html;
@@ -1771,7 +1775,7 @@
     }
 
     async function markDepositRefunded(txnId) {
-      if (!(await confirmDialog('ทำเครื่องหมายว่าคืนเงินมัดจำแล้ว? อย่าลืมเพิ่มรายการรายจ่ายสำหรับเงินสดที่คืนไปด้วย', {title:'ยืนยันการคืนเงินมัดจำ', confirmText:'ทำเครื่องหมายว่าคืนแล้ว'}))) return;
+      if (!(await confirmDialog(HuaHinI18n.t('fin.mark_refunded_q'), {title:HuaHinI18n.t('fin.refund_confirm_title'), confirmText:HuaHinI18n.t('fin.mark_refunded')}))) return;
       callApi('financeMarkDepositRefunded', [session.token, txnId]).then(function(res) {
         if (!res.ok) { alert(res.error); return; }
         openUnrefundedModal();
@@ -1817,12 +1821,12 @@
 
       var lost = MO_CARD_QTY - returned;
       var foundIdx = MO_ITEMS.findIndex(function(item) {
-        return item.description.indexOf('คีย์การ์ดที่ไม่ได้คืน') === 0;
+        return item.description.indexOf(HuaHinI18n.t('fin.lost_cards')) === 0;
       });
 
       if (lost > 0) {
         var amt = lost * MO_CARD_DEP;
-        var desc = 'คีย์การ์ดที่ไม่ได้คืน (' + lost + ' ใบ)';
+        var desc = HuaHinI18n.t('fin.lost_cards_n', lost);
         var newItem = {
           description: desc,
           category: 'other',
@@ -1860,20 +1864,20 @@
         }
         var catOpts = mCats.map(c => '<option value="'+c+'" '+(item.category === c ? 'selected' : '')+'>'+tv(c)+'</option>').join('');
         html += '<div class="item-row" style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">' +
-          '<input type="text" placeholder="รายละเอียด (เช่น ค่าน้ำ)" value="'+escapeHtml(item.description)+'" onchange="MO_ITEMS['+index+'].description=this.value" style="flex:2;">' +
+          '<input type="text" placeholder="'+HuaHinI18n.t('fin.mo_desc_ph')+'" value="'+escapeHtml(item.description)+'" onchange="MO_ITEMS['+index+'].description=this.value" style="flex:2;">' +
           '<select onchange="MO_ITEMS['+index+'].category=this.value" style="flex:1;">' +
             catOpts +
           '</select>' +
-          '<input type="number" placeholder="จำนวน" value="'+item.units+'" onchange="MO_ITEMS['+index+'].units=this.value; calcMoRow('+index+')" id="mo-u-'+index+'" style="width:60px;">' +
-          '<input type="number" placeholder="ราคา" value="'+item.unit_price+'" onchange="MO_ITEMS['+index+'].unit_price=this.value; calcMoRow('+index+')" id="mo-p-'+index+'" style="width:80px;">' +
-          '<input type="number" placeholder="จำนวนเงิน" value="'+item.amount+'" onchange="MO_ITEMS['+index+'].amount=this.value; calcMoTotal()" id="mo-a-'+index+'" style="width:100px;">' +
+          '<input type="number" placeholder="'+HuaHinI18n.t('fin.it_units_ph')+'" value="'+item.units+'" onchange="MO_ITEMS['+index+'].units=this.value; calcMoRow('+index+')" id="mo-u-'+index+'" style="width:60px;">' +
+          '<input type="number" placeholder="'+HuaHinI18n.t('fin.it_price_ph')+'" value="'+item.unit_price+'" onchange="MO_ITEMS['+index+'].unit_price=this.value; calcMoRow('+index+')" id="mo-p-'+index+'" style="width:80px;">' +
+          '<input type="number" placeholder="'+HuaHinI18n.t('fin.mo_amount_ph')+'" value="'+item.amount+'" onchange="MO_ITEMS['+index+'].amount=this.value; calcMoTotal()" id="mo-a-'+index+'" style="width:100px;">' +
           '<button class="mx" style="font-size:18px;" onclick="MO_ITEMS.splice('+index+',1); renderMoveOutItems();">&times;</button>' +
         '</div>';
       });
       document.getElementById('mo-items-container').innerHTML = html;
 
       var hasLostCardItem = MO_ITEMS.some(function(item) {
-        return item.description.indexOf('คีย์การ์ดที่ไม่ได้คืน') === 0;
+        return item.description.indexOf(HuaHinI18n.t('fin.lost_cards')) === 0;
       });
       if (!hasLostCardItem && MO_CARD_QTY > 0) {
         document.getElementById('mo-cards-returned').value = MO_CARD_QTY;
@@ -1901,11 +1905,11 @@
       document.getElementById('mo-total-deductions').textContent = formatTHB(deductions);
 
       if (net >= 0) {
-        document.getElementById('mo-net-label').textContent = 'เงินสดที่ต้องคืนผู้เข้าพัก:';
+        document.getElementById('mo-net-label').textContent = HuaHinI18n.t('fin.cash_to_return');
         document.getElementById('mo-net-amount').textContent = formatTHB(net);
         document.getElementById('mo-net-amount').style.color = 'var(--go)';
       } else {
-        document.getElementById('mo-net-label').textContent = 'ผู้เข้าพักค้างชำระ:';
+        document.getElementById('mo-net-label').textContent = HuaHinI18n.t('fin.guest_owes');
         document.getElementById('mo-net-amount').textContent = formatTHB(Math.abs(net));
         document.getElementById('mo-net-amount').style.color = 'var(--warn)';
       }
@@ -1918,10 +1922,10 @@
       var validItems = MO_ITEMS.filter(i => i.description && (parseFloat(i.amount) > 0));
 
       var btn = this;
-      btn.textContent = 'กำลังดำเนินการ...'; btn.disabled = true;
+      btn.textContent = HuaHinI18n.t('fin.working'); btn.disabled = true;
 
       callApi('financeProcessMoveOut', [session.token, txnId, validItems]).then(function(res) {
-        btn.textContent = 'ยืนยันการย้ายออก'; btn.disabled = false;
+        btn.textContent = HuaHinI18n.t('fin.confirm_moveout'); btn.disabled = false;
         if (!res.ok) {
           document.getElementById('moveout-error').textContent = res.error;
           show('moveout-error');
@@ -1933,7 +1937,8 @@
     });
 
     function exportFinanceCsv() {
-      var rows = [['วันที่', 'ประเภท', 'อาคาร', 'ห้อง', 'หมวด', 'จำนวนเงิน', 'ผู้เข้าพัก/ผู้ขาย', 'หมายเหตุ']];
+      var rows = [['fin.col_date', 'fin.col_type', 'fin.col_property', 'fin.col_room', 'fin.col_category',
+               'fin.col_amount', 'fin.col_guest_vendor', 'fin.col_notes'].map(HuaHinI18n.t)];
       document.querySelectorAll('#finance-table-body tr').forEach(function (tr) {
         if (tr.classList.contains('items-expand-row')) return;
         var cells = [];
@@ -1979,10 +1984,10 @@
         
         var html = '<td colspan="10" style="background:#fcfbf9;padding:12px 24px;border-bottom:1px solid var(--line);">';
         if (!t.items || t.items.length === 0) {
-          html += '<div style="color:var(--muted);font-style:italic;font-size:12px;">ไม่พบรายการย่อยของรายการนี้</div>';
+          html += '<div style="color:var(--muted);font-style:italic;font-size:12px;">' + HuaHinI18n.t('fin.no_sub_items') + '</div>';
         } else {
           html += '<table style="width:100%;border-collapse:collapse;margin:4px 0;background:#ffffff;border:1px solid var(--line);font-size:13px;border-radius:6px;overflow:hidden;">';
-          html += '<thead><tr style="border-bottom:1px solid var(--line);background:#f3f1ec;"><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;background:#f3f1ec;">รายละเอียด</th><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:150px;background:#f3f1ec;">หมวด</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:80px;background:#f3f1ec;">จำนวน</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">ราคา</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">จำนวนเงิน</th></tr></thead>';
+          html += '<thead><tr style="border-bottom:1px solid var(--line);background:#f3f1ec;"><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;background:#f3f1ec;">' + HuaHinI18n.t('fin.it_description') + '</th><th style="padding:8px 12px;text-align:left;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:150px;background:#f3f1ec;">' + HuaHinI18n.t('fin.it_category') + '</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:80px;background:#f3f1ec;">' + HuaHinI18n.t('fin.it_units') + '</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">' + HuaHinI18n.t('fin.it_price_ph') + '</th><th style="padding:8px 12px;text-align:right;color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.03em;font-weight:600;width:120px;background:#f3f1ec;">' + HuaHinI18n.t('fin.it_amount') + '</th></tr></thead>';
           html += '<tbody>';
           t.items.forEach(function(item) {
             var unitsText = item.units != null ? item.units : '—';
@@ -2001,10 +2006,10 @@
         if (t.vat_type && t.vat_type !== 'none' || t.wht_percent > 0) {
           var details = [];
           if (t.vat_type && t.vat_type !== 'none') {
-            details.push('VAT (' + (t.vat_type === 'include' ? 'รวมภาษี' : 'แยกภาษี') + '): ' + formatTHB(t.vat_amount));
+            details.push('VAT (' + (t.vat_type === 'include' ? tv('Included') : tv('Excluded')) + '): ' + formatTHB(t.vat_amount));
           }
           if (t.wht_percent > 0) {
-            details.push('หัก ณ ที่จ่าย (' + t.wht_percent + '%): -' + formatTHB(t.wht_amount));
+            details.push(HuaHinI18n.t('fin.wht_pct_line', t.wht_percent) + formatTHB(t.wht_amount));
           }
           html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right;">' + details.join(' &nbsp;|&nbsp; ') + '</div>';
         }
@@ -2058,9 +2063,9 @@
       // Set title dynamically
       var titleText = '';
       if (approvingActionType === 'verify') {
-        titleText = 'ยืนยันและตรวจสอบรายการ';
+        titleText = HuaHinI18n.t('fin.approve_verify_h');
       } else {
-        titleText = t.direction === 'IN' ? 'ยืนยันและอนุมัติรายรับ' : 'ยืนยันและอนุมัติรายจ่าย';
+        titleText = t.direction === 'IN' ? HuaHinI18n.t('fin.approve_in_h') : HuaHinI18n.t('fin.approve_out_h');
       }
       document.getElementById('am-title-display').textContent = titleText;
 
@@ -2090,9 +2095,9 @@
 
       var confirmBtn = document.getElementById('approveBtn');
       if (approvingActionType === 'verify') {
-        confirmBtn.textContent = 'ยืนยันและตรวจสอบ';
+        confirmBtn.textContent = HuaHinI18n.t('fin.btn_verify');
       } else {
-        confirmBtn.textContent = 'ยืนยันการรับเงิน';
+        confirmBtn.textContent = HuaHinI18n.t('fin.btn_receive');
       }
 
       document.getElementById('approve-modal-error').classList.add('hidden');
@@ -2114,8 +2119,8 @@
       
       var isApp = true;
       var isVer = approvingActionType === 'verify';
-      var actionText = isVer ? 'กำลังตรวจสอบ...' : 'กำลังอนุมัติ...';
-      var defaultText = isVer ? 'ยืนยันและตรวจสอบ' : 'ยืนยันการรับเงิน';
+      var actionText = isVer ? HuaHinI18n.t('fin.verifying') : HuaHinI18n.t('fin.approving');
+      var defaultText = isVer ? HuaHinI18n.t('fin.btn_verify') : HuaHinI18n.t('fin.btn_receive');
 
       btn.disabled = true; btn.textContent = actionText;
       callApi('financeUpdateTransaction', [session.token, approvingTxnId, isApp, isVer, channel, ref, receivedBy]).then(function(res) {
@@ -2131,7 +2136,7 @@
       }).catch(function(err) {
         btn.disabled = false; btn.textContent = defaultText;
         var errEl = document.getElementById('approve-modal-error');
-        errEl.textContent = 'การเชื่อมต่อผิดพลาด: ' + err.message;
+        errEl.textContent = HuaHinI18n.t('fin.conn_error') + err.message;
         errEl.classList.remove('hidden');
       });
     }
@@ -2143,14 +2148,14 @@
 
     function renderVendorsTable() {
       var tbody = document.getElementById('vendors-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">กำลังโหลด...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">' + HuaHinI18n.t('fin.loading') + '</td></tr>';
       callApi('financeGetVendors', [session.token]).then(function(res) {
-        if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;color:var(--warn);">ข้อผิดพลาด: ' + escapeHtml(res.error) + '</td></tr>'; return; }
+        if (!res.ok) { tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;color:var(--warn);">' + HuaHinI18n.t('fin.error_prefix') + escapeHtml(res.error) + '</td></tr>'; return; }
         VENDORS = res.vendors || [];
         document.getElementById('fm-vendor-list').innerHTML = VENDORS.map(function(v) { return '<option value="'+escapeHtml(v.name || v)+'">'; }).join('');
 
         if (VENDORS.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">ไม่พบผู้ขาย</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">' + HuaHinI18n.t('fin.no_vendors') + '</td></tr>';
           return;
         }
 
@@ -2162,8 +2167,8 @@
           html += '<td>' + escapeHtml(v.tax_id || '-') + '</td>';
           html += '<td>' + escapeHtml(v.branch || 'Head Office') + '</td>';
           html += '<td>';
-          html += '<button class="row-action-btn" style="margin-right:8px;" onclick="editVendor('+v.vendor_id+')">แก้ไข</button>';
-          html += '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="deleteVendor('+v.vendor_id+')">ลบ</button>';
+          html += '<button class="row-action-btn" style="margin-right:8px;" onclick="editVendor('+v.vendor_id+')">' + HuaHinI18n.t('fin.v_edit') + '</button>';
+          html += '<button class="row-action-btn" style="color:var(--warn);border-color:var(--warn);" onclick="deleteVendor('+v.vendor_id+')">' + HuaHinI18n.t('fin.v_delete') + '</button>';
           html += '</td>';
           html += '</tr>';
         });
@@ -2174,14 +2179,14 @@
     function openVendorForm(vendor) {
       document.getElementById('vendor-form-error').classList.add('hidden');
       if (vendor) {
-        document.getElementById('vendor-form-title').textContent = 'แก้ไขผู้ขาย';
+        document.getElementById('vendor-form-title').textContent = HuaHinI18n.t('fin.edit_vendor_h');
         document.getElementById('vf-id').value = vendor.vendor_id;
         document.getElementById('vf-name').value = vendor.name || '';
         document.getElementById('vf-address').value = vendor.address || '';
         document.getElementById('vf-tax').value = vendor.tax_id || '';
         document.getElementById('vf-branch').value = vendor.branch || 'Head Office';
       } else {
-        document.getElementById('vendor-form-title').textContent = 'เพิ่มผู้ขาย';
+        document.getElementById('vendor-form-title').textContent = HuaHinI18n.t('fin.vendor_form_h');
         document.getElementById('vf-id').value = '';
         document.getElementById('vf-name').value = '';
         document.getElementById('vf-address').value = '';
@@ -2197,9 +2202,9 @@
     };
 
     window.deleteVendor = async function(id) {
-      if (!(await confirmDialog('ลบผู้ขายรายนี้?', {title:'ลบผู้ขาย', confirmText:'ลบ', danger:true}))) return;
+      if (!(await confirmDialog(HuaHinI18n.t('fin.del_vendor_q'), {title:HuaHinI18n.t('fin.del_vendor_title'), confirmText:HuaHinI18n.t('fin.del_confirm'), danger:true}))) return;
       callApi('financeDeleteVendor', [session.token, id]).then(function(res) {
-        if (!res.ok) alert('ข้อผิดพลาด: ' + res.error);
+        if (!res.ok) alert(HuaHinI18n.t('fin.error_prefix') + res.error);
         else renderVendorsTable();
       });
     };
@@ -2213,7 +2218,7 @@
 
       if (!name) {
         var err = document.getElementById('vendor-form-error');
-        err.textContent = 'ต้องระบุชื่อผู้ขาย';
+        err.textContent = HuaHinI18n.t('fin.vendor_name_required');
         err.classList.remove('hidden');
         return;
       }
@@ -2236,37 +2241,37 @@
 
   <div class="modal-overlay hidden" id="approve-modal-bg" onclick="closeApproveMod(event)">
     <div class="modal-box" onclick="event.stopPropagation()" style="width:400px;max-width:90vw;">
-      <div class="mhdr"><div class="mtitle" id="am-title-display">ยืนยันและอนุมัติรายรับ</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
+      <div class="mhdr"><div class="mtitle" id="am-title-display" data-i18n="fin.approve_in_h">ยืนยันและอนุมัติรายรับ</div><button class="mx" onclick="closeApproveMod()">✕</button></div>
       <div class="fg">
-        <label class="fl">ยอดที่ต้องชำระ</label>
+        <label class="fl" data-i18n="fin.amount_due">ยอดที่ต้องชำระ</label>
         <div id="am-amount-display" style="font-size:20px;font-weight:700;color:var(--go);margin:8px 0;">฿0</div>
       </div>
       <div class="fg">
-        <label class="fl">ช่องทางชำระเงิน</label>
+        <label class="fl" data-i18n="fin.channel">ช่องทางชำระเงิน</label>
         <div class="custom-select" id="am-channel-select">
-          <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('am-channel-select')">💵 เงินสด <span class="arrow">▼</span></div>
+          <div class="custom-select-trigger" onclick="event.stopPropagation(); toggleCustomSelect('am-channel-select')"><span data-i18n="fin.cash">💵 เงินสด</span> <span class="arrow">▼</span></div>
           <div class="custom-select-options">
-            <div class="custom-select-option" data-value="cash">💵 เงินสด</div>
+            <div class="custom-select-option" data-value="cash" data-i18n="fin.cash_opt">💵 เงินสด</div>
             <div class="custom-select-option" data-value="kb">💳 KB</div>
             <div class="custom-select-option" data-value="scb">💳 SCB</div>
-            <div class="custom-select-option" data-value="maemanee">📱 แม่มณี</div>
+            <div class="custom-select-option" data-value="maemanee" data-i18n="fin.maemanee2">📱 แม่มณี</div>
             <div class="custom-select-option" data-value="kshop">📱 Kshop</div>
           </div>
           <input type="hidden" id="am-channel" value="cash" />
         </div>
       </div>
       <div class="fg">
-        <label class="fl" for="am-received-by">ผู้รับเงิน</label>
+        <label class="fl" for="am-received-by" data-i18n="fin.received_by">ผู้รับเงิน</label>
         <select class="fs" id="am-received-by" style="width:100%;"></select>
       </div>
       <div class="fg">
-        <label class="fl">เลขอ้างอิงการโอน</label>
-        <input class="fi" type="text" id="am-ref" placeholder="เช่น เลขรายการ หรือ อ้างอิงธนาคาร…">
+        <label class="fl" data-i18n="fin.transfer_ref2">เลขอ้างอิงการโอน</label>
+        <input class="fi" type="text" id="am-ref" data-i18n-attr="placeholder:fin.ref_ph" placeholder="เช่น เลขรายการ หรือ อ้างอิงธนาคาร…">
       </div>
       <div class="error hidden" id="approve-modal-error"></div>
       <div style="display:flex;gap:9px;margin-top:16px">
-        <button class="btn-secondary" style="flex:1" onclick="closeApproveMod()">ยกเลิก</button>
-        <button class="btn-primary" style="flex:2" id="approveBtn" onclick="submitApproval()">ยืนยันการรับเงิน</button>
+        <button class="btn-secondary" style="flex:1" onclick="closeApproveMod()" data-i18n="fin.cancel">ยกเลิก</button>
+        <button class="btn-primary" style="flex:2" id="approveBtn" onclick="submitApproval()" data-i18n="fin.btn_receive">ยืนยันการรับเงิน</button>
       </div>
     </div>
   </div>
@@ -2274,20 +2279,20 @@
   <!-- ===================== SLIP-ASSISTED APPROVE MODAL ===================== -->
   <div class="modal-overlay hidden" id="slip-modal-bg" onclick="closeSlipModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()" style="width:520px;max-width:94vw;">
-      <div class="mhdr"><div class="mtitle">📷 ยืนยันด้วยสลิป</div><button class="mx" onclick="closeSlipModal()">✕</button></div>
+      <div class="mhdr"><div class="mtitle" data-i18n="fin.slip_approve">📷 ยืนยันด้วยสลิป</div><button class="mx" onclick="closeSlipModal()">✕</button></div>
       <div class="fg">
-        <label class="fl">อัปโหลด/ถ่ายรูปสลิปโอนเงิน</label>
+        <label class="fl" data-i18n="fin.slip_upload">อัปโหลด/ถ่ายรูปสลิปโอนเงิน</label>
         <input class="fi" type="file" id="slip-file" accept="image/*" onchange="handleSlipFile(this)">
       </div>
       <div class="fg">
-        <label class="fl">เลขที่รายการ (จาก QR)</label>
+        <label class="fl" data-i18n="fin.slip_ref_l">เลขที่รายการ (จาก QR)</label>
         <div id="slip-ref" style="font-family:monospace;font-size:13px;color:var(--ink);word-break:break-all;">—</div>
       </div>
       <div class="fg">
-        <label class="fl" for="slip-amount">จำนวนเงิน (ตรวจสอบจากธนาคารอัตโนมัติ · แก้ไขได้หากตรวจไม่สำเร็จ)</label>
+        <label class="fl" for="slip-amount" data-i18n="fin.slip_amount_l">จำนวนเงิน (ตรวจสอบจากธนาคารอัตโนมัติ · แก้ไขได้หากตรวจไม่สำเร็จ)</label>
         <div style="display:flex;gap:8px;">
-          <input class="fi" type="number" step="0.01" id="slip-amount" style="flex:1;" oninput="runSlipMatch()" placeholder="ยอดจะเติมอัตโนมัติหลังตรวจสอบสลิป">
-          <button class="btn-secondary" style="white-space:nowrap;" onclick="runSlipMatch()">ค้นหา</button>
+          <input class="fi" type="number" step="0.01" id="slip-amount" style="flex:1;" oninput="runSlipMatch()" data-i18n-attr="placeholder:fin.slip_amount_ph" placeholder="ยอดจะเติมอัตโนมัติหลังตรวจสอบสลิป">
+          <button class="btn-secondary" style="white-space:nowrap;" onclick="runSlipMatch()" data-i18n="fin.slip_search">ค้นหา</button>
         </div>
       </div>
       <div id="slip-status" class="muted" style="font-size:13px;min-height:18px;margin:4px 0;"></div>
@@ -2332,7 +2337,7 @@
       hide('slip-modal-bg');
     }
 
-    // EMVCo/ITMX TLV walk. Thai slip QR: tag 00 → sub 01 = bank code, sub 02 = เลขที่รายการ.
+    // EMVCo/ITMX TLV walk. Thai slip QR: tag 00 → sub 01 = bank code, sub 02 = the transaction number.
     function slipTlv(s) {
       var o = {}, i = 0;
       while (i + 4 <= s.length) {
@@ -2359,7 +2364,7 @@
       var statusEl = document.getElementById('slip-status');
       document.getElementById('slip-matches').innerHTML = '';
       document.getElementById('slip-amount').value = '';
-      statusEl.textContent = 'กำลังอ่าน QR...';
+      statusEl.textContent = HuaHinI18n.t('fin.reading_qr');
       var img = new Image();
       img.onload = function () {
         var c = document.createElement('canvas');
@@ -2368,40 +2373,40 @@
         var id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
         loadScriptOnce('vendor/jsQR.js', 'jsqr').then(function () {
           var code = window.jsQR(id.data, id.width, id.height);
-          if (!code) { statusEl.textContent = '❌ ไม่พบ QR ในสลิป — ใช้รูปที่ชัดขึ้น'; return; }
+          if (!code) { statusEl.textContent = HuaHinI18n.t('fin.no_qr'); return; }
           var p = parseSlipQr(code.data);
           slipRefValue = p.ref;
           slipBankChannel = p.bank ? p.bank.channel : '';
           document.getElementById('slip-ref').textContent = (p.bank ? p.bank.name + ' · ' : '') + p.ref;
-          statusEl.textContent = '⏳ กำลังตรวจสอบสลิปกับธนาคาร (EasySlip)…';
+          statusEl.textContent = HuaHinI18n.t('fin.checking_slip');
           // Verify server-side (token is a Worker secret). Reliable amount across banks.
           callApi('financeVerifySlip', [session.token, code.data]).then(function (res) {
             if (res.ok && res.amount != null) {
               if (res.ref) slipRefValue = res.ref;
               document.getElementById('slip-ref').textContent =
                 (p.bank ? p.bank.name + ' · ' : '') + slipRefValue +
-                (res.senderName ? ' · จาก ' + res.senderName : '');
+                (res.senderName ? HuaHinI18n.t('fin.slip_from') + res.senderName : '');
               document.getElementById('slip-amount').value = res.amount;
-              statusEl.innerHTML = '✅ ตรวจสอบสลิปสำเร็จ · ยอด <b>' + formatTHB(res.amount) + '</b>' +
-                (res.receiverName ? ' · เข้าบัญชี ' + escapeHtml(res.receiverName) : '');
+              statusEl.innerHTML = HuaHinI18n.t('fin.slip_ok') + '<b>' + formatTHB(res.amount) + '</b>' +
+                (res.receiverName ? HuaHinI18n.t('fin.slip_into') + escapeHtml(res.receiverName) : '');
               runSlipMatch();
             } else {
               // Verify failed (quota/unknown slip/not configured) → keep QR ref, staff types amount.
-              statusEl.textContent = '⚠️ ' + (res.error || 'ตรวจสอบสลิปไม่สำเร็จ') + ' — กรอกจำนวนเงินเอง';
+              statusEl.textContent = '⚠️ ' + (res.error || HuaHinI18n.t('fin.slip_failed')) + HuaHinI18n.t('fin.type_amount');
             }
           }).catch(function () {
-            statusEl.textContent = '⚠️ เชื่อมต่อบริการตรวจสอบไม่สำเร็จ — กรอกจำนวนเงินเอง';
+            statusEl.textContent = HuaHinI18n.t('fin.slip_service_down');
           });
-        }).catch(function () { statusEl.textContent = 'โหลดตัวอ่าน QR ไม่สำเร็จ'; });
+        }).catch(function () { statusEl.textContent = HuaHinI18n.t('fin.qr_reader_failed'); });
       };
-      img.onerror = function () { statusEl.textContent = 'เปิดรูปไม่สำเร็จ'; };
+      img.onerror = function () { statusEl.textContent = HuaHinI18n.t('fin.image_failed'); };
       img.src = URL.createObjectURL(f);
     }
 
     function runSlipMatch() {
       var box = document.getElementById('slip-matches');
       var amt = parseFloat(String(document.getElementById('slip-amount').value).replace(/,/g, ''));
-      if (isNaN(amt)) { box.innerHTML = '<div class="muted">กรอกจำนวนเงินก่อน</div>'; return; }
+      if (isNaN(amt)) { box.innerHTML = '<div class="muted">' + HuaHinI18n.t('fin.enter_amount_first') + '</div>'; return; }
       var target = Math.round(amt * 100);
       var prop = document.getElementById('finance-property').value;
       var canIN = HuaHinSession.hasRole('owner', 'accountant');
@@ -2415,13 +2420,13 @@
         return Math.round(net * 100) === target;
       });
       if (!matches.length) {
-        box.innerHTML = '<div class="muted" style="padding:8px 0;">ไม่พบรายการที่ยอดตรงกัน (' + formatTHB(amt) + ')</div>' +
-          '<button class="btn-secondary" onclick="showAllPendingFromSlip()">แสดงรายการรออนุมัติทั้งหมด</button>';
+        box.innerHTML = '<div class="muted" style="padding:8px 0;">' + HuaHinI18n.t('fin.no_amount_match', formatTHB(amt)) + '</div>' +
+          '<button class="btn-secondary" onclick="showAllPendingFromSlip()">' + HuaHinI18n.t('fin.show_all_pending') + '</button>';
         return;
       }
       var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr>' +
-        '<th style="text-align:left;padding:4px;">วันที่</th><th style="text-align:left;padding:4px;">ผู้เข้าพัก</th><th style="padding:4px;">ห้อง</th>' +
-        '<th style="padding:4px;">ยอดระบบ</th><th style="padding:4px;">ยอดสลิป</th><th></th></tr></thead><tbody>';
+        '<th style="text-align:left;padding:4px;">' + HuaHinI18n.t('fin.s_date') + '</th><th style="text-align:left;padding:4px;">' + HuaHinI18n.t('fin.s_guest') + '</th><th style="padding:4px;">' + HuaHinI18n.t('fin.s_room') + '</th>' +
+        '<th style="padding:4px;">' + HuaHinI18n.t('fin.s_system_amt') + '</th><th style="padding:4px;">' + HuaHinI18n.t('fin.s_slip_amt') + '</th><th></th></tr></thead><tbody>';
       matches.forEach(function (t) {
         var net = Number(t.net_amount != null ? t.net_amount : t.amount);
         html += '<tr style="border-top:1px solid var(--line);">' +
@@ -2430,7 +2435,7 @@
           '<td style="text-align:center;padding:6px 4px;">' + (t.room_id || '-') + '</td>' +
           '<td style="text-align:right;padding:6px 4px;">' + formatTHB(net) + '</td>' +
           '<td style="text-align:right;padding:6px 4px;">' + formatTHB(amt) + '</td>' +
-          '<td style="text-align:right;padding:6px 4px;"><button class="btn-primary" style="padding:4px 10px;" onclick="selectSlipMatch(\'' + t.txn_id + '\')">✔ อนุมัติ</button></td>' +
+          '<td style="text-align:right;padding:6px 4px;"><button class="btn-primary" style="padding:4px 10px;" onclick="selectSlipMatch(\'' + t.txn_id + '\')">' + HuaHinI18n.t('fin.s_approve') + '</button></td>' +
           '</tr>';
       });
       html += '</tbody></table>';

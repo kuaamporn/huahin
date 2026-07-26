@@ -133,43 +133,57 @@
   };
 
   // --- Thai display translator (additive) -------------------------------
-  // Maps a backend/logic ENGLISH value to its Thai DISPLAY string. Used ONLY
-  // when rendering — the underlying value stays English everywhere (state,
+  // Maps a backend/logic value to its DISPLAY text, [English, Thai]. Used ONLY
+  // when rendering — the underlying value stays as stored everywhere (state,
   // comparisons, API params). Unknown keys pass through unchanged, so it never
   // blanks a label. Free text (names, notes) is never looked up.
-  var thaiVocab = {
+  var vocab = {
     // booking status
-    'CHECKED_IN': 'เข้าพักแล้ว', 'CONFIRMED': 'จองแล้ว', 'CHECKED_OUT': 'เช็คเอาท์แล้ว', 'CANCELLED': 'ยกเลิก',
+    'CHECKED_IN': ['Checked in', 'เข้าพักแล้ว'], 'CONFIRMED': ['Reserved', 'จองแล้ว'],
+    'CHECKED_OUT': ['Checked out', 'เช็คเอาท์แล้ว'], 'CANCELLED': ['Cancelled', 'ยกเลิก'],
     // room status / overrides
-    'CLEANING_DUE': 'รอทำความสะอาด', 'CLOSED': 'ปิดห้อง', 'MAINTENANCE': 'ซ่อมบำรุง',
+    'CLEANING_DUE': ['Cleaning due', 'รอทำความสะอาด'], 'CLOSED': ['Closed', 'ปิดห้อง'],
+    'MAINTENANCE': ['Maintenance', 'ซ่อมบำรุง'],
     // occupancy labels
-    'Occupied': 'มีผู้พัก', 'Vacant': 'ว่าง', 'Reserved': 'จองแล้ว', 'Available': 'ว่าง',
+    'Occupied': ['Occupied', 'มีผู้พัก'], 'Vacant': ['Vacant', 'ว่าง'],
+    'Reserved': ['Reserved', 'จองแล้ว'], 'Available': ['Available', 'ว่าง'],
     // booking types (OTA names kept as-is intentionally)
-    'monthly': 'รายเดือน', 'walkin': 'รายวัน', 'monthly-draft': 'ร่างรายเดือน',
+    'monthly': ['Monthly', 'รายเดือน'], 'walkin': ['Daily', 'รายวัน'],
+    'monthly-draft': ['Monthly draft', 'ร่างรายเดือน'],
     // finance: transaction direction + approval status (display only; values stay English)
-    'Revenue': 'รายรับ', 'Expense': 'รายจ่าย', 'Reservation': 'การจอง',
-    'Verified': 'ตรวจสอบแล้ว', 'Approved': 'อนุมัติแล้ว', 'Pending Approval': 'รออนุมัติ', 'Pending': 'รอดำเนินการ',
-    // finance: revenue categories (keys sent to worker — Thai is display only)
-    'monthly rent': 'ค่าเช่ารายเดือน', 'monthly deposit': 'เงินมัดจำรายเดือน',
-    'daily rent': 'ค่าเช่ารายวัน', 'daily deposit': 'เงินมัดจำรายวัน',
-    'bk rent': 'ค่าเช่า Booking.com', 'bk deposit': 'มัดจำ Booking.com',
-    'exp rent': 'ค่าเช่า Expedia', 'exp deposit': 'มัดจำ Expedia',
-    'damage_fee': 'ค่าเสียหาย', 'fitness': 'ฟิตเนส', 'breakfast': 'อาหารเช้า',
+    'Revenue': ['Revenue', 'รายรับ'], 'Expense': ['Expense', 'รายจ่าย'],
+    'Reservation': ['Reservation', 'การจอง'],
+    'Verified': ['Verified', 'ตรวจสอบแล้ว'], 'Approved': ['Approved', 'อนุมัติแล้ว'],
+    'Pending Approval': ['Pending approval', 'รออนุมัติ'], 'Pending': ['Pending', 'รอดำเนินการ'],
+    // finance: revenue categories (keys sent to worker — display only)
+    'monthly rent': ['Monthly rent', 'ค่าเช่ารายเดือน'],
+    'monthly deposit': ['Monthly deposit', 'เงินมัดจำรายเดือน'],
+    'daily rent': ['Daily rent', 'ค่าเช่ารายวัน'],
+    'daily deposit': ['Daily deposit', 'เงินมัดจำรายวัน'],
+    'bk rent': ['Booking.com rent', 'ค่าเช่า Booking.com'],
+    'bk deposit': ['Booking.com deposit', 'มัดจำ Booking.com'],
+    'exp rent': ['Expedia rent', 'ค่าเช่า Expedia'],
+    'exp deposit': ['Expedia deposit', 'มัดจำ Expedia'],
+    'damage_fee': ['Damage fee', 'ค่าเสียหาย'], 'fitness': ['Fitness', 'ฟิตเนส'],
+    'breakfast': ['Breakfast', 'อาหารเช้า'],
     // finance: expense categories
-    'electricity': 'ค่าไฟฟ้า', 'water': 'ค่าน้ำ', 'water treatment': 'ค่าบำบัดน้ำ',
-    'utility': 'ค่าสาธารณูปโภค', 'repair': 'ค่าซ่อม', 'cleaning': 'ค่าทำความสะอาด',
-    'supplies': 'ค่าของใช้', 'salaries': 'เงินเดือน', 'deposit_return': 'คืนเงินมัดจำ',
-    'other': 'อื่น ๆ',
+    'electricity': ['Electricity', 'ค่าไฟฟ้า'], 'water': ['Water', 'ค่าน้ำ'],
+    'water treatment': ['Water treatment', 'ค่าบำบัดน้ำ'],
+    'utility': ['Utilities', 'ค่าสาธารณูปโภค'], 'repair': ['Repairs', 'ค่าซ่อม'],
+    'cleaning': ['Cleaning', 'ค่าทำความสะอาด'], 'supplies': ['Supplies', 'ค่าของใช้'],
+    'salaries': ['Salaries', 'เงินเดือน'], 'deposit_return': ['Deposit return', 'คืนเงินมัดจำ'],
+    'other': ['Other', 'อื่น ๆ'],
     // finance: VAT wording shown in the item expander
-    'Included': 'รวมภาษี', 'Excluded': 'แยกภาษี'
+    'Included': ['Tax included', 'รวมภาษี'], 'Excluded': ['Tax excluded', 'แยกภาษี']
   };
   function tv(v) {
     if (v == null) return v;
-    return Object.prototype.hasOwnProperty.call(thaiVocab, v) ? thaiVocab[v] : v;
+    var e = Object.prototype.hasOwnProperty.call(vocab, v) ? vocab[v] : null;
+    return e ? e[window.HuaHinI18n && HuaHinI18n.lang() === 'en' ? 0 : 1] : v;
   }
 
   window.showToast = showToast;
   window.confirmDialog = confirmDialog;
   window.tv = tv;
-  window.thaiVocab = thaiVocab;
+  window.tvVocab = vocab;
 })();

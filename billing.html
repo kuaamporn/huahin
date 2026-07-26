@@ -180,6 +180,9 @@
       if (sess) {
         apiCall('financeGetSettings', [sess.token]).then(function(res) { if (res.ok) BILLING_SETTINGS = res.settings; });
       }
+
+      // The invoice table is built in JS, so data-i18n cannot re-render it.
+      HuaHinI18n.onLangChange(function() { if (loadedRooms.length) renderTable(); });
     };
 
     function apiCall(action, params) {

@@ -115,16 +115,16 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen">
       <div class="brand">The Precious Moment System</div>
-      <h1>เข้าสู่ระบบ</h1>
+      <h1 data-i18n="index.login_h1">เข้าสู่ระบบ</h1>
       <div class="card">
-        <label for="username">ชื่อผู้ใช้</label>
+        <label for="username" data-i18n="index.username">ชื่อผู้ใช้</label>
         <input id="username" type="text" autocomplete="username" />
-        <label for="password">รหัสผ่าน</label>
+        <label for="password" data-i18n="index.password">รหัสผ่าน</label>
         <div class="pw-wrap">
           <input id="password" type="password" autocomplete="current-password" />
-          <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'password')" aria-label="แสดง/ซ่อนรหัสผ่าน">👁</button>
+          <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'password')" data-i18n-attr="aria-label:index.pw_toggle_aria" aria-label="แสดง/ซ่อนรหัสผ่าน">👁</button>
         </div>
-        <button class="btn-primary" id="login-btn">เข้าสู่ระบบ</button>
+        <button class="btn-primary" id="login-btn" data-i18n="index.login_btn">เข้าสู่ระบบ</button>
         <div class="error hidden" id="login-error"></div>
       </div>
     </div>
@@ -137,100 +137,100 @@
             <div class="brand">The Precious Moment System</div>
             <h1 id="welcome-name" style="font-size:20px;margin:0;"></h1>
           </div>
-          <a href="#" class="btn-signout" id="logout-link">ออกจากระบบ</a>
+          <a href="#" class="btn-signout" id="logout-link" data-i18n="nav.signout">ออกจากระบบ</a>
         </div>
         <div class="userbar-nav" id="hh-nav" data-page="home" data-link-class="toplink"></div>
       </div>
 
       <!-- MY ACCOUNT CARD (leave requests, day-off swaps, password change) -->
       <div class="card hidden" id="account-card">
-        <h2 style="font-size: 16px; margin: 0 0 16px; font-family: 'Lexend', sans-serif;">👤 บัญชีของฉัน</h2>
+        <h2 style="font-size: 16px; margin: 0 0 16px; font-family: 'Lexend', sans-serif;" data-i18n="index.my_account">👤 บัญชีของฉัน</h2>
 
         <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px;">
-          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">คำขอของฉัน</h3>
-          <div id="vacation-balance" class="muted" style="font-size:13px; margin-bottom:10px;">กำลังโหลด…</div>
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;" data-i18n="index.my_requests">คำขอของฉัน</h3>
+          <div id="vacation-balance" class="muted" style="font-size:13px; margin-bottom:10px;" data-i18n="index.loading">กำลังโหลด…</div>
           <div id="my-requests-list" style="font-size:13px;"></div>
         </div>
 
         <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;">
-          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">ขอลา</h3>
-          <label for="leave-date">วันที่ลา</label>
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;" data-i18n="index.request_leave">ขอลา</h3>
+          <label for="leave-date" data-i18n="index.leave_date">วันที่ลา</label>
           <input type="date" id="leave-date" />
-          <label for="leave-type">ประเภทการลา</label>
+          <label for="leave-type" data-i18n="index.leave_type">ประเภทการลา</label>
           <select id="leave-type" onchange="onLeaveTypeChange()" style="width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); font-family:'Source Sans 3', sans-serif;">
-            <option value="VACATION">ลาพักร้อน</option>
-            <option value="MEDICAL">ลาป่วย</option>
+            <option value="VACATION" data-i18n="index.vacation">ลาพักร้อน</option>
+            <option value="MEDICAL" data-i18n="index.medical">ลาป่วย</option>
           </select>
-          <label for="leave-reason">เหตุผล</label>
-          <input type="text" id="leave-reason" placeholder="รายละเอียด…" />
+          <label for="leave-reason" data-i18n="index.reason">เหตุผล</label>
+          <input type="text" id="leave-reason" data-i18n-attr="placeholder:index.detail_ph" placeholder="รายละเอียด…" />
           <div id="behalf-group" class="hidden">
-            <label for="leave-behalf-id">ยื่นแทนเพื่อนร่วมงาน? ใส่รหัสพนักงานของเขา (เว้นว่างถ้ายื่นให้ตัวเอง)</label>
-            <input type="text" id="leave-behalf-id" placeholder="เช่น EMP-..." />
-            <div class="muted" style="margin-top:4px;">การลาพักร้อนที่แจ้งน้อยกว่า 2 วัน ต้องให้เพื่อนที่มีสิทธิ์ frontdesk เป็นผู้ยื่นแทน</div>
+            <label for="leave-behalf-id" data-i18n="index.on_behalf">ยื่นแทนเพื่อนร่วมงาน? ใส่รหัสพนักงานของเขา (เว้นว่างถ้ายื่นให้ตัวเอง)</label>
+            <input type="text" id="leave-behalf-id" data-i18n-attr="placeholder:index.emp_ph" placeholder="เช่น EMP-..." />
+            <div class="muted" style="margin-top:4px;" data-i18n="index.behalf_note">การลาพักร้อนที่แจ้งน้อยกว่า 2 วัน ต้องให้เพื่อนที่มีสิทธิ์ frontdesk เป็นผู้ยื่นแทน</div>
           </div>
-          <button class="btn-primary" onclick="submitLeave()">ส่งคำขอลา</button>
+          <button class="btn-primary" onclick="submitLeave()" data-i18n="index.submit_leave">ส่งคำขอลา</button>
           <div class="error hidden" id="leave-error"></div>
           <div class="success hidden" id="leave-success"></div>
         </div>
 
         <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;">
-          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">สลับวันหยุด</h3>
-          <label for="swap-original">วันหยุดเดิม</label>
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;" data-i18n="index.swap_dayoff">สลับวันหยุด</h3>
+          <label for="swap-original" data-i18n="index.swap_original">วันหยุดเดิม</label>
           <input type="date" id="swap-original" />
-          <label for="swap-new">วันหยุดใหม่ที่ต้องการ</label>
+          <label for="swap-new" data-i18n="index.swap_new">วันหยุดใหม่ที่ต้องการ</label>
           <input type="date" id="swap-new" />
-          <div class="muted" style="margin-top:4px;">ต้องแจ้งล่วงหน้าอย่างน้อย 2 วันก่อนวันใหม่ และต้องได้รับการอนุมัติจากเพื่อนร่วมงาน</div>
-          <button class="btn-primary" onclick="submitSwap()">ส่งคำขอสลับวันหยุด</button>
+          <div class="muted" style="margin-top:4px;" data-i18n="index.swap_note">ต้องแจ้งล่วงหน้าอย่างน้อย 2 วันก่อนวันใหม่ และต้องได้รับการอนุมัติจากเพื่อนร่วมงาน</div>
+          <button class="btn-primary" onclick="submitSwap()" data-i18n="index.submit_swap">ส่งคำขอสลับวันหยุด</button>
           <div class="error hidden" id="swap-error"></div>
           <div class="success hidden" id="swap-success"></div>
         </div>
 
         <div style="border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px;">
-          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;">เปลี่ยนรหัสผ่าน</h3>
-          <label for="pw-current">รหัสผ่านปัจจุบัน</label>
+          <h3 style="font-size: 14px; margin: 0 0 8px; font-family: 'Lexend', sans-serif;" data-i18n="index.change_pw">เปลี่ยนรหัสผ่าน</h3>
+          <label for="pw-current" data-i18n="index.pw_current">รหัสผ่านปัจจุบัน</label>
           <input type="password" id="pw-current" />
-          <label for="pw-new">รหัสผ่านใหม่</label>
+          <label for="pw-new" data-i18n="index.pw_new">รหัสผ่านใหม่</label>
           <input type="password" id="pw-new" />
-          <label for="pw-confirm">ยืนยันรหัสผ่านใหม่</label>
+          <label for="pw-confirm" data-i18n="index.pw_confirm">ยืนยันรหัสผ่านใหม่</label>
           <input type="password" id="pw-confirm" />
-          <button class="btn-primary" onclick="submitPasswordChange()">อัปเดตรหัสผ่าน</button>
+          <button class="btn-primary" onclick="submitPasswordChange()" data-i18n="index.pw_update">อัปเดตรหัสผ่าน</button>
           <div class="error hidden" id="pw-error"></div>
           <div class="success hidden" id="pw-success"></div>
         </div>
       </div>
 
       <div class="card" id="camera-card">
-        <div id="today-status" style="font-weight:bold; font-size:15px; margin-bottom:12px; text-align:center;">กำลังโหลดสถานะ…</div>
+        <div id="today-status" style="font-weight:bold; font-size:15px; margin-bottom:12px; text-align:center;" data-i18n="index.loading_status">กำลังโหลดสถานะ…</div>
 
         <div id="camera-section" class="hidden">
-          <div class="muted" style="margin-bottom:12px;">สแกน QR code ที่ติดไว้ที่ออฟฟิศเพื่อลงเวลาเข้า-ออกงาน ต้องเปิดระบบระบุตำแหน่ง (GPS) — ลงเวลาได้เฉพาะเมื่ออยู่ในบริเวณออฟฟิศเท่านั้น</div>
+          <div class="muted" style="margin-bottom:12px;" data-i18n="index.scan_help">สแกน QR code ที่ติดไว้ที่ออฟฟิศเพื่อลงเวลาเข้า-ออกงาน ต้องเปิดระบบระบุตำแหน่ง (GPS) — ลงเวลาได้เฉพาะเมื่ออยู่ในบริเวณออฟฟิศเท่านั้น</div>
 
-          <button class="btn-primary" id="start-camera-btn">แตะเพื่อเปิดกล้อง</button>
+          <button class="btn-primary" id="start-camera-btn" data-i18n="index.open_camera">แตะเพื่อเปิดกล้อง</button>
           <div class="error hidden" id="camera-error"></div>
 
           <div id="qr-reader" class="hidden"></div>
           <div id="qr-status" class="muted" style="margin-top:10px;"></div>
-          <button class="btn-secondary hidden" id="rescan-btn">สแกนใหม่</button>
+          <button class="btn-secondary hidden" id="rescan-btn" data-i18n="index.rescan">สแกนใหม่</button>
         </div>
 
         <div id="quick-checkout-section" class="hidden">
-          <button class="btn-out" id="quick-checkout-btn" style="margin-top:0;">ออกงานตอนนี้</button>
+          <button class="btn-out" id="quick-checkout-btn" style="margin-top:0;" data-i18n="index.checkout_now">ออกงานตอนนี้</button>
           <div class="error hidden" id="quick-checkout-error"></div>
           <div class="success hidden" id="quick-checkout-success"></div>
         </div>
       </div>
 
       <div class="card hidden" id="manual-entry-card">
-        <div class="muted" style="margin-bottom:10px;">ใช้กล้องไม่ได้? กรอกรหัสออฟฟิศที่อยู่ใต้ป้าย QR แทน</div>
-        <input id="manual-office-code" type="text" placeholder="เช่น OFF1" autocapitalize="characters" />
-        <button class="btn-secondary" id="manual-submit-btn" style="margin-top:10px;">ใช้รหัสนี้</button>
+        <div class="muted" style="margin-bottom:10px;" data-i18n="index.manual_help">ใช้กล้องไม่ได้? กรอกรหัสออฟฟิศที่อยู่ใต้ป้าย QR แทน</div>
+        <input id="manual-office-code" type="text" data-i18n-attr="placeholder:index.office_ph" placeholder="เช่น OFF1" autocapitalize="characters" />
+        <button class="btn-secondary" id="manual-submit-btn" style="margin-top:10px;" data-i18n="index.use_code">ใช้รหัสนี้</button>
       </div>
 
       <div class="card hidden" id="confirm-card">
         <div id="confirm-office" style="font-weight:600;margin-bottom:4px;"></div>
         <div class="muted" id="confirm-loc" style="margin-bottom:14px;"></div>
-        <button class="btn-primary" id="checkin-btn">เข้างาน</button>
-        <button class="btn-out" id="checkout-btn">ออกงาน</button>
+        <button class="btn-primary" id="checkin-btn" data-i18n="index.checkin">เข้างาน</button>
+        <button class="btn-out" id="checkout-btn" data-i18n="index.checkout">ออกงาน</button>
         <div class="error hidden" id="checkin-error"></div>
         <div class="success hidden" id="checkin-success"></div>
       </div>
@@ -238,14 +238,14 @@
       <!-- TASK LIST CARD -->
       <div class="card hidden" id="tasks-card">
         <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
-          <span>📋</span> รายการงาน
+          <span>📋</span> <span data-i18n="index.tasks_h2">รายการงาน</span>
         </h2>
         <div style="display:flex; flex-direction:column; gap:10px;">
           <!-- Overdue Accordion -->
           <div id="acc-remaining" class="hidden">
             <div class="acc-header" onclick="toggleAccordion('remaining')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.15); border-radius: 12px;">
               <div style="font-weight:600; color:var(--warn); display:flex; align-items:center; gap:6px; font-size:13.5px;">
-                <span>⚠️</span> ค้าง / เลยกำหนด
+                <span>⚠️</span> <span data-i18n="index.acc_overdue">ค้าง / เลยกำหนด</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="acc-badge" id="badge-remaining" style="background:var(--warn); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
@@ -259,7 +259,7 @@
           <div id="acc-today">
             <div class="acc-header" onclick="toggleAccordion('today')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15); border-radius: 12px;">
               <div style="font-weight:600; color:var(--go); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-today">
-                <span>📅</span> วันนี้
+                <span>📅</span> <span data-i18n="index.today">วันนี้</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="acc-badge" id="badge-today" style="background:var(--go); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
@@ -273,7 +273,7 @@
           <div id="acc-tomorrow">
             <div class="acc-header" onclick="toggleAccordion('tomorrow')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: #FAF9F6; border: 1px solid var(--line); border-radius: 12px;">
               <div style="font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-tomorrow">
-                <span>📅</span> พรุ่งนี้
+                <span>📅</span> <span data-i18n="index.tomorrow">พรุ่งนี้</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="acc-badge" id="badge-tomorrow" style="background:var(--muted); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
@@ -287,7 +287,7 @@
           <div id="acc-dayafter">
             <div class="acc-header" onclick="toggleAccordion('dayafter')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: #FAF9F6; border: 1px solid var(--line); border-radius: 12px;">
               <div style="font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-dayafter">
-                <span>📅</span> มะรืนนี้
+                <span>📅</span> <span data-i18n="index.dayafter">มะรืนนี้</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="acc-badge" id="badge-dayafter" style="background:var(--muted); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
@@ -301,7 +301,7 @@
           <div id="acc-dayafterplus">
             <div class="acc-header" onclick="toggleAccordion('dayafterplus')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding: 10px 14px; background: #FAF9F6; border: 1px solid var(--line); border-radius: 12px;">
               <div style="font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; font-size:13.5px;" id="header-dayafterplus">
-                <span>📅</span> อีก 3 วัน
+                <span>📅</span> <span data-i18n="index.in3days">อีก 3 วัน</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="acc-badge" id="badge-dayafterplus" style="background:var(--muted); color:#fff; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px;">0</span>
@@ -316,22 +316,22 @@
       <!-- UTILITIES COST CARD -->
       <div class="card" id="utilities-cost-card">
         <h2 style="font-size: 16px; margin: 0 0 12px; font-family: 'Lexend', sans-serif; display: flex; align-items: center; gap: 8px;">
-          <span>💡</span> บิลค่าไฟ-ค่าน้ำหลวง (รายเดือน)
+          <span>💡</span> <span data-i18n="index.utilities_h2">บิลค่าไฟ-ค่าน้ำหลวง (รายเดือน)</span>
         </h2>
         <div id="utilities-saving-banner" class="utilities-banner hidden"></div>
         <div style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
             <thead>
               <tr style="border-bottom: 1px solid var(--line); text-align: left;">
-                <th style="padding: 6px 4px; color: var(--muted);">เดือน</th>
-                <th style="padding: 6px 4px; text-align: right; color: var(--muted);">ค่าไฟ</th>
-                <th style="padding: 6px 4px; text-align: right; color: var(--muted);">ค่าน้ำ</th>
-                <th style="padding: 6px 4px; text-align: right; color: var(--muted);">ค่าบำบัด</th>
+                <th style="padding: 6px 4px; color: var(--muted);" data-i18n="index.col_month">เดือน</th>
+                <th style="padding: 6px 4px; text-align: right; color: var(--muted);" data-i18n="index.col_elec">ค่าไฟ</th>
+                <th style="padding: 6px 4px; text-align: right; color: var(--muted);" data-i18n="index.col_water">ค่าน้ำ</th>
+                <th style="padding: 6px 4px; text-align: right; color: var(--muted);" data-i18n="index.col_treatment">ค่าบำบัด</th>
               </tr>
             </thead>
             <tbody id="utilities-cost-table-body">
               <tr>
-                <td colspan="4" class="muted" style="text-align: center; padding: 12px;">กำลังโหลด…</td>
+                <td colspan="4" class="muted" style="text-align: center; padding: 12px;" data-i18n="index.loading2">กำลังโหลด…</td>
               </tr>
             </tbody>
           </table>
@@ -344,12 +344,12 @@
   <!-- ===================== NOTICE WARNING OVERLAY ===================== -->
   <div id="notice-warning-overlay" class="modal-overlay hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="background:#fff; border-radius:24px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; border:2px solid var(--warn); box-shadow:0 20px 40px rgba(0,0,0,0.3); text-align:center;">
-      <div style="background:#FEE2E2; border:1px solid #FCA5A5; border-radius:16px; padding:12px; color:#DC2626; font-family:'Lexend',sans-serif; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px;">
+      <div style="background:#FEE2E2; border:1px solid #FCA5A5; border-radius:16px; padding:12px; color:#DC2626; font-family:'Lexend',sans-serif; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px;" data-i18n="index.notice_h">
         ⚠️ รายงานข้อผิดพลาด
       </div>
 
-      <h2 style="font-size:18px; margin:0 0 6px; font-family:'Lexend',sans-serif; color:var(--ink);" id="notice-warning-category">หมวดหมู่</h2>
-      <div class="muted" style="margin-bottom:12px; font-size:12px;">วันที่เกิดเหตุ: <strong id="notice-warning-date">YYYY-MM-DD</strong></div>
+      <h2 style="font-size:18px; margin:0 0 6px; font-family:'Lexend',sans-serif; color:var(--ink);" id="notice-warning-category" data-i18n="index.notice_category">หมวดหมู่</h2>
+      <div class="muted" style="margin-bottom:12px; font-size:12px;"><span data-i18n="index.notice_date">วันที่เกิดเหตุ:</span> <strong id="notice-warning-date">YYYY-MM-DD</strong></div>
 
       <div class="card" style="background:var(--paper); padding:16px; border-radius:16px; text-align:left; font-size:14px; color:var(--ink); line-height:1.5; white-space:pre-wrap; max-height:200px; overflow-y:auto; margin-bottom:16px;" id="notice-warning-desc">
         Description...
@@ -357,9 +357,9 @@
 
       <div id="notice-warning-img-container"></div>
 
-      <div class="muted" style="margin-top:16px; font-size:12px; font-weight:600;" id="notice-warning-count">รายการที่ 1 จาก 1</div>
+      <div class="muted" style="margin-top:16px; font-size:12px; font-weight:600;" id="notice-warning-count"></div>
 
-      <button class="btn-primary" id="btn-acknowledge-notice" onclick="acknowledgeCurrentNotice()" style="margin-top:14px; background:var(--warn); background:linear-gradient(135deg, var(--warn), #EF4444);">
+      <button class="btn-primary" id="btn-acknowledge-notice" onclick="acknowledgeCurrentNotice()" style="margin-top:14px; background:var(--warn); background:linear-gradient(135deg, var(--warn), #EF4444);" data-i18n="index.acknowledge">
         ฉันรับทราบข้อผิดพลาด
       </button>
     </div>
@@ -398,7 +398,7 @@
     if (session && session.token) {
       sessionToken = session.token;
       currentEmployeeName = session.name;
-      document.getElementById('welcome-name').textContent = 'สวัสดี ' + session.name;
+      document.getElementById('welcome-name').textContent = t('index.hello', session.name);
       hide('login-screen');
       show('main-screen');
       applyNavLinkVisibility();
@@ -406,6 +406,16 @@
       loadTodayStatus();
       loadUtilitiesDashboard();
       checkPendingNotices();
+
+      // Static text re-renders itself via data-i18n; these panels are built in JS,
+      // so redraw them to pick up the new language.
+      HuaHinI18n.onLangChange(function() {
+        document.getElementById('welcome-name').textContent = t('index.hello', currentEmployeeName);
+        loadEmployeeTasks();
+        loadTodayStatus();
+        loadUtilitiesDashboard();
+        if (!document.getElementById('account-card').classList.contains('hidden')) loadMyRequests();
+      });
 
       var apiName = session.isAdmin ? 'adminListEmployeesWithRoles' : 'financeGetEmployees';
       callApi(apiName, [sessionToken]).then(function(rolesRes) {
@@ -526,31 +536,30 @@
         if (!res.ok) { balEl.textContent = ''; listEl.innerHTML = ''; return; }
 
         var v = res.vacation || {};
-        balEl.innerHTML = 'ลาพักร้อนปี ' + v.year + ': เหลือ <b>' + v.remainingDays + '</b> จาก ' + v.poolDays +
-          ' วัน' + (v.pendingDays ? ' &middot; รออนุมัติ ' + v.pendingDays + ' วัน' : '');
+        balEl.innerHTML = t('index.vac_balance', v.year, '<b>' + v.remainingDays + '</b>', v.poolDays) + (v.pendingDays ? t('index.vac_pending', v.pendingDays) : '');
 
         var items = [];
         (res.leaves || []).forEach(function(l) {
           items.push({
             date: l.leave_date,
-            label: (l.type === 'VACATION' ? 'ลาพักร้อน' : 'ลาป่วย') + ' &middot; ' + escapeHtml(l.leave_date),
+            label: (l.type === 'VACATION' ? t('index.vacation') : t('index.medical')) + ' &middot; ' + escapeHtml(l.leave_date),
             status: l.status
           });
         });
         (res.swaps || []).forEach(function(s) {
           items.push({
             date: s.new_date,
-            label: 'สลับวันหยุด &middot; ' + escapeHtml(s.original_date) + ' &rarr; ' + escapeHtml(s.new_date),
+            label: t('index.swap_dayoff') + ' &middot; ' + escapeHtml(s.original_date) + ' &rarr; ' + escapeHtml(s.new_date),
             status: s.status
           });
         });
         items.sort(function(a, b) { return a.date < b.date ? 1 : -1; });
 
         if (!items.length) {
-          listEl.innerHTML = '<div class="muted">ยังไม่มีคำขอ</div>';
+          listEl.innerHTML = '<div class="muted">' + t('index.no_requests') + '</div>';
           return;
         }
-        var STATUS_TH = { APPROVED: 'อนุมัติแล้ว', REJECTED: 'ไม่อนุมัติ', PENDING: 'รออนุมัติ' };
+        var STATUS_TH = { APPROVED: t('index.st_approved'), REJECTED: t('index.st_rejected'), PENDING: t('index.st_pending') };
         listEl.innerHTML = items.map(function(it) {
           var color = it.status === 'APPROVED' ? '#16A34A' : it.status === 'REJECTED' ? '#DC2626' : '#D97706';
           var bg = it.status === 'APPROVED' ? '#dcfce7' : it.status === 'REJECTED' ? '#fee2e2' : '#fef3c7';
@@ -569,11 +578,11 @@
       var reason = document.getElementById('leave-reason').value;
       var behalf = document.getElementById('leave-behalf-id').value.trim() || null;
       hide('leave-error'); hide('leave-success');
-      if (!date) { document.getElementById('leave-error').textContent = 'กรุณาเลือกวันที่'; show('leave-error'); return; }
+      if (!date) { document.getElementById('leave-error').textContent = t('index.pick_date'); show('leave-error'); return; }
 
       callApi('employeeRequestLeave', [sessionToken, date, type, reason, behalf]).then(function(res) {
         if (res.ok) {
-          document.getElementById('leave-success').textContent = 'ส่งคำขอเรียบร้อยแล้ว';
+          document.getElementById('leave-success').textContent = t('index.request_sent');
           show('leave-success');
           document.getElementById('leave-date').value = '';
           document.getElementById('leave-reason').value = '';
@@ -590,11 +599,11 @@
       var orig = document.getElementById('swap-original').value;
       var newVal = document.getElementById('swap-new').value;
       hide('swap-error'); hide('swap-success');
-      if (!orig || !newVal) { document.getElementById('swap-error').textContent = 'กรุณากรอกทั้งสองวันที่'; show('swap-error'); return; }
+      if (!orig || !newVal) { document.getElementById('swap-error').textContent = t('index.need_both_dates'); show('swap-error'); return; }
 
       callApi('employeeRequestSwap', [sessionToken, orig, newVal]).then(function(res) {
         if (res.ok) {
-          document.getElementById('swap-success').textContent = 'ส่งคำขอสลับวันหยุดเรียบร้อยแล้ว';
+          document.getElementById('swap-success').textContent = t('index.swap_sent');
           show('swap-success');
           document.getElementById('swap-original').value = '';
           document.getElementById('swap-new').value = '';
@@ -611,14 +620,14 @@
       var n1 = document.getElementById('pw-new').value;
       var n2 = document.getElementById('pw-confirm').value;
       hide('pw-error'); hide('pw-success');
-      if (!curr || !n1) { document.getElementById('pw-error').textContent = 'กรุณากรอกให้ครบทุกช่อง'; show('pw-error'); return; }
-      if (n1 !== n2) { document.getElementById('pw-error').textContent = 'รหัสผ่านใหม่ไม่ตรงกัน'; show('pw-error'); return; }
+      if (!curr || !n1) { document.getElementById('pw-error').textContent = t('index.fill_all'); show('pw-error'); return; }
+      if (n1 !== n2) { document.getElementById('pw-error').textContent = t('index.pw_mismatch'); show('pw-error'); return; }
 
       Promise.all([clientHashPassword(curr), clientHashPassword(n1)]).then(function(hashes) {
         return callApi('employeeChangePassword', [sessionToken, hashes[0], hashes[1]]);
       }).then(function(res) {
         if (res.ok) {
-          document.getElementById('pw-success').textContent = 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว';
+          document.getElementById('pw-success').textContent = t('index.pw_changed');
           show('pw-success');
           document.getElementById('pw-current').value = '';
           document.getElementById('pw-new').value = '';
@@ -643,23 +652,23 @@
       var password = document.getElementById('password').value;
       hide('login-error');
       if (!username || !password) {
-        document.getElementById('login-error').textContent = 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
+        document.getElementById('login-error').textContent = t('index.need_credentials');
         show('login-error');
         return;
       }
       var btn = document.getElementById('login-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังเข้าสู่ระบบ…';
+      btn.textContent = t('index.signing_in');
 
       clientHashPassword(password).then(function(hashedPassword) {
         return callApi('login', [username, hashedPassword]);
       }).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'เข้าสู่ระบบ';
+        btn.textContent = t('index.login_btn');
         if (res.ok) {
           sessionToken = res.token;
           currentEmployeeName = res.name;
-          document.getElementById('welcome-name').textContent = 'สวัสดี ' + res.name;
+          document.getElementById('welcome-name').textContent = t('index.hello', res.name);
 
           HuaHinSession.saveSessionPartial(res);
           callApi('adminListEmployeesWithRoles', [sessionToken]).then(function(rolesRes) {
@@ -692,8 +701,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'เข้าสู่ระบบ';
-        document.getElementById('login-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+        btn.textContent = t('index.login_btn');
+        document.getElementById('login-error').textContent = t('index.conn_error') + err.message;
         show('login-error');
       });
     });
@@ -712,12 +721,12 @@
       hide('manual-entry-card');
       var btn = document.getElementById('start-camera-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังขอสิทธิ์ใช้กล้อง…';
+      btn.textContent = t('index.asking_camera');
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         btn.disabled = false;
-        btn.textContent = 'แตะเพื่อเปิดกล้อง';
-        showCameraError('เบราว์เซอร์นี้เปิดกล้องไม่ได้ กรุณาใช้วิธีกรอกรหัสออฟฟิศด้านล่างแทน');
+        btn.textContent = t('index.open_camera');
+        showCameraError(t('index.no_camera_api'));
         show('manual-entry-card');
         return;
       }
@@ -731,18 +740,17 @@
         })
         .catch(function(err) {
           btn.disabled = false;
-          btn.textContent = 'แตะเพื่อเปิดกล้อง';
+          btn.textContent = t('index.open_camera');
           if (err.name === 'NotAllowedError') {
             showCameraError(
-              'ไม่ได้รับอนุญาตให้ใช้กล้อง แตะไอคอนรูปกุญแจ/ข้อมูล ข้างช่องที่อยู่เว็บ ' +
-              'เปิดการตั้งค่าเว็บไซต์ ตั้งค่ากล้องเป็น “อนุญาต” แล้วโหลดหน้านี้ใหม่แล้วลองอีกครั้ง'
+              t('index.camera_denied')
             );
           } else if (err.name === 'NotFoundError') {
-            showCameraError('ไม่พบกล้องบนอุปกรณ์นี้');
+            showCameraError(t('index.no_camera_found'));
           } else if (err.name === 'NotReadableError') {
-            showCameraError('กล้องกำลังถูกใช้งานโดยแอปอื่น กรุณาปิดแอปกล้องอื่นแล้วลองใหม่');
+            showCameraError(t('index.camera_busy'));
           } else {
-            showCameraError('กล้องผิดพลาด: ' + err.message + ' กรุณาใช้วิธีกรอกรหัสออฟฟิศด้านล่างแทน');
+            showCameraError(t('index.camera_error') + err.message + t('index.use_code_instead'));
           }
           show('manual-entry-card');
         });
@@ -757,7 +765,7 @@
     function startScanner() {
       hide('confirm-card');
       show('qr-reader');
-      document.getElementById('qr-status').textContent = 'เล็งกล้องไปที่ QR code ของออฟฟิศ';
+      document.getElementById('qr-status').textContent = t('index.aim_camera');
       html5QrCode = new Html5Qrcode('qr-reader');
       html5QrCode.start(
         { facingMode: 'environment' },
@@ -767,7 +775,7 @@
       ).catch(function(err) {
         document.getElementById('qr-status').textContent = '';
         hide('qr-reader');
-        showCameraError('เปิดกล้องไม่สำเร็จ: ' + err + ' กรุณาใช้วิธีกรอกรหัสออฟฟิศด้านล่างแทน');
+        showCameraError(t('index.camera_failed') + err + t('index.use_code_instead'));
         show('manual-entry-card');
       });
     }
@@ -777,18 +785,18 @@
       try {
         data = JSON.parse(decodedText);
       } catch (e) {
-        document.getElementById('qr-status').textContent = 'QR code นี้ไม่ใช่รหัสลงเวลาที่ถูกต้อง';
+        document.getElementById('qr-status').textContent = t('index.bad_qr');
         return;
       }
       if (!data.officeId) {
-        document.getElementById('qr-status').textContent = 'QR code นี้ไม่ใช่รหัสลงเวลาที่ถูกต้อง';
+        document.getElementById('qr-status').textContent = t('index.bad_qr');
         return;
       }
       scannedOfficeId = data.officeId;
 
       html5QrCode.stop().catch(function() {});
       hide('qr-reader');
-      document.getElementById('qr-status').textContent = 'สแกนสำเร็จ กำลังตรวจตำแหน่ง…';
+      document.getElementById('qr-status').textContent = t('index.scanned_locating');
       show('rescan-btn');
       getLocationAndConfirm();
     }
@@ -805,7 +813,7 @@
       if (!code) return;
       scannedOfficeId = code;
       hide('manual-entry-card');
-      document.getElementById('qr-status').textContent = 'กรอกรหัสแล้ว กำลังตรวจตำแหน่ง…';
+      document.getElementById('qr-status').textContent = t('index.code_locating');
       show('rescan-btn');
       getLocationAndConfirm();
     });
@@ -813,21 +821,21 @@
     // ---------- GEOLOCATION ----------
     function getLocationAndConfirm() {
       if (!navigator.geolocation) {
-        document.getElementById('qr-status').textContent = 'เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง';
+        document.getElementById('qr-status').textContent = t('index.no_geolocation');
         return;
       }
       navigator.geolocation.getCurrentPosition(function(pos) {
         lastKnownPosition = pos;
         document.getElementById('qr-status').textContent = '';
-        document.getElementById('confirm-office').textContent = 'พร้อมบันทึกการลงเวลาเข้า-ออกงาน';
+        document.getElementById('confirm-office').textContent = t('index.ready_to_clock');
         document.getElementById('confirm-loc').textContent =
-          'ความแม่นยำตำแหน่ง: ' + Math.round(pos.coords.accuracy) + ' เมตร';
+          t('index.accuracy', Math.round(pos.coords.accuracy));
         show('confirm-card');
         hide('checkin-error');
         hide('checkin-success');
       }, function(err) {
         document.getElementById('qr-status').textContent =
-          'ระบุตำแหน่งไม่สำเร็จ (' + err.message + ') กรุณาเปิด GPS แล้วแตะ “สแกนใหม่”';
+          t('index.geo_failed_rescan', err.message);
       }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     }
 
@@ -838,7 +846,7 @@
       hide('checkin-success');
       var btn = type === 'IN' ? document.getElementById('checkin-btn') : document.getElementById('checkout-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังบันทึก…';
+      btn.textContent = t('index.saving');
 
       callApi('checkIn', [
         sessionToken,
@@ -850,11 +858,11 @@
         getDeviceId()
       ]).then(function(res) {
         btn.disabled = false;
-        btn.textContent = type === 'IN' ? 'เข้างาน' : 'ออกงาน';
+        btn.textContent = type === 'IN' ? t('index.checkin') : t('index.checkout');
         if (res.ok) {
-          var msg = (type === 'IN' ? 'ลงเวลาเข้างาน' : 'ลงเวลาออกงาน') + 'ที่ ' + res.officeName + ' เรียบร้อย';
+          var msg = t('index.clocked_at', type === 'IN' ? t('index.clock_in') : t('index.clock_out'), res.officeName);
           if (res.flagged) {
-            msg += ' (ถูกทำเครื่องหมายเพื่อตรวจสอบ: ' + res.reasons.join('; ') + ')';
+            msg += t('index.flagged', res.reasons.join('; '));
           }
           document.getElementById('checkin-success').textContent = msg;
           show('checkin-success');
@@ -869,8 +877,8 @@
         }
       }).catch(function(err) {
         btn.disabled = false;
-        btn.textContent = type === 'IN' ? 'เข้างาน' : 'ออกงาน';
-        document.getElementById('checkin-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+        btn.textContent = type === 'IN' ? t('index.checkin') : t('index.checkout');
+        document.getElementById('checkin-error').textContent = t('index.conn_error') + err.message;
         show('checkin-error');
       });
     }
@@ -892,38 +900,38 @@
           var statusEl = document.getElementById('today-status');
           if (res.checkedIn) {
             var timeStr = new Date(res.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-            statusEl.innerHTML = '<span style="color:var(--go);">✅ ลงเวลาเข้างานแล้ววันนี้ เวลา ' + timeStr + ' น.</span>';
+            statusEl.innerHTML = '<span style="color:var(--go);">' + t('index.checked_in_at', timeStr) + '</span>';
             hide('camera-section');
             show('quick-checkout-section');
             currentOfficeId = res.officeId;
           } else {
-            statusEl.innerHTML = '<span style="color:var(--warn);">วันนี้ยังไม่ได้ลงเวลาเข้างาน</span>';
+            statusEl.innerHTML = '<span style="color:var(--warn);">' + t('index.not_checked_in') + '</span>';
             show('camera-section');
             hide('quick-checkout-section');
           }
         } else {
-          document.getElementById('today-status').textContent = 'โหลดสถานะไม่สำเร็จ';
+          document.getElementById('today-status').textContent = t('index.status_failed');
         }
       }).catch(function() {});
     }
 
     document.getElementById('quick-checkout-btn').addEventListener('click', function() {
       if (!currentOfficeId) {
-        document.getElementById('quick-checkout-error').textContent = 'ไม่พบรหัสออฟฟิศ กรุณาลงเวลาออกงานด้วยการสแกน QR code';
+        document.getElementById('quick-checkout-error').textContent = t('index.no_office_code');
         show('quick-checkout-error');
         return;
       }
 
       var btn = document.getElementById('quick-checkout-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังตรวจตำแหน่ง…';
+      btn.textContent = t('index.locating');
       hide('quick-checkout-error');
       hide('quick-checkout-success');
 
       if (!navigator.geolocation) {
         btn.disabled = false;
-        btn.textContent = 'ออกงานตอนนี้';
-        document.getElementById('quick-checkout-error').textContent = 'เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง';
+        btn.textContent = t('index.checkout_now');
+        document.getElementById('quick-checkout-error').textContent = t('index.no_geolocation');
         show('quick-checkout-error');
         return;
       }
@@ -934,50 +942,51 @@
         var acc = pos.coords.accuracy;
         var dev = getDeviceId();
 
-        btn.textContent = 'กำลังลงเวลาออกงาน…';
+        btn.textContent = t('index.clocking_out');
         callApi('checkIn', [sessionToken, 'OUT', currentOfficeId, lat, lng, acc, dev]).then(function(res) {
           btn.disabled = false;
-          btn.textContent = 'ออกงานตอนนี้';
+          btn.textContent = t('index.checkout_now');
           if (res.ok) {
-            document.getElementById('quick-checkout-success').textContent = 'ลงเวลาออกงานที่ ' + res.officeName + ' เรียบร้อย';
+            document.getElementById('quick-checkout-success').textContent = t('index.clocked_out_at', res.officeName);
             show('quick-checkout-success');
             loadTodayStatus();
           } else {
-            document.getElementById('quick-checkout-error').textContent = res.error || 'ลงเวลาออกงานไม่สำเร็จ';
+            document.getElementById('quick-checkout-error').textContent = res.error || t('index.checkout_failed');
             show('quick-checkout-error');
           }
         }).catch(function(err) {
           btn.disabled = false;
-          btn.textContent = 'ออกงานตอนนี้';
-          document.getElementById('quick-checkout-error').textContent = 'เชื่อมต่อผิดพลาด: ' + err.message;
+          btn.textContent = t('index.checkout_now');
+          document.getElementById('quick-checkout-error').textContent = t('index.conn_error') + err.message;
           show('quick-checkout-error');
         });
       }, function(err) {
         btn.disabled = false;
-        btn.textContent = 'ออกงานตอนนี้';
-        document.getElementById('quick-checkout-error').textContent = 'ระบุตำแหน่งไม่สำเร็จ (' + err.message + ') กรุณาเปิด GPS แล้วลองใหม่';
+        btn.textContent = t('index.checkout_now');
+        document.getElementById('quick-checkout-error').textContent = t('index.geo_failed_retry', err.message);
         show('quick-checkout-error');
       }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     });
 
-    // Task titles/descriptions come from the backend in English; translate the
-    // known auto-generated patterns to Thai here (staff-entered reasons stay as typed).
-    function thaiTaskTitle(task) {
+    // Task titles/descriptions come from the backend in English; rewrite the known
+    // auto-generated patterns into the active language (staff-entered reasons stay
+    // as typed). In English the replacements are identity.
+    function localTaskTitle(task) {
       var room = task.displayName || task.roomId || '';
-      if (task.type === 'housekeeping') return 'ทำความสะอาดห้อง ' + room;
+      if (task.type === 'housekeeping') return t('index.task_clean_room', room);
       var t = task.title || '';
-      if (/closed/i.test(t)) return 'ซ่อมห้องที่ปิด: ' + room;
-      if (/maintenance/i.test(t)) return 'งานซ่อมบำรุง: ' + room;
+      if (/closed/i.test(t)) return t('index.task_closed_room', room);
+      if (/maintenance/i.test(t)) return t('index.task_maintenance', room);
       return t;
     }
-    function thaiTaskDesc(d) {
+    function localTaskDesc(d) {
       if (!d) return d;
       return d
-        .replace(/\(OVERDUE\)/gi, '(เลยกำหนด)')
-        .replace(/Walk-in checkout cleaning/gi, 'ทำความสะอาดหลังแขก Walk-in ออก')
-        .replace(/Daily cleaning/gi, 'ทำความสะอาดประจำวัน')
-        .replace(/Checkout cleaning/gi, 'ทำความสะอาดหลังเช็คเอาท์')
-        .replace(/Under maintenance/gi, 'อยู่ระหว่างซ่อมบำรุง');
+        .replace(/\(OVERDUE\)/gi, '(' + t('index.task_overdue') + ')')
+        .replace(/Walk-in checkout cleaning/gi, t('index.task_walkin_clean'))
+        .replace(/Daily cleaning/gi, t('index.task_daily_clean'))
+        .replace(/Checkout cleaning/gi, t('index.task_checkout_clean'))
+        .replace(/Under maintenance/gi, t('index.task_under_maint'));
     }
 
     function loadEmployeeTasks() {
@@ -1012,21 +1021,21 @@
           var d3 = new Date(d0); d3.setDate(d3.getDate() + 3);
           var dayAfterPlusStr = getIsoString(d3);
 
-          document.getElementById('header-today').innerHTML = '<span>📅</span> วันนี้ (' + formatDateLabelShort(d0) + ')';
-          document.getElementById('header-tomorrow').innerHTML = '<span>📅</span> พรุ่งนี้ (' + formatDateLabelShort(d1) + ')';
+          document.getElementById('header-today').innerHTML = '<span>📅</span> ' + t('index.today') + ' (' + formatDateLabelShort(d0) + ')';
+          document.getElementById('header-tomorrow').innerHTML = '<span>📅</span> ' + t('index.tomorrow') + ' (' + formatDateLabelShort(d1) + ')';
           document.getElementById('header-dayafter').innerHTML = '<span>📅</span> ' + formatDateLabelShort(d2);
           document.getElementById('header-dayafterplus').innerHTML = '<span>📅</span> ' + formatDateLabelShort(d3);
 
           if (tasks.length === 0) {
             document.getElementById('acc-remaining').classList.add('hidden');
             document.getElementById('badge-today').textContent = '0';
-            document.getElementById('content-today').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">ไม่มีงานค้าง</div>';
+            document.getElementById('content-today').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">' + t('index.no_outstanding') + '</div>';
             document.getElementById('badge-tomorrow').textContent = '0';
-            document.getElementById('content-tomorrow').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">ไม่มี</div>';
+            document.getElementById('content-tomorrow').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">' + t('index.none') + '</div>';
             document.getElementById('badge-dayafter').textContent = '0';
-            document.getElementById('content-dayafter').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">ไม่มี</div>';
+            document.getElementById('content-dayafter').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">' + t('index.none') + '</div>';
             document.getElementById('badge-dayafterplus').textContent = '0';
-            document.getElementById('content-dayafterplus').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">ไม่มี</div>';
+            document.getElementById('content-dayafterplus').innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">' + t('index.none') + '</div>';
             container.classList.remove('hidden');
             return;
           }
@@ -1038,7 +1047,7 @@
           var tasksDayAfterPlus = tasks.filter(function(t) { return t.date && t.date === dayAfterPlusStr; });
 
           function renderTasksList(taskList) {
-            if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">ไม่มี</div>';
+            if (taskList.length === 0) return '<div style="color:var(--muted);font-style:italic;font-size:12px;padding:8px 0;">' + t('index.none') + '</div>';
             var preciousTasks = taskList.filter(function(t) { return (t.propertyId || 'precious') === 'precious'; });
             var momentTasks = taskList.filter(function(t) { return t.propertyId === 'moment'; });
 
@@ -1060,13 +1069,13 @@
 
                 groupTasks.forEach(function(task) {
                   var badgeColor = task.type === 'housekeeping' ? 'var(--go)' : '#D97706';
-                  var badgeText = task.type === 'housekeeping' ? 'ทำความสะอาด' : 'งานช่าง';
+                  var badgeText = task.type === 'housekeeping' ? t('index.badge_clean') : t('index.badge_tech');
                   var confirmBtn = '';
 
                   if (task.type === 'housekeeping') {
-                    confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">✓ ยืนยันทำความสะอาดแล้ว</button>';
+                    confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'housekeeping\', \''+task.roomId+'\', \''+task.date+'\')">' + t('index.confirm_cleaned') + '</button>';
                   } else {
-                    confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">🔧 ยืนยันซ่อมเสร็จแล้ว</button>';
+                    confirmBtn = '<button class="btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:13px;width:auto;" onclick="completeTask(\'technician\', \''+task.roomId+'\', \'\')">' + t('index.confirm_repaired') + '</button>';
                   }
 
                   groupHtml += '<div style="background:'+badgeColor+'05;border-left:4px solid '+propColor+';border-radius:8px;padding:8px 12px;margin-bottom:6px;box-shadow:0 1px 2px rgba(0,0,0,0.02);">' +
@@ -1074,13 +1083,13 @@
                       '<span class="muted" style="background:'+badgeColor+'10;color:'+badgeColor+';padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;">'+badgeText+'</span>' +
                       '<div style="display:flex;align-items:center;gap:6px;">' +
                         '<span style="background:'+propBg+';color:'+propColor+';padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:0.3px;">'+propName+'</span>' +
-                        '<span class="muted" style="font-size:11px;font-weight:600;">ห้อง '+task.displayName+'</span>' +
+                        '<span class="muted" style="font-size:11px;font-weight:600;">' + t('index.room_prefix') + task.displayName+'</span>' +
                       '</div>' +
                     '</div>' +
-                    '<div style="font-weight:600;font-size:14px;margin-top:4px;display:flex;align-items:center;">'+escapeHtml(thaiTaskTitle(task))+
+                    '<div style="font-weight:600;font-size:14px;margin-top:4px;display:flex;align-items:center;">'+escapeHtml(localTaskTitle(task))+
                       (task.date ? '<span style="font-size:11px; color:#b45309; background:#fef3c7; padding:2px 6px; border-radius:4px; margin-left:8px; font-weight:normal;">' + escapeHtml(task.date) + '</span>' : '') +
                     '</div>' +
-                    (task.description ? '<div class="muted" style="font-size:12px;margin-top:2px;">'+escapeHtml(thaiTaskDesc(task.description))+'</div>' : '') +
+                    (task.description ? '<div class="muted" style="font-size:12px;margin-top:2px;">'+escapeHtml(localTaskDesc(task.description))+'</div>' : '') +
                     confirmBtn +
                   '</div>';
                 });
@@ -1113,7 +1122,7 @@
 
           container.classList.remove('hidden');
         } else {
-          document.getElementById('content-today').innerHTML = '<div class="error">โหลดรายการงานไม่สำเร็จ: ' + escapeHtml(res.error || 'ไม่ทราบสาเหตุ') + '</div>';
+          document.getElementById('content-today').innerHTML = '<div class="error">' + t('index.tasks_failed') + escapeHtml(res.error || t('index.unknown_reason')) + '</div>';
           container.classList.remove('hidden');
         }
       }).catch(function(err) {
@@ -1135,7 +1144,7 @@
     }
 
     async function completeTask(type, roomId, dateStr) {
-      if (!(await confirmDialog('ยืนยันว่าทำงานนี้เสร็จแล้ว?', {title:'ทำงานเสร็จ', confirmText:'ยืนยันเสร็จ', cancelText:'ยกเลิก'}))) return;
+      if (!(await confirmDialog(t('index.task_done_msg'), {title:t('index.task_done_title'), confirmText:t('index.task_done_ok'), cancelText:t('index.cancel')}))) return;
       var apiName = type === 'housekeeping' ? 'roomsMarkCleaned' : 'roomsResolveMaintenance';
       var params = type === 'housekeeping' ? [sessionToken, roomId, dateStr] : [sessionToken, roomId];
 
@@ -1143,10 +1152,10 @@
         if (res.ok) {
           loadEmployeeTasks();
         } else {
-          alert('เกิดข้อผิดพลาด: ' + res.error);
+          alert(t('index.error_prefix') + res.error);
         }
       }).catch(function(err) {
-        alert('เชื่อมต่อผิดพลาด: ' + err.message);
+        alert(t('index.conn_error') + err.message);
       });
     }
 
@@ -1159,7 +1168,7 @@
         if (!tbody) return;
 
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:12px;">ยังไม่มีข้อมูลบิลค่าไฟ-ค่าน้ำ</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:12px;">' + t('index.no_utilities') + '</td></tr>';
           if (banner) banner.classList.add('hidden');
           return;
         }
@@ -1187,7 +1196,7 @@
           var latestCostPerNight = latestOccupied > 0 ? (latestElec / latestOccupied) : 0;
 
           if (latestCostPerNight > 150) {
-            banner.innerHTML = '⚠️ <strong>เตือน! ใช้ไฟเปลือง</strong> ค่าไฟเฉลี่ยต่อคืนที่มีผู้เข้าพักอยู่ที่ <strong>฿' + latestCostPerNight.toFixed(0) + '</strong> (เป้าหมาย: ต่ำกว่า ฿150) แม้ผู้เข้าพักน้อยแต่ยังใช้ไฟเปลือง กรุณาตรวจปิดแอร์ห้องที่ว่าง!';
+            banner.innerHTML = t('index.banner_waste', latestCostPerNight.toFixed(0));
             banner.className = 'utilities-banner warning-banner';
             banner.classList.remove('hidden');
           } else if (list.length >= 2) {
@@ -1197,11 +1206,11 @@
               var diffPct = ((latestTotal - prevTotal) / prevTotal) * 100;
               if (diffPct < 0) {
                 var savedPct = Math.abs(diffPct).toFixed(1);
-                banner.innerHTML = '📉 <strong>เยี่ยมมาก!</strong> ค่าน้ำ-ค่าไฟรวมลดลง <strong>' + savedPct + '%</strong> เทียบกับเดือนก่อน ขอบคุณที่ช่วยกันประหยัดพลังงาน!';
+                banner.innerHTML = t('index.banner_saved', savedPct);
                 banner.className = 'utilities-banner success-banner';
               } else {
                 var rosePct = diffPct.toFixed(1);
-                banner.innerHTML = '⚠️ <strong>โปรดระวัง:</strong> ค่าน้ำ-ค่าไฟรวมเพิ่มขึ้น <strong>' + rosePct + '%</strong> เทียบกับเดือนก่อน กรุณาปิดแอร์ห้องที่ว่าง!';
+                banner.innerHTML = t('index.banner_rose', rosePct);
                 banner.className = 'utilities-banner warning-banner';
               }
               banner.classList.remove('hidden');
@@ -1267,7 +1276,7 @@
 
       var countLabel = document.getElementById('notice-warning-count');
       if (countLabel) {
-        countLabel.textContent = 'รายการที่ ' + (currentNoticeIndex + 1) + ' จาก ' + currentNoticeList.length;
+        countLabel.textContent = t('index.item_x_of_y', currentNoticeIndex + 1, currentNoticeList.length);
       }
     }
 
@@ -1276,21 +1285,21 @@
       var notice = currentNoticeList[currentNoticeIndex];
       var btn = document.getElementById('btn-acknowledge-notice');
       btn.disabled = true;
-      btn.textContent = 'กำลังบันทึกการรับทราบ…';
+      btn.textContent = t('index.saving_ack');
 
       callApi('employeeAcknowledgeNotice', [sessionToken, notice.complaint_id]).then(function(res) {
         btn.disabled = false;
-        btn.textContent = 'ฉันรับทราบข้อผิดพลาด';
+        btn.textContent = t('index.acknowledge');
         if (res.ok) {
           currentNoticeIndex++;
           renderCurrentNotice();
         } else {
-          alert('บันทึกการรับทราบไม่สำเร็จ: ' + res.error);
+          alert(t('index.ack_failed') + res.error);
         }
       }).catch(function(e) {
         btn.disabled = false;
-        btn.textContent = 'ฉันรับทราบข้อผิดพลาด';
-        alert('เชื่อมต่อผิดพลาด: ' + e.message);
+        btn.textContent = t('index.acknowledge');
+        alert(t('index.conn_error') + e.message);
       });
     };
   </script>
