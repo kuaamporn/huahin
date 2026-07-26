@@ -308,9 +308,9 @@
         show('link-hr');
         show('link-setting');
       }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) show('link-finance');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) show('link-finance');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-report');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
+      if (HuaHinSession.hasRole('owner', 'accountant')) show('link-billing');
 
       loadSettings();
       loadOffices();

@@ -603,7 +603,7 @@
     // ---------------------------------------------------------------------
     var session = HuaHinSession.requireSession();
     if (session) {
-      var canViewFinance = HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk');
+      var canViewFinance = HuaHinSession.hasRole('owner', 'accountant', 'frontdesk');
       if (!canViewFinance) {
         hide('finance-content');
         show('access-denied');
@@ -617,15 +617,15 @@
           show('link-setting');
         }
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-hr');
-        if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
+        if (HuaHinSession.hasRole('owner', 'accountant')) show('link-billing');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) show('link-rooms');
         if (HuaHinSession.hasRole('owner', 'frontdesk')) {
           document.getElementById('link-report').classList.remove('hidden');
         }
         if (HuaHinSession.hasRole('owner', 'accountant')) show('link-reconcile');
 
-        var canAddRevenue = HuaHinSession.hasRole('owner', 'revenue');
-        var canAddExpense = HuaHinSession.hasRole('owner', 'expense');
+        var canAddRevenue = HuaHinSession.hasRole('owner', 'accountant');
+        var canAddExpense = HuaHinSession.hasRole('owner', 'accountant');
         if (canAddRevenue) show('btn-add-revenue');
         if (canAddRevenue) show('btn-tt-batch-receipt');
         if (canAddExpense) {
@@ -638,7 +638,7 @@
         loadRoomsAndBookingsCache();
         initFinancePage();
 
-        var canViewFullFinance = HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense');
+        var canViewFullFinance = HuaHinSession.hasRole('owner', 'accountant');
         if (!canViewFullFinance) {
           hide('card-revenue');
           hide('card-expense');
@@ -1075,11 +1075,12 @@
           (t.direction === 'IN' ? '<span class="pill ok" style="white-space:nowrap;">รายรับ</span>' : '<span class="pill flag" style="white-space:nowrap;">รายจ่าย</span>') +
           statusLabel + '</div>';
         var isOwner = HuaHinSession.hasRole('owner');
-        var isRevenue = HuaHinSession.hasRole('revenue');
-        var isExpense = HuaHinSession.hasRole('expense');
+        // migration_28 merged the revenue/expense roles into accountant, which now
+        // approves both directions. Owner still holds the verify step alone.
+        var isAccountant = HuaHinSession.hasRole('accountant');
 
-        var canApproveRevenue = (isOwner || isRevenue) && t.direction === 'IN' && !t.is_approved;
-        var canApproveExpense = (isOwner || isExpense) && t.direction === 'OUT' && !t.is_approved;
+        var canApproveRevenue = (isOwner || isAccountant) && t.direction === 'IN' && !t.is_approved;
+        var canApproveExpense = (isOwner || isAccountant) && t.direction === 'OUT' && !t.is_approved;
         var canVerify = isOwner && t.is_approved && !t.is_verified;
         var canEdit = isOwner || !t.is_approved;
 
@@ -2421,8 +2422,8 @@
       if (isNaN(amt)) { box.innerHTML = '<div class="muted">กรอกจำนวนเงินก่อน</div>'; return; }
       var target = Math.round(amt * 100);
       var prop = document.getElementById('finance-property').value;
-      var canIN = HuaHinSession.hasRole('owner', 'revenue');
-      var canOUT = HuaHinSession.hasRole('owner', 'expense');
+      var canIN = HuaHinSession.hasRole('owner', 'accountant');
+      var canOUT = HuaHinSession.hasRole('owner', 'accountant');
       var matches = (TRANSACTIONS || []).filter(function (t) {
         if (t.is_approved || t.status === 'pending') return false;
         if (prop && t.property_id !== prop) return false;

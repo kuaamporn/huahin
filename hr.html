@@ -331,9 +331,7 @@
           <li><b>หน้าเคาน์เตอร์ (frontdesk)</b>: เพิ่มและจัดการการจองห้องได้</li>
           <li><b>ช่างซ่อม (technician)</b>: ดูสถานะห้องและจัดการงานซ่อมได้</li>
           <li><b>แม่บ้าน (housekeeping / housekeeping_precious / housekeeping_moment)</b>: ดูสถานะห้องและทำเครื่องหมายว่าทำความสะอาดแล้วได้ (ทั้งหมด, เฉพาะเดอะเพรเชียส หรือเฉพาะเดอะโมเมนต์)</li>
-          <li><b>รายรับ (revenue)</b>: เพิ่มรายการรายรับได้</li>
-          <li><b>รายจ่าย (expense)</b>: เพิ่มรายการรายจ่ายได้</li>
-          <li><b>บัญชี (accountant)</b>: ดูสรุปและรายการทางการเงินได้</li>
+          <li><b>บัญชี (accountant)</b>: ดูสรุปและรายการทางการเงิน เพิ่มและอนุมัติรายการรายรับและรายจ่ายได้ (เจ้าของเป็นผู้ตรวจสอบยืนยัน)</li>
         </ul>
       </div>
 
@@ -476,8 +474,6 @@
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (ทั้งหมด)</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_precious" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (เดอะเพรเชียส)</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="housekeeping_moment" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">แม่บ้าน (เดอะโมเมนต์)</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="revenue" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">รายรับ</span></label>
-        <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="expense" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">รายจ่าย</span></label>
         <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" value="accountant" class="role-cb" style="width:auto;" /> <span style="color:var(--ink);font-size:14px;">บัญชี</span></label>
       </div>
       <div style="display:flex;gap:10px;margin-top:14px;">
@@ -527,8 +523,8 @@
 
     if (_session) {
       if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('link-rooms').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
+      if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-billing').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner')) document.getElementById('link-dashboard').classList.remove('hidden');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
         document.getElementById('link-report').classList.remove('hidden');
@@ -1382,7 +1378,7 @@
         if (cb.checked) checkedRoles.push(cb.value);
       });
 
-      var allRoles = ['owner', 'frontdesk', 'technician', 'housekeeping', 'housekeeping_precious', 'housekeeping_moment', 'revenue', 'expense', 'accountant'];
+      var allRoles = ['owner', 'frontdesk', 'technician', 'housekeeping', 'housekeeping_precious', 'housekeeping_moment', 'accountant'];
       var btn = document.getElementById('roles-modal-save');
       btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
 

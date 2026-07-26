@@ -163,8 +163,6 @@
           { val: 'owner', label: 'Owner (Default)' },
           { val: 'frontdesk', label: 'Frontdesk' },
           { val: 'accountant', label: 'Accountant' },
-          { val: 'revenue', label: 'Revenue Admin' },
-          { val: 'expense', label: 'Expense Admin' },
           { val: 'housekeeping', label: 'Housekeeper' }
         ];
 

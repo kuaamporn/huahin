@@ -182,15 +182,15 @@
         show('link-hr');
         show('link-setting');
       }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) show('link-finance');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) show('link-finance');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
         document.getElementById('link-report').classList.remove('hidden');
       }
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('link-billing');
-      if (HuaHinSession.hasRole('owner', 'frontdesk', 'revenue', 'accountant')) show('link-companies');
+      if (HuaHinSession.hasRole('owner', 'accountant')) show('link-billing');
+      if (HuaHinSession.hasRole('owner', 'frontdesk', 'accountant')) show('link-companies');
       if (HuaHinSession.hasRole('owner', 'accountant')) show('link-reconcile');
 
-      if (!HuaHinSession.hasRole('owner', 'accountant', 'revenue')) {
+      if (!HuaHinSession.hasRole('owner', 'accountant')) {
         hide('main-content');
         show('access-denied');
         return;

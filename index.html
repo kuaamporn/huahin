@@ -398,12 +398,12 @@
 
     function applyNavLinkVisibility() {
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('rooms-link');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) show('finance-link');
+      if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) show('finance-link');
       if (HuaHinSession.hasRole('owner')) {
         show('dashboard-link');
       }
       if (HuaHinSession.hasRole('owner', 'frontdesk')) show('hr-link');
-      if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) show('billing-link');
+      if (HuaHinSession.hasRole('owner', 'accountant')) show('billing-link');
       if (HuaHinSession.hasRole('owner', 'frontdesk')) {
         show('report-link');
       }

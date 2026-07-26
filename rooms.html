@@ -646,8 +646,8 @@ var currentEmployeeName = session ? session.name : null;
 if (session) {
   document.getElementById('welcome-name').textContent = currentEmployeeName;
   document.getElementById('main-screen').classList.remove('hidden');
-  if (HuaHinSession.hasRole('owner', 'accountant', 'revenue', 'expense', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
-  if (HuaHinSession.hasRole('owner', 'accountant', 'revenue')) document.getElementById('link-billing').classList.remove('hidden');
+  if (HuaHinSession.hasRole('owner', 'accountant', 'frontdesk')) document.getElementById('link-finance').classList.remove('hidden');
+  if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-billing').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner')) {
     document.getElementById('link-dashboard').classList.remove('hidden');
     document.getElementById('link-setting').classList.remove('hidden');
@@ -658,7 +658,7 @@ if (session) {
   }
   if (HuaHinSession.hasRole('owner', 'accountant')) document.getElementById('link-reconcile').classList.remove('hidden');
   // manageCompany roles: owner, frontdesk, revenue, accountant
-  if (HuaHinSession.hasRole('owner', 'frontdesk', 'revenue', 'accountant')) document.getElementById('companiesBtn').classList.remove('hidden');
+  if (HuaHinSession.hasRole('owner', 'frontdesk', 'accountant')) document.getElementById('companiesBtn').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('roomDetailsBtn').classList.remove('hidden');
 
   callApi('financeGetSettings', [sessionToken]).then(function(res) {
@@ -669,7 +669,7 @@ if (session) {
 
   // Deep-link: rooms.html#companies (e.g. from the Billing page) opens the manager.
   if (window.location.hash === '#companies'
-      && HuaHinSession.hasRole('owner', 'frontdesk', 'revenue', 'accountant')) {
+      && HuaHinSession.hasRole('owner', 'frontdesk', 'accountant')) {
     openCompaniesModal();
   }
 }
