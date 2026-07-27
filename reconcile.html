@@ -10,14 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
+    @import url('app.css');
     :root {
-      --ink: #1D1D1F; --paper: #F5F5F7; --line: #E5E5EA;
-      --muted: #86868B; --go: #0F766E; --warn: #D97706;
-      --err: #DC2626; --card: #FFFFFF;
+      /* Amber "needs review" is this page's own; everything else is app.css. */
+      --warn: #D97706;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); padding: 24px; }
-    h1, h2, h3 { font-family: 'Lexend', sans-serif; }
+    * { margin: 0; padding: 0; }
+    /* No .wrap on this page — <body> is the content shell, same rhythm as .wrap. */
+    body { max-width: var(--wrap); margin: 0 auto; padding: 24px var(--gutter) 60px; }
     .nav { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
     .nav a { color: var(--go); text-decoration: none; font-weight: 600; font-size: 14px; }
     .nav a.active { text-decoration: underline; }

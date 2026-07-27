@@ -1,12 +1,18 @@
-/* app.css — shared design tokens for The Precious Moment System (staff app).
+/* app.css — shared design tokens AND base template for the staff app.
  *
  * Single source of truth for the brand palette. Previously these variables were
  * duplicated in the <style> block of every page; change them here once now.
  *
  * Loaded via @import at the TOP of each page's <style> (must stay before any
- * other CSS rule). Pages with legitimately different tokens (rooms.html's
- * property colours, reconcile.html's amber warn) keep their own :root, which
- * overrides these where the names overlap.
+ * other CSS rule). Because it is imported first, every rule here is a DEFAULT:
+ * a page's own <style> comes later in the cascade and wins at equal specificity,
+ * so pages with legitimately different chrome (rooms.html's full-height board,
+ * reconcile.html's amber warn) keep working untouched.
+ *
+ * Layout contract for a standard page:
+ *   <body> <div class="wrap"> …page… </div>
+ * and set --wrap in the page's own :root to change it (default 1200px; only
+ * index.html narrows it, to 480px, because it is a single-column sign-in page).
  */
 :root {
   /* Core palette — was copied into all 7 main staff pages */
@@ -28,4 +34,74 @@
   --shadow: 0 4px 14px rgba(0, 0, 0, .06);
   --font-head: 'Lexend', 'Segoe UI', sans-serif;
   --font-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+
+  /* Aliases so the pages that named things differently resolve to one palette. */
+  --bg: #F5F5F7;
+  --surface: #FFFFFF;
+  --panel: #FFFFFF;
+  --border: #E5E5EA;
+  --err: #DC2626;
+
+  --wrap: 1200px;       /* page content width; a page may override in its :root */
+  --gutter: 20px;
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-head); }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 24px var(--gutter) 60px; }
+
+/* ---------- controls ---------- */
+/* 16px kills the iOS focus-zoom on tap. */
+input, select, textarea, button { font-family: inherit; font-size: 16px; }
+
+button, .btn, [role="button"] { cursor: pointer; }
+button:disabled, .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Never remove the focus ring — replace it with a visible one. */
+:focus-visible { outline: 2px solid var(--go); outline-offset: 2px; border-radius: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 768px) {
+  :root { --gutter: 14px; }
+
+  /* Touch-target floor, phones only — on desktop it would bloat the dense
+     toolbars (rooms.html's board controls especially). */
+  button, .btn, [role="button"], input, select { min-height: 44px; }
+
+  /* Wide data tables scroll inside themselves instead of scrolling the page.
+     .gantt is rooms.html's board — it already lives in its own scroller. */
+  table:not(.gantt) { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Horizontal tab strips scroll sideways instead of pushing the page wide.
+     (report.html's .ftabs overflowed the viewport by 417px before this.) */
+  .ftabs, .tabs, .nav-tabs, .prop-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .ftabs::-webkit-scrollbar, .tabs::-webkit-scrollbar,
+  .nav-tabs::-webkit-scrollbar, .prop-tabs::-webkit-scrollbar { display: none; }
+  .ftab, .tab-btn, .ptab { flex: 0 0 auto; }
+
+  /* Any grid of cards collapses to one column rather than squeezing. */
+  .summary, .summary-grid, .grid-2, .charts-row, .modal-grid, .frow { grid-template-columns: 1fr; }
+
+  h1 { font-size: 20px; }
 }

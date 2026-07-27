@@ -55,6 +55,14 @@
       .a4-page { box-shadow: none; margin: 0; }
       .no-print { display: none !important; }
     }
+
+    /* On a phone the A4 sheet (21cm ≈ 794px) is wider than the screen. Scale the
+       whole sheet to fit instead of reflowing it — the layout must stay
+       print-exact, so shrink-to-fit is the only honest preview. */
+    @media screen and (max-width: 820px) {
+      body { padding: 10px; }
+      .a4-page, .print-btn-container { zoom: calc((100vw - 20px) / 794); }
+    }
   </style>
 </head>
 <body>
