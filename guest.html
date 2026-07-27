@@ -10,7 +10,7 @@
   <link rel="alternate" hreflang="th" href="https://www.thepreciousmoment.com/th/" />
   <link rel="alternate" hreflang="x-default" href="https://www.thepreciousmoment.com/" />
   <title>The Precious Moment | Monthly &amp; Daily Residences in Hua Hin near the Sea</title>
-  <meta name="description" content="Unhurried coastal residences in Hua Hin, Thailand. The Precious offers 79 quiet monthly rooms across 7 floors for expats &amp; retirees. The Moment offers monthly residences and daily holiday stays minutes from the beach." />
+  <meta name="description" content="Unhurried coastal living in Hua Hin, Thailand. The Precious: 79 quiet monthly rooms plus a standalone private house. The Moment: monthly residences and daily holiday stays, minutes from the beach." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.thepreciousmoment.com/" />
   <meta property="og:title" content="The Precious Moment @ Huahin | Coastal Residences" />
@@ -65,6 +65,12 @@
         "name": "The Moment",
         "description": "Monthly Residences and Daily Stays across 7 floors, opening mid-2027. Designed for flexible coastal living and holiday getaways.",
         "url": "https://www.thepreciousmoment.com/#moment"
+      },
+      {
+        "@type": "House",
+        "name": "Private House",
+        "description": "A standalone private house with its own entrance in central Hua Hin, operated by The Precious and available for monthly stays.",
+        "url": "https://www.thepreciousmoment.com/#house"
       }
     ]
   }
@@ -105,6 +111,14 @@
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "The Precious offers Standard Studios (private bath, balcony, air-conditioning), more spacious Deluxe Rooms for extended living, and top-floor suites, across 7 floors and 79 rooms in total."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you have a private house for rent in Hua Hin?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — a standalone private house with its own entrance, operated by The Precious and available for monthly stays. Message us on LINE or Facebook Messenger for rates and availability."
         }
       },
       {
@@ -374,6 +388,8 @@
 
     /* ── Room cards ──────────────────────────── */
     .rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 26px; }
+    /* One card only: auto-fit would stretch it across the whole container. */
+    .rooms.rooms-single { grid-template-columns: minmax(290px, 420px); justify-content: center; }
     .room-card {
       background: var(--cream); border: 1px solid var(--hairline);
       display: flex; flex-direction: column;
@@ -835,6 +851,10 @@
         The Moment
         <span class="tab-note">Opening Mid 2027</span>
       </button>
+      <button class="tab-btn" id="tabbtn-house" role="tab" aria-selected="false" aria-controls="panel-house" onclick="showTab('house')">
+        Private House
+        <span class="tab-note">Monthly Residence</span>
+      </button>
     </div>
 
     <!-- PANEL: THE PRECIOUS -->
@@ -971,6 +991,40 @@
         </article>
       </div>
     </section>
+
+    <!-- PANEL: THE PRIVATE HOUSE — one unit (P-G01), operated by The Precious.
+         Its card keys off precious|House because the house shares The Precious's
+         property_id; only checkDates' panel scoping keeps the two tabs apart. -->
+    <section class="tab-panel" id="panel-house" role="tabpanel" aria-labelledby="tabbtn-house">
+      <p class="panel-desc">A standalone house with its own private entrance, on the grounds of The Precious and cared for by the same team. One home, let by the month.</p>
+
+      <div class="datebox">
+        <div class="field">
+          <label for="date-in-house">Arrival</label>
+          <input type="date" id="date-in-house">
+        </div>
+        <div class="field">
+          <label for="date-out-house">Departure</label>
+          <input type="date" id="date-out-house">
+        </div>
+        <button class="btn btn-gold" onclick="checkDates('house')">Check Availability</button>
+        <div class="note" id="date-note-house">Showing availability for tonight — choose your dates to check a specific stay.</div>
+      </div>
+
+      <div class="rooms rooms-single">
+        <article class="room-card" data-key="precious|House">
+          <div class="photo"><span class="ph-label">Private House</span><img src="/images/guest/precious-house.jpg" alt="The private house at The Precious, Hua Hin" loading="lazy" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>Private House</h3>
+            <p class="desc">Your own front door, your own space — a detached house for those who want a home rather than a room, with the run of the pools, gym and parking.</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">Checking</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">Enquire</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
   </div>
 
   <!-- FACILITIES -->
@@ -1100,6 +1154,10 @@
       <details style="border-bottom:1px solid var(--hairline);padding:16px 4px;">
         <summary style="cursor:pointer;font-weight:600;color:var(--ink);">What room types does The Precious offer?</summary>
         <p style="margin:10px 0 0;color:var(--ink-soft);">The Precious offers Standard Studios (private bath, balcony, air-conditioning), more spacious Deluxe Rooms for extended living, and top-floor suites, across 7 floors and 79 rooms in total.</p>
+      </details>
+      <details style="border-bottom:1px solid var(--hairline);padding:16px 4px;">
+        <summary style="cursor:pointer;font-weight:600;color:var(--ink);">Do you have a private house for rent in Hua Hin?</summary>
+        <p style="margin:10px 0 0;color:var(--ink-soft);">Yes — a standalone private house with its own entrance, operated by The Precious and available for monthly stays. Message us on LINE or Facebook Messenger for rates and availability.</p>
       </details>
       <details style="border-bottom:1px solid var(--hairline);padding:16px 4px;">
         <summary style="cursor:pointer;font-weight:600;color:var(--ink);">Do you offer monthly and daily stays?</summary>
@@ -1365,7 +1423,7 @@
     })();
 
     function showTab(name) {
-      ['precious', 'moment'].forEach(function (t) {
+      ['precious', 'moment', 'house'].forEach(function (t) {
         document.getElementById('tabbtn-' + t).setAttribute('aria-selected', t === name ? 'true' : 'false');
         document.getElementById('panel-' + t).classList.toggle('active', t === name);
       });
@@ -1413,16 +1471,26 @@
       });
     }
 
-    function checkDates(prop) {
-      var start = document.getElementById('date-in-' + prop).value;
-      var end = document.getElementById('date-out-' + prop).value;
-      var note = document.getElementById('date-note-' + prop);
+    // `tab` is a tab id, NOT a property id. The Private House tab keys off
+    // precious|House, so filtering cards by a "<prop>|" prefix would make The
+    // Precious report the house alongside its studios. Scope by the panel's own
+    // cards instead — correct for every tab, whatever property it draws from.
+    function checkDates(tab) {
+      var start = document.getElementById('date-in-' + tab).value;
+      var end = document.getElementById('date-out-' + tab).value;
+      var note = document.getElementById('date-note-' + tab);
       if (!start || !end || end <= start) {
         note.textContent = 'Please choose an arrival date and a later departure date.';
         return;
       }
+      var cards = document.querySelectorAll('#panel-' + tab + ' .room-card');
+      var ownKeys = {};
+      cards.forEach(function (c) { ownKeys[c.getAttribute('data-key')] = true; });
+
       note.textContent = 'Checking ' + start + ' — ' + end + ' …';
-      document.querySelectorAll('.room-card[data-key^="' + prop + '|"] .availability').forEach(function (el) {
+      cards.forEach(function (c) {
+        var el = c.querySelector('.availability');
+        if (!el) return;
         el.className = 'availability is-loading';
         el.querySelector('.txt').textContent = 'Checking';
       });
@@ -1433,18 +1501,18 @@
           note.innerHTML = 'We couldn\'t check live availability just now — message us on ' + contact + ' and we\'ll confirm your dates right away.';
           return;
         }
-        var openKeys = Object.keys(agg).filter(function (k) { return k.indexOf(prop + '|') === 0 && agg[k] > 0; });
+        var openKeys = Object.keys(agg).filter(function (k) { return ownKeys[k] && agg[k] > 0; });
         if (openKeys.length > 0) {
           var names = openKeys.map(function (k) {
-            var card = document.querySelector('.room-card[data-key="' + k + '"] h3');
+            var card = document.querySelector('#panel-' + tab + ' .room-card[data-key="' + k + '"] h3');
             return card ? card.textContent.trim() : k.split('|')[1];
           });
           var list = names.length > 1
             ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1]
             : names[0];
-          note.innerHTML = '<p style="margin:10px 0;">' + list + (names.length > 1 ? ' room types are' : ' room type is')
-            + ' open for <strong>' + start + ' – ' + end + '</strong>.</p>'
-            + '<p style="margin:10px 0;">Rooms for these dates get taken quickly — message us on '
+          note.innerHTML = '<p style="margin:10px 0;">' + list + (names.length > 1 ? ' are open for ' : ' is open for ')
+            + '<strong>' + start + ' – ' + end + '</strong>.</p>'
+            + '<p style="margin:10px 0;">These dates get taken quickly — message us on '
             + contact + ' now to secure yours before someone else does.</p>';
         } else {
           note.innerHTML = '<p style="margin:10px 0;">Fully booked for <strong>' + start + ' – ' + end + '</strong> right now — but dates free up often.</p>'
@@ -1473,6 +1541,18 @@
     }
 
     if (MOMENT_LIVE) enableMomentBooking();
+
+    // The JSON-LD gives each residence its own URL (#precious / #moment / #house).
+    // The panels are display:none until selected, so a plain anchor cannot reach
+    // them — open the matching tab instead, then scroll the tab strip into view.
+    (function openTabFromHash() {
+      var want = (location.hash || '').replace('#', '');
+      if (['precious', 'moment', 'house'].indexOf(want) < 0) return;
+      showTab(want);
+      var anchor = document.getElementById('residences');
+      if (anchor) anchor.scrollIntoView();
+    })();
+
     loadAvailability(null, null);
 
     /* ══════════════════════════════════════════════════════════════

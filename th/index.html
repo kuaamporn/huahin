@@ -10,7 +10,7 @@
   <link rel="alternate" hreflang="th" href="https://www.thepreciousmoment.com/th/" />
   <link rel="alternate" hreflang="x-default" href="https://www.thepreciousmoment.com/" />
   <title>The Precious Moment | ห้องพักรายเดือนและรายวัน หัวหิน ใกล้ทะเล</title>
-  <meta name="description" content="ที่พักบรรยากาศสงบใจกลางหัวหิน The Precious ห้องพักรายเดือน 79 ห้อง 7 ชั้น เหมาะกับชาวต่างชาติและผู้พักระยะยาว ส่วน The Moment มีทั้งห้องพักรายเดือนและรายวัน ห่างจากชายหาดเพียงไม่กี่นาที" />
+  <meta name="description" content="ที่พักบรรยากาศสงบใจกลางหัวหิน The Precious ห้องพักรายเดือน 79 ห้อง และบ้านเดี่ยวให้เช่ารายเดือน ส่วน The Moment มีทั้งห้องพักรายเดือนและรายวัน ห่างจากชายหาดเพียงไม่กี่นาที" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.thepreciousmoment.com/th/" />
   <meta property="og:title" content="The Precious Moment @ หัวหิน | ที่พักใกล้ทะเล" />
@@ -65,6 +65,12 @@
         "name": "The Moment",
         "description": "ห้องพักรายเดือนและรายวัน 7 ชั้น เปิดกลางปี 2570 ออกแบบสำหรับการใช้ชีวิตริมทะเลอย่างยืดหยุ่นและการพักผ่อนช่วงวันหยุด",
         "url": "https://www.thepreciousmoment.com/th/#moment"
+      },
+      {
+        "@type": "House",
+        "name": "บ้านเดี่ยว",
+        "description": "บ้านเดี่ยวพร้อมทางเข้าส่วนตัวใจกลางหัวหิน ดูแลโดย The Precious ให้เช่าแบบรายเดือน",
+        "url": "https://www.thepreciousmoment.com/th/#house"
       }
     ]
   }
@@ -105,6 +111,14 @@
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "The Precious มีห้อง Standard แบบสตูดิโอ (ห้องน้ำในตัว ระเบียง เครื่องปรับอากาศ) ห้อง Deluxe ที่กว้างขึ้นสำหรับการพักระยะยาว และห้องชั้นบนสุด รวมทั้งหมด 7 ชั้น 79 ห้อง"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "มีบ้านเดี่ยวให้เช่าที่หัวหินไหม",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "มี — บ้านเดี่ยวพร้อมทางเข้าส่วนตัว ดูแลโดย The Precious ให้เช่าแบบรายเดือน ทักมาทาง LINE หรือ Facebook Messenger เพื่อสอบถามราคาและห้องว่าง"
         }
       },
       {
@@ -374,6 +388,8 @@
 
     /* ── Room cards ──────────────────────────── */
     .rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 26px; }
+    /* One card only: auto-fit would stretch it across the whole container. */
+    .rooms.rooms-single { grid-template-columns: minmax(290px, 420px); justify-content: center; }
     .room-card {
       background: var(--cream); border: 1px solid var(--hairline);
       display: flex; flex-direction: column;
@@ -835,6 +851,10 @@
         The Moment
         <span class="tab-note">เปิดกลางปี 2570</span>
       </button>
+      <button class="tab-btn" id="tabbtn-house" role="tab" aria-selected="false" aria-controls="panel-house" onclick="showTab('house')">
+        บ้านเดี่ยว
+        <span class="tab-note">เช่ารายเดือน</span>
+      </button>
     </div>
 
     <!-- PANEL: THE PRECIOUS -->
@@ -971,6 +991,40 @@
         </article>
       </div>
     </section>
+
+    <!-- PANEL: THE PRIVATE HOUSE — one unit (P-G01), operated by The Precious.
+         Its card keys off precious|House because the house shares The Precious's
+         property_id; only checkDates' panel scoping keeps the two tabs apart. -->
+    <section class="tab-panel" id="panel-house" role="tabpanel" aria-labelledby="tabbtn-house">
+      <p class="panel-desc">บ้านเดี่ยวพร้อมทางเข้าส่วนตัว ตั้งอยู่ในพื้นที่ของ The Precious และดูแลโดยทีมงานชุดเดียวกัน มีเพียงหลังเดียว ให้เช่าแบบรายเดือน</p>
+
+      <div class="datebox">
+        <div class="field">
+          <label for="date-in-house">วันเข้าพัก</label>
+          <input type="date" id="date-in-house">
+        </div>
+        <div class="field">
+          <label for="date-out-house">วันออก</label>
+          <input type="date" id="date-out-house">
+        </div>
+        <button class="btn btn-gold" onclick="checkDates('house')">ตรวจสอบห้องว่าง</button>
+        <div class="note" id="date-note-house">กำลังแสดงห้องว่างสำหรับคืนนี้ — เลือกวันที่เพื่อตรวจสอบช่วงเข้าพักที่ต้องการ</div>
+      </div>
+
+      <div class="rooms rooms-single">
+        <article class="room-card" data-key="precious|House">
+          <div class="photo"><span class="ph-label">บ้านเดี่ยว</span><img src="/images/guest/precious-house.jpg" alt="บ้านเดี่ยวที่ The Precious หัวหิน" loading="lazy" onerror="this.remove()"></div>
+          <div class="body">
+            <h3>บ้านเดี่ยว</h3>
+            <p class="desc">ประตูบ้านเป็นของคุณเอง พื้นที่เป็นส่วนตัวทั้งหลัง สำหรับผู้ที่ต้องการบ้านมากกว่าห้องพัก พร้อมใช้สระว่ายน้ำ ห้องฟิตเนส และที่จอดรถได้เต็มที่</p>
+            <div class="meta-row">
+              <span class="availability is-loading"><span class="dot"></span><span class="txt">กำลังตรวจสอบ</span></span>
+              <a class="enquire" href="https://line.me/ti/p/~the.precious" target="_blank" rel="noopener">สอบถาม</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
   </div>
 
   <!-- FACILITIES -->
@@ -1100,6 +1154,10 @@
       <details style="border-bottom:1px solid var(--hairline);padding:16px 4px;">
         <summary style="cursor:pointer;font-weight:600;color:var(--ink);">The Precious มีห้องพักประเภทใดบ้าง</summary>
         <p style="margin:10px 0 0;color:var(--ink-soft);">The Precious มีห้อง Standard แบบสตูดิโอ (ห้องน้ำในตัว ระเบียง เครื่องปรับอากาศ) ห้อง Deluxe ที่กว้างขึ้นสำหรับการพักระยะยาว และห้องชั้นบนสุด รวมทั้งหมด 7 ชั้น 79 ห้อง</p>
+      </details>
+      <details style="border-bottom:1px solid var(--hairline);padding:16px 4px;">
+        <summary style="cursor:pointer;font-weight:600;color:var(--ink);">มีบ้านเดี่ยวให้เช่าที่หัวหินไหม</summary>
+        <p style="margin:10px 0 0;color:var(--ink-soft);">มี — บ้านเดี่ยวพร้อมทางเข้าส่วนตัว ดูแลโดย The Precious ให้เช่าแบบรายเดือน ทักมาทาง LINE หรือ Facebook Messenger เพื่อสอบถามราคาและห้องว่าง</p>
       </details>
       <details style="border-bottom:1px solid var(--hairline);padding:16px 4px;">
         <summary style="cursor:pointer;font-weight:600;color:var(--ink);">มีทั้งห้องพักรายเดือนและรายวันหรือไม่</summary>
@@ -1365,7 +1423,7 @@
     })();
 
     function showTab(name) {
-      ['precious', 'moment'].forEach(function (t) {
+      ['precious', 'moment', 'house'].forEach(function (t) {
         document.getElementById('tabbtn-' + t).setAttribute('aria-selected', t === name ? 'true' : 'false');
         document.getElementById('panel-' + t).classList.toggle('active', t === name);
       });
@@ -1413,16 +1471,26 @@
       });
     }
 
-    function checkDates(prop) {
-      var start = document.getElementById('date-in-' + prop).value;
-      var end = document.getElementById('date-out-' + prop).value;
-      var note = document.getElementById('date-note-' + prop);
+    // `tab` is a tab id, NOT a property id. The Private House tab keys off
+    // precious|House, so filtering cards by a "<prop>|" prefix would make The
+    // Precious report the house alongside its studios. Scope by the panel's own
+    // cards instead — correct for every tab, whatever property it draws from.
+    function checkDates(tab) {
+      var start = document.getElementById('date-in-' + tab).value;
+      var end = document.getElementById('date-out-' + tab).value;
+      var note = document.getElementById('date-note-' + tab);
       if (!start || !end || end <= start) {
         note.textContent = 'กรุณาเลือกวันเข้าพัก และวันออกที่หลังจากวันเข้าพัก';
         return;
       }
+      var cards = document.querySelectorAll('#panel-' + tab + ' .room-card');
+      var ownKeys = {};
+      cards.forEach(function (c) { ownKeys[c.getAttribute('data-key')] = true; });
+
       note.textContent = 'กำลังตรวจสอบ ' + start + ' — ' + end + ' …';
-      document.querySelectorAll('.room-card[data-key^="' + prop + '|"] .availability').forEach(function (el) {
+      cards.forEach(function (c) {
+        var el = c.querySelector('.availability');
+        if (!el) return;
         el.className = 'availability is-loading';
         el.querySelector('.txt').textContent = 'กำลังตรวจสอบ';
       });
@@ -1433,18 +1501,18 @@
           note.innerHTML = 'ขณะนี้เราตรวจสอบห้องว่างแบบเรียลไทม์ไม่ได้ — ทักมาทาง ' + contact + ' แล้วเราจะยืนยันวันที่ของคุณให้ทันที';
           return;
         }
-        var openKeys = Object.keys(agg).filter(function (k) { return k.indexOf(prop + '|') === 0 && agg[k] > 0; });
+        var openKeys = Object.keys(agg).filter(function (k) { return ownKeys[k] && agg[k] > 0; });
         if (openKeys.length > 0) {
           var names = openKeys.map(function (k) {
-            var card = document.querySelector('.room-card[data-key="' + k + '"] h3');
+            var card = document.querySelector('#panel-' + tab + ' .room-card[data-key="' + k + '"] h3');
             return card ? card.textContent.trim() : k.split('|')[1];
           });
           var list = names.length > 1
             ? names.slice(0, -1).join(', ') + ' และ ' + names[names.length - 1]
             : names[0];
-          note.innerHTML = '<p style="margin:10px 0;">' + list + (names.length > 1 ? ' ยังมีห้องว่าง' : ' ยังมีห้องว่าง')
-            + 'สำหรับ<strong>' + start + ' – ' + end + '</strong>.</p>'
-            + '<p style="margin:10px 0;">ห้องในช่วงวันดังกล่าวเต็มเร็ว — ทักมาทาง '
+          note.innerHTML = '<p style="margin:10px 0;">' + list + (names.length > 1 ? ' ยังว่างสำหรับ ' : ' ยังว่างสำหรับ ')
+            + '<strong>' + start + ' – ' + end + '</strong>.</p>'
+            + '<p style="margin:10px 0;">ช่วงวันดังกล่าวเต็มเร็ว — ทักมาทาง '
             + contact + ' ตอนนี้เพื่อจองไว้ก่อนใคร</p>';
         } else {
           note.innerHTML = '<p style="margin:10px 0;">เต็มแล้วสำหรับ<strong>' + start + ' – ' + end + '</strong> ในขณะนี้ — แต่มักมีห้องว่างเพิ่มขึ้นอยู่เสมอ</p>'
@@ -1473,6 +1541,18 @@
     }
 
     if (MOMENT_LIVE) enableMomentBooking();
+
+    // The JSON-LD gives each residence its own URL (#precious / #moment / #house).
+    // The panels are display:none until selected, so a plain anchor cannot reach
+    // them — open the matching tab instead, then scroll the tab strip into view.
+    (function openTabFromHash() {
+      var want = (location.hash || '').replace('#', '');
+      if (['precious', 'moment', 'house'].indexOf(want) < 0) return;
+      showTab(want);
+      var anchor = document.getElementById('residences');
+      if (anchor) anchor.scrollIntoView();
+    })();
+
     loadAvailability(null, null);
 
     /* ══════════════════════════════════════════════════════════════
