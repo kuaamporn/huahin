@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือบุคคล (HR) — The Precious Moment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Sarabun:wght@300;400;500;600;700&display=swap');
+@import url('app.css');
+
+:root{
+  --muted:#6b7280;   /* softer than app.css for long-form reading */
+  --teal:#0F766E; --teal-light:rgba(15,118,110,.08); --teal-border:rgba(15,118,110,.25);
+  --green:#16A34A; --red:#DC2626; --amber:#D97706;
+  --amber-bg:rgba(217,119,6,.08); --amber-border:rgba(217,119,6,.28);
+  --red-bg:rgba(220,38,38,.06); --red-border:rgba(220,38,38,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:16.5px;line-height:1.7}
+.wrap{max-width:920px;margin:0 auto;padding:32px 22px 120px}
+h1,h2,h3,.eyebrow,.snum,.steps li::before,.mono{font-family:'Lexend',sans-serif}
+.thai-head{font-family:'Sarabun',sans-serif;font-weight:700}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px;flex-wrap:wrap;gap:10px}
+.back{font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--teal-border);border-radius:999px;background:var(--teal-light)}
+.back:hover{background:var(--teal);color:#fff}
+.tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bottom:14px;font-family:'Sarabun',sans-serif}
+.lead{color:var(--muted);font-size:16px;max-width:680px;margin-bottom:14px}
+.lead b{color:var(--text)}
+
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;margin:30px 0 44px}
+.toc h2{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:500}
+.toc ol{list-style:none;counter-reset:t;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.toc li{counter-increment:t}
+.toc a{color:var(--text);text-decoration:none;display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:15.5px}
+.toc a::before{content:counter(t);font-family:'Lexend',sans-serif;font-weight:700;color:var(--teal);min-width:22px;font-size:13px}
+.toc a:hover{color:var(--teal)}
+
+.section{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 30px;margin-bottom:26px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.section-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:8px}
+.snum{flex-shrink:0;width:42px;height:42px;border-radius:13px;background:var(--teal);color:#fff;font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center}
+.section-head h2{font-size:24px;font-weight:700;line-height:1.25;font-family:'Sarabun',sans-serif;padding-top:3px}
+.section-head .en{display:block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:400;margin-top:3px}
+.section > p{color:#3a3a3c;margin:14px 0}
+.section > p.intro{margin-top:16px}
+
+.fig{margin:22px 0;text-align:center}
+.fig img{max-width:100%;width:auto;border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 20px -8px rgba(0,0,0,.18)}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px}
+
+.steps{list-style:none;counter-reset:s;margin:16px 0 4px;padding:0}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 42px;border-bottom:1px solid #f1f1f3}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:27px;height:27px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center}
+.steps li b{color:var(--teal)}
+.steps.circ{counter-reset:none}
+.steps.circ li::before{content:attr(data-n)}
+
+.note,.warn,.tip{border-radius:14px;padding:15px 18px;margin:20px 0;font-size:15.5px;line-height:1.6}
+.note{background:var(--teal-light);border:1px solid var(--teal-border)}
+.warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+.tip{background:var(--red-bg);border:1px solid var(--red-border)}
+.note b,.warn b,.tip b{font-weight:700}
+.warn b{color:var(--amber)} .tip b{color:var(--red)}
+
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px;font-family:'DM Mono',monospace;letter-spacing:1px}
+
+@media(max-width:680px){
+  .toc ol{grid-template-columns:1fr}
+  .section{padding:26px 20px}
+  .section-head h2{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="staff_manual.html">← กลับหน้าหลักคู่มือ</a>
+    <span class="tag">The Precious Moment</span>
+  </div>
+
+  <div class="eyebrow">คู่มือบุคคล · HR · Front desk</div>
+  <h1>บุคคล — ลงเวลา การเข้างาน และอนุมัติการลา</h1>
+  <p class="lead">คู่มือนี้สำหรับ<b>พนักงานต้อนรับ (front desk)</b> — ครอบคลุมเฉพาะส่วนที่คุณเข้าถึงได้ในหน้า
+  <b>บุคคล</b>: ดูการลงเวลาวันนี้ ตรวจ/ปรับสถานะการเข้างาน ดูรายงานประจำเดือน อนุมัติคำขอลาและสลับวันหยุด
+  และเปลี่ยนรหัสผ่านของคุณเอง</p>
+  <p class="lead" style="margin-bottom:0"><b>ไม่ครอบคลุมในคู่มือนี้:</b> แท็บ พนักงาน · บทบาท ·
+  ข้อร้องเรียน &amp; ใบเตือน — สามแท็บนี้เห็นได้เฉพาะ<b>เจ้าของกิจการ</b>เท่านั้น หน้าจอของคุณจะไม่มีแท็บเหล่านี้เลย</p>
+
+  <nav class="toc">
+    <h2>สารบัญ</h2>
+    <ol>
+      <li><a href="#s1">การลงเวลาวันนี้</a></li>
+      <li><a href="#s2">การเข้างาน &amp; ปรับสถานะ</a></li>
+      <li><a href="#s3">รายงานประจำเดือน</a></li>
+      <li><a href="#s4">อนุมัติการลาและสลับวันหยุด</a></li>
+      <li><a href="#s5">บัญชีของฉัน</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 CHECKINS -->
+  <section class="section" id="s1">
+    <div class="section-head"><div class="snum">1</div><h2>การลงเวลาวันนี้<span class="en">Today's check-ins</span></h2></div>
+    <p class="intro">เปิดหน้า <b>บุคคล</b> จากเมนูด้านบน แท็บแรกที่เห็นคือ <b>ลงเวลาวันนี้</b> —
+    รายการลงเวลาเข้า-ออกงานของพนักงานทุกคนในวันนี้</p>
+    <figure class="fig"><img src="manual_assets/hr/01_checkins.png" alt="หน้าการลงเวลาวันนี้" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>การ์ดสรุป</b> — รายการทั้งหมด ปกติ และผิดปกติของวันนี้</li>
+      <li data-n="2"><b>ตารางรายการ</b> — เวลา พนักงาน ประเภท (เข้า/ออกงาน) สำนักงาน และสถานะ
+      แถวที่เป็น <b>ผิดปกติ</b> จะโชว์เหตุผล เช่น ลงเวลานอกพื้นที่สำนักงาน</li>
+      <li data-n="3"><b>รีเฟรช</b> — กดเพื่อดึงรายการล่าสุด</li>
+    </ol>
+  </section>
+
+  <!-- 2 ATTENDANCE -->
+  <section class="section" id="s2">
+    <div class="section-head"><div class="snum">2</div><h2>การเข้างาน &amp; ปรับสถานะ<span class="en">Attendance &amp; overrides</span></h2></div>
+    <p class="intro">แท็บ <b>การเข้างาน</b> แสดงสถานะรายวันของพนักงานทุกคน (มาทำงาน/มาสาย/ขาดงาน/ลา)
+    เลือกวันที่แล้วกด <b>โหลด</b></p>
+    <figure class="fig"><img src="manual_assets/hr/02_attendance.png" alt="หน้าการเข้างาน" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>เลือกวันที่</b> — ดูสถานะของวันอื่นย้อนหลังหรือล่วงหน้าได้</li>
+      <li data-n="2"><b>ตารางพนักงาน</b> — กด <b>ตั้งสถานะ</b> เพื่อปรับสถานะด้วยมือ (เช่น บันทึกวันลา)
+      แถวที่ปรับไว้แล้วจะมีปุ่ม <b>แก้ไข</b> / <b>ล้าง</b> แทน</li>
+    </ol>
+    <p>กด <b>ตั้งสถานะ</b> เพื่อเปิดหน้าต่างปรับสถานะ — เลือกสถานะ ช่วงวันที่ (ใช้วันเดียวกันทั้งสองช่องสำหรับวันเดียว)
+    และหมายเหตุถ้ามี</p>
+    <figure class="fig"><img src="manual_assets/hr/03_override.png" alt="หน้าต่างตั้งสถานะการเข้างาน" loading="lazy"></figure>
+    <div class="note">สถานะที่ปรับด้วยมือ (เช่น ลา) จะมี<b>ความสำคัญกว่า</b>สถานะที่ระบบตรวจจับอัตโนมัติเสมอ</div>
+  </section>
+
+  <!-- 3 MONTHLY -->
+  <section class="section" id="s3">
+    <div class="section-head"><div class="snum">3</div><h2>รายงานประจำเดือน<span class="en">Monthly report</span></h2></div>
+    <p class="intro">แท็บ <b>รายงานประจำเดือน</b> สรุปการเข้างานทั้งเดือน (หรือทั้งปี) ของพนักงานทุกคน</p>
+    <figure class="fig"><img src="manual_assets/hr/04_monthly.png" alt="หน้ารายงานประจำเดือน" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ประเภทรายงาน</b> — เลือก <b>รายเดือน</b> หรือ <b>รายปี</b> พร้อมปี/เดือน แล้วกดโหลด</li>
+      <li data-n="2"><b>ตารางสรุป</b> — จำนวนวันมาทำงาน มาสาย ขาดงาน และลา ต่อพนักงาน 1 คน
+      คลิกแถวเพื่อดูรายละเอียดรายวัน</li>
+      <li data-n="3"><b>ส่งออก CSV</b> — ดาวน์โหลดรายงานเป็นไฟล์เพื่อเก็บหรือส่งต่อ</li>
+    </ol>
+  </section>
+
+  <!-- 4 LEAVES -->
+  <section class="section" id="s4">
+    <div class="section-head"><div class="snum">4</div><h2>อนุมัติการลาและสลับวันหยุด<span class="en">Leave &amp; swap approvals</span></h2></div>
+    <p class="intro">แท็บ <b>อนุมัติการลา &amp; สลับวันหยุด</b> รวมคำขอทั้งหมดที่พนักงานส่งมาจากหน้าลงเวลาของตัวเอง</p>
+    <figure class="fig"><img src="manual_assets/hr/05_leaves.png" alt="หน้าอนุมัติการลาและสลับวันหยุด" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>คำขอลาที่รออนุมัติ</b> — ลาป่วยต้องมีหลักฐาน กด <b>ยืนยันหลักฐาน</b> ก่อนได้ถ้าต้องการตรวจสอบ
+      จากนั้นกด <b>อนุมัติ</b> หรือ <b>ไม่อนุมัติ</b></li>
+      <li data-n="2"><b>คำขอสลับวันหยุดที่รออนุมัติ</b> — เทียบวันเดิมกับวันใหม่ แล้วกด <b>อนุมัติ</b> หรือ <b>ไม่อนุมัติ</b></li>
+    </ol>
+    <div class="warn"><b>ข้อจำกัด:</b> คุณไม่สามารถอนุมัติคำขอลาหรือสลับวันหยุดของตัวเองได้</div>
+  </section>
+
+  <!-- 5 MY ACCOUNT -->
+  <section class="section" id="s5">
+    <div class="section-head"><div class="snum">5</div><h2>บัญชีของฉัน<span class="en">My account</span></h2></div>
+    <p class="intro">แท็บ <b>บัญชีของฉัน</b> ใช้เปลี่ยนรหัสผ่านของคุณเอง</p>
+    <figure class="fig"><img src="manual_assets/hr/06_account.png" alt="หน้าบัญชีของฉัน" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>รหัสผ่านปัจจุบัน</b> — กรอกรหัสผ่านที่ใช้อยู่ตอนนี้</li>
+      <li data-n="2"><b>เปลี่ยนรหัสผ่าน</b> — กรอกรหัสผ่านใหม่และยืนยัน แล้วกดเปลี่ยนรหัสผ่าน</li>
+    </ol>
+  </section>
+
+  <div class="footer">The Precious Moment System · คู่มือบุคคล (HR)</div>
+</div>
+</body>
+</html>
