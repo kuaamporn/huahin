@@ -527,10 +527,10 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="i18n.js?v=db82414e"></script>
-  <script src="session.js?v=f661977c"></script>
-  <script src="nav.js?v=68e2cd72"></script>
-<script src="ui.js?v=715a859f"></script>
+<script src="i18n.js?v=81febd36"></script>
+  <script src="session.js?v=1c7dbdbc"></script>
+  <script src="nav.js?v=7a0007ee"></script>
+<script src="ui.js?v=5c737329"></script>
 <script>
 // =====================================================================
 var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
@@ -2084,9 +2084,12 @@ function doEarlyMoveOut(bookingId, roomId) {
     '<div class="df"><label>' + t('rooms.d_room') + '</label><span>'+(r?r.displayName:roomId)+'</span></div>'+
     '<div class="df"><label>' + t('rooms.d_booked_until') + '</label><span>'+(b.checkoutDate||'-')+'</span></div>';
   var dateInput = document.getElementById('emoDate');
-  dateInput.value = dk(TODAY);
-  dateInput.min = b.checkinDate || '';
-  dateInput.max = b.checkoutDate || '';
+  var lo = b.checkinDate || '', hi = b.checkoutDate || '', todayStr = dk(TODAY);
+  dateInput.min = lo;
+  dateInput.max = hi;
+  // min/max only constrain the picker, not a value set from JS — so clamp it here.
+  // Without this a future booking opens pre-filled with a date before its check-in.
+  dateInput.value = (lo && todayStr < lo) ? lo : (hi && todayStr > hi) ? hi : todayStr;
   document.getElementById('emoBg').classList.remove('hidden');
 }
 function closeEarlyMoveOut() { document.getElementById('emoBg').classList.add('hidden'); }
