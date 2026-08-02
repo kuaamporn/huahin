@@ -922,6 +922,12 @@
         cats = cats.concat(['electricity', 'water', 'utility']);
       }
 
+      // Salary is owner-only. This just keeps the option out of the dropdown —
+      // the worker rejects the category regardless of what the client sends.
+      if (!HuaHinSession.hasRole('owner')) {
+        cats = cats.filter(function(c) { return !isConfidentialCat(c); });
+      }
+
       CURRENT_ITEMS.forEach(function(item, i) {
         var itemCats = cats.slice();
         if (item.category && itemCats.indexOf(item.category) === -1) {
@@ -1220,6 +1226,19 @@
       'electricity', 'water', 'water treatment', 'utility', 'repair', 'cleaning',
       'supplies', 'salaries', 'deposit_return', 'other'
     ];
+
+    // A subset of CONFIDENTIAL_CATEGORY_PATTERNS in worker.js — every entry here
+    // must exist there, enforced by scripts/test-confidential.mjs. This copy only
+    // tidies the dropdown; the worker is what actually withholds the rows, totals
+    // and item history, and it rejects the category whatever the client sends.
+    // The Thai pattern is deliberately server-side only: a Thai literal here is
+    // indistinguishable from untranslated UI text to test-nav-i18n.mjs, and a
+    // Thai-named category slipping into the dropdown is cosmetic, not a leak.
+    var CONFIDENTIAL_CATEGORY_PATTERNS = ['salary', 'salaries', 'payroll'];
+    function isConfidentialCat(category) {
+      var c = String(category || '').toLowerCase();
+      return CONFIDENTIAL_CATEGORY_PATTERNS.some(function(p) { return c.indexOf(p) >= 0; });
+    }
 
     
     function openFinanceModal(mode) {
