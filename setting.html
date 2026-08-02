@@ -147,11 +147,31 @@
       <div class="card-section">
         <h2 style="font-family:'Lexend',sans-serif; font-size:16px; margin-top:0; margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:8px;">Transaction Categories</h2>
 
-        <label>Revenue Categories (comma separated)</label>
-        <input type="text" id="revenue_categories" placeholder="e.g. rent, deposit, water, electricity, other" />
+        <p style="font-size:12px; color:var(--muted); margin:0 0 12px;">
+          Categories are stored in the category master. <strong>Changes here save immediately</strong> &mdash;
+          they are not part of &ldquo;Save Configuration&rdquo; below.
+          <em>Manual</em> = staff may pick it when adding a transaction (booking-generated
+          categories are unticked). <em>Active</em> = shown at all. A code can never be deleted,
+          only deactivated, because transactions keep referring to it.
+        </p>
 
-        <label>Expense Categories (comma separated)</label>
-        <input type="text" id="expense_categories" placeholder="e.g. utility, maintenance, salary, other" />
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <button type="button" class="btn-primary" id="cat-tab-OUT" onclick="switchCatTab('OUT')">Expense</button>
+          <button type="button" class="btn-primary" id="cat-tab-IN" onclick="switchCatTab('IN')">Revenue</button>
+        </div>
+
+        <div id="cat-status" style="font-size:12px; margin-bottom:8px;"></div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:13px;" id="cat-table">
+            <thead id="cat-thead"></thead>
+            <tbody id="cat-tbody"></tbody>
+          </table>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:12px; align-items:center;">
+          <input type="text" id="cat-new-code" placeholder="new category code" style="flex:1; margin:0;" />
+          <button type="button" class="btn-primary" onclick="addCategory()">Add</button>
+        </div>
       </div>
 
       <!-- Card 2.5: Notice & Warning Settings -->
@@ -273,7 +293,7 @@
   <script src="i18n.js?v=81febd36"></script>
   <script src="session.js?v=1c7dbdbc"></script>
   <script src="nav.js?v=7a0007ee"></script>
-  <script src="ui.js?v=5c737329"></script>
+  <script src="ui.js?v=4cfdb645"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
@@ -296,6 +316,7 @@
       loadSettings();
       loadOffices();
       initHolidays();
+      switchCatTab('OUT');
 
       document.getElementById('btn-save-settings').onclick = saveAllSettings;
     };
@@ -322,9 +343,123 @@
       'moment_company_address_th', 'moment_company_address_en',
       'moment_company_tax_id', 'moment_company_branch', 'moment_vat_reg_no', 'moment_company_tel',
       'moment_default_electricity_rate', 'moment_default_water_rate', 'moment_default_keycard_deposit',
-      'revenue_categories', 'expense_categories',
+      // 'revenue_categories' / 'expense_categories' were removed 2026-08-02 —
+      // they are now rows in transaction_categories, saved immediately below
+      // rather than batched with this list. See docs/design-transaction-category-master.md.
       'notice_strike_limit', 'notice_rolling_days', 'notice_categories'
     ];
+
+    // ---- Category master (transaction_categories, migration_31) -------------
+    // Rows save the instant a control changes, NOT via "Save Configuration".
+    // A confidentiality toggle left unsaved beside an unrelated Save button is a
+    // trap: you would tick it, walk away, and believe salary was hidden.
+    var CAT_DIR = 'OUT';
+    var CAT_ROWS = [];
+
+    function escCat(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function catStatus(msg, ok) {
+      var el = document.getElementById('cat-status');
+      el.textContent = msg || '';
+      el.className = ok === false ? 'error' : 'success';
+    }
+
+    window.switchCatTab = function(dir) {
+      CAT_DIR = dir;
+      ['IN', 'OUT'].forEach(function(d) {
+        document.getElementById('cat-tab-' + d).style.opacity = (d === dir) ? '1' : '0.5';
+      });
+      loadCategories();
+    };
+
+    function loadCategories() {
+      catStatus('Loading…');
+      apiCall('adminListTransactionCategories', [CAT_DIR]).then(function(res) {
+        if (!res.ok) { catStatus(res.error, false); return; }
+        CAT_ROWS = res.categories || [];
+        renderCategories();
+        catStatus('');
+      });
+    }
+
+    function renderCategories() {
+      var isIn = CAT_DIR === 'IN';
+      document.getElementById('cat-thead').innerHTML =
+        '<tr style="text-align:left; border-bottom:1px solid var(--line);">' +
+          '<th style="padding:6px;">Code</th>' +
+          '<th style="padding:6px;">Active</th>' +
+          '<th style="padding:6px;">Manual</th>' +
+          (isIn ? '<th style="padding:6px;">Is revenue</th><th style="padding:6px;">Report column</th>'
+                : '<th style="padding:6px;">🔒 Confidential</th>') +
+          '<th style="padding:6px;">Sort</th>' +
+        '</tr>';
+
+      var cols = ['room', 'furniture', 'electricity', 'water', 'daily', 'other'];
+      document.getElementById('cat-tbody').innerHTML = CAT_ROWS.map(function(r, i) {
+        // Code is static text: it is the primary key AND the value already stored
+        // on every historical transaction, so it can never be renamed.
+        return '<tr style="border-bottom:1px solid var(--line);">' +
+          '<td style="padding:6px; font-family:monospace;">' + escCat(r.code) + '</td>' +
+          '<td style="padding:6px;"><input type="checkbox" ' + (r.is_active ? 'checked' : '') +
+            ' onchange="saveCategory(' + i + ', \'is_active\', this.checked)"></td>' +
+          '<td style="padding:6px;"><input type="checkbox" ' + (r.is_manual ? 'checked' : '') +
+            ' onchange="saveCategory(' + i + ', \'is_manual\', this.checked)"></td>' +
+          (isIn
+            ? '<td style="padding:6px;"><input type="checkbox" ' + (r.is_revenue ? 'checked' : '') +
+                ' onchange="saveCategory(' + i + ', \'is_revenue\', this.checked)"></td>' +
+              '<td style="padding:6px;"><select ' + (r.is_revenue ? '' : 'disabled') +
+                ' onchange="saveCategory(' + i + ', \'report_column\', this.value)">' +
+                cols.map(function(c) {
+                  return '<option value="' + c + '"' + (r.report_column === c ? ' selected' : '') + '>' + c + '</option>';
+                }).join('') + '</select></td>'
+            : '<td style="padding:6px;"><input type="checkbox" ' + (r.is_confidential ? 'checked' : '') +
+                ' onchange="saveCategory(' + i + ', \'is_confidential\', this.checked)"></td>') +
+          '<td style="padding:6px;"><input type="number" value="' + (r.sort_order || 100) +
+            '" style="width:70px; margin:0;" onchange="saveCategory(' + i + ', \'sort_order\', this.value)"></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    window.saveCategory = function(i, field, value) {
+      var r = CAT_ROWS[i];
+      // Ticking Confidential hides data and is safe. UN-ticking exposes every
+      // historical row in that category at once, so only that direction asks.
+      if (field === 'is_confidential' && value === false) {
+        if (!confirm('Un-hide "' + r.code + '"?\n\nEvery past transaction in this category becomes visible to all finance staff immediately.')) {
+          renderCategories();
+          return;
+        }
+      }
+      r[field] = (field === 'sort_order') ? (parseInt(value, 10) || 100)
+               : (field === 'report_column') ? value
+               : (value ? 1 : 0);
+
+      catStatus('Saving ' + r.code + '…');
+      apiCall('adminSaveTransactionCategory', [r.code, CAT_DIR, {
+        isActive: !!r.is_active, isManual: !!r.is_manual, sortOrder: r.sort_order,
+        isConfidential: !!r.is_confidential, isRevenue: !!r.is_revenue,
+        reportColumn: r.report_column || 'other'
+      }]).then(function(res) {
+        if (!res.ok) { catStatus(res.error, false); loadCategories(); return; }
+        catStatus('Saved ' + r.code);
+        if (field === 'is_revenue') renderCategories();   // enables/disables the column picker
+      });
+    };
+
+    window.addCategory = function() {
+      var el = document.getElementById('cat-new-code');
+      var code = (el.value || '').trim().toLowerCase();
+      if (!code) return;
+      if (CAT_ROWS.some(function(r) { return r.code === code; })) { catStatus('"' + code + '" already exists', false); return; }
+      apiCall('adminSaveTransactionCategory', [code, CAT_DIR, {
+        isActive: true, isManual: true, sortOrder: 100,
+        isConfidential: false, isRevenue: CAT_DIR === 'IN', reportColumn: 'other'
+      }]).then(function(res) {
+        if (!res.ok) { catStatus(res.error, false); return; }
+        el.value = '';
+        loadCategories();
+      });
+    };
 
     function loadSettings() {
       apiCall('financeGetSettings').then(function(res) {

@@ -166,6 +166,16 @@
     'exp deposit': ['Expedia deposit', 'มัดจำ Expedia'],
     'damage_fee': ['Damage fee', 'ค่าเสียหาย'], 'fitness': ['Fitness', 'ฟิตเนส'],
     'breakfast': ['Breakfast', 'อาหารเช้า'],
+    // Registered in transaction_categories (migration_31) but unlabelled until
+    // 2026-08-02 — they rendered as raw English slugs in the Thai UI.
+    'as rent': ['AS rent', 'ค่าเช่า AS'],
+    'as deposit': ['AS deposit', 'มัดจำ AS'],
+    'tt rent': ['Thai Tour rent', 'ค่าเช่า Thai Tour'],
+    'tt deposit': ['Thai Tour deposit', 'มัดจำ Thai Tour'],
+    'card deposit': ['Card deposit', 'มัดจำคีย์การ์ด'],
+    'reservation': ['Reservation deposit', 'เงินจอง'],
+    'furniture': ['Furniture rent', 'ค่าเช่าเฟอร์นิเจอร์'],
+    'refund': ['Refund', 'เงินคืน'],
     // finance: expense categories
     'electricity': ['Electricity', 'ค่าไฟฟ้า'], 'water': ['Water', 'ค่าน้ำ'],
     'water treatment': ['Water treatment', 'ค่าบำบัดน้ำ'],

@@ -559,7 +559,7 @@
   <script src="i18n.js?v=81febd36"></script>
   <script src="session.js?v=1c7dbdbc"></script>
   <script src="nav.js?v=7a0007ee"></script>
-  <script src="ui.js?v=5c737329"></script>
+  <script src="ui.js?v=4cfdb645"></script>
   <script>
     // =====================================================================
     // CONFIG — must match the Worker URL used in index.html/rooms.html/hr.html
@@ -721,7 +721,15 @@
           }
         }
       });
-      callApi('financeGetVendors', [session.token]).then(res => { 
+      // Category master (migration_31). Both directions up front so opening the
+      // add dialog never waits on a fetch; a failure leaves CATEGORY_MASTER null
+      // and masterCats() falls back to the built-in arrays.
+      ['IN', 'OUT'].forEach(function(dir) {
+        callApi('financeGetCategories', [session.token, dir]).then(function(res) {
+          if (res.ok && res.categories && res.categories.length) CATEGORY_MASTER[dir] = res.categories;
+        });
+      });
+      callApi('financeGetVendors', [session.token]).then(res => {
         if(res.ok) {
           VENDORS = res.vendors;
           document.getElementById('fm-vendor-list').innerHTML = VENDORS.map(v => '<option value="'+escapeHtml(v.name || v)+'">').join('');
@@ -890,9 +898,11 @@
           // Category comes from the last time this description was used, which
           // is what keeps the same expense landing in the same category every
           // month without anyone having to remember. Only applied when it is a
-          // category this user may actually pick — never silently reinstate a
-          // confidential one — and the price still wins the round trip below.
-          if (match.category && !isConfidentialCat(match.category)) {
+          // category this user may actually pick — the master response already
+          // excludes confidential codes for non-owners, so this cannot silently
+          // reinstate one.
+          var pickable = masterCats(financeModalMode, false);
+          if (match.category && (!pickable || pickable.indexOf(match.category) >= 0)) {
             CURRENT_ITEMS[index].category = match.category;
           }
           CURRENT_ITEMS[index].unit_price = match.unit_price;
@@ -924,16 +934,17 @@
 
     function renderItems() {
       var html = '';
-      var cats = financeModalMode === 'revenue' ? REVENUE_CATS : EXPENSE_CATS;
+      // Adding a transaction offers only staff-selectable categories; editing
+      // keeps the full active set so a booking-generated row can still be
+      // corrected. Either way the row's own category is appended below if it is
+      // missing, so no existing value is ever silently changed.
+      var cats = masterCats(financeModalMode, editingTxnId === null);
 
-      if (financeModalMode === 'revenue' && cats.indexOf('electricity') === -1) {
-        cats = cats.concat(['electricity', 'water', 'utility']);
-      }
-
-      // Salary is owner-only. This just keeps the option out of the dropdown —
-      // the worker rejects the category regardless of what the client sends.
-      if (!HuaHinSession.hasRole('owner')) {
-        cats = cats.filter(function(c) { return !isConfidentialCat(c); });
+      if (!cats) {
+        cats = financeModalMode === 'revenue' ? REVENUE_CATS : EXPENSE_CATS;
+        if (financeModalMode === 'revenue' && cats.indexOf('electricity') === -1) {
+          cats = cats.concat(['electricity', 'water', 'utility']);
+        }
       }
 
       CURRENT_ITEMS.forEach(function(item, i) {
@@ -1235,17 +1246,21 @@
       'supplies', 'salaries', 'deposit_return', 'other'
     ];
 
-    // A subset of CONFIDENTIAL_CATEGORY_PATTERNS in worker.js — every entry here
-    // must exist there, enforced by scripts/test-confidential.mjs. This copy only
-    // tidies the dropdown; the worker is what actually withholds the rows, totals
-    // and item history, and it rejects the category whatever the client sends.
-    // The Thai pattern is deliberately server-side only: a Thai literal here is
-    // indistinguishable from untranslated UI text to test-nav-i18n.mjs, and a
-    // Thai-named category slipping into the dropdown is cosmetic, not a leak.
-    var CONFIDENTIAL_CATEGORY_PATTERNS = ['salary', 'salaries', 'payroll'];
-    function isConfidentialCat(category) {
-      var c = String(category || '').toLowerCase();
-      return CONFIDENTIAL_CATEGORY_PATTERNS.some(function(p) { return c.indexOf(p) >= 0; });
+    // Filled from financeGetCategories (transaction_categories, migration_31).
+    // The arrays above are only an offline fallback for the window before this
+    // resolves, or if the master is unreadable.
+    //
+    // No confidential-pattern list lives here any more: the worker omits
+    // confidential codes from this response for non-owners, so "what may I pick"
+    // and "what may I see" are one answer from one place.
+    var CATEGORY_MASTER = { IN: null, OUT: null };
+
+    function masterCats(mode, manualOnly) {
+      var dir = mode === 'revenue' ? 'IN' : 'OUT';
+      var rows = CATEGORY_MASTER[dir];
+      if (!rows || !rows.length) return null;               // fall back to the arrays
+      if (manualOnly) rows = rows.filter(function(r) { return r.is_manual; });
+      return rows.map(function(r) { return r.code; });
     }
 
     
