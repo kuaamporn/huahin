@@ -160,6 +160,16 @@
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
     function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+    // Prorate a monthly charge over a span that may cross a month boundary.
+    // Each calendar month is charged at its OWN daily rate — billing 2 Aug to
+    // 30 Sep at August's 6000/31 for all 59 days undercharges by 194, because
+    // 30 of those days belong to September (6000/30). Owner-confirmed
+    // convention 2026-08-02: per-month daily rate, not calendar-month + tail.
+    window.prorateSpan = function(base, daysThisMonth, daysInThisMonth, daysNextMonth, daysInNextMonth) {
+      if (!base) return 0;
+      return Math.round(base / daysInThisMonth * daysThisMonth + base / daysInNextMonth * daysNextMonth);
+    };
+
     window.onload = function() {
       document.getElementById('logout-link').addEventListener('click', function(e) { e.preventDefault(); HuaHinSession.logout(); });
 
@@ -289,19 +299,18 @@
 
                 if (checkoutDateStr >= monthEndTarget) return '';
 
-                // Prorate by ACTUAL days in the billing month (28/30/31), applied to
-                // both room rent and furniture rent. ponytail: the "+1 month" link
-                // reuses the same daysInMonth divisor across the span — a strict
-                // improvement over the old fixed /30; exact cross-month split TBD.
+                // Prorate by ACTUAL days in each calendar month the span covers
+                // (28/30/31), applied to both room rent and furniture rent.
                 var furn = r.furniture_rent || 0;
                 var curD = new Date(checkoutDateStr);
                 var nightsToMonthEnd = Math.round((new Date(monthEndTarget) - curD) / 86400000);
-                var proRentEnd = Math.round((r.rent / lastDay) * nightsToMonthEnd);
-                var proFurnEnd = Math.round((furn / lastDay) * nightsToMonthEnd);
+                var proRentEnd = prorateSpan(r.rent, nightsToMonthEnd, lastDay, 0, nextLastDay);
+                var proFurnEnd = prorateSpan(furn, nightsToMonthEnd, lastDay, 0, nextLastDay);
 
                 var nightsToNextMonthEnd = Math.round((new Date(nextMonthEndTarget) - curD) / 86400000);
-                var proRentNext = Math.round((r.rent / lastDay) * nightsToNextMonthEnd);
-                var proFurnNext = Math.round((furn / lastDay) * nightsToNextMonthEnd);
+                var tailDays = nightsToNextMonthEnd - nightsToMonthEnd;
+                var proRentNext = prorateSpan(r.rent, nightsToMonthEnd, lastDay, tailDays, nextLastDay);
+                var proFurnNext = prorateSpan(furn, nightsToMonthEnd, lastDay, tailDays, nextLastDay);
 
                 return '<div style="font-size:10px; margin-top:4px; line-height:1.2; text-align:left;">' +
                   '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRentEnd + ', ' + proFurnEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">' + t('billing.align_end') + ' (฿' + proRentEnd.toLocaleString() + ')</a><br>' +
