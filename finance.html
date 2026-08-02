@@ -1491,6 +1491,9 @@
       document.getElementById('fm-invoice-error').classList.add('hidden');
 
       if (t.direction === 'IN') {
+        // Types already issued for this txn, from the receipt-no prefix (RR6907-003 -> RR).
+        var issuedTypes = (t.receipt_no || '').split(',').map(function(s) { return s.trim().slice(0, 2); }).filter(Boolean);
+
         if (t.receipt_no) {
           printReceiptBtn.classList.add('hidden');
           var receiptNos = t.receipt_no.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
@@ -1509,8 +1512,10 @@
               printReceiptBtn.parentNode.insertBefore(btn, printReceiptBtn);
             });
           }
-        } else {
-          receiptGenSection.classList.remove('hidden');
+        }
+
+        {
+          // -- receipt issuing --
           document.getElementById('fm-receipt-date').value = t.txn_date || todayDateStringForInput();
 
           var typeSelect = document.getElementById('fm-receipt-type');
@@ -1538,15 +1543,25 @@
           // into separate documents; deposits are always RA. At The Precious
           // (no VAT) RR carries rent + other. See docs/design-vat-wht-doctypes.md.
           var isMoment = (t.property_id === 'moment');
-          var splitTypes = [];
+          var allTypes = [];
           if (isMoment) {
-            if (hasRent) splitTypes.push('RR');
-            if (hasOther) splitTypes.push('RM');
-            if (hasDeposit) splitTypes.push('RA');
+            if (hasRent) allTypes.push('RR');
+            if (hasOther) allTypes.push('RM');
+            if (hasDeposit) allTypes.push('RA');
           } else {
-            if (hasRent || hasOther) splitTypes.push('RR');
-            if (hasDeposit) splitTypes.push('RA');
+            if (hasRent || hasOther) allTypes.push(typeSelect.value === 'RD' ? 'RD' : 'RR');
+            if (hasDeposit) allTypes.push('RA');
           }
+          // Only offer the documents this transaction still owes. Without this,
+          // issuing RR first on a rent+deposit txn hid the section and the RA
+          // could never be issued (the worker always allowed it — see
+          // findActiveReceiptForTxn, which is per-type).
+          var splitTypes = allTypes.filter(function(ty) { return issuedTypes.indexOf(ty) < 0; });
+          if (allTypes.length === 0 && issuedTypes.length === 0) splitTypes = [typeSelect.value];
+          if (splitTypes.length > 0) {          // otherwise every document is issued
+
+          receiptGenSection.classList.remove('hidden');
+          if (splitTypes.indexOf(typeSelect.value) < 0) typeSelect.value = splitTypes[0];
 
           var genBtn = document.getElementById('fm-generate-receipt-btn');
           genBtn.textContent = (splitTypes.length > 1) ? HuaHinI18n.t('fin.gen_receipt_only') : HuaHinI18n.t('fin.gen_receipt');
@@ -1657,6 +1672,7 @@
               errorEl.classList.remove('hidden');
             });
           };
+          }
         }
 
         if (t.invoice_no) {
