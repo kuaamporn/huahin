@@ -160,6 +160,14 @@
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
     function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+    // 'YYYY-MM-DD' -> 'DD/MM/YYYY' Buddhist Era, matching receipt.html, invoice.html
+    // and the rent-line descriptions the worker writes.
+    function formatBE(dateStr) {
+      var p = String(dateStr || '').split('-');
+      if (p.length !== 3) return dateStr || '';
+      return p[2] + '/' + p[1] + '/' + (parseInt(p[0], 10) + 543);
+    }
+
     // Prorate a monthly charge over a span that may cross a month boundary.
     // Each calendar month is charged at its OWN daily rate — billing 2 Aug to
     // 30 Sep at August's 6000/31 for all 59 days undercharges by 194, because
@@ -312,9 +320,20 @@
                 var proRentNext = prorateSpan(r.rent, nightsToMonthEnd, lastDay, tailDays, nextLastDay);
                 var proFurnNext = prorateSpan(furn, nightsToMonthEnd, lastDay, tailDays, nextLastDay);
 
-                return '<div style="font-size:10px; margin-top:4px; line-height:1.2; text-align:left;">' +
-                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRentEnd + ', ' + proFurnEnd + ', \'' + monthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">' + t('billing.align_end') + ' (฿' + proRentEnd.toLocaleString() + ')</a><br>' +
-                  '<a href="#" onclick="applyGridProRate(' + idx + ', ' + proRentNext + ', ' + proFurnNext + ', \'' + nextMonthEndTarget + '\'); return false;" style="color:var(--go); text-decoration:underline;">' + t('billing.align_next') + ' (฿' + proRentNext.toLocaleString() + ')</a>' +
+                // Each option states the period it bills, so the amount can be
+                // checked against real dates before it is applied. Same
+                // Buddhist-Era format the rent line ends up carrying.
+                var opt = function(label, rentAmt, furnAmt, target) {
+                  return '<div style="margin-bottom:3px;">' +
+                      '<a href="#" onclick="applyGridProRate(' + idx + ', ' + rentAmt + ', ' + furnAmt + ', \'' + target + '\'); return false;" style="color:var(--go); text-decoration:underline;">' +
+                        label + ' (฿' + rentAmt.toLocaleString() + ')</a>' +
+                      '<div style="color:var(--muted); white-space:nowrap;">' + formatBE(checkoutDateStr) + ' - ' + formatBE(target) + '</div>' +
+                    '</div>';
+                };
+
+                return '<div style="font-size:10px; margin-top:4px; line-height:1.3; text-align:left;">' +
+                  opt(t('billing.align_end'), proRentEnd, proFurnEnd, monthEndTarget) +
+                  opt(t('billing.align_next'), proRentNext, proFurnNext, nextMonthEndTarget) +
                 '</div>';
               })() +
               '<div style="font-size:10px; margin-top:4px; text-align:left; color:var(--muted);">' + t('billing.furniture') +
