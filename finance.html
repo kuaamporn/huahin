@@ -41,6 +41,9 @@
     .card-section:hover { box-shadow: 0 8px 16px rgba(0,0,0,.05); }
     .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
     .actions-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+    .ftabs { display: flex; gap: 3px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 3px; margin-bottom: 12px; }
+    .ftab { flex: 1; text-align: center; padding: 8px 10px; border-radius: 9px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
+    .ftab.active { background: var(--go); color: #fff; }
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.4);
       display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100;
@@ -190,6 +193,12 @@
         <input id="finance-search" type="text" data-i18n-attr="placeholder:fin.search_ph" placeholder="ค้นหารายการ..." style="max-width:250px;" />
         <button id="btn-tt-batch-receipt" class="hidden btn-secondary" style="font-weight:600;border-color:#0F766E;color:#0F766E;" onclick="openTtBatchReceipt()" data-i18n="fin.tt_batch">🧾 ใบเสร็จรวม Thai Tour</button>
         <button id="finance-export-csv-btn" style="margin-left:auto;" data-i18n="fin.export_csv">ส่งออก CSV</button>
+      </div>
+
+      <div class="ftabs">
+        <div class="ftab active" id="dtab-all" onclick="switchDirTab('all')" data-i18n="fin.tab_all">ทั้งหมด</div>
+        <div class="ftab" id="dtab-IN" onclick="switchDirTab('IN')" data-i18n="fin.tab_revenue">รายรับ</div>
+        <div class="ftab" id="dtab-OUT" onclick="switchDirTab('OUT')" data-i18n="fin.tab_expense">รายจ่าย</div>
       </div>
 
       <div style="overflow-x: auto;">
@@ -557,7 +566,7 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=81febd36"></script>
+  <script src="i18n.js?v=0cb8542b"></script>
   <script src="session.js?v=1c7dbdbc"></script>
   <script src="nav.js?v=7a0007ee"></script>
   <script src="ui.js?v=4cfdb645"></script>
@@ -1139,11 +1148,25 @@
       });
     }
 
+    // Revenue / Expense tabs. Filters the table only — the stat cards above stay
+    // whole-month totals, which is what they're for.
+    var financeDirTab = 'all';
+    function switchDirTab(dir) {
+      financeDirTab = dir;
+      ['all', 'IN', 'OUT'].forEach(function (d) {
+        document.getElementById('dtab-' + d).classList.toggle('active', d === dir);
+      });
+      currentPage = 1;
+      renderFinanceTable();
+    }
+
     function getFilteredTransactions() {
       var q = document.getElementById('finance-search').value.trim().toLowerCase();
       var statusFilter = document.getElementById('finance-status-filter').value;
 
       return TRANSACTIONS.filter(function(t) {
+        if (financeDirTab !== 'all' && t.direction !== financeDirTab) return false;
+
         var matchSearch = true;
         if (q) {
           var searchStr = (
@@ -2502,7 +2525,8 @@
     function showAllPendingFromSlip() {
       closeSlipModal();
       document.getElementById('finance-status-filter').value = 'pending-approval';
-      renderFinanceTable();
+      // Reset the direction tab too, or "show all pending" silently hides half of them.
+      switchDirTab('all');
     }
 
     // Hand off to the existing approve modal, pre-filling ref + bank channel from the slip.
