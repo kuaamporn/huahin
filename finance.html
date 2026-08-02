@@ -887,6 +887,14 @@
       if (field === 'description' && financeModalMode === 'expense') {
         var match = PREV_ITEMS.find(function(i) { return i.description.toLowerCase() === value.toLowerCase(); });
         if (match) {
+          // Category comes from the last time this description was used, which
+          // is what keeps the same expense landing in the same category every
+          // month without anyone having to remember. Only applied when it is a
+          // category this user may actually pick — never silently reinstate a
+          // confidential one — and the price still wins the round trip below.
+          if (match.category && !isConfidentialCat(match.category)) {
+            CURRENT_ITEMS[index].category = match.category;
+          }
           CURRENT_ITEMS[index].unit_price = match.unit_price;
           updateItemField(index, 'unit_price', match.unit_price);
         }
