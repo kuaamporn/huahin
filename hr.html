@@ -264,7 +264,7 @@
         <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.emp_vacation_days">วันลาพักร้อน/ปี</th><th data-i18n="hr.emp_day_off">วันหยุดประจำสัปดาห์</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
+            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.emp_vacation_days">วันลาพักร้อน/ปี</th><th data-i18n="hr.emp_extra_vacation_days">วันลาพิเศษ</th><th data-i18n="hr.emp_day_off">วันหยุดประจำสัปดาห์</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
@@ -480,7 +480,7 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=d74e717d"></script>
+  <script src="i18n.js?v=9540bb48"></script>
   <script src="session.js?v=1c7dbdbc"></script>
   <script src="nav.js?v=059149d8"></script>
   <script src="ui.js?v=4cfdb645"></script>
@@ -835,29 +835,37 @@
             // Yearly vacation allowance (migration_32), owner-only — this whole
             // tab is owner-gated. Adds to the company-holiday and day-off-shortfall
             // credits; staff see the resulting total as read-only on index.html.
-            var tdVac = document.createElement('td');
-            var vacInput = document.createElement('input');
-            vacInput.type = 'number';
-            vacInput.min = '0';
-            vacInput.max = '365';
-            vacInput.step = '1';
-            vacInput.value = emp.vacationDays || 0;
-            vacInput.style.width = '70px';
-            vacInput.style.padding = '4px 6px';
-            vacInput.setAttribute('aria-label', t('hr.emp_vacation_days') + ' — ' + emp.name);
-            vacInput.addEventListener('change', function() {
-              var prev = emp.vacationDays || 0;
-              vacInput.disabled = true;
-              callApi('adminSetEmployeeVacationDays', [token, emp.employeeId, vacInput.value])
-                .then(function(res) {
-                  if (!res.ok) { vacInput.value = prev; alert(res.error); return; }
-                  emp.vacationDays = res.vacationDays;
-                  vacInput.value = res.vacationDays;
-                })
-                .catch(function(err) { vacInput.value = prev; alert(t('hr.err_network') + err.message); })
-                .then(function() { vacInput.disabled = false; });
-            });
-            tdVac.appendChild(vacInput);
+            // Two vacation buckets (migration_34): the standard entitlement and
+            // the owner-granted bonus. Same widget twice — `which` picks the
+            // column server-side from a fixed map, never from this string.
+            function vacationCell(which, field, label) {
+              var td = document.createElement('td');
+              var input = document.createElement('input');
+              input.type = 'number';
+              input.min = '0';
+              input.max = '365';
+              input.step = '1';
+              input.value = emp[field] || 0;
+              input.style.width = '70px';
+              input.style.padding = '4px 6px';
+              input.setAttribute('aria-label', label + ' — ' + emp.name);
+              input.addEventListener('change', function() {
+                var prev = emp[field] || 0;
+                input.disabled = true;
+                callApi('adminSetEmployeeVacationDays', [token, emp.employeeId, input.value, which])
+                  .then(function(res) {
+                    if (!res.ok) { input.value = prev; alert(res.error); return; }
+                    emp[field] = res.vacationDays;
+                    input.value = res.vacationDays;
+                  })
+                  .catch(function(err) { input.value = prev; alert(t('hr.err_network') + err.message); })
+                  .then(function() { input.disabled = false; });
+              });
+              td.appendChild(input);
+              return td;
+            }
+            var tdVac = vacationCell('base', 'vacationDays', t('hr.emp_vacation_days'));
+            var tdExtraVac = vacationCell('extra', 'extraVacationDays', t('hr.emp_extra_vacation_days'));
 
             // Weekly day off (migration_33). Effective-dated: the change is saved
             // against the shared date above the table, never retroactively, so
@@ -901,6 +909,7 @@
               '<td>' + statusLabel + '</td>';
             tr.appendChild(tdLang);
             tr.appendChild(tdVac);
+            tr.appendChild(tdExtraVac);
             tr.appendChild(tdDayOff);
             tr.appendChild(tdAction);
             tbody.appendChild(tr);
