@@ -253,10 +253,18 @@
       <div class="card-section">
         <h2 data-i18n="hr.emp_all_h2">พนักงานทั้งหมด</h2>
         <button id="refresh-employees-btn" style="margin-bottom:12px;" data-i18n="hr.refresh_list">รีเฟรชรายการ</button>
+        <!-- One shared effective date for the whole tab: the normal use is the
+             December round, where the owner sets it once to 1 Jan and then works
+             down the rows. Every day-off change below is saved with this date. -->
+        <div style="margin-bottom:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <label for="dayoff-effective-from" style="margin:0;" data-i18n="hr.dayoff_effective_from">วันหยุดใหม่มีผลตั้งแต่</label>
+          <input type="date" id="dayoff-effective-from" style="width:auto; padding:6px 10px;" />
+          <span class="muted" style="font-size:12px;" data-i18n="hr.dayoff_effective_note">ใช้กับทุกการเปลี่ยนวันหยุดด้านล่าง — ย้อนหลังไม่ได้</span>
+        </div>
         <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.emp_vacation_days">วันลาพักร้อน/ปี</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
+            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.emp_vacation_days">วันลาพักร้อน/ปี</th><th data-i18n="hr.emp_day_off">วันหยุดประจำสัปดาห์</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
@@ -472,7 +480,7 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=53ff9a22"></script>
+  <script src="i18n.js?v=9e6efcb8"></script>
   <script src="session.js?v=1c7dbdbc"></script>
   <script src="nav.js?v=059149d8"></script>
   <script src="ui.js?v=4cfdb645"></script>
@@ -759,6 +767,16 @@
       });
     };
 
+    // Default the shared effective date to today — the mid-year correction case.
+    // For the December round the owner retypes it as 1 January.
+    (function seedDayOffDate() {
+      var el = document.getElementById('dayoff-effective-from');
+      var now = new Date();
+      el.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') +
+        '-' + String(now.getDate()).padStart(2, '0');
+      el.min = el.value;
+    })();
+
     function loadEmployees() {
       callApi('adminListEmployees', [token]).then(function(res) {
         if (!res.ok) {
@@ -841,6 +859,40 @@
             });
             tdVac.appendChild(vacInput);
 
+            // Weekly day off (migration_33). Effective-dated: the change is saved
+            // against the shared date above the table, never retroactively, so
+            // past attendance reports keep whatever schedule they were computed
+            // with. The server rejects a past date outright.
+            var tdDayOff = document.createElement('td');
+            var dayOffSel = document.createElement('select');
+            dayOffSel.style.padding = '4px 6px';
+            dayOffSel.setAttribute('aria-label', t('hr.emp_day_off') + ' — ' + emp.name);
+            for (var w = 0; w < 7; w++) {
+              var dOpt = document.createElement('option');
+              dOpt.value = String(w);
+              dOpt.textContent = t('index.dow.' + w);
+              if (emp.dayOffWday === w) dOpt.selected = true;
+              dayOffSel.appendChild(dOpt);
+            }
+            dayOffSel.addEventListener('change', function() {
+              var prev = String(emp.dayOffWday);
+              var from = document.getElementById('dayoff-effective-from').value;
+              if (!from) {
+                dayOffSel.value = prev;
+                alert(t('hr.dayoff_need_date'));
+                return;
+              }
+              dayOffSel.disabled = true;
+              callApi('adminSetEmployeeDayOff', [token, emp.employeeId, dayOffSel.value, from])
+                .then(function(res) {
+                  if (!res.ok) { dayOffSel.value = prev; alert(res.error); return; }
+                  emp.dayOffWday = res.wday;
+                })
+                .catch(function(err) { dayOffSel.value = prev; alert(t('hr.err_network') + err.message); })
+                .then(function() { dayOffSel.disabled = false; });
+            });
+            tdDayOff.appendChild(dayOffSel);
+
             var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ ' + t('hr.termination_warning') + '</span>' : '';
             tr.innerHTML =
               '<td>' + emp.name + warningBadge + '</td>' +
@@ -849,6 +901,7 @@
               '<td>' + statusLabel + '</td>';
             tr.appendChild(tdLang);
             tr.appendChild(tdVac);
+            tr.appendChild(tdDayOff);
             tr.appendChild(tdAction);
             tbody.appendChild(tr);
           });
