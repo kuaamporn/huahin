@@ -23,6 +23,7 @@
   // revenue/expense roles that migration_28 removed.
   var NAV_ITEMS = [
     { id: 'home',      href: 'index.html',     key: 'nav.home',      roles: null },
+    { id: 'account',   href: 'index.html#account', key: 'nav.account', roles: null },
     { id: 'rooms',     href: 'rooms.html',     key: 'nav.rooms',     roles: ['owner', 'frontdesk'] },
     { id: 'finance',   href: 'finance.html',   key: 'nav.finance',   roles: ['owner', 'accountant', 'frontdesk'] },
     { id: 'billing',   href: 'billing.html',   key: 'nav.billing',   roles: ['owner', 'accountant'] },

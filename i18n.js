@@ -233,6 +233,7 @@
       'month.short.8': 'Aug',
       'month.short.9': 'Sep',
       'nav.home': 'Home',
+      'nav.account': 'My account',
       'nav.rooms': 'Rooms',
       'nav.finance': 'Finance',
       'nav.billing': 'Billing',
@@ -247,6 +248,7 @@
       'nav.lang_th': 'ไทย',
       'nav.lang_switch': 'Change language',
       'hr.emp_lang': 'Language',
+      'hr.emp_vacation_days': 'Vacation days / year',
       'hr.emp_lang_none': '— default (Thai) —',
 
       // --- billing.html (slice 2) ---
@@ -1233,6 +1235,7 @@
       'month.short.8': 'ส.ค.',
       'month.short.9': 'ก.ย.',
       'nav.home': 'ลงเวลา',
+      'nav.account': 'บัญชีของฉัน',
       'nav.rooms': 'ผังห้องพัก',
       'nav.finance': 'การเงิน',
       'nav.billing': 'วางบิล',
@@ -1249,6 +1252,7 @@
       'nav.lang_th': 'ไทย',
       'nav.lang_switch': 'เปลี่ยนภาษา',
       'hr.emp_lang': 'ภาษา',
+      'hr.emp_vacation_days': 'วันลาพักร้อน/ปี',
       'hr.emp_lang_none': '— ค่าเริ่มต้น (ไทย) —',
 
       // --- billing.html (slice 2) ---
