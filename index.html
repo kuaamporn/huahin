@@ -365,7 +365,7 @@
   </div>
 
   <!-- QR scanning library (lightweight, free, no API key needed) -->
-  <script src="i18n.js?v=9540bb48"></script>
+  <script src="i18n.js?v=a6387fdc"></script>
   <script src="session.js?v=1c7dbdbc"></script>
   <script src="nav.js?v=059149d8"></script>
   <script src="ui.js?v=4cfdb645"></script>
@@ -621,6 +621,9 @@
           (v.pendingDays ? t('index.vac_pending', v.pendingDays) : '') +
           '<div class="muted" style="font-size:12px; margin-top:4px;">' +
             t('index.vac_breakdown', v.holidayDays, v.baseDays, v.extraDays) +
+            // Only shown when actually owed — it is 0 for anyone whose weekly day
+            // off never moved, which is almost everyone, almost always.
+            (v.shortfallDays ? t('index.vac_shortfall', v.shortfallDays) : '') +
           '</div>';
         renderDayOffSchedule(res);
 
