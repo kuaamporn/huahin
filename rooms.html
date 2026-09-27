@@ -119,6 +119,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 .bar{position:absolute;top:3px;bottom:3px;border-radius:4px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5;cursor:pointer;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .bar:hover{filter:brightness(1.1);z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .bar.monthly{background:linear-gradient(90deg,#2563EB,#3B82F6)}
+.bar.lease-open{-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}
 .bar.monthly-draft{background:repeating-linear-gradient(45deg, #93C5FD, #93C5FD 10px, #BFDBFE 10px, #BFDBFE 20px); border: 1px dashed #2563EB; color: #1E3A8A; opacity: 0.8;}
 .bar.walkin{background:linear-gradient(90deg,#15803D,#22C55E);color:#fff}
 .bar.reserved{background:linear-gradient(90deg,#B45309,#F59E0B);color:#fff}
@@ -216,6 +217,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
         <button class="btn btn-p" id="addBtn" onclick="openBook()" data-i18n="rooms.new_booking_btn">＋ จองห้องใหม่</button>
         <button class="btn btn-o hidden" id="companiesBtn" onclick="openCompaniesModal()" data-i18n="rooms.companies">🏢 บริษัท</button>
         <button class="btn btn-o hidden" id="roomDetailsBtn" onclick="openRoomDetailsModal()" data-i18n="rooms.room_details">🛏 ข้อมูลห้อง</button>
+        <button class="btn btn-o hidden" id="longStayBtn" onclick="openLongStays()" data-i18n="rooms.long_stays">📅 ผู้เช่าระยะยาว</button>
         <div class="timeline-nav">
           <button class="btn btn-o" onclick="shiftTimeline(-30)">◀</button>
           <button class="btn btn-o" onclick="jumpToday()" data-i18n="rooms.today">วันนี้</button>
@@ -372,6 +374,23 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
     <div class="frow hidden" id="mFurnWrapper">
       <div class="fg"><label class="fl" data-i18n="rooms.furniture">ค่าเฟอร์นิเจอร์ (฿/เดือน)</label><input class="fi" type="number" id="mFurn" min="0" value="0"></div>
     </div>
+    <div class="hidden" id="mLeaseWrapper">
+      <div class="frow">
+        <div class="fg"><label class="fl" data-i18n="rooms.lease_type">ประเภทสัญญา</label>
+          <select class="fs" id="mLeaseType" onchange="onLeaseChange()">
+            <option value="fixed" data-i18n="rooms.lease_fixed">กำหนดระยะเวลา (เช็คเอาท์ = สิ้นสุดสัญญา)</option>
+            <option value="open" data-i18n="rooms.lease_open">ไม่กำหนด (จนกว่าจะแจ้งออก)</option>
+          </select></div>
+        <div class="fg"><label class="fl" data-i18n="rooms.first_period_end">รอบชำระแรกถึงวันที่</label>
+          <input class="fi" type="date" id="mFirstEnd" onchange="calcP()">
+          <div style="font-size:11px; margin-top:4px;">
+            <a href="#" onclick="setFirstEnd('month'); return false;" data-i18n="rooms.fp_month_end">สิ้นเดือนนี้</a> ·
+            <a href="#" onclick="setFirstEnd('next'); return false;" data-i18n="rooms.fp_next_end">สิ้นเดือนหน้า</a> ·
+            <a href="#" onclick="setFirstEnd('cycle'); return false;" data-i18n="rooms.fp_cycle">1 เดือน</a>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="fg"><label class="fl" data-i18n="rooms.notes">หมายเหตุ</label><textarea class="fta" id="mNotes"></textarea></div>
     <div class="pbox" id="pbox">
       <div class="prow"><span><span data-i18n="rooms.p_duration">ระยะเวลา</span></span><span id="pDur">-</span></div>
@@ -527,7 +546,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="i18n.js?v=30608e62"></script>
+<script src="i18n.js?v=e6039371"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
 <script src="ui.js?v=c2a21efc"></script>
@@ -557,6 +576,145 @@ var activeProp = 'precious';
 var activeFloor = 'all';
 var searchQ = '';
 var selBT = 'monthly';
+// Long-stay lease on new monthly bookings (docs/design-long-stay-leases.md).
+// extendMode = the legacy "Extend stay" flow for not-yet-converted tenants, which stays month-by-month.
+var extendMode = false;
+var leaseRentPreview = { key: '', rent: null };
+
+function fmtBE(ds) {
+  if (!ds) return '';
+  var p = ds.slice(0, 10).split('-');
+  return p[2] + '/' + p[1] + '/' + (parseInt(p[0], 10) + 543);
+}
+function leaseLine(b) {
+  if (b.endConfirmed) return t('rooms.lease_moving_out', fmtBE(b.checkoutDate));
+  if (b.leaseType === 'open') return t('rooms.lease_open_short');
+  return t('rooms.lease_fixed_until', fmtBE(b.checkoutDate));
+}
+
+// Set move-out date / withdraw notice / renew — one dialog, roomsSetLeaseEnd.
+var leaseEndTarget = null;
+function openLeaseEnd(id) {
+  var b = bookings.find(function(x) { return x.bookingId === id; }) ||
+          (window.longStayRows || []).find(function(x) { return x.bookingId === id; });
+  if (!b) return;
+  leaseEndTarget = id;
+  document.getElementById('leTitle').textContent = (b.guestName || '') + ' — ' + leaseLine(b);
+  var sel = document.getElementById('leAction');
+  sel.querySelector('option[value="withdraw"]').hidden = !b.endConfirmed;
+  sel.value = 'notice';
+  document.getElementById('leDate').value = b.endConfirmed ? (b.checkoutDate || '').slice(0, 10) : '';
+  onLeaseEndAction();
+  document.getElementById('leaseEndBg').classList.remove('hidden');
+}
+function onLeaseEndAction() {
+  var a = document.getElementById('leAction').value;
+  document.getElementById('leDateWrap').classList.toggle('hidden', a === 'withdraw' || a === 'open');
+}
+function closeLeaseEnd(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('leaseEndBg').classList.add('hidden');
+}
+function saveLeaseEnd() {
+  var a = document.getElementById('leAction').value;
+  var d = document.getElementById('leDate').value;
+  if ((a === 'notice' || a === 'newEnd') && !d) { showToast(t('rooms.enter_dates'), 'err'); return; }
+  callApi('roomsSetLeaseEnd', [sessionToken, leaseEndTarget, a, d || null]).then(function(res) {
+    if (!res.ok) { showToast(res.error || t('rooms.note_save_failed'), 'err'); return; }
+    closeLeaseEnd();
+    closeDetail();
+    showToast(t('rooms.lease_saved'), 'ok');
+    bootApp();
+    if (!document.getElementById('longStayBg').classList.contains('hidden')) openLongStays();
+  });
+}
+
+// ---- Long-stay tenant list + one-time conversion (roomsListLongStays / roomsConvertLease) ----
+window.longStayRows = [];
+var longStayUnconverted = [];
+function openLongStays() {
+  document.getElementById('longStayBg').classList.remove('hidden');
+  document.getElementById('lsBody').innerHTML = '<div class="muted" style="padding:16px;text-align:center">' + t('rooms.loading_history') + '</div>';
+  callApi('roomsListLongStays', [sessionToken]).then(function(res) {
+    if (!res.ok) { document.getElementById('lsBody').innerHTML = '<div class="error">' + escapeHtml(res.error) + '</div>'; return; }
+    window.longStayRows = res.leases;
+    longStayUnconverted = res.unconverted;
+    renderLongStays();
+  });
+}
+function closeLongStays(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('longStayBg').classList.add('hidden');
+}
+function renderLongStays() {
+  var openOnly = document.getElementById('lsOpenOnly').checked;
+  var rows = window.longStayRows.filter(function(l) { return !openOnly || (l.leaseType === 'open' && !l.endConfirmed); });
+  var th = 'style="text-align:left;padding:6px 8px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)"';
+  var td = 'style="padding:6px 8px;font-size:12px;border-bottom:1px solid var(--line)"';
+  var html = '<table style="width:100%;border-collapse:collapse"><tr>' +
+    '<th ' + th + '>' + t('rooms.d_room') + '</th><th ' + th + '>' + t('rooms.ls_tenant') + '</th><th ' + th + '>' + t('rooms.d_lease') + '</th>' +
+    '<th ' + th + '>' + t('rooms.d_billed_through') + '</th><th ' + th + '>' + t('rooms.ls_last_invoice') + '</th><th ' + th + '></th></tr>';
+  rows.forEach(function(l) {
+    html += '<tr><td ' + td + '><strong>' + escapeHtml(l.roomName) + '</strong></td><td ' + td + '>' + escapeHtml(l.guestName || '') + '</td>' +
+      '<td ' + td + '>' + leaseLine(l) + '</td><td ' + td + '>' + (l.billedThrough ? fmtBE(l.billedThrough) : '-') + '</td>' +
+      '<td ' + td + '>' + (l.lastInvoiceStatus ? tv(l.lastInvoiceStatus) : '-') + '</td>' +
+      '<td ' + td + '><a href="#" onclick="openLeaseEnd(\'' + l.bookingId + '\');return false;">' + t('rooms.btn_set_moveout') + '</a></td></tr>';
+  });
+  if (!rows.length) html += '<tr><td ' + td + ' colspan="6">' + t('rooms.ls_none') + '</td></tr>';
+  html += '</table>';
+
+  if (longStayUnconverted.length) {
+    html += '<h3 style="font-size:14px;margin:18px 0 4px">' + t('rooms.ls_convert_h') + '</h3>' +
+      '<div class="muted" style="font-size:12px;margin-bottom:8px">' + t('rooms.ls_convert_help') + '</div>';
+    longStayUnconverted.forEach(function(u, i) {
+      var chain = u.chain.map(function(c) { return fmtBE(c.checkinDate); }).join(' → ') + ' → ' + fmtBE(u.billedThrough);
+      html += '<div style="border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;font-size:12px">' +
+        '<div><strong>' + escapeHtml(u.roomName) + '</strong> · ' + escapeHtml(u.guestName || '') + ' · ' + t('rooms.ls_bookings', u.chain.length) + '</div>' +
+        '<div class="muted" style="margin:4px 0 8px">' + chain + ' · ' + t('rooms.d_billed_through') + ' ' + fmtBE(u.billedThrough) + '</div>' +
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+          '<select class="fs" id="cvType' + i + '" onchange="document.getElementById(\'cvEnd' + i + '\').classList.toggle(\'hidden\', this.value===\'open\')" style="padding:6px;border-radius:8px;width:auto">' +
+            '<option value="fixed">' + t('rooms.lease_fixed_short') + '</option><option value="open">' + t('rooms.lease_open_short') + '</option></select>' +
+          '<input class="fi" type="date" id="cvEnd' + i + '" style="padding:6px;border-radius:8px;width:auto">' +
+          '<button class="btn btn-m" onclick="convertLease(' + i + ')">' + t('rooms.ls_convert_btn') + '</button>' +
+        '</div></div>';
+    });
+  }
+  document.getElementById('lsBody').innerHTML = html;
+}
+function convertLease(i) {
+  var u = longStayUnconverted[i];
+  var type = document.getElementById('cvType' + i).value;
+  var end = document.getElementById('cvEnd' + i).value;
+  if (type === 'fixed' && !end) { showToast(t('rooms.enter_dates'), 'err'); return; }
+  callApi('roomsConvertLease', [sessionToken, u.bookingId, type, type === 'fixed' ? end : null]).then(function(res) {
+    if (!res.ok) { showToast(res.error, 'err'); return; }
+    showToast(t('rooms.ls_converted', u.roomName), 'ok');
+    bootApp();
+    openLongStays();
+  });
+}
+
+function leaseActive() { return selBT === 'monthly' && !extendMode && document.getElementById('mAction').value === 'book'; }
+function onLeaseChange() {
+  var open = leaseActive() && document.getElementById('mLeaseType').value === 'open';
+  document.getElementById('mOut').disabled = open;
+  document.getElementById('mNights').disabled = open;
+  calcP();
+}
+function setFirstEnd(kind) {
+  var ci = document.getElementById('mIn').value;
+  if (!ci) return;
+  var d = pd(ci), out;
+  if (kind === 'month') out = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  else if (kind === 'next') out = new Date(d.getFullYear(), d.getMonth() + 2, 0);
+  else { out = new Date(d); out.setMonth(out.getMonth() + 1); out.setDate(out.getDate() - 1); } // 15 Oct → 14 Nov: next cycle starts on the 15th
+  document.getElementById('mFirstEnd').value = dk(out);
+  calcP();
+}
+function syncLeaseUi() {
+  document.getElementById('mLeaseWrapper').classList.toggle('hidden', !leaseActive());
+  onLeaseChange();
+}
 
 var TODAY = new Date(); TODAY.setHours(0,0,0,0);
 var WIN_S = new Date(TODAY); WIN_S.setDate(WIN_S.getDate()-60);
@@ -643,6 +801,7 @@ if (session) {
   // manageCompany roles: owner, frontdesk, revenue, accountant
   if (HuaHinSession.hasRole('owner', 'frontdesk', 'accountant')) document.getElementById('companiesBtn').classList.remove('hidden');
   if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('roomDetailsBtn').classList.remove('hidden');
+  if (HuaHinSession.hasRole('owner', 'frontdesk')) document.getElementById('longStayBtn').classList.remove('hidden');
 
   callApi('financeGetSettings', [sessionToken]).then(function(res) {
     if (res.ok) window.ROOMS_SETTINGS = res.settings;
@@ -834,8 +993,12 @@ function render(){
           var w = (endCoord - startCoord) * colWidth - 2;
           var bt = (b.bookingType || '').replace(/[.\s]/g, '-').toLowerCase();
           if (b.status === 'CONFIRMED') { bt += ' pending-checkin'; }
-          var guestLabel = (b.status === 'CONFIRMED' ? '🕒 ' : '') + escapeHtml(b.guestName || '');
-          var detailTitle = escapeHtml(b.guestName || '') + ' (' + b.checkinDate + t('rooms.date_range') + b.checkoutDate + ', ' + dd(cin, cout) + t('rooms.n_nights_comma') + tv(b.bookingType) + ')';
+          var openEnded = b.leaseType === 'open' && !b.endConfirmed;
+          if (openEnded) { bt += ' lease-open'; }
+          var guestLabel = (b.status === 'CONFIRMED' ? '🕒 ' : '') + escapeHtml(b.guestName || '') + (openEnded ? ' →' : '');
+          var detailTitle = openEnded
+            ? escapeHtml(b.guestName || '') + ' (' + b.checkinDate + ' → ' + t('rooms.lease_until_notice') + ')'
+            : escapeHtml(b.guestName || '') + ' (' + b.checkinDate + t('rooms.date_range') + b.checkoutDate + ', ' + dd(cin, cout) + t('rooms.n_nights_comma') + tv(b.bookingType) + ')';
           html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"><div class="bar '+bt+'" style="left:'+left+'px; width:'+w+'px" title="'+detailTitle+'" onclick="showDetail(\''+b.bookingId+'\')">'+guestLabel+'</div></td>';
         } else {
           html += '<td class="'+(isT?'tc':'')+'" data-date="'+ds+'"></td>';
@@ -975,6 +1138,10 @@ function openBook(rid, date, prop, endDate){
   document.getElementById('mRate').dataset.baseRate = defaultRate || '';
 
   document.getElementById('cwarn').style.display = 'none';
+  extendMode = false;
+  document.getElementById('mLeaseType').value = 'fixed';
+  setFirstEnd('cycle');
+  syncLeaseUi();
   calcP();
   document.getElementById('mTitle').textContent = t('rooms.new_booking');
   document.getElementById('mbg').classList.add('open');
@@ -1015,6 +1182,7 @@ function selType(t, el){
     furnWrapper.classList.add('hidden');
     document.getElementById('mFurn').value = '0';
   }
+  syncLeaseUi();
 }
 
 function toggleResDep() {
@@ -1049,9 +1217,15 @@ function calcP(){
   }
   document.getElementById('pDur').textContent = durText;
 
+  var lease = leaseActive();
+  if (lease) {
+    var open = document.getElementById('mLeaseType').value === 'open';
+    document.getElementById('pDur').textContent = open ? t('rooms.lease_until_notice') : t('rooms.lease_until', fmtBE(co));
+  }
+
   var baseRate = parseFloat(document.getElementById('mRate').dataset.baseRate) || rate || 0;
   var helperEl = document.getElementById('mProRateHelper');
-  if (selBT === 'monthly' && nights < 30 && baseRate > 0) {
+  if (!lease && selBT === 'monthly' && nights < 30 && baseRate > 0) {
     var suggested = Math.round((baseRate / 30) * nights);
     helperEl.textContent = t('rooms.prorata_hint', suggested.toLocaleString());
     helperEl.style.display = 'block';
@@ -1096,6 +1270,25 @@ function calcP(){
   var total = 0;
   if (selBT === 'monthly' || selBT === 'Booking.com' || selBT === 'Expedia.com') { total = rate + totalDep - resDep; }
   else { total = (nights * rate) + totalDep - resDep; }
+
+  if (lease) {
+    // First period only: rent from the worker's formula (what roomsAddBooking will charge).
+    var fe = document.getElementById('mFirstEnd').value;
+    if (!fe || fe <= ci) { document.getElementById('pRate').textContent = t('rooms.fp_invalid'); document.getElementById('pTot').textContent = '-'; return; }
+    var key = rate + '|' + ci + '|' + fe;
+    var show = function(rent) {
+      document.getElementById('pRate').textContent = '฿' + rent.toLocaleString() + ' (' + fmtBE(ci) + ' - ' + fmtBE(fe) + ')';
+      document.getElementById('pTot').textContent = '฿' + (rent + totalDep - resDep).toLocaleString();
+    };
+    if (leaseRentPreview.key === key && leaseRentPreview.rent !== null) { show(leaseRentPreview.rent); return; }
+    document.getElementById('pRate').textContent = '…';
+    callApi('roomsLeaseRentPreview', [sessionToken, rate, ci, fe, true]).then(function(res) {
+      if (!res.ok) return;
+      leaseRentPreview = { key: key, rent: res.rent };
+      if (leaseActive() && (rate + '|' + document.getElementById('mIn').value + '|' + document.getElementById('mFirstEnd').value) === key) show(res.rent);
+    });
+    return;
+  }
   document.getElementById('pTot').textContent = '฿'+total.toLocaleString();
 }
 
@@ -1171,7 +1364,18 @@ function saveBook(){
 
   var furnitureRent = selBT === 'monthly' ? (parseFloat(document.getElementById('mFurn').value) || 0) : 0;
 
-  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId, companyId, furnitureRent]).then(function(res){
+  var leaseType = null, firstEnd = null;
+  if (leaseActive()) {
+    leaseType = document.getElementById('mLeaseType').value;
+    firstEnd = document.getElementById('mFirstEnd').value;
+    if (!firstEnd || firstEnd <= ci || (leaseType === 'fixed' && firstEnd > co)) {
+      showToast(t('rooms.fp_invalid'), 'err');
+      btn.disabled=false; btn.textContent=t('rooms.confirm_booking');
+      return;
+    }
+  }
+
+  callApi('roomsAddBooking', [sessionToken, prop, room, guest, selBT, ci, co, rate, dep, notes, cardPrice, cardQty, isRes, resDep, otaBookingId, companyId, furnitureRent, leaseType, firstEnd]).then(function(res){
     btn.disabled=false; btn.textContent=t('rooms.confirm_booking');
     if(res.ok){
       closeMod();
@@ -1612,8 +1816,11 @@ function showDetail(id){
     })() +
     '<div class="df"><label>' + t('rooms.d_room') + '</label><span>'+(r?r.displayName:b.roomId)+' · '+(r?tl(r.roomType):'')+'</span></div>'+
     '<div class="df"><label>' + t('rooms.d_checkin') + '</label><span>'+(b.checkinDate||'-')+'</span></div>'+
-    '<div class="df"><label>' + t('rooms.d_checkout') + '</label><span>'+(b.checkoutDate||'-')+'</span></div>'+
-    '<div class="df"><label>' + t('rooms.d_duration') + '</label><span>'+t('rooms.n_nights_span', nights)+'</span></div>'+
+    (b.leaseType
+      ? '<div class="df"><label>' + t('rooms.d_lease') + '</label><span style="font-weight:600">' + leaseLine(b) + '</span></div>' +
+        '<div class="df"><label>' + t('rooms.d_billed_through') + '</label><span>' + (b.billedThrough ? fmtBE(b.billedThrough) : '-') + '</span></div>'
+      : '<div class="df"><label>' + t('rooms.d_checkout') + '</label><span>'+(b.checkoutDate||'-')+'</span></div>'+
+        '<div class="df"><label>' + t('rooms.d_duration') + '</label><span>'+t('rooms.n_nights_span', nights)+'</span></div>')+
     '<div class="df"><label>' + t('rooms.d_rate') + '</label><span>'+(b.rate>0?'฿'+Number(b.rate).toLocaleString()+(b.bookingType==='monthly'?t('rooms.per_month'):(b.bookingType==='Booking.com'||b.bookingType==='Expedia.com'?t('rooms.per_booking'):t('rooms.per_night'))):t('rooms.rate_tbd_span'))+'</span></div>'+
     '<div class="df"><label>' + t('rooms.d_damage_dep') + '</label><span>'+(b.deposit>0?'฿'+Number(b.deposit).toLocaleString():'-')+'</span></div>'+
     '<div class="df"><label>' + t('rooms.d_card_dep') + '</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+t('rooms.cards_at', b.cardDepositQty, b.cardDeposit)+')':'-')+'</span></div>'+
@@ -1635,7 +1842,9 @@ function showDetail(id){
         return '';
       })() +
       '<button class="btn btn-red" onclick="delBook(\''+b.bookingId+'\')">' + (b.status === 'CONFIRMED' ? t('rooms.btn_cancel_res') : t('rooms.btn_cancel_booking')) + '</button>'+
-      (b.bookingType === 'monthly-draft' ?
+      (b.leaseType ?
+        '<button class="btn btn-m" onclick="openLeaseEnd(\''+b.bookingId+'\')">' + t('rooms.btn_set_moveout') + '</button>' :
+       b.bookingType === 'monthly-draft' ?
         (b.pendingTxnId ? '<button class="btn btn-m" onclick="openConfirmPaymentModal(\''+b.pendingTxnId+'\')">' + t('rooms.btn_confirm_payment') + '</button>' : '') :
         '<button class="btn btn-m" onclick="extendBooking(\''+b.bookingId+'\')">' + t('rooms.btn_extend') + '</button>'
       )+
@@ -1708,6 +1917,8 @@ function extendBooking(id) {
   btns.forEach(function(btn) {
     btn.classList.toggle('sel', btn.dataset.bt === selBT);
   });
+  extendMode = true;
+  syncLeaseUi();
   calcP();
   document.getElementById('mTitle').textContent = t('rooms.extend_title', b.bookingId);
   document.getElementById('mbg').classList.add('open');
@@ -2777,6 +2988,44 @@ window.saveNoteEdit = function() {
         <button class="btn btn-o" onclick="closeNoteEdit()" data-i18n="rooms.cancel">ยกเลิก</button>
         <button class="btn btn-m" onclick="saveNoteEdit()" data-i18n="rooms.save_note">✓ บันทึก</button>
       </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="leaseEndBg" onclick="closeLeaseEnd(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1100;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:420px; max-width:95%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <div class="mtitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;" data-i18n="rooms.btn_set_moveout">กำหนดวันย้ายออก</div>
+        <button class="mx" onclick="closeLeaseEnd()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <div id="leTitle" style="font-size:13px; color:var(--muted); margin-bottom:14px;"></div>
+      <div class="fg" style="margin-bottom:12px;">
+        <select class="fs" id="leAction" onchange="onLeaseEndAction()" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff;">
+          <option value="notice" data-i18n="rooms.le_notice">ผู้เช่าแจ้งย้ายออก (ยืนยันวันออก)</option>
+          <option value="newEnd" data-i18n="rooms.le_new_end">ต่อสัญญา — วันสิ้นสุดใหม่</option>
+          <option value="open" data-i18n="rooms.le_open">ต่อแบบไม่กำหนด (จนกว่าจะแจ้งออก)</option>
+          <option value="withdraw" data-i18n="rooms.le_withdraw">ยกเลิกการแจ้งออก</option>
+        </select>
+      </div>
+      <div class="fg" id="leDateWrap" style="margin-bottom:16px;">
+        <input class="fi" type="date" id="leDate" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:12px;">
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-o" onclick="closeLeaseEnd()" data-i18n="rooms.cancel">ยกเลิก</button>
+        <button class="btn btn-m" onclick="saveLeaseEnd()" data-i18n="rooms.save_note">✓ บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="longStayBg" onclick="closeLongStays(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:760px; max-width:96%; max-height:88vh; overflow-y:auto; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div class="mtitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;" data-i18n="rooms.long_stays">📅 ผู้เช่าระยะยาว</div>
+        <button class="mx" onclick="closeLongStays()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <label style="font-size:12px; display:flex; gap:6px; align-items:center; margin-bottom:10px;">
+        <input type="checkbox" id="lsOpenOnly" onchange="renderLongStays()"> <span data-i18n="rooms.ls_open_only">เฉพาะผู้เช่าแบบไม่กำหนด</span>
+      </label>
+      <div id="lsBody"></div>
     </div>
   </div>
 

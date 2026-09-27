@@ -125,6 +125,14 @@
       return TH_MONTHS[d.getMonth()];
     }
 
+    // Long-stay lease: an open-ended booking's check-out is a rolling ~12-month date,
+    // never a real move-out — don't print it as one (design §4.5a A5).
+    function moveOutLine(b) {
+      if (b.lease_type === 'open' && !b.end_confirmed) return 'Move-out date: open-ended / ไม่กำหนด (until notice)';
+      if (b.lease_type === 'fixed' && !b.end_confirmed) return 'Lease end / สิ้นสุดสัญญา: ' + formatBE(b.checkout_date);
+      return 'Move-out date: ' + formatBE(b.checkout_date);
+    }
+
     function formatItemDescription(item, billingMonth, booking) {
       var desc = item.description || '';
       var catLower = (item.category || '').toLowerCase();
@@ -133,7 +141,7 @@
         desc = 'ค่าเช่าห้องและเฟอร์นิเจอร์ / Room and furniture Charge';
         if (booking) {
           desc += '<div style="font-size:10px; color:#555; margin-top:2px;">Move-in date: ' + formatBE(booking.checkin_date) + '</div>';
-          desc += '<div style="font-size:10px; color:#555;">Move-out date: ' + formatBE(booking.checkout_date) + '</div>';
+          desc += '<div style="font-size:10px; color:#555;">' + moveOutLine(booking) + '</div>';
         }
       } else if (catLower === 'electricity' || (catLower === 'utility' && desc.toLowerCase().indexOf('elec') !== -1) || desc.toLowerCase().indexOf('electric') !== -1) {
         var prevMonth = getPreviousMonthName(billingMonth);

@@ -148,7 +148,7 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=30608e62"></script>
+  <script src="i18n.js?v=e6039371"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
   <script src="ui.js?v=c2a21efc"></script>
@@ -167,6 +167,70 @@
       var p = String(dateStr || '').split('-');
       if (p.length !== 3) return dateStr || '';
       return p[2] + '/' + p[1] + '/' + (parseInt(p[0], 10) + 543);
+    }
+
+    // ---- Long-stay leases (docs/design-long-stay-leases.md) ----
+    // The worker proposes the period (after billed-through to the end of next month,
+    // cut at a confirmed move-out or a fixed lease end). A fixed lease ending inside
+    // it needs a decision before it can be invoiced.
+    function monthEndAfterSelected() {
+      var p = document.getElementById('sel-month').value.split('-');
+      var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) + 1, 0);
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function leaseCell(r, idx) {
+      var L = r.lease, to = r.leasePeriodTo || L.periodTo;
+      var html = '<div id="lc_' + idx + '" style="font-size:10px; margin-top:4px; line-height:1.4; text-align:left;">' +
+        '<div style="color:var(--muted); white-space:nowrap;">' + t('billing.lease_period') + ' ' + formatBE(L.periodFrom) + ' - ' + formatBE(to) + '</div>';
+      if (L.alreadyBilled) html += '<div style="color:var(--muted);">' + t('billing.lease_already_billed', formatBE(L.periodFrom)) + '</div>';
+      if (L.needsDecision) {
+        var d = r.leaseDecision || {};
+        html += '<div style="color:#9f1239; font-weight:600; margin-top:3px;">' + t('billing.lease_ends', formatBE(r.checkout_date)) + '</div>' +
+          '<select id="ld_' + idx + '" onchange="onLeaseDecision(' + idx + ')" style="font-size:11px; margin-top:2px;">' +
+            '<option value="">' + t('billing.lease_choose') + '</option>' +
+            '<option value="leaving"' + (d.action === 'leaving' ? ' selected' : '') + '>' + t('billing.lease_leaving') + '</option>' +
+            '<option value="open"' + (d.action === 'open' ? ' selected' : '') + '>' + t('billing.lease_open') + '</option>' +
+            '<option value="newEnd"' + (d.action === 'newEnd' ? ' selected' : '') + '>' + t('billing.lease_new_end') + '</option>' +
+          '</select>' +
+          '<input type="date" id="ldd_' + idx + '" value="' + (d.date || '') + '" onchange="onLeaseDecision(' + idx + ')" style="font-size:11px; margin-top:2px;' + (d.action === 'newEnd' ? '' : ' display:none;') + '">';
+      }
+      return html + '</div>';
+    }
+    window.onLeaseDecision = function(idx) {
+      var r = loadedRooms[idx];
+      var action = document.getElementById('ld_' + idx).value;
+      var dateEl = document.getElementById('ldd_' + idx);
+      dateEl.style.display = action === 'newEnd' ? '' : 'none';
+      if (!action || (action === 'newEnd' && !dateEl.value)) { r.leaseDecision = null; refreshLeaseBanner(); return; }
+      r.leaseDecision = { action: action, date: action === 'newEnd' ? dateEl.value : null };
+      var cap = monthEndAfterSelected();
+      var to = action === 'leaving' ? r.checkout_date : (action === 'newEnd' && dateEl.value < cap ? dateEl.value : cap);
+      r.leasePeriodTo = to;
+      var session = HuaHinSession.getSession();
+      var tok = session ? session.token : null;
+      Promise.all([
+        apiCall('roomsLeaseRentPreview', [tok, r.baseRate, r.lease.periodFrom, to]),
+        apiCall('roomsLeaseRentPreview', [tok, r.furniture_rent || 0, r.lease.periodFrom, to])
+      ]).then(function(res) {
+        // Update this row only — re-rendering the table would wipe typed meter readings.
+        if (res[0].ok) { r.rent = res[0].rent; document.getElementById('rent_' + idx).value = r.rent; }
+        if (res[1].ok) { r.leaseFurn = res[1].rent; document.getElementById('furn_' + idx).value = r.leaseFurn; }
+        var cell = document.getElementById('lc_' + idx);
+        if (cell) cell.outerHTML = leaseCell(r, idx);
+        calcRow(idx);
+        refreshLeaseBanner();
+      });
+    };
+    function refreshLeaseBanner() {
+      var old = document.getElementById('lease-banner');
+      if (old) old.parentNode.removeChild(old);
+      var undecided = loadedRooms.filter(function(r) { return !r.txn_id && r.lease && r.lease.needsDecision && !r.leaseDecision; }).length;
+      if (!undecided) return;
+      var tbody = document.getElementById('billing-body');
+      var bn = document.createElement('tr');
+      bn.id = 'lease-banner';
+      bn.innerHTML = '<td colspan="14"><div style="padding:10px; background:#fff1f2; border:1px solid #fecdd3; border-radius:8px; color:#9f1239; font-weight:600;">⚠ ' + t('billing.lease_decisions', undecided) + '</div></td>';
+      tbody.insertBefore(bn, tbody.firstChild);
     }
 
     // Prorate a monthly charge over a span that may cross a month boundary.
@@ -286,13 +350,20 @@
             '</td>';
         } else {
           hasNonPending = true;
+          // Long-stay lease: rent and furniture for the proposed period, not the monthly base.
+          if (r.lease && r.leaseRentInit === undefined) {
+            r.leaseRentInit = true;
+            r.baseRate = r.rent;
+            r.rent = r.lease.rent;
+            r.leaseFurn = r.lease.furniture;
+          }
           tr.innerHTML =
             '<td><input type="checkbox" class="chk-room" data-idx="' + idx + '" checked onchange="updateGenerateBtn()" /></td>' +
             '<td>' + escapeHtml(r.room_name) + '</td>' +
             '<td>' + escapeHtml(r.guest_name) + '</td>' +
             '<td class="text-right">' +
               '<input type="number" min="0" class="grid-input" id="rent_' + idx + '" value="' + r.rent + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')">' +
-              (function() {
+              (r.lease ? leaseCell(r, idx) : (function() {
                 var checkoutDateStr = r.checkout_date;
                 var mo = document.getElementById('sel-month').value;
                 if (!checkoutDateStr || !mo) return '';
@@ -336,9 +407,11 @@
                   opt(t('billing.align_end'), proRentEnd, proFurnEnd, monthEndTarget) +
                   opt(t('billing.align_next'), proRentNext, proFurnNext, nextMonthEndTarget) +
                 '</div>';
-              })() +
+              })()) +
               '<div style="font-size:10px; margin-top:4px; text-align:left; color:var(--muted);">' + t('billing.furniture') +
-                '<input type="number" min="0" class="grid-input" id="furn_' + idx + '" value="' + (r.furniture_rent || 0) + '" style="width:70px; margin-left:4px;" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')" onchange="saveFurniture(' + idx + ')"></div>' +
+                // A lease row shows the period's furniture amount; editing it must not
+                // overwrite the monthly base, so it is not persisted.
+                '<input type="number" min="0" class="grid-input" id="furn_' + idx + '" value="' + (r.lease ? (r.leaseFurn || 0) : (r.furniture_rent || 0)) + '" style="width:70px; margin-left:4px;" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"' + (r.lease ? '' : ' onchange="saveFurniture(' + idx + ')"') + '></div>' +
             '</td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="prev_e_' + idx + '" value="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
             '<td class="text-right"><input type="number" min="0" class="grid-input" id="curr_e_' + idx + '" placeholder="' + (r.prev_elec || 0) + '" oninput="if(this.value<0)this.value=0; calcRow(' + idx + ')"></td>' +
@@ -356,6 +429,7 @@
           calcRow(idx);
         }
       });
+      refreshLeaseBanner();
       var hasPending = loadedRooms.some(function(r) { return r.txn_id && r.txn_status === 'pending'; });
       if (hasNonPending || hasPending) {
         document.getElementById('chk-all').checked = true;
@@ -515,6 +589,17 @@
       var checkedBoxes = document.querySelectorAll('.chk-room:checked');
       if (checkedBoxes.length === 0) return;
 
+      var undecidedRooms = Array.from(checkedBoxes)
+        .map(function(cb) { return loadedRooms[parseInt(cb.getAttribute('data-idx'))]; })
+        .filter(function(r) { return r && r.lease && r.lease.needsDecision && !r.leaseDecision; })
+        .map(function(r) { return r.room_name; });
+      if (undecidedRooms.length > 0) {
+        var errBox = document.getElementById('err-display');
+        errBox.style.color = 'var(--warn)';
+        errBox.textContent = t('billing.lease_decide_first') + undecidedRooms.join(', ');
+        return;
+      }
+
       var untouchedRooms = Array.from(checkedBoxes)
         .map(function(cb) { return loadedRooms[parseInt(cb.getAttribute('data-idx'))]; })
         .filter(function(r) { return r && r.metersUntouched; })
@@ -542,6 +627,7 @@
           roomId: r.room_id, bookingId: r.booking_id, guestName: r.guest_name, rent: r.rent,
           furnitureRent: r.furnitureLineAmt || 0,
           newCheckoutDate: r.newCheckoutDate || null,
+          leaseDecision: r.leaseDecision || null,
           prevElec: r.prevElecCalc, currElec: r.currentElec, elecUnits: r.elecUnits, elecAmt: r.elecAmt, elecRate: r.elecRate,
           prevWater: r.prevWaterCalc, currWater: r.currentWater, waterUnits: r.waterUnits, waterAmt: r.waterAmt, waterRate: r.waterRate,
           additionsAmt: r.additionsAmt, extraItems: r.extraItems, totalAmount: r.totalAmount
