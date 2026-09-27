@@ -1602,9 +1602,7 @@ function showDetail(id){
     '<div class="dbadge '+b.propertyId+'">'+(b.propertyId==='precious'?'The Precious':'The Moment')+'</div>'+
     '<h2 style="font-size:17px;font-weight:700;margin-bottom:12px">'+escapeHtml(b.guestName||'-')+'</h2>'+
     (function() {
-      var cusMatch = allCustomers.find(function(c) {
-        return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
-      });
+      var cusMatch = customerFor(b);
       if (cusMatch && cusMatch.status === 'blacklisted') {
         return '<div style="background:#fee2e2; border:1px solid #fecaca; border-radius:12px; padding:10px; margin-bottom:12px; color:#991b1b; font-size:12px;">' +
           t('rooms.blacklist_warn_reason') + '<em>' + escapeHtml(cusMatch.blacklist_reason || t('rooms.no_reason_given')) + '</em>' +
@@ -1629,9 +1627,7 @@ function showDetail(id){
       (b.status === 'CONFIRMED' ? '<button class="btn btn-p" onclick="checkInGuest(\''+b.bookingId+'\')">' + t('rooms.btn_checkin_guest') + '</button>' : '')+
       (b.status === 'CONFIRMED' ? '<button class="btn btn-o" onclick="openChangeDatesModal(\''+b.bookingId+'\')">' + t('rooms.btn_change_dates') + '</button>' : '')+
       (function() {
-        var cusMatch = allCustomers.find(function(c) {
-          return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
-        });
+        var cusMatch = customerFor(b);
         if (cusMatch) {
           return '<button class="btn btn-o" onclick="openCustomerHistoryModal(\''+cusMatch.customer_id+'\', \''+escapeHtml(cusMatch.name)+'\')">' + t('rooms.btn_history') + '</button>' +
                  '<button class="btn btn-o" onclick="openEditCusModal(\''+cusMatch.customer_id+'\')">' + t('rooms.btn_edit_guest') + '</button>';
@@ -1723,9 +1719,7 @@ function checkInGuest(id) {
   var r = ROOMS.filter(function(x){ return x.roomId === b.roomId; })[0];
   document.getElementById('ciBookingId').value = id;
 
-  var matchedCustomer = allCustomers.find(function(c) {
-    return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
-  });
+  var matchedCustomer = customerFor(b);
   var passportWrapper = document.getElementById('ciMissingPassportWrapper');
   var passportInput = document.getElementById('ciPassportInput');
   passportInput.value = '';
@@ -1780,9 +1774,7 @@ function confirmCheckIn() {
   var b = bookings.find(function(x) { return x.bookingId === id; });
   if (!b) return;
 
-  var matchedCustomer = allCustomers.find(function(c) {
-    return c.name && c.name.toLowerCase() === (b.guestName || '').toLowerCase();
-  });
+  var matchedCustomer = customerFor(b);
 
   var passportWrapper = document.getElementById('ciMissingPassportWrapper');
   var passportInput = document.getElementById('ciPassportInput');
@@ -2265,6 +2257,17 @@ function saveCustomer() {
   });
 }
 var allCustomers = [];
+
+// A booking's customer: by the stored link first (survives a rename or a typo in
+// the guest name), then by name for bookings made before a customer record existed.
+function customerFor(b) {
+  if (b.customerId) {
+    var byId = allCustomers.find(function(c) { return c.customer_id === b.customerId; });
+    if (byId) return byId;
+  }
+  var name = (b.guestName || '').toLowerCase();
+  return allCustomers.find(function(c) { return c.name && c.name.toLowerCase() === name; });
+}
 
 var ISO_COUNTRIES = {
   "THA": { name: "Thailand", nationality: "Thai" },
