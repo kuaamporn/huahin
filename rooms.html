@@ -527,7 +527,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="i18n.js?v=d1368424"></script>
+<script src="i18n.js?v=30608e62"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
 <script src="ui.js?v=c2a21efc"></script>
@@ -1621,7 +1621,9 @@ function showDetail(id){
     '<div class="df"><label>' + t('rooms.d_card_dep') + '</label><span>'+(cardDepTotal>0?'฿'+cardDepTotal.toLocaleString()+' ('+t('rooms.cards_at', b.cardDepositQty, b.cardDeposit)+')':'-')+'</span></div>'+
     (b.otaBookingId ? '<div class="df"><label>' + t('rooms.d_ota_ref') + '</label><span style="font-weight:700;color:var(--primary)">'+escapeHtml(b.otaBookingId)+'</span></div>' : '') +
     '<div class="df"><label>' + t('rooms.d_type') + '</label><span>'+(b.bookingType==='monthly-draft'?t('rooms.monthly_draft'):tv(b.bookingType||'-'))+'</span></div>'+
-    (b.notes?'<div class="df"><label>' + t('rooms.d_notes') + '</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.notes)+'</span></div>':'')+
+    '<div class="df"><label>' + t('rooms.d_notes') + '</label><span style="font-size:12px;color:var(--muted)">'+(b.notes?escapeHtml(b.notes):'—')+
+      ' <a href="#" onclick="openNoteEdit(\'booking\',\''+b.bookingId+'\');return false;" style="margin-left:6px;white-space:nowrap">' + t('rooms.btn_edit_note') + '</a></span></div>'+
+    '<div id="bookingNoteEdits" style="font-size:11px;color:var(--muted);margin:-4px 0 8px;line-height:1.5"></div>'+
     (b.createdByName?'<div class="df"><label>' + t('rooms.d_added_by') + '</label><span style="font-size:12px;color:var(--muted)">'+escapeHtml(b.createdByName)+'</span></div>':'')+
     '<div class="dactions" style="flex-wrap:wrap;gap:8px 12px;">'+
       (b.status === 'CONFIRMED' ? '<button class="btn btn-p" onclick="checkInGuest(\''+b.bookingId+'\')">' + t('rooms.btn_checkin_guest') + '</button>' : '')+
@@ -1647,6 +1649,19 @@ function showDetail(id){
         : '') +
       '<button class="btn btn-p" onclick="closeDetail()">' + t('rooms.btn_done') + '</button></div>';
   document.getElementById('detailPanel').classList.add('open');
+  loadBookingNoteEdits(b.bookingId);
+}
+
+// Who changed this booking's note, and when (note_edits, migration_35). Fetched with
+// the session token — bookingsList is called before login, so it must not carry this.
+function loadBookingNoteEdits(id){
+  callApi('roomsGetNoteEdits', [sessionToken, 'booking', id]).then(function(res){
+    var box = document.getElementById('bookingNoteEdits');
+    if(!box || !res.ok || !res.edits.length || window.currentDetailBookingId !== id) return;
+    box.innerHTML = res.edits.map(function(e){
+      return '✏️ ' + escapeHtml(t('rooms.note_edited_by', e.editor, e.editedAt)) + ': “' + escapeHtml(e.oldValue || '—') + '” → “' + escapeHtml(e.newValue || '—') + '”';
+    }).join('<br>');
+  });
 }
 
 function closeDetail(){ document.getElementById('detailPanel').classList.remove('open'); }
@@ -2495,17 +2510,23 @@ window.openCustomerHistoryModal = function(customerId, customerName) {
   callApi('roomsGetCustomerHistory', [sessionToken, customerId]).then(function(res) {
     if (!res.ok) { timelineContainer.innerHTML = '<div class="error">' + escapeHtml(res.error) + '</div>'; return; }
     var html = '';
+    window.historyNotes = {};
     (res.timeline || []).forEach(function(item) {
-      var typeLabel = item.type === 'note' ? t('rooms.ev_note') : (item.type === 'checkin' ? t('rooms.ev_checkin') : (item.type === 'checkout' ? t('rooms.ev_checkout') : t('rooms.ev_paid')));
-      var typeBg = item.type === 'note' ? '#f3f4f6' : (item.type === 'checkin' ? '#ecfdf5' : '#eff6ff');
-      var typeColor = item.type === 'note' ? '#374151' : (item.type === 'checkin' ? '#065f46' : '#1e40af');
+      var typeLabel = item.type === 'note' ? t('rooms.ev_note') : (item.type === 'edit' ? t('rooms.ev_edit') : (item.type === 'checkin' ? t('rooms.ev_checkin') : (item.type === 'checkout' ? t('rooms.ev_checkout') : t('rooms.ev_paid'))));
+      var typeBg = item.type === 'note' ? '#f3f4f6' : (item.type === 'edit' ? '#fffbeb' : (item.type === 'checkin' ? '#ecfdf5' : '#eff6ff'));
+      var typeColor = item.type === 'note' ? '#374151' : (item.type === 'edit' ? '#92400e' : (item.type === 'checkin' ? '#065f46' : '#1e40af'));
+      var editLink = '';
+      if (item.type === 'note' && item.logId != null) {
+        window.historyNotes[item.logId] = item.note;
+        editLink = ' <a href="#" onclick="openNoteEdit(\'customer_log\',' + Number(item.logId) + ');return false;" style="font-weight:400;font-size:11px;margin-left:6px">' + t('rooms.btn_edit_note') + '</a>';
+      }
 
       html += '<div style="margin-bottom:12px; padding:10px; border-radius:12px; background:'+typeBg+'; border:1px solid rgba(0,0,0,0.02);">' +
         '<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:4px;">' +
           '<span style="font-weight:700; color:'+typeColor+'; text-transform:uppercase; letter-spacing:0.3px;">'+typeLabel+'</span>' +
           '<span class="muted">'+item.date+'</span>' +
         '</div>' +
-        '<div style="font-size:13px; font-weight:600; color:#1f2937;">'+escapeHtml(item.text)+'</div>' +
+        '<div style="font-size:13px; font-weight:600; color:#1f2937;">'+escapeHtml(item.text)+editLink+'</div>' +
       '</div>';
     });
     timelineContainer.innerHTML = html || '<div class="muted" style="text-align:center; padding:20px;">' + t('rooms.no_history') + '</div>';
@@ -2523,8 +2544,53 @@ window.submitCustomerHistoryNote = function() {
   var note = document.getElementById('historyNoteText').value.trim();
   if (!note) return;
   callApi('roomsAddCustomerLog', [sessionToken, cId, note]).then(function(res) {
-    if (res.ok) {
-      openCustomerHistoryModal(cId, document.getElementById('historyModalTitle').textContent.replace(t('rooms.history_of'), ''));
+    if (res.ok) reopenHistory();
+    else showToast(res.error || t('rooms.note_save_failed'), 'err');
+  });
+};
+
+function reopenHistory() {
+  openCustomerHistoryModal(document.getElementById('historyCusId').value,
+    document.getElementById('historyModalTitle').textContent.replace(t('rooms.history_of'), ''));
+}
+
+// One edit modal for both a booking's note and a staff note in the customer history.
+// The worker logs every change (who, when, old -> new) in note_edits.
+var noteEditTarget = null;
+window.openNoteEdit = function(entity, id) {
+  var text = '';
+  if (entity === 'booking') {
+    var b = bookings.find(function(x) { return x.bookingId === id; });
+    text = (b && b.notes) || '';
+  } else {
+    text = (window.historyNotes || {})[id] || '';
+  }
+  noteEditTarget = { entity: entity, id: id };
+  document.getElementById('noteEditText').value = text;
+  document.getElementById('noteEditBg').classList.remove('hidden');
+  document.getElementById('noteEditText').focus();
+};
+
+window.closeNoteEdit = function(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('noteEditBg').classList.add('hidden');
+};
+
+window.saveNoteEdit = function() {
+  if (!noteEditTarget) return;
+  var target = noteEditTarget;
+  var text = document.getElementById('noteEditText').value.trim();
+  var action = target.entity === 'booking' ? 'roomsUpdateBookingNotes' : 'roomsEditCustomerLog';
+  callApi(action, [sessionToken, target.id, text]).then(function(res) {
+    if (!res.ok) { showToast(res.error || t('rooms.note_save_failed'), 'err'); return; }
+    closeNoteEdit();
+    showToast(t('rooms.note_saved'), 'ok');
+    if (target.entity === 'booking') {
+      var b = bookings.find(function(x) { return x.bookingId === target.id; });
+      if (b) b.notes = text || null;
+      if (window.currentDetailBookingId === target.id) showDetail(target.id);
+    } else {
+      reopenHistory();
     }
   });
 };
@@ -2693,6 +2759,20 @@ window.submitCustomerHistoryNote = function() {
           <button class="btn btn-o" onclick="closeHistoryModal()" data-i18n="rooms.close">ปิด</button>
           <button class="btn btn-m" onclick="submitCustomerHistoryNote()" data-i18n="rooms.add_note">✓ เพิ่มบันทึก</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mbg hidden" id="noteEditBg" onclick="closeNoteEdit(event)" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1100;">
+    <div class="modal" onclick="event.stopPropagation()" style="background:#fff; padding:24px; border-radius:24px; width:420px; max-width:95%; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+      <div class="mhdr" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <div class="mtitle" style="font-size:18px; font-weight:700; font-family:'Lexend', sans-serif;" data-i18n="rooms.edit_note_h">แก้ไขบันทึก</div>
+        <button class="mx" onclick="closeNoteEdit()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <textarea class="fta" id="noteEditText" style="height:90px; width:100%; margin-bottom:12px; border-radius:12px;"></textarea>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-o" onclick="closeNoteEdit()" data-i18n="rooms.cancel">ยกเลิก</button>
+        <button class="btn btn-m" onclick="saveNoteEdit()" data-i18n="rooms.save_note">✓ บันทึก</button>
       </div>
     </div>
   </div>
