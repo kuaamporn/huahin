@@ -365,10 +365,10 @@
   </div>
 
   <!-- QR scanning library (lightweight, free, no API key needed) -->
-  <script src="i18n.js?v=a6387fdc"></script>
-  <script src="session.js?v=1c7dbdbc"></script>
-  <script src="nav.js?v=059149d8"></script>
-  <script src="ui.js?v=4cfdb645"></script>
+  <script src="i18n.js?v=d1368424"></script>
+  <script src="session.js?v=f661977c"></script>
+  <script src="nav.js?v=b5344bde"></script>
+  <script src="ui.js?v=c2a21efc"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
     // =====================================================================
@@ -760,10 +760,12 @@
           document.getElementById('welcome-name').textContent = t('index.hello', res.name);
 
           HuaHinSession.saveSessionPartial(res);
-          callApi('adminListEmployeesWithRoles', [sessionToken]).then(function(rolesRes) {
+          // Same choice as the reload path below: the admin list is owner-only, so a
+          // staff login must use financeGetEmployees or the nav renders role-less.
+          callApi(res.isAdmin ? 'adminListEmployeesWithRoles' : 'financeGetEmployees', [sessionToken]).then(function(rolesRes) {
             var myRoles = [];
             if (rolesRes.ok) {
-              var me = rolesRes.employees.filter(function(e) { return e.employeeId === res.employeeId; })[0];
+              var me = rolesRes.employees.filter(function(e) { return (e.employeeId || e.employee_id) === res.employeeId; })[0];
               myRoles = (me && me.roles) ? me.roles : [];
             }
             HuaHinSession.updateSessionRoles(myRoles);
@@ -953,13 +955,12 @@
           if (res.flagged) {
             msg += t('index.flagged', res.reasons.join('; '));
           }
-          document.getElementById('checkin-success').textContent = msg;
-          show('checkin-success');
+          // #checkin-success lives inside #confirm-card, which is hidden here, so the
+          // message goes into the always-visible status line instead; the real status
+          // (clocked in at HH:MM + quick checkout) replaces it after a moment.
           hide('confirm-card');
-          setTimeout(function() {
-            hide('checkin-success');
-            startScanner();
-          }, 3500);
+          document.getElementById('today-status').innerHTML = '<span style="color:var(--go);">' + escapeHtml(msg) + '</span>';
+          setTimeout(loadTodayStatus, 3000);
         } else {
           document.getElementById('checkin-error').textContent = res.error;
           show('checkin-error');
@@ -1036,9 +1037,8 @@
           btn.disabled = false;
           btn.textContent = t('index.checkout_now');
           if (res.ok) {
-            document.getElementById('quick-checkout-success').textContent = t('index.clocked_out_at', res.officeName);
-            show('quick-checkout-success');
-            loadTodayStatus();
+            document.getElementById('today-status').innerHTML = '<span style="color:var(--go);">' + escapeHtml(t('index.clocked_out_at', res.officeName)) + '</span>';
+            setTimeout(loadTodayStatus, 3000);
           } else {
             document.getElementById('quick-checkout-error').textContent = res.error || t('index.checkout_failed');
             show('quick-checkout-error');
