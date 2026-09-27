@@ -778,7 +778,7 @@
     function loadRoomsAndBookingsCache() {
       return Promise.all([
         callApi('roomsList', ['combined']),
-        callApi('bookingsList', ['combined'])
+        callApi('bookingsList', [session.token, 'combined'])
       ]).then(function (results) {
         if (results[0] && results[0].ok) ROOMS_CACHE = results[0].rooms || [];
         if (results[1] && results[1].ok) BOOKINGS_CACHE = results[1].bookings || [];

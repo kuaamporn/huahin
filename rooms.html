@@ -678,7 +678,7 @@ function bootApp() {
 
   Promise.all([
     callApi('roomsList', ['combined']),
-    callApi('bookingsList', ['combined']),
+    callApi('bookingsList', [sessionToken, 'combined']),
     callApi('roomsListOverrides', [sessionToken])
   ]).then(function(results) {
     var roomsRes = results[0], bookingsRes = results[1], overridesRes = results[2];
@@ -1653,7 +1653,7 @@ function showDetail(id){
 }
 
 // Who changed this booking's note, and when (note_edits, migration_35). Fetched with
-// the session token — bookingsList is called before login, so it must not carry this.
+// the session token, only when a booking is opened.
 function loadBookingNoteEdits(id){
   callApi('roomsGetNoteEdits', [sessionToken, 'booking', id]).then(function(res){
     var box = document.getElementById('bookingNoteEdits');
