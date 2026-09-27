@@ -7,13 +7,13 @@ Price Tier: ฿฿ - Moderate (Inquire directly via chat for exact seasonal quot
 ## 1. The Precious (Monthly Residences — Open Now)
 - **Overview:** An exclusive monthly residence building spanning 7 floors with 79 rooms.
 - **Target Guests:** Expats, digital nomads, retirees, and long-stay guests seeking a peaceful, residential atmosphere.
-- **Room Types:** Standard Studio (balcony, private bath, air conditioning), Deluxe Room (spacious layout for extended living), and top-floor suites.
+- **Room Types:** Standard Room (studio with air-conditioning, private bath and balcony; floors 1–7), Deluxe Room (spacious seventh-floor rooms, upgraded furnishings, best outlook), Penthouse (the entire eighth floor — largest and most private).
 - **Link:** https://www.thepreciousmoment.com/#precious
 
 ## 2. The Moment (Monthly & Daily Stays — Opening Mid-2027)
 - **Overview:** A flexible 7-floor residence offering both monthly leases and daily/weekend holiday accommodations. Opens mid-2027; reservations and enquiries welcome ahead of opening.
 - **Target Guests:** International visitors, retirees, and Bangkok weekend/holiday getaways.
-- **Room Types:** Standard Monthly, Superior Monthly, Deluxe Monthly, plus daily Standard and Deluxe studios on top floors.
+- **Room Types (5):** Studio (bright modern studio, floors 6–7), Studio Suite (roomier studio with kitchen pantry, floors 2–5, for long stays), One-Bedroom (separate bedroom and living space, floors 2–4), Scenic One-Bedroom (upper floors 5–7, layout reoriented for wider views), Deluxe (premium corner units, floors 2–7, step-free wheelchair-accessible layout).
 - **Link:** https://www.thepreciousmoment.com/#moment
 
 ## 3. The Private House (Monthly — Available Now)
@@ -42,11 +42,12 @@ Price Tier: ฿฿ - Moderate (Inquire directly via chat for exact seasonal quot
 ## 1. The Precious (ห้องพักรายเดือน — เปิดให้บริการแล้ว)
 - **ภาพรวม:** อาคารพักอาศัยรายเดือน 7 ชั้น รวม 79 ห้อง
 - **กลุ่มผู้เข้าพัก:** ชาวต่างชาติ ผู้ทำงานทางไกล ผู้เกษียณ และผู้ที่ต้องการพักระยะยาวในบรรยากาศเงียบสงบ
-- **ประเภทห้อง:** Standard แบบสตูดิโอ (ระเบียง ห้องน้ำในตัว เครื่องปรับอากาศ), Deluxe (กว้างขึ้น เหมาะกับการพักระยะยาว) และห้องชั้นบนสุด
+- **ประเภทห้อง:** ห้อง Standard (สตูดิโอ เครื่องปรับอากาศ ห้องน้ำในตัว ระเบียง ชั้น 1–7), ห้อง Deluxe (ห้องกว้างขวางบนชั้น 7 เฟอร์นิเจอร์อัปเกรด วิวดีที่สุด), Penthouse (ทั้งชั้น 8 ใหญ่และเป็นส่วนตัวที่สุด)
 
 ## 2. The Moment (รายเดือนและรายวัน — เปิดกลางปี 2570 / ค.ศ. 2027)
 - **ภาพรวม:** อาคาร 7 ชั้น ให้บริการทั้งการเช่ารายเดือนและการเข้าพักรายวัน/ช่วงวันหยุด
 - **กลุ่มผู้เข้าพัก:** นักท่องเที่ยวต่างชาติ ผู้เกษียณ และชาวกรุงเทพฯ ที่มาพักผ่อนช่วงสุดสัปดาห์
+- **ประเภทห้อง (5 แบบ):** Studio (สตูดิโอทันสมัย ชั้น 6–7), Studio Suite (สตูดิโอกว้างขึ้นพร้อมมุมครัว ชั้น 2–5 เหมาะพักระยะยาว), One-Bedroom (แยกห้องนอนกับพื้นที่นั่งเล่น ชั้น 2–4), Scenic One-Bedroom (ชั้น 5–7 ปรับผังเพื่อวิวกว้างขึ้น), Deluxe (ห้องหัวมุมพรีเมียม ชั้น 2–7 ไม่มีขั้นบันได รองรับรถเข็น)
 
 ## 3. บ้านเดี่ยว (เช่ารายเดือน — ว่างให้เช่าแล้ว)
 - **ภาพรวม:** บ้านเดี่ยวพร้อมทางเข้าส่วนตัว ตั้งอยู่ในพื้นที่ของ The Precious และดูแลโดยทีมงานชุดเดียวกัน มีเพียงหลังเดียว
