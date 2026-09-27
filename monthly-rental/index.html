@@ -51,6 +51,7 @@
   
   <style>
     :root {
+      --display: 'Cormorant', 'Noto Sans Thai', serif; /* /th/ overrides via meta.font_link */
       --ink: #1C1B18; --ink-soft: #4A4842; --ivory: #F7F4EE; --cream: #FDFCF9;
       --gold: #A16207; --gold-soft: #B08D57; --hairline: #E3DDD2;
       --line-green: #06C755; --fb-blue: #0084FF; --wa-green: #128C7E;
@@ -60,7 +61,7 @@
       font-family: 'Montserrat', 'Noto Sans Thai', sans-serif; background: var(--ivory); color: var(--ink);
       font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased;
     }
-    h1, h2, h3 { font-family: 'Cormorant', 'Chonburi', serif; font-weight: 500; line-height: 1.2; }
+    h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.2; }
     a { color: inherit; }
     :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
     .kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold); }
@@ -72,7 +73,7 @@
       background: linear-gradient(180deg, rgba(20,19,15,.55) 0%, rgba(20,19,15,.25) 40%, rgba(20,19,15,.75) 100%); }
     .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; justify-content: space-between;
       align-items: center; gap: 12px; padding: 22px clamp(16px, 5vw, 56px); }
-    .brand { font-family: 'Cormorant', 'Chonburi', serif; font-size: 20px; letter-spacing: .08em; text-decoration: none; }
+    .brand { font-family: var(--display); font-size: 20px; letter-spacing: .08em; text-decoration: none; }
     .lang-switch { font-size: 13px; letter-spacing: .12em; display: flex; gap: 8px; }
     .lang-switch a { text-decoration: none; opacity: .75; } .lang-switch .cur { font-weight: 600; }
     .hero .inner { position: relative; z-index: 1; max-width: 880px; padding: 120px clamp(16px, 5vw, 56px) 64px; }
