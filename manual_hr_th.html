@@ -99,8 +99,9 @@ h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bo
       <li><a href="#s1">การลงเวลาวันนี้</a></li>
       <li><a href="#s2">การเข้างาน &amp; ปรับสถานะ</a></li>
       <li><a href="#s3">รายงานประจำเดือน</a></li>
-      <li><a href="#s4">อนุมัติการลาและสลับวันหยุด</a></li>
-      <li><a href="#s5">บัญชีของฉัน</a></li>
+      <li><a href="#s4">ตารางกะ</a></li>
+      <li><a href="#s5">อนุมัติการลาและสลับวันหยุด</a></li>
+      <li><a href="#s6">บัญชีของฉัน</a></li>
     </ol>
   </nav>
 
@@ -126,13 +127,15 @@ h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bo
     <figure class="fig"><img src="manual_assets/hr/02_attendance.png" alt="หน้าการเข้างาน" loading="lazy"></figure>
     <ol class="steps circ">
       <li data-n="1"><b>เลือกวันที่</b> — ดูสถานะของวันอื่นย้อนหลังหรือล่วงหน้าได้</li>
-      <li data-n="2"><b>ตารางพนักงาน</b> — กด <b>ตั้งสถานะ</b> เพื่อปรับสถานะด้วยมือ (เช่น บันทึกวันลา)
+      <li data-n="2"><b>ตารางพนักงาน</b> — คอลัมน์ <b>กะ</b> และ <b>เวลาเข้า</b> แสดงกะที่กำหนดไว้ของวันนั้นและเวลาที่สแกนจริง
+      (ขีดกลาง “—” หมายถึงยังไม่ลงเวลาหรือวันนั้นไม่มีกะ) กด <b>ตั้งสถานะ</b> เพื่อปรับสถานะด้วยมือ (เช่น บันทึกวันลา)
       แถวที่ปรับไว้แล้วจะมีปุ่ม <b>แก้ไข</b> / <b>ล้าง</b> แทน</li>
     </ol>
     <p>กด <b>ตั้งสถานะ</b> เพื่อเปิดหน้าต่างปรับสถานะ — เลือกสถานะ ช่วงวันที่ (ใช้วันเดียวกันทั้งสองช่องสำหรับวันเดียว)
     และหมายเหตุถ้ามี</p>
     <figure class="fig"><img src="manual_assets/hr/03_override.png" alt="หน้าต่างตั้งสถานะการเข้างาน" loading="lazy"></figure>
-    <div class="note">สถานะที่ปรับด้วยมือ (เช่น ลา) จะมี<b>ความสำคัญกว่า</b>สถานะที่ระบบตรวจจับอัตโนมัติเสมอ</div>
+    <div class="note">สถานะที่ปรับด้วยมือ (เช่น ลา) จะมี<b>ความสำคัญกว่า</b>สถานะที่ระบบตรวจจับอัตโนมัติเสมอ
+    และนับในรายงานประจำเดือนกับยอดวันลาคงเหลือด้วย — ถ้าตั้งเป็นลาพักร้อนหรือลาป่วย ระบบจะหักวันจากโควตาให้อัตโนมัติ</div>
   </section>
 
   <!-- 3 MONTHLY -->
@@ -142,15 +145,34 @@ h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bo
     <figure class="fig"><img src="manual_assets/hr/04_monthly.png" alt="หน้ารายงานประจำเดือน" loading="lazy"></figure>
     <ol class="steps circ">
       <li data-n="1"><b>ประเภทรายงาน</b> — เลือก <b>รายเดือน</b> หรือ <b>รายปี</b> พร้อมปี/เดือน แล้วกดโหลด</li>
-      <li data-n="2"><b>ตารางสรุป</b> — จำนวนวันมาทำงาน มาสาย ขาดงาน และลา ต่อพนักงาน 1 คน
-      คลิกแถวเพื่อดูรายละเอียดรายวัน</li>
+      <li data-n="2"><b>ตารางสรุป</b> — คอลัมน์เรียงตามวันของเดือน: <b>มาทำงาน · มาสาย · ขาดงาน · วันหยุด ·
+      ลาพักร้อน · ลาป่วย</b> (คอลัมน์ <b>วันหยุดบริษัท</b> โผล่เฉพาะเดือนที่มีวันหยุดบริษัท) <b>· ยังไม่ถึง</b>
+      (วันที่ยังไม่มาถึง) <b>· รวมวัน</b> ทุกแถวบวกกันแล้วต้องเท่ากับจำนวนวันในเดือนนั้นพอดี
+      คลิกแถวเพื่อดูรายละเอียดรายวัน — ตารางย่อยมีแถว<b>เวลาเข้า</b>ของแต่ละวันด้วย</li>
       <li data-n="3"><b>ส่งออก CSV</b> — ดาวน์โหลดรายงานเป็นไฟล์เพื่อเก็บหรือส่งต่อ</li>
     </ol>
   </section>
 
-  <!-- 4 LEAVES -->
+  <!-- 4 SHIFTS -->
   <section class="section" id="s4">
-    <div class="section-head"><div class="snum">4</div><h2>อนุมัติการลาและสลับวันหยุด<span class="en">Leave &amp; swap approvals</span></h2></div>
+    <div class="section-head"><div class="snum">4</div><h2>ตารางกะ<span class="en">Shifts &amp; roster</span></h2></div>
+    <p class="intro">แท็บ <b>ตารางกะ</b> ใช้ดูและปรับกะรายสัปดาห์ของพนักงานแต่ละคน</p>
+    <figure class="fig"><img src="manual_assets/hr/07_shifts.png" alt="ตารางกะรายสัปดาห์" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>สัปดาห์เริ่ม</b> — เลือกวันที่ หรือกด <b>‹ สัปดาห์ก่อน</b> / <b>สัปดาห์ถัดไป ›</b> เพื่อเลื่อนดูสัปดาห์อื่น</li>
+      <li data-n="2"><b>ตารางรายสัปดาห์</b> — แต่ละช่องคือกะของพนักงาน 1 คนใน 1 วัน ป้าย <b>วันหยุด</b> หมายถึงวันหยุดประจำสัปดาห์
+      ของคนนั้น (แก้ไม่ได้ที่นี่) ส่วนช่องที่เป็นเมนูเลือกใช้ <b>กะประจำ</b> ของคนนั้นเป็นค่าเริ่มต้น — เลือกกะอื่นเพื่อ
+      เปลี่ยนเฉพาะวันนั้น ช่องที่ถูกเปลี่ยนจะมีพื้นหลังสีเขียวอ่อนให้สังเกตง่าย</li>
+    </ol>
+    <div class="note"><b>มาสาย</b> นับเมื่อลงเวลาเข้างานหลังเวลาเริ่มกะเกิน <b>5 นาที</b> วันที่ไม่ได้กำหนดกะไว้เลย
+    ใช้กฎเดิม (เข้า 08:00 / ออก 17:30) แก้กะย้อนหลังไม่ได้ — ช่องของวันที่ผ่านไปแล้วจะถูกล็อก</div>
+    <div class="warn"><b>กะประจำของแต่ละคน</b> และการเพิ่ม/แก้ไข<b>ประเภทกะ</b> (เช่น เปลี่ยนเวลาเช้า-บ่าย) ตั้งค่าได้เฉพาะ
+    <b>เจ้าของกิจการ</b> ในแท็บ พนักงาน — ที่นี่ปรับได้เฉพาะตารางกะรายสัปดาห์เท่านั้น</div>
+  </section>
+
+  <!-- 5 LEAVES -->
+  <section class="section" id="s5">
+    <div class="section-head"><div class="snum">5</div><h2>อนุมัติการลาและสลับวันหยุด<span class="en">Leave &amp; swap approvals</span></h2></div>
     <p class="intro">แท็บ <b>อนุมัติการลา &amp; สลับวันหยุด</b> รวมคำขอทั้งหมดที่พนักงานส่งมาจากหน้าลงเวลาของตัวเอง</p>
     <figure class="fig"><img src="manual_assets/hr/05_leaves.png" alt="หน้าอนุมัติการลาและสลับวันหยุด" loading="lazy"></figure>
     <ol class="steps circ">
@@ -161,9 +183,9 @@ h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bo
     <div class="warn"><b>ข้อจำกัด:</b> คุณไม่สามารถอนุมัติคำขอลาหรือสลับวันหยุดของตัวเองได้</div>
   </section>
 
-  <!-- 5 MY ACCOUNT -->
-  <section class="section" id="s5">
-    <div class="section-head"><div class="snum">5</div><h2>บัญชีของฉัน<span class="en">My account</span></h2></div>
+  <!-- 6 MY ACCOUNT -->
+  <section class="section" id="s6">
+    <div class="section-head"><div class="snum">6</div><h2>บัญชีของฉัน<span class="en">My account</span></h2></div>
     <p class="intro">แท็บ <b>บัญชีของฉัน</b> ใช้เปลี่ยนรหัสผ่านของคุณเอง</p>
     <figure class="fig"><img src="manual_assets/hr/06_account.png" alt="หน้าบัญชีของฉัน" loading="lazy"></figure>
     <ol class="steps circ">
