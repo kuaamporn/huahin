@@ -167,7 +167,7 @@
             <input type="text" id="leave-behalf-id" data-i18n-attr="placeholder:index.emp_ph" placeholder="เช่น EMP-..." />
             <div class="muted" style="margin-top:4px;" data-i18n="index.behalf_note">การลาพักร้อนที่แจ้งน้อยกว่า 2 วัน ต้องให้เพื่อนที่มีสิทธิ์ frontdesk เป็นผู้ยื่นแทน</div>
           </div>
-          <button class="btn-primary" onclick="submitLeave()" data-i18n="index.submit_leave">ส่งคำขอลา</button>
+          <button class="btn-primary" id="submit-leave-btn" onclick="submitLeave()" data-i18n="index.submit_leave">ส่งคำขอลา</button>
           <div class="error hidden" id="leave-error"></div>
           <div class="success hidden" id="leave-success"></div>
         </div>
@@ -178,8 +178,8 @@
           <input type="date" id="swap-original" />
           <label for="swap-new" data-i18n="index.swap_new">วันหยุดใหม่ที่ต้องการ</label>
           <input type="date" id="swap-new" />
-          <div class="muted" style="margin-top:4px;" data-i18n="index.swap_note">ต้องแจ้งล่วงหน้าอย่างน้อย 2 วันก่อนวันใหม่ และต้องได้รับการอนุมัติจากเพื่อนร่วมงาน</div>
-          <button class="btn-primary" onclick="submitSwap()" data-i18n="index.submit_swap">ส่งคำขอสลับวันหยุด</button>
+          <div class="muted" style="margin-top:4px;" data-i18n="index.swap_note">ต้องแจ้งล่วงหน้าอย่างน้อย 2 วันก่อนวันใหม่ และต้องให้ frontdesk อีกคนหรือเจ้าของเป็นผู้อนุมัติ (อนุมัติคำขอของตัวเองไม่ได้)</div>
+          <button class="btn-primary" id="submit-swap-btn" onclick="submitSwap()" data-i18n="index.submit_swap">ส่งคำขอสลับวันหยุด</button>
           <div class="error hidden" id="swap-error"></div>
           <div class="success hidden" id="swap-success"></div>
         </div>
@@ -365,7 +365,7 @@
   </div>
 
   <!-- QR scanning library (lightweight, free, no API key needed) -->
-  <script src="i18n.js?v=97b37650"></script>
+  <script src="i18n.js?v=e9993f00"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
   <script src="ui.js?v=c2a21efc"></script>
@@ -405,7 +405,10 @@
       loadTodayStatus();
       loadUtilitiesDashboard();
       checkPendingNotices();
-      openAccountCardFromHash();
+      // Deferred: loadMyRequests/submitLeave are assigned further down this
+      // script, so opening the card right now (arriving via index.html#account)
+      // threw and stopped the rest of the page script.
+      setTimeout(openAccountCardFromHash, 0);
 
       // Static text re-renders itself via data-i18n; these panels are built in JS,
       // so redraw them to pick up the new language.
@@ -518,13 +521,25 @@
       else hide('behalf-group');
     }
 
-    // Vacation can't be booked in the past; medical leave may be retroactive.
+    // Earliest vacation date this form will accept. Staff filing for themselves
+    // need 2 days notice; anything sooner must be filed on their behalf by a
+    // frontdesk/owner colleague, so the picker opens up to today only when the
+    // on-behalf field is filled. Medical leave may be retroactive (no min).
+    function vacationMinDate() {
+      var behalf = document.getElementById('leave-behalf-id').value.trim();
+      var filingForOther = behalf && HuaHinSession.hasRole('frontdesk', 'owner');
+      var d = new Date();
+      if (!filingForOther) d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 2);
+      return isoDate(d);
+    }
+
     function applyLeaveDateMin() {
       var type = document.getElementById('leave-type').value;
       var el = document.getElementById('leave-date');
-      if (type === 'VACATION') el.min = isoDate(new Date());
+      if (type === 'VACATION') el.min = vacationMinDate();
       else el.removeAttribute('min');
     }
+    document.getElementById('leave-behalf-id').addEventListener('input', applyLeaveDateMin);
 
     function onLeaveTypeChange() {
       toggleBehalfField();
@@ -554,7 +569,11 @@
       // Resolved per date, not once — the weekly day off is effective-dated, so a
       // 60-day window can legitimately straddle a change. Mirrors dayOffWdayOn()
       // in worker.js; keep the two in step.
-      var schedule = res.schedule || [];
+      // Sorted here too: wdayOn() stops at the first future row, so it relies on
+      // effective_from order, and must not depend on the server's ORDER BY.
+      var schedule = (res.schedule || []).slice().sort(function(a, b) {
+        return a.effective_from < b.effective_from ? -1 : a.effective_from > b.effective_from ? 1 : 0;
+      });
       function wdayOn(iso) {
         var w = 1;
         for (var k = 0; k < schedule.length; k++) {
@@ -573,6 +592,19 @@
       (res.leaves || []).forEach(function(l) {
         if (l.status === 'APPROVED') leaveByDate[l.leave_date] = l.type;
       });
+      // Leave HR set by hand (attendance override). The server applies it ahead
+      // of leave requests, so it wins here too — but never on a day off, where
+      // the server does not spend leave either (that branch runs below).
+      var hrLeave = (res.leaveOverrides || []).slice().sort(function(a, b) {
+        return String(a.created_at) < String(b.created_at) ? -1 : 1;
+      });
+      function hrLeaveOn(iso) {
+        var type = null;
+        hrLeave.forEach(function(o) {
+          if (o.start_date <= iso && o.end_date >= iso) type = o.status === 'VACATION_LEAVE' ? 'VACATION' : 'MEDICAL';
+        });
+        return type;
+      }
 
       var start = res.today ? new Date(res.today + 'T00:00:00') : new Date();
       var rows = [];
@@ -580,11 +612,14 @@
         var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
         var iso = isoDate(d);
         var why = null;
-        if (leaveByDate[iso]) {
-          why = leaveByDate[iso] === 'VACATION' ? t('index.vacation') : t('index.medical');
+        var isWeeklyOff = d.getDay() === wdayOn(iso) && !swappedOut[iso];
+        var hrType = (!swappedIn[iso] && !isWeeklyOff) ? hrLeaveOn(iso) : null;
+        var leaveType = hrType || leaveByDate[iso];
+        if (leaveType) {
+          why = leaveType === 'VACATION' ? t('index.vacation') : t('index.medical');
         } else if (swappedIn[iso]) {
           why = t('index.dayoff_swapped');
-        } else if (d.getDay() === wdayOn(iso) && !swappedOut[iso]) {
+        } else if (isWeeklyOff) {
           why = t('index.dayoff_weekly');
         }
         if (why) rows.push({ d: d, iso: iso, why: why, isToday: i === 0 });
@@ -668,8 +703,17 @@
       var behalf = document.getElementById('leave-behalf-id').value.trim() || null;
       hide('leave-error'); hide('leave-success');
       if (!date) { document.getElementById('leave-error').textContent = t('index.pick_date'); show('leave-error'); return; }
+      // The picker's min can be bypassed by typing, so check again here.
+      if (type === 'VACATION' && date < vacationMinDate()) {
+        document.getElementById('leave-error').textContent = t('index.vac_need_2_days');
+        show('leave-error');
+        return;
+      }
 
+      var btn = document.getElementById('submit-leave-btn');
+      btn.disabled = true;
       callApi('employeeRequestLeave', [sessionToken, date, type, reason, behalf]).then(function(res) {
+        btn.disabled = false;
         if (res.ok) {
           document.getElementById('leave-success').textContent = t('index.request_sent');
           show('leave-success');
@@ -681,6 +725,10 @@
           document.getElementById('leave-error').textContent = res.error;
           show('leave-error');
         }
+      }).catch(function(err) {
+        btn.disabled = false;
+        document.getElementById('leave-error').textContent = t('index.conn_error') + err.message;
+        show('leave-error');
       });
     };
 
@@ -690,7 +738,10 @@
       hide('swap-error'); hide('swap-success');
       if (!orig || !newVal) { document.getElementById('swap-error').textContent = t('index.need_both_dates'); show('swap-error'); return; }
 
+      var btn = document.getElementById('submit-swap-btn');
+      btn.disabled = true;
       callApi('employeeRequestSwap', [sessionToken, orig, newVal]).then(function(res) {
+        btn.disabled = false;
         if (res.ok) {
           document.getElementById('swap-success').textContent = t('index.swap_sent');
           show('swap-success');
@@ -701,6 +752,10 @@
           document.getElementById('swap-error').textContent = res.error;
           show('swap-error');
         }
+      }).catch(function(err) {
+        btn.disabled = false;
+        document.getElementById('swap-error').textContent = t('index.conn_error') + err.message;
+        show('swap-error');
       });
     };
 
@@ -936,7 +991,10 @@
       hide('checkin-error');
       hide('checkin-success');
       var btn = type === 'IN' ? document.getElementById('checkin-btn') : document.getElementById('checkout-btn');
-      btn.disabled = true;
+      // Both buttons, not just the one pressed: IN and OUT must not race.
+      var bothBtns = [document.getElementById('checkin-btn'), document.getElementById('checkout-btn')];
+      function setBusy(busy) { bothBtns.forEach(function(b) { b.disabled = busy; }); }
+      setBusy(true);
       btn.textContent = t('index.saving');
 
       callApi('checkIn', [
@@ -948,7 +1006,7 @@
         lastKnownPosition.coords.accuracy,
         getDeviceId()
       ]).then(function(res) {
-        btn.disabled = false;
+        setBusy(false);
         btn.textContent = type === 'IN' ? t('index.checkin') : t('index.checkout');
         if (res.ok) {
           var msg = t('index.clocked_at', type === 'IN' ? t('index.clock_in') : t('index.clock_out'), res.officeName);
@@ -966,7 +1024,7 @@
           show('checkin-error');
         }
       }).catch(function(err) {
-        btn.disabled = false;
+        setBusy(false);
         btn.textContent = type === 'IN' ? t('index.checkin') : t('index.checkout');
         document.getElementById('checkin-error').textContent = t('index.conn_error') + err.message;
         show('checkin-error');
@@ -989,7 +1047,7 @@
         if (res.ok) {
           var statusEl = document.getElementById('today-status');
           if (res.checkedIn) {
-            var timeStr = new Date(res.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            var timeStr = new Date(res.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
             statusEl.innerHTML = '<span style="color:var(--go);">' + t('index.checked_in_at', timeStr) + '</span>';
             hide('camera-section');
             show('quick-checkout-section');
