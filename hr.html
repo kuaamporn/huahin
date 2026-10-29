@@ -1415,7 +1415,18 @@
       var table = document.getElementById('monthly-grid-table');
       table.innerHTML = '';
 
+      // First column labels the rows: status, then the check-in time HR asked
+      // to see for every day.
+      function rowLabel(tag, text) {
+        var c = document.createElement(tag);
+        c.className = tag === 'th' ? 'grid-header-cell' : 'grid-cell';
+        c.style.cssText = 'text-align:left; white-space:nowrap; font-weight:600; color:var(--muted);';
+        c.textContent = text;
+        return c;
+      }
+
       var headerRow = document.createElement('tr');
+      headerRow.appendChild(rowLabel('th', ''));
       emp.dailyStatuses.forEach(function(day) {
         var th = document.createElement('th');
         th.className = 'grid-header-cell';
@@ -1425,6 +1436,7 @@
       table.appendChild(headerRow);
 
       var statusRow = document.createElement('tr');
+      statusRow.appendChild(rowLabel('td', t('hr.col_status')));
       emp.dailyStatuses.forEach(function(day) {
         var td = document.createElement('td');
         if (day.status === null) {
@@ -1440,6 +1452,19 @@
         statusRow.appendChild(td);
       });
       table.appendChild(statusRow);
+
+      // Check-in time row (first IN of the day, Thai time); late days in red.
+      var timeRow = document.createElement('tr');
+      timeRow.appendChild(rowLabel('td', t('hr.col_checkin_time')));
+      emp.dailyStatuses.forEach(function(day) {
+        var td = document.createElement('td');
+        td.className = 'grid-cell';
+        td.style.fontSize = '10px';
+        td.textContent = day.checkInTime || '';
+        if (day.status === 'LATE') { td.style.color = 'var(--warn)'; td.style.fontWeight = '600'; }
+        timeRow.appendChild(td);
+      });
+      table.appendChild(timeRow);
 
       show('monthly-grid-section');
     }
