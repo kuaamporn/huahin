@@ -116,6 +116,7 @@
         <button class="nav-tab" id="tab-attendance" data-i18n="hr.tab_attendance">การเข้างาน</button>
         <button class="nav-tab" id="tab-monthly" data-i18n="hr.tab_monthly">รายงานประจำเดือน</button>
         <button class="nav-tab" id="tab-employees" data-i18n="hr.tab_employees">พนักงาน</button>
+        <button class="nav-tab hidden" id="tab-shifts" data-i18n="hr.tab_shifts">ตารางกะ</button>
         <button class="nav-tab hidden" id="tab-leaves" data-i18n="hr.tab_leaves">อนุมัติการลา &amp; สลับวันหยุด</button>
         <button class="nav-tab" id="tab-account" data-i18n="hr.tab_account">บัญชีของฉัน</button>
         <button class="nav-tab hidden" id="tab-roles" data-i18n="hr.tab_roles">บทบาท</button>
@@ -164,7 +165,7 @@
       <div style="overflow-x: auto;">
       <table>
         <thead>
-          <tr><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.col_note">หมายเหตุ</th><th data-i18n="hr.col_actions">การจัดการ</th></tr>
+          <tr><th data-i18n="hr.col_employee">พนักงาน</th><th data-i18n="hr.col_shift">กะ</th><th data-i18n="hr.col_checkin_time">เวลาเข้า</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.col_note">หมายเหตุ</th><th data-i18n="hr.col_actions">การจัดการ</th></tr>
         </thead>
         <tbody id="attendance-rows"></tbody>
       </table>
@@ -264,12 +265,49 @@
         <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.emp_vacation_days">วันลาพักร้อน/ปี</th><th data-i18n="hr.emp_extra_vacation_days">วันลาพิเศษ</th><th data-i18n="hr.emp_day_off">วันหยุดประจำสัปดาห์</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
+            <tr><th data-i18n="hr.col_name">ชื่อ</th><th data-i18n="hr.col_username">ชื่อผู้ใช้</th><th data-i18n="hr.col_position">ตำแหน่ง</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.emp_lang">ภาษา</th><th data-i18n="hr.emp_vacation_days">วันลาพักร้อน/ปี</th><th data-i18n="hr.emp_extra_vacation_days">วันลาพิเศษ</th><th data-i18n="hr.emp_day_off">วันหยุดประจำสัปดาห์</th><th data-i18n="hr.emp_default_shift">กะประจำ</th><th data-i18n="hr.reset_pw">รีเซ็ตรหัสผ่าน</th></tr>
           </thead>
           <tbody id="employee-rows"></tbody>
         </table>
         </div>
         <div class="muted" id="employees-empty-msg" style="margin-top:14px;" data-i18n="hr.no_employees">ยังไม่มีพนักงาน</div>
+      </div>
+    </div>
+
+    <!-- ===================== SHIFTS (roster + shift types) ===================== -->
+    <div id="panel-shifts" class="hidden">
+      <h1 data-i18n="hr.tab_shifts">ตารางกะ</h1>
+      <div class="sub" data-i18n="hr.shifts_sub">เลือกกะของแต่ละคนในแต่ละวัน</div>
+
+      <div class="card-section">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+          <label for="roster-start" style="margin:0;" data-i18n="hr.week_from">สัปดาห์เริ่ม</label>
+          <input type="date" id="roster-start" style="width:auto; padding:6px 10px;" />
+          <button id="roster-prev" class="row-action-btn" data-i18n="hr.prev_week">‹ สัปดาห์ก่อน</button>
+          <button id="roster-next" class="row-action-btn" data-i18n="hr.next_week">สัปดาห์ถัดไป ›</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="roster-table"></table>
+        </div>
+        <div class="error hidden" id="roster-error"></div>
+      </div>
+
+      <div class="card-section hidden" id="shift-types-section" style="margin-top:20px;">
+        <h2 style="margin-top:0;" data-i18n="hr.shift_templates_h2">ประเภทกะ</h2>
+        <div class="muted" id="shift-grace-note" style="margin-bottom:10px;"></div>
+        <table>
+          <thead><tr><th data-i18n="hr.shift_name">ชื่อกะ</th><th data-i18n="hr.shift_start">เวลาเข้า</th><th data-i18n="hr.shift_end">เวลาออก</th><th data-i18n="hr.col_status">สถานะ</th><th data-i18n="hr.col_actions">การจัดการ</th></tr></thead>
+          <tbody id="shift-types-rows"></tbody>
+        </table>
+        <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-top:14px;">
+          <div><label for="shift-form-name" data-i18n="hr.shift_name">ชื่อกะ</label><input id="shift-form-name" type="text" style="width:160px;" /></div>
+          <div><label for="shift-form-start" data-i18n="hr.shift_start">เวลาเข้า</label><input id="shift-form-start" type="time" style="width:auto;" /></div>
+          <div><label for="shift-form-end" data-i18n="hr.shift_end">เวลาออก</label><input id="shift-form-end" type="time" style="width:auto;" /></div>
+          <div id="shift-form-from-group" class="hidden"><label for="shift-form-from" data-i18n="hr.shift_effective">เวลาใหม่มีผลตั้งแต่</label><input id="shift-form-from" type="date" style="width:auto;" /></div>
+          <button class="btn-primary" id="shift-form-save" style="width:auto; margin-top:0;" data-i18n="hr.shift_add_btn">เพิ่มกะ</button>
+          <button class="btn-secondary hidden" id="shift-form-cancel" style="width:auto; margin-top:0;" data-i18n="hr.cancel">ยกเลิก</button>
+        </div>
+        <div class="error hidden" id="shift-form-error"></div>
       </div>
     </div>
 
@@ -480,7 +518,7 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=e9993f00"></script>
+  <script src="i18n.js?v=72a72b1b"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
   <script src="ui.js?v=c2a21efc"></script>
@@ -574,8 +612,8 @@
     });
 
     // ===================== TAB SWITCHING =====================
-    var panels = { checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', leaves: 'panel-leaves', account: 'panel-account', roles: 'panel-roles', notices: 'panel-notices' };
-    var tabs = { checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles', notices: 'tab-notices' };
+    var panels = { shifts: 'panel-shifts', checkins: 'panel-checkins', attendance: 'panel-attendance', monthly: 'panel-monthly', employees: 'panel-employees', leaves: 'panel-leaves', account: 'panel-account', roles: 'panel-roles', notices: 'panel-notices' };
+    var tabs = { shifts: 'tab-shifts', checkins: 'tab-checkins', attendance: 'tab-attendance', monthly: 'tab-monthly', employees: 'tab-employees', leaves: 'tab-leaves', account: 'tab-account', roles: 'tab-roles', notices: 'tab-notices' };
 
     var activeTab = 'checkins';
 
@@ -584,7 +622,7 @@
         switchTab('checkins');
         return;
       }
-      if (name === 'leaves' && !hasRole('owner') && !hasRole('frontdesk')) {
+      if ((name === 'leaves' || name === 'shifts') && !hasRole('owner') && !hasRole('frontdesk')) {
         switchTab('checkins');
         return;
       }
@@ -596,6 +634,7 @@
       if (name === 'employees') loadEmployees();
       if (name === 'notices') loadComplaints();
       if (name === 'leaves') loadPendingApprovals();
+      if (name === 'shifts') loadShiftsTab();
       if (name === 'attendance') {
         if (!document.getElementById('attendance-date').value) {
           document.getElementById('attendance-date').value = todayDateStringForInput();
@@ -625,6 +664,7 @@
     document.getElementById('tab-monthly').addEventListener('click', function() { switchTab('monthly'); });
     document.getElementById('tab-employees').addEventListener('click', function() { switchTab('employees'); });
     document.getElementById('tab-leaves').addEventListener('click', function() { switchTab('leaves'); });
+    document.getElementById('tab-shifts').addEventListener('click', function() { switchTab('shifts'); });
     document.getElementById('tab-account').addEventListener('click', function() { switchTab('account'); });
     document.getElementById('tab-roles').addEventListener('click', function() { switchTab('roles'); });
     document.getElementById('tab-notices').addEventListener('click', function() { switchTab('notices'); });
@@ -786,7 +826,10 @@
     })();
 
     function loadEmployees() {
-      callApi('adminListEmployees', [token]).then(function(res) {
+      // Shift types first, so the usual-shift picker can be filled per row.
+      Promise.all([callApi('adminListEmployees', [token]), callApi('shiftsList', [token])]).then(function(both) {
+        var res = both[0];
+        shiftTypes = (both[1] && both[1].ok) ? both[1].shifts : [];
         if (!res.ok) {
           alert(res.error);
           return;
@@ -909,6 +952,31 @@
             });
             tdDayOff.appendChild(dayOffSel);
 
+            // Usual shift (migration_42): effective-dated with the same date as
+            // the day off above, never retroactive.
+            var tdShift = document.createElement('td');
+            var shiftSel = document.createElement('select');
+            shiftSel.style.padding = '4px 6px';
+            shiftSel.setAttribute('aria-label', t('hr.emp_default_shift') + ' — ' + emp.name);
+            fillShiftOptions(shiftSel, t('hr.shift_none'), emp.defaultShiftId);
+            shiftSel.value = emp.defaultShiftId || '';
+            shiftSel.addEventListener('change', function() {
+              var prev = emp.defaultShiftId || '';
+              var from = document.getElementById('dayoff-effective-from').value;
+              if (!from) { shiftSel.value = prev; alert(t('hr.dayoff_need_date')); return; }
+              shiftSel.disabled = true;
+              callApi('adminSetEmployeeDefaultShift', [token, emp.employeeId, shiftSel.value || null, from])
+                .then(function(r) {
+                  if (!r.ok) { shiftSel.value = prev; alert(r.error); return; }
+                  // A future-dated change does not show as current until then.
+                  if (r.effectiveFrom <= todayDateStringForInput()) emp.defaultShiftId = r.shiftId;
+                  else shiftSel.value = prev;
+                })
+                .catch(function(err) { shiftSel.value = prev; alert(t('hr.err_network') + err.message); })
+                .then(function() { shiftSel.disabled = false; });
+            });
+            tdShift.appendChild(shiftSel);
+
             var warningBadge = emp.hasTerminationWarning ? ' <span class="pill flag" style="background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; font-size:11px; margin-left:6px; font-weight:bold;">⚠️ ' + t('hr.termination_warning') + '</span>' : '';
             tr.innerHTML =
               '<td>' + escapeHtml(emp.name) + warningBadge + '</td>' +
@@ -919,6 +987,7 @@
             tr.appendChild(tdVac);
             tr.appendChild(tdExtraVac);
             tr.appendChild(tdDayOff);
+            tr.appendChild(tdShift);
             tr.appendChild(tdAction);
             tbody.appendChild(tr);
           });
@@ -1113,6 +1182,8 @@
 
             tr.innerHTML =
               '<td>' + escapeHtml(row.name) + '</td>' +
+              '<td class="muted">' + (row.shift ? escapeHtml(row.shift.name + ' ' + row.shift.start + '–' + row.shift.end) : '—') + '</td>' +
+              '<td>' + escapeHtml(row.checkInTime || '—') + '</td>' +
               '<td><span class="pill ' + pillClass + '">' + escapeHtml(label) + '</span></td>' +
               '<td class="muted">' + escapeHtml(row.note || '') + '</td>';
             tr.appendChild(tdAction);
@@ -1363,7 +1434,8 @@
           var code = STATUS_GRID_CODE[day.status] || '?';
           td.className = 'grid-cell ' + code;
           td.textContent = code;
-          if (day.note) td.title = day.note;
+          var tip = [day.checkInTime ? t('hr.col_checkin_time') + ' ' + day.checkInTime : '', day.note || ''].filter(Boolean).join(' · ');
+          if (tip) td.title = tip;
         }
         statusRow.appendChild(td);
       });
@@ -1427,7 +1499,8 @@
       data.employees.forEach(function(emp) {
         var row = [emp.name, emp.username];
         emp.dailyStatuses.forEach(function(day) {
-          row.push(day.status === null ? '' : (STATUS_GRID_CODE[day.status] || day.status));
+          var code = day.status === null ? '' : (STATUS_GRID_CODE[day.status] || day.status);
+          row.push(day.checkInTime ? code + ' ' + day.checkInTime : code);
         });
         cols.forEach(function(c) { row.push(c.get(emp.counts || {})); });
         lines.push(row.map(csvEscape).join(','));
@@ -1482,8 +1555,211 @@
       document.getElementById('tab-roles').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-employees').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-leaves').classList.toggle('hidden', !isOwner && !hasRole('frontdesk'));
+      document.getElementById('tab-shifts').classList.toggle('hidden', !isOwner && !hasRole('frontdesk'));
+      document.getElementById('shift-types-section').classList.toggle('hidden', !isOwner);
       document.getElementById('tab-notices').classList.toggle('hidden', !isOwner);
     }
+
+    // ===================== SHIFTS =====================
+    var shiftTypes = [];          // from shiftsList
+    var rosterStart = null;       // 'YYYY-MM-DD'
+    var editingShiftId = null;
+
+    function shiftLabel(s) { return s.name + ' ' + s.startTime + '–' + s.endTime; }
+
+    // Options: "" (= usual shift / no shift) then every active shift. A shift
+    // that is disabled but still selected stays listed so the value shows.
+    function fillShiftOptions(sel, blankLabel, keepId) {
+      sel.innerHTML = '';
+      var blank = document.createElement('option');
+      blank.value = '';
+      blank.textContent = blankLabel;
+      sel.appendChild(blank);
+      shiftTypes.forEach(function(s) {
+        if (!s.active && s.shiftId !== keepId) return;
+        var o = document.createElement('option');
+        o.value = s.shiftId;
+        o.textContent = shiftLabel(s);
+        sel.appendChild(o);
+      });
+    }
+
+    function loadShiftsTab() {
+      if (!rosterStart) rosterStart = todayDateStringForInput();
+      document.getElementById('roster-start').value = rosterStart;
+      callApi('shiftsList', [token]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        shiftTypes = res.shifts;
+        document.getElementById('shift-grace-note').textContent = t('hr.shift_grace_note', res.graceMinutes);
+        renderShiftTypes();
+        loadRoster();
+      }).catch(function(err) { alert(t('hr.err_network') + err.message); });
+    }
+
+    function addDaysIso(iso, days) {
+      var d = new Date(iso + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    document.getElementById('roster-start').addEventListener('change', function(e) {
+      if (e.target.value) { rosterStart = e.target.value; loadRoster(); }
+    });
+    document.getElementById('roster-prev').addEventListener('click', function() { rosterStart = addDaysIso(rosterStart, -7); loadShiftsTab(); });
+    document.getElementById('roster-next').addEventListener('click', function() { rosterStart = addDaysIso(rosterStart, 7); loadShiftsTab(); });
+
+    function loadRoster() {
+      hide('roster-error');
+      callApi('rosterGetWeek', [token, rosterStart]).then(function(res) {
+        if (!res.ok) { alert(res.error); return; }
+        renderRoster(res);
+      }).catch(function(err) { alert(t('hr.err_network') + err.message); });
+    }
+
+    function renderRoster(res) {
+      var byId = {};
+      shiftTypes.forEach(function(s) { byId[s.shiftId] = s; });
+      var table = document.getElementById('roster-table');
+      var head = '<thead><tr><th>' + escapeHtml(t('hr.col_employee')) + '</th>' + res.days.map(function(d) {
+        var dt = new Date(d + 'T00:00:00');
+        return '<th style="white-space:nowrap;' + (d === res.today ? 'text-decoration:underline;' : '') + '">' +
+          escapeHtml(t('index.dow.' + dt.getDay()) + ' ' + dt.getDate() + ' ' + t('month.short.' + (dt.getMonth() + 1))) + '</th>';
+      }).join('') + '</tr></thead>';
+      table.innerHTML = head + '<tbody></tbody>';
+      var tbody = table.querySelector('tbody');
+      res.employees.forEach(function(emp) {
+        var tr = document.createElement('tr');
+        var tdName = document.createElement('td');
+        tdName.textContent = emp.name;
+        tr.appendChild(tdName);
+        emp.cells.forEach(function(cell) {
+          var td = document.createElement('td');
+          if (cell.dayOff) {
+            td.innerHTML = '<span class="pill pending" style="white-space:nowrap;">' + escapeHtml(t('hr.st_day_off')) + '</span>';
+            tr.appendChild(td);
+            return;
+          }
+          var def = cell.defaultShiftId && byId[cell.defaultShiftId];
+          var sel = document.createElement('select');
+          sel.style.padding = '4px 6px';
+          sel.style.minWidth = '130px';
+          fillShiftOptions(sel, t('hr.shift_default_opt', def ? shiftLabel(def) : t('hr.shift_none')), cell.isRoster ? cell.shiftId : null);
+          sel.value = cell.isRoster ? cell.shiftId : '';
+          // A day picked on the roster (not the usual shift) is highlighted.
+          if (cell.isRoster) sel.style.background = '#e0f2f1';
+          sel.disabled = cell.date < res.today;
+          sel.setAttribute('aria-label', emp.name + ' ' + cell.date);
+          sel.addEventListener('change', function() {
+            var prev = cell.isRoster ? cell.shiftId : '';
+            sel.disabled = true;
+            callApi('rosterSetCell', [token, emp.employeeId, cell.date, sel.value || null]).then(function(r) {
+              if (!r.ok) {
+                sel.value = prev;
+                sel.disabled = false;
+                document.getElementById('roster-error').textContent = r.error;
+                show('roster-error');
+                return;
+              }
+              loadRoster();
+            }).catch(function(err) {
+              sel.value = prev;
+              sel.disabled = false;
+              alert(t('hr.err_network') + err.message);
+            });
+          });
+          td.appendChild(sel);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderShiftTypes() {
+      var tbody = document.getElementById('shift-types-rows');
+      tbody.innerHTML = '';
+      shiftTypes.forEach(function(s) {
+        var tr = document.createElement('tr');
+        var next = s.nextChange
+          ? '<div class="muted" style="font-size:12px;">' + escapeHtml(t('hr.shift_next_change', s.nextChange.effectiveFrom, s.nextChange.startTime, s.nextChange.endTime)) + '</div>'
+          : '';
+        tr.innerHTML = '<td>' + escapeHtml(s.name) + '</td>' +
+          '<td>' + escapeHtml(s.startTime) + next + '</td>' +
+          '<td>' + escapeHtml(s.endTime) + '</td>' +
+          '<td>' + (s.active ? '<span class="pill ok">' + escapeHtml(t('hr.shift_active')) + '</span>' : '<span class="pill pending">' + escapeHtml(t('hr.shift_inactive')) + '</span>') + '</td>';
+        var tdAct = document.createElement('td');
+        var editBtn = document.createElement('button');
+        editBtn.className = 'row-action-btn';
+        editBtn.textContent = t('hr.edit');
+        editBtn.addEventListener('click', function() { startEditShift(s); });
+        var toggleBtn = document.createElement('button');
+        toggleBtn.className = 'row-action-btn';
+        toggleBtn.style.marginLeft = '6px';
+        toggleBtn.textContent = s.active ? t('hr.shift_disable') : t('hr.shift_enable');
+        toggleBtn.addEventListener('click', function() {
+          toggleBtn.disabled = true;
+          callApi('shiftsSetActive', [token, s.shiftId, !s.active]).then(function(r) {
+            if (!r.ok) { toggleBtn.disabled = false; alert(r.error); return; }
+            loadShiftsTab();
+          }).catch(function(err) { toggleBtn.disabled = false; alert(t('hr.err_network') + err.message); });
+        });
+        tdAct.appendChild(editBtn);
+        tdAct.appendChild(toggleBtn);
+        tr.appendChild(tdAct);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetShiftForm() {
+      editingShiftId = null;
+      document.getElementById('shift-form-name').value = '';
+      document.getElementById('shift-form-start').value = '';
+      document.getElementById('shift-form-end').value = '';
+      hide('shift-form-from-group');
+      hide('shift-form-cancel');
+      hide('shift-form-error');
+      document.getElementById('shift-form-save').textContent = t('hr.shift_add_btn');
+    }
+
+    // Editing: a rename applies at once; new times apply from the chosen date
+    // (today or later), so days already recorded keep the old times.
+    function startEditShift(s) {
+      editingShiftId = s.shiftId;
+      document.getElementById('shift-form-name').value = s.name;
+      document.getElementById('shift-form-start').value = s.startTime;
+      document.getElementById('shift-form-end').value = s.endTime;
+      var from = document.getElementById('shift-form-from');
+      from.value = todayDateStringForInput();
+      from.min = from.value;
+      show('shift-form-from-group');
+      show('shift-form-cancel');
+      hide('shift-form-error');
+      document.getElementById('shift-form-save').textContent = t('hr.shift_save_btn');
+      document.getElementById('shift-form-name').focus();
+    }
+
+    document.getElementById('shift-form-cancel').addEventListener('click', resetShiftForm);
+    document.getElementById('shift-form-save').addEventListener('click', function() {
+      var btn = this;
+      var name = document.getElementById('shift-form-name').value.trim();
+      var start = document.getElementById('shift-form-start').value;
+      var end = document.getElementById('shift-form-end').value;
+      var from = editingShiftId ? document.getElementById('shift-form-from').value : null;
+      hide('shift-form-error');
+      btn.disabled = true;
+      callApi('shiftsSave', [token, editingShiftId, name, start, end, from]).then(function(r) {
+        btn.disabled = false;
+        if (!r.ok) {
+          document.getElementById('shift-form-error').textContent = r.error;
+          show('shift-form-error');
+          return;
+        }
+        resetShiftForm();
+        loadShiftsTab();
+      }).catch(function(err) {
+        btn.disabled = false;
+        document.getElementById('shift-form-error').textContent = t('hr.err_network') + err.message;
+        show('shift-form-error');
+      });
+    });
 
     // ===================== ROLES =====================
     var rolesEditingEmployeeId = null;
