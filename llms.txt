@@ -26,7 +26,7 @@ Price Tier: ฿฿ - Moderate (Inquire directly via chat for exact seasonal quot
 ## Monthly Rental Guide
 - **Page:** https://www.thepreciousmoment.com/monthly-rental/ (ไทย: https://www.thepreciousmoment.com/th/monthly-rental/)
 - **Minimum stay:** 1 month. Extensions: tell us at least one month before your contract ends, subject to availability.
-- **Included:** free wifi, swimming pool, wardrobe and mattress. **Paid separately:** electricity, water, fitness room.
+- **Included:** free wifi, swimming pool, wardrobe and mattress. **Paid separately:** electricity and water (by meter), fitness room. **Parking:** free, limited spaces.
 - **Deposit:** refundable damage deposit (amount quoted by chat) + 500 THB key deposit; cash or bank transfer. No pets.
 - **Booking from abroad:** we send room photos by LINE, Facebook Messenger, WhatsApp or email.
 - **Hospitals nearby:** San Paulo Hospital Hua Hin approx 1.5 km; Bangkok Hospital Hua Hin approx 2.1 km.
@@ -35,7 +35,7 @@ Price Tier: ฿฿ - Moderate (Inquire directly via chat for exact seasonal quot
 - **Address:** 21/234 Soi Moo Baan Thang Rot Fai Fang Tawan Tok (Soi Hua Hin 88), Sub-district Hua Hin, District Hua Hin, Prachuap Khiri Khan 77110, Thailand. Soi Hua Hin 88 connects through to Soi Hua Hin 94.
 - **Location:** Central Hua Hin, minutes from Hua Hin Beach.
 - **Nearby:** 7-Eleven approx 82 m; Hua Hin Railway Station approx 1.6 km; Hua Hin Night Market approx 2.2 km.
-- **On-site:** Two swimming pools (one per property), fitness room, on-site car park.
+- **On-site:** Two swimming pools (one per property), fitness room, free on-site car park (limited spaces).
 
 ## Reservations & Contact
 - No online booking forms or reservation fees. All inquiries, rate quotes, and reservations are handled personally via chat:
@@ -72,7 +72,7 @@ Price Tier: ฿฿ - Moderate (Inquire directly via chat for exact seasonal quot
 - **ที่อยู่:** 21/234 ซอยหมู่บ้านทางรถไฟฝั่งตะวันตก (ซอย หัวหิน 88) ตำบลหัวหิน อำเภอหัวหิน จ.ประจวบคีรีขันธ์ 77110 (ซอยหัวหิน 88 เชื่อมต่อกับซอยหัวหิน 94)
 - **ที่ตั้ง:** ใจกลางหัวหิน ห่างจากหาดหัวหินไม่กี่นาที
 - **ใกล้เคียง:** 7-Eleven ประมาณ 82 ม. · สถานีรถไฟหัวหิน ประมาณ 1.6 กม. · ตลาดโต้รุ่งหัวหิน ประมาณ 2.2 กม.
-- **ภายในโครงการ:** สระว่ายน้ำ 2 สระ (อาคารละ 1 สระ) ห้องฟิตเนส ที่จอดรถ
+- **ภายในโครงการ:** สระว่ายน้ำ 2 สระ (อาคารละ 1 สระ) ห้องฟิตเนส ที่จอดรถฟรี (จำนวนจำกัด)
 
 ## การจองและติดต่อ
 - ไม่มีระบบจองออนไลน์และไม่มีค่าธรรมเนียมการจอง สอบถามราคา ขอใบเสนอราคา และจองห้องพักได้โดยตรงทางแชท:
@@ -80,5 +80,5 @@ Price Tier: ฿฿ - Moderate (Inquire directly via chat for exact seasonal quot
   - Facebook Messenger: https://m.me/precious.huahin
   - โทร: +66 94 567 4488, +66 94 249 1188
 - **เงินประกัน:** รายเดือน มีเงินประกันความเสียหาย (คืนเมื่อย้ายออก สอบถามจำนวนทางแชท) + ค่ามัดจำกุญแจ 500 บาท · รายวัน 500 บาท · รับเงินสดและโอนผ่านธนาคาร
-- **ค่าเช่ารายเดือนรวม:** อินเทอร์เน็ตไร้สายฟรี สระว่ายน้ำ เฟอร์นิเจอร์พื้นฐาน (ตู้เสื้อผ้า ที่นอน) — ค่าไฟฟ้า ค่าน้ำ และห้องฟิตเนสคิดแยก
+- **ค่าเช่ารายเดือนรวม:** อินเทอร์เน็ตไร้สายฟรี สระว่ายน้ำ เฟอร์นิเจอร์พื้นฐาน (ตู้เสื้อผ้า ที่นอน) — ค่าไฟฟ้าและค่าน้ำคิดตามมิเตอร์ ห้องฟิตเนสคิดแยก · ที่จอดรถฟรี (จำนวนจำกัด)
 - **ไม่อนุญาตให้นำสัตว์เลี้ยงเข้าพัก**
