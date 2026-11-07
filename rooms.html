@@ -546,10 +546,10 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="i18n.js?v=72a72b1b"></script>
+<script src="i18n.js?v=5d71840c"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
-<script src="ui.js?v=c2a21efc"></script>
+<script src="ui.js?v=67214d77"></script>
 <script>
 // =====================================================================
 var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
@@ -2068,7 +2068,8 @@ async function delBook(id){
     document.getElementById('cancelResBg').classList.remove('hidden');
   } else {
     if(!(await confirmDialog(t('rooms.cancel_active_q'), {title:t('rooms.btn_cancel_booking_plain'), confirmText:t('rooms.btn_cancel_booking_plain'), cancelText:t('rooms.keep_it'), danger:true}))) return;
-    callApi('roomsCancelBooking', [sessionToken, id, true]).then(function(res){
+    var reason = await askReason(t('audit.reason_msg'), {title:t('audit.reason_title'), confirmText:t('audit.reason_ok'), cancelText:t('audit.reason_cancel')}); if (reason === null) return;
+    callApi('roomsCancelBooking', [sessionToken, id, true, reason]).then(function(res){
       if(res.ok){ closeDetail(); showToast(t('rooms.booking_cancelled'),'ok'); bootApp(); }
       else showToast(res.error||t('rooms.cancel_needs_owner'),'err');
     });
@@ -2079,10 +2080,11 @@ function closeCancelRes() {
   document.getElementById('cancelResBg').classList.add('hidden');
 }
 
-function confirmCancelRes(refund) {
+async function confirmCancelRes(refund) {
   var id = document.getElementById('mrCancelBookingId').value;
   closeCancelRes();
-  callApi('roomsCancelBooking', [sessionToken, id, refund]).then(function(res){
+  var reason = await askReason(t('audit.reason_msg'), {title:t('audit.reason_title'), confirmText:t('audit.reason_ok'), cancelText:t('audit.reason_cancel')}); if (reason === null) return;
+  callApi('roomsCancelBooking', [sessionToken, id, refund, reason]).then(function(res){
     if(res.ok){ closeDetail(); showToast(t('rooms.res_cancelled'),'ok'); bootApp(); }
     else showToast(res.error||t('rooms.cancel_needs_owner'),'err');
   });

@@ -122,6 +122,49 @@
     });
   }
 
+  // Reason prompt for audited actions (delete / cancel). Resolves the trimmed text,
+  // or null if the user backs out. The worker refuses these actions without a
+  // reason of at least 3 characters (audit_log, migration 44), so OK stays
+  // disabled until then.
+  function askReason(message, opts) {
+    opts = opts || {};
+    return new Promise(function (resolve) {
+      var ov = document.createElement('div');
+      ov.className = 'hh-modal-ov';
+      ov.innerHTML =
+        '<div class="hh-modal" role="dialog" aria-modal="true">' +
+          '<h3></h3><p></p>' +
+          '<textarea rows="3" maxlength="500" style="width:100%;box-sizing:border-box;margin:4px 0 12px;font:inherit;padding:8px;border:1px solid #cbd5e1;border-radius:8px"></textarea>' +
+          '<div class="hh-modal-btns">' +
+            '<button class="hh-btn hh-cancel"></button>' +
+            '<button class="hh-btn hh-ok hh-btn-danger" disabled></button>' +
+          '</div>' +
+        '</div>';
+      ov.querySelector('h3').textContent = opts.title || 'Reason required';
+      ov.querySelector('p').textContent = message == null ? '' : String(message);
+      var box = ov.querySelector('textarea');
+      var cancel = ov.querySelector('.hh-cancel');
+      var ok = ov.querySelector('.hh-ok');
+      box.placeholder = opts.placeholder || '';
+      cancel.textContent = opts.cancelText || 'Cancel';
+      ok.textContent = opts.confirmText || 'Confirm';
+      (document.body || document.documentElement).appendChild(ov);
+      requestAnimationFrame(function () { ov.classList.add('show'); });
+      box.addEventListener('input', function () { ok.disabled = box.value.trim().length < 3; });
+      function close(val) {
+        document.removeEventListener('keydown', onKey);
+        ov.classList.remove('show');
+        setTimeout(function () { if (ov.parentNode) ov.parentNode.removeChild(ov); }, 200);
+        resolve(val);
+      }
+      function onKey(e) { if (e.key === 'Escape') close(null); }
+      ok.addEventListener('click', function () { if (!ok.disabled) close(box.value.trim()); });
+      cancel.addEventListener('click', function () { close(null); });
+      document.addEventListener('keydown', onKey);
+      setTimeout(function () { box.focus(); }, 50);
+    });
+  }
+
   // Non-blocking replacement for native alert(). Colour by message intent.
   window.__nativeAlert = window.alert;
   window.alert = function (msg) {
@@ -194,6 +237,7 @@
 
   window.showToast = showToast;
   window.confirmDialog = confirmDialog;
+  window.askReason = askReason;
   window.tv = tv;
   window.tvVocab = vocab;
 })();

@@ -148,10 +148,10 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=72a72b1b"></script>
+  <script src="i18n.js?v=5d71840c"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
-  <script src="ui.js?v=c2a21efc"></script>
+  <script src="ui.js?v=67214d77"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
     var loadedRooms = [];
@@ -665,9 +665,11 @@
 
     async function deletePendingInvoice(txnId) {
       if (!(await confirmDialog(t('billing.del_msg'), {title:t('billing.del_title'), confirmText:t('billing.del_ok'), danger:true}))) return;
+      var reason = await askReason(t('audit.reason_msg'), {title:t('audit.reason_title'), confirmText:t('audit.reason_ok'), cancelText:t('audit.reason_cancel')});
+      if (reason === null) return;
       var session = HuaHinSession.getSession();
       var token = session ? session.token : null;
-      apiCall('financeDeleteTransaction', [token, txnId]).then(function(res) {
+      apiCall('financeDeleteTransaction', [token, txnId, reason]).then(function(res) {
         if (!res.ok) { alert(res.error); return; }
         document.getElementById('btn-load').click();
       });

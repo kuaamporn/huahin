@@ -566,10 +566,10 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=72a72b1b"></script>
+  <script src="i18n.js?v=5d71840c"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
-  <script src="ui.js?v=c2a21efc"></script>
+  <script src="ui.js?v=67214d77"></script>
   <script>
     // =====================================================================
     // CONFIG — must match the Worker URL used in index.html/rooms.html/hr.html
@@ -1247,11 +1247,13 @@
     }
 
     function closeDeleteTxn() { hide('delete-txn-modal'); }
-    function confirmDeleteTxn() {
+    async function confirmDeleteTxn() {
       var txnId = document.getElementById('del-txn-id').value;
+      var reason = await askReason(HuaHinI18n.t('audit.reason_msg'), {title:HuaHinI18n.t('audit.reason_title'), confirmText:HuaHinI18n.t('audit.reason_ok'), cancelText:HuaHinI18n.t('audit.reason_cancel')});
+      if (reason === null) return;
       var btn = document.getElementById('del-txn-confirm');
       btn.disabled = true; btn.textContent = HuaHinI18n.t('fin.deleting');
-      callApi('financeDeleteTransaction', [session.token, txnId]).then(function(res) {
+      callApi('financeDeleteTransaction', [session.token, txnId, reason]).then(function(res) {
         btn.disabled = false; btn.textContent = HuaHinI18n.t('fin.delete_forever');
         closeDeleteTxn();
         if (!res.ok) { alert(res.error); return; }

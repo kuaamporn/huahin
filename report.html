@@ -624,10 +624,10 @@
 
   </div>
 
-  <script src="i18n.js?v=72a72b1b"></script>
+  <script src="i18n.js?v=5d71840c"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
-  <script src="ui.js?v=c2a21efc"></script>
+  <script src="ui.js?v=67214d77"></script>
   <script>
     var WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
 
@@ -1047,7 +1047,9 @@
       if (e) e.preventDefault();
       if (!(await confirmDialog('Cancel receipt ' + receiptNo + '? This is permanent and marks the receipt as void/cancelled.', {title:'Cancel receipt', confirmText:'Cancel receipt', cancelText:'Keep', danger:true}))) return;
 
-      callApi('financeCancelReceipt', [sessionToken, receiptNo]).then(function(res) {
+      var reason = await askReason('Why? It is saved in the audit log with your name. / เหตุผลจะถูกบันทึกพร้อมชื่อของคุณ', {title:'Reason required / ต้องระบุเหตุผล', confirmText:'Cancel receipt', cancelText:'Back'});
+      if (reason === null) return;
+      callApi('financeCancelReceipt', [sessionToken, receiptNo, reason]).then(function(res) {
         if (res.ok) {
           alert('Receipt ' + receiptNo + ' cancelled successfully.');
           loadReceiptReport();
