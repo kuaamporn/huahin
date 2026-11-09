@@ -172,7 +172,7 @@
   <script src="i18n.js?v=cf4e70f9"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
-  <script src="ui.js?v=67214d77"></script>
+  <script src="ui.js?v=c2dec6fe"></script>
   <script>
     const WORKER_API_URL = 'https://huahin-api.huahin.workers.dev';
     let sessionToken = '';
@@ -400,7 +400,7 @@
     }
 
     async function confirmOtaBatch(batchId) {
-      if (!(await confirmDialog('Confirm this OTA payout batch? This will mark matched invoices as paid.', {title:'Confirm payout batch', confirmText:'Confirm'}))) return;
+      if (!(await confirmDialog('Confirm this OTA payout batch? Matched bookings are marked paid on the bank date, and the OTA commission is recorded as an expense.', {title:'Confirm payout batch', confirmText:'Confirm'}))) return;
       const r = await api('reconcileConfirmOtaBatch', [sessionToken, batchId]);
       if (r.ok) {
         loadOtaBatches();

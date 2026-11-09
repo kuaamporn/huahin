@@ -225,6 +225,7 @@
     'utility': ['Utilities', 'ค่าสาธารณูปโภค'], 'repair': ['Repairs', 'ค่าซ่อม'],
     'cleaning': ['Cleaning', 'ค่าทำความสะอาด'], 'supplies': ['Supplies', 'ค่าของใช้'],
     'salaries': ['Salaries', 'เงินเดือน'], 'deposit_return': ['Deposit return', 'คืนเงินมัดจำ'],
+    'ota commission': ['OTA commission', 'ค่าคอมมิชชั่น OTA'],
     'other': ['Other', 'อื่น ๆ'],
     // finance: VAT wording shown in the item expander
     'Included': ['Tax included', 'รวมภาษี'], 'Excluded': ['Tax excluded', 'แยกภาษี']
