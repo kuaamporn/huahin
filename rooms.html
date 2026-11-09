@@ -546,7 +546,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="i18n.js?v=5d71840c"></script>
+<script src="i18n.js?v=cf4e70f9"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
 <script src="ui.js?v=67214d77"></script>
@@ -2211,6 +2211,8 @@ async function confirmMoveRoom() {
 
   if (res.chargeDifference > 0) {
     alert(t('rooms.move_charged', res.chargeDifference.toLocaleString()));
+  } else if (res.chargeDifference < 0) {
+    showToast(t('rooms.move_refunded', Math.abs(res.chargeDifference).toLocaleString()), 'ok');
   } else {
     showToast(t('rooms.tenant_moved'), 'ok');
   }
@@ -2229,7 +2231,11 @@ window.calcMrPreview = function() {
   var today = todayThaiDateString();
 
   if (today <= b.checkinDate) {
-    var chargeDiff = rateToUse - (b.rate || 0);
+    // Same rule as the worker: a nightly booking is repriced for every night; a monthly one
+    // by the rate difference (a lease's first period is prorated, so the final figure may differ).
+    var nights = Math.round((new Date(b.checkoutDate) - new Date(b.checkinDate)) / 86400000);
+    var perNight = ['monthly', 'monthly-draft', 'Booking.com', 'Expedia.com'].indexOf(b.bookingType) === -1;
+    var chargeDiff = (rateToUse - (b.rate || 0)) * (perNight ? nights : 1);
     var txt = t('rooms.move_before_start') +
               t('rooms.cur_rate') + (b.rate || 0).toLocaleString() + '<br>' +
               t('rooms.new_rate_line') + rateToUse.toLocaleString() + '<br>';
@@ -2263,7 +2269,7 @@ window.calcMrPreview = function() {
   var oldTotal = b.rate || 0;
   var newTotal = rateToUse;
 
-  if (b.bookingType === 'monthly') {
+  if (['monthly', 'monthly-draft', 'Booking.com', 'Expedia.com'].indexOf(b.bookingType) !== -1) {
     rentOld = Math.round(((b.rate || 0) / totalNights) * oldNights);
     rentNew = Math.round((rateToUse / totalNights) * newNights);
     oldTotal = b.rate || 0;
