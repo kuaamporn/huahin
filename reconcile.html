@@ -360,6 +360,9 @@
             <td>${it.guest_name}</td>
             <td>${it.check_in_date || '—'}</td>
             <td>฿${parseFloat(it.gross_amount).toLocaleString()}</td>
+            <td>${it.booked_amount == null ? '—' : Math.abs(it.booked_amount - it.gross_amount) > 1
+              ? `<span style="color:var(--err);font-weight:600;" title="Booked amount differs from the OTA gross — check the booking">⚠ ฿${parseFloat(it.booked_amount).toLocaleString()}</span>`
+              : `฿${parseFloat(it.booked_amount).toLocaleString()}`}</td>
             <td>฿${parseFloat(it.commission_amount).toLocaleString()}</td>
             <td>฿${parseFloat(it.net_amount).toLocaleString()}</td>
             <td><span class="badge ${it.status === 'confirmed' ? 'badge-high' : it.status === 'matched' ? 'badge-med' : 'badge-low'}">${it.status.toUpperCase()}</span></td>
@@ -387,7 +390,7 @@
               <table style="margin-top:0;">
                 <thead><tr>
                   <th>Reservation Ref</th><th>Guest</th><th>Check-in</th>
-                  <th>Gross</th><th>Commission</th><th>Net</th><th>Status</th>
+                  <th>Gross</th><th>Booked</th><th>Commission</th><th>Net</th><th>Status</th>
                 </tr></thead>
                 <tbody>${itemRows}</tbody>
               </table>
