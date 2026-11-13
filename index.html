@@ -798,6 +798,7 @@
       hide('pw-error'); hide('pw-success');
       if (!curr || !n1) { document.getElementById('pw-error').textContent = t('index.fill_all'); show('pw-error'); return; }
       if (n1 !== n2) { document.getElementById('pw-error').textContent = t('index.pw_mismatch'); show('pw-error'); return; }
+      if (n1.length < 6) { document.getElementById('pw-error').textContent = t('hr.err_new_pw_min6'); show('pw-error'); return; }
 
       Promise.all([clientHashPassword(curr), clientHashPassword(n1)]).then(function(hashes) {
         return callApi('employeeChangePassword', [sessionToken, hashes[0], hashes[1]]);
