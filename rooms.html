@@ -546,7 +546,7 @@ body{background:var(--bg);color:var(--text);font-family:'Source Sans 3','Inter',
 
 <div class="toast" id="toast"></div>
 
-<script src="i18n.js?v=cf4e70f9"></script>
+<script src="i18n.js?v=1c3e83fc"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
 <script src="ui.js?v=c2dec6fe"></script>
@@ -1962,7 +1962,7 @@ function checkInGuest(id) {
     '<div class="df"><label>' + t('rooms.d_room') + '</label><span>'+(r?r.displayName:b.roomId)+'</span></div>'+
     '<div class="df"><label>' + t('rooms.d_stay') + '</label><span>'+t('rooms.stay_range', b.checkinDate||'-', b.checkoutDate||'-', nights)+'</span></div>'+
     '<hr style="margin:12px 0; border:0; border-top:1px solid #eee;">'+
-    '<div class="df"><label>' + t('rooms.d_rate_paren') + ' ('+(isDaily ? t('rooms.rate_label_daily', nights, b.rate.toLocaleString()) : t('rooms.bt_monthly_plain'))+')</label><span>฿'+rentAmount.toLocaleString()+'</span></div>';
+    '<div class="df"><label>' + t('rooms.d_rate_paren') + ' ('+(isDaily ? t('rooms.rate_label_daily', nights, b.rate.toLocaleString()) : b.bookingType === 'monthly' ? t('rooms.bt_monthly_plain') : t('rooms.rate_label_ota', b.bookingType, nights))+')</label><span>฿'+rentAmount.toLocaleString()+'</span></div>';
 
   if (depAmount > 0) {
     detailsHtml += '<div class="df"><label>' + t('rooms.d_damage_dep') + '</label><span>฿'+depAmount.toLocaleString()+'</span></div>';
