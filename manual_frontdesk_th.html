@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือพนักงานต้อนรับ (Front desk) — The Precious Moment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Sarabun:wght@300;400;500;600;700&display=swap');
+@import url('app.css');
+
+:root{
+  --muted:#6b7280;   /* softer than app.css for long-form reading */
+  --teal:#0F766E; --teal-light:rgba(15,118,110,.08); --teal-border:rgba(15,118,110,.25);
+  --green:#16A34A; --red:#DC2626; --amber:#D97706;
+  --amber-bg:rgba(217,119,6,.08); --amber-border:rgba(217,119,6,.28);
+  --red-bg:rgba(220,38,38,.06); --red-border:rgba(220,38,38,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:16.5px;line-height:1.7}
+.wrap{max-width:920px;margin:0 auto;padding:32px 22px 120px}
+h1,h2,h3,.eyebrow,.snum,.steps li::before,.mono{font-family:'Lexend',sans-serif}
+.thai-head{font-family:'Sarabun',sans-serif;font-weight:700}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px;flex-wrap:wrap;gap:10px}
+.back{font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--teal-border);border-radius:999px;background:var(--teal-light)}
+.back:hover{background:var(--teal);color:#fff}
+.tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;margin-bottom:14px;font-family:'Sarabun',sans-serif}
+.lead{color:var(--muted);font-size:16px;max-width:680px;margin-bottom:14px}
+.lead b{color:var(--text)}
+
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;margin:30px 0 44px}
+.toc h2{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:500}
+.toc ol{list-style:none;counter-reset:t;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.toc li{counter-increment:t}
+.toc a{color:var(--text);text-decoration:none;display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:15.5px}
+.toc a::before{content:counter(t);font-family:'Lexend',sans-serif;font-weight:700;color:var(--teal);min-width:22px;font-size:13px}
+.toc a:hover{color:var(--teal)}
+
+.section{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 30px;margin-bottom:26px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.section-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:8px}
+.snum{flex-shrink:0;width:42px;height:42px;border-radius:13px;background:var(--teal);color:#fff;font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center}
+.section-head h2{font-size:24px;font-weight:700;line-height:1.25;font-family:'Sarabun',sans-serif;padding-top:3px}
+.section-head .en{display:block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:400;margin-top:3px}
+.section > p{color:#3a3a3c;margin:14px 0}
+.section > p.intro{margin-top:16px}
+
+.fig{margin:22px 0;text-align:center}
+.fig img{max-width:100%;width:auto;border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 20px -8px rgba(0,0,0,.18)}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px}
+
+.steps{list-style:none;counter-reset:s;margin:16px 0 4px;padding:0}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 42px;border-bottom:1px solid #f1f1f3}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:27px;height:27px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center}
+.steps li b{color:var(--teal)}
+.steps.circ{counter-reset:none}
+.steps.circ li::before{content:attr(data-n)}
+
+.note,.warn,.tip{border-radius:14px;padding:15px 18px;margin:20px 0;font-size:15.5px;line-height:1.6}
+.note{background:var(--teal-light);border:1px solid var(--teal-border)}
+.warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+.tip{background:var(--red-bg);border:1px solid var(--red-border)}
+.note b,.warn b,.tip b{font-weight:700}
+.warn b{color:var(--amber)} .tip b{color:var(--red)}
+
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px;font-family:'DM Mono',monospace;letter-spacing:1px}
+
+@media(max-width:680px){
+  .toc ol{grid-template-columns:1fr}
+  .section{padding:26px 20px}
+  .section-head h2{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="staff_manual.html">← กลับหน้าหลักคู่มือ</a>
+    <span class="tag">The Precious Moment</span>
+  </div>
+
+  <div class="eyebrow">คู่มือพนักงานต้อนรับ · Front desk · Rooms</div>
+  <h1>ผังห้องพัก การจอง และการเช็คอิน</h1>
+  <p class="lead">คู่มือนี้สำหรับ<b>พนักงานต้อนรับ (front desk)</b> ครอบคลุมงานประจำวันในหน้า <b>ผังห้องพัก</b>:
+  ดูห้องว่าง สร้างการจอง (รายวัน รายเดือน และ OTA) ลงทะเบียนผู้เข้าพัก เช็คอิน เปลี่ยนวัน ต่อ หรือยกเลิกการจอง
+  จองในนามบริษัท แจ้งซ่อมหรือทำความสะอาดห้อง และพิมพ์ใบเสร็จซ้ำ</p>
+  <p class="lead" style="margin-bottom:0"><b>เกี่ยวข้อง:</b> เรื่องเงิน (บันทึกรายรับ ออกใบเสร็จ คืนเงินมัดจำ สัญญาเช่ารายเดือน)
+  อยู่ใน<a href="manual_finance_th.html">คู่มือการเงิน</a> ส่วนการลงเวลาและการลาอยู่ใน<a href="manual_hr_th.html">คู่มือบุคคล</a></p>
+
+  <nav class="toc">
+    <h2>สารบัญ</h2>
+    <ol>
+      <li><a href="#s1">ผังห้องพัก</a></li>
+      <li><a href="#s2">จองห้องใหม่ (รายวัน / รายเดือน)</a></li>
+      <li><a href="#s3">จองผ่าน OTA และจองล่วงหน้า</a></li>
+      <li><a href="#s4">ลงทะเบียนผู้เข้าพัก</a></li>
+      <li><a href="#s5">รายละเอียดการจอง</a></li>
+      <li><a href="#s6">เช็คอินผู้เข้าพัก</a></li>
+      <li><a href="#s7">เปลี่ยนวันที่ และต่อการเข้าพัก</a></li>
+      <li><a href="#s8">ยกเลิกการจอง</a></li>
+      <li><a href="#s9">จองในนามบริษัท</a></li>
+      <li><a href="#s10">แจ้งซ่อม ปิดห้อง ทำความสะอาด</a></li>
+      <li><a href="#s11">พิมพ์ใบเสร็จซ้ำ</a></li>
+    </ol>
+  </nav>
+
+  <section class="section" id="s1">
+    <div class="section-head"><div class="snum">1</div><h2>ผังห้องพัก<span class="en">Room board</span></h2></div>
+    <p class="intro">เปิด <b>ผังห้องพัก</b> จากเมนูด้านบน หน้านี้แสดงทุกห้องเป็นแถว และวันที่เป็นคอลัมน์
+    แถบสีในตารางคือการจองแต่ละรายการ</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/01_board.png" alt="ผังห้องพัก" loading="lazy"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>เลือกโครงการ</b>: The Precious, The Moment หรือ <b>รวมทั้งหมด</b></li>
+      <li data-n="2"><b>＋ จองห้องใหม่</b>: เปิดฟอร์มจอง (ดูหัวข้อ 2) ถัดไปมีปุ่ม <b>บริษัท</b>, <b>ข้อมูลห้อง</b>, <b>ผู้เช่าระยะยาว</b>
+      และ ◀ <b>วันนี้</b> ▶ สำหรับเลื่อนผังทีละ 30 วัน</li>
+      <li data-n="3"><b>สรุปวันนี้</b>: ห้องว่าง มีผู้พัก เช็คอิน เช็คเอาท์ และอัตราเข้าพัก</li>
+      <li data-n="4"><b>ค้นหา</b>: พิมพ์ชื่อผู้เข้าพักหรือเลขห้อง</li>
+      <li data-n="5"><b>หาห้องว่าง</b>: เลือกวันเข้าและวันออก ระบบจะแสดงห้องที่ว่างช่วงนั้น เลือกชั้นได้จากปุ่มด้านขวา</li>
+      <li data-n="6"><b>ตารางห้อง</b>: คลิก<b>ช่องว่าง</b>เพื่อจองห้องนั้นในวันนั้นได้ทันที คลิก<b>แถบสี</b>เพื่อเปิดรายละเอียดการจอง (หัวข้อ 5)</li>
+    </ol>
+    <div class="note"><b>สีของแถบ</b> (คำอธิบายอยู่ใต้ตาราง): น้ำเงิน = รายเดือน · เขียว = รายวัน · ส้ม = จองล่วงหน้า ·
+    ม่วง = เชิงพาณิชย์ · แถบลายทาง = ยังไม่เช็คอิน</div>
+  </section>
+
+  <section class="section" id="s2">
+    <div class="section-head"><div class="snum">2</div><h2>จองห้องใหม่ (รายวัน / รายเดือน)<span class="en">New booking</span></h2></div>
+    <p class="intro">กด <b>＋ จองห้องใหม่</b> หรือคลิกช่องว่างในผัง แล้วกรอกฟอร์ม</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/02_new_booking.png" alt="ฟอร์มจองห้องใหม่" loading="lazy" style="max-width:min(100%,560px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ประเภทการทำรายการ</b>: ใช้ <b>จองห้องใหม่</b> (ตัวเลือกอื่นดูหัวข้อ 10)</li>
+      <li data-n="2"><b>โครงการและห้อง</b>: ในรายการห้องจะเห็นประเภทห้องและราคาตั้งต้น</li>
+      <li data-n="3"><b>ผู้เข้าพัก</b>: พิมพ์ชื่อ ถ้าเคยพักแล้วระบบจะแนะนำชื่อให้ ถ้าเป็นลูกค้าใหม่กด <b>＋ เพิ่มผู้เข้าพัก</b> (หัวข้อ 4)</li>
+      <li data-n="4"><b>ประเภทการจอง</b>: รายเดือน · รายวัน · Booking.com · Expedia.com · AS · Thai Tour</li>
+      <li data-n="5"><b>วันที่</b>: ใส่วันเช็คอิน แล้วใส่จำนวนคืนหรือวันเช็คเอาท์ ระบบคำนวณอีกช่องให้</li>
+      <li data-n="6"><b>ค่าเช่าและเงินประกัน</b>: รายวันใส่ราคา<b>ต่อคืน</b> รายเดือนใส่<b>ต่อเดือน</b> และใส่ค่ามัดจำคีย์การ์ดกับจำนวนบัตร</li>
+      <li data-n="7"><b>สรุปยอด</b>: ตรวจ <b>ยอดชำระตอนนี้</b> ให้ตรงกับเงินที่รับจากลูกค้า</li>
+      <li data-n="8"><b>✓ ยืนยันการจอง</b></li>
+    </ol>
+    <div class="warn"><b>สำคัญ:</b> ถ้า<b>ไม่ได้</b>ติ๊ก “การจองล่วงหน้า” ระบบถือว่าแขก<b>เข้าพักทันที</b>
+    สถานะเป็น “เข้าพักแล้ว” และบันทึกยอดในกล่องสรุปเป็น<b>รายรับที่ได้รับแล้ว</b>ทันที
+    ถ้าแขกยังไม่มาหรือยังไม่จ่าย ให้ติ๊ก <b>การจองล่วงหน้า</b> (หัวข้อ 3)</div>
+    <div class="note">จองทับช่วงที่ห้องไม่ว่างไม่ได้ ระบบจะเตือนใต้ฟอร์ม · ถ้าชื่อผู้เข้าพักอยู่ใน<b>บัญชีดำ</b>
+    จะมีแถบสีแดงพร้อมเหตุผลขึ้นทันทีที่พิมพ์ชื่อ · เลือกประเภท<b>รายเดือน</b>จะมีช่อง<b>ประเภทสัญญา</b>และ<b>รอบชำระแรก</b>เพิ่ม
+    (รายละเอียดสัญญาเช่าดูในคู่มือการเงิน หัวข้อ “ผู้เช่าระยะยาว”)</div>
+  </section>
+
+  <section class="section" id="s3">
+    <div class="section-head"><div class="snum">3</div><h2>จองผ่าน OTA และจองล่วงหน้า<span class="en">OTA &amp; advance reservations</span></h2></div>
+    <p class="intro">การจองจาก Booking.com, Expedia, AS หรือ Thai Tour และการจองที่แขกจะมาภายหลัง</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/03_ota_booking.png" alt="จองผ่าน OTA" loading="lazy" style="max-width:min(100%,560px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>เลือกช่องทาง</b>: เช่น Booking.com</li>
+      <li data-n="2"><b>รหัสการจอง *</b>: ต้องกรอก ให้คัดลอก<b>เลขการจองจากอีเมล/หลังบ้าน OTA ให้ตรงทุกตัว</b>
+      เพราะระบบใช้เลขนี้จับคู่กับยอดเงินที่ OTA โอนมา</li>
+      <li data-n="3"><b>การจองล่วงหน้า (รอเช็คอิน)</b>: ติ๊กเมื่อแขกยังไม่มาถึง แถบในผังจะเป็นลายทาง</li>
+      <li data-n="4"><b>เงินมัดจำการจอง</b>: ถ้าแขกโอนมัดจำมาแล้ว ใส่ยอดที่นี่ (ถ้าไม่มีใส่ 0) ยอดนี้จะหักออกตอนเช็คอิน</li>
+    </ol>
+    <div class="note">สำหรับ OTA ช่อง <b>ค่าเช่า</b> ใส่<b>ยอดรวมทั้งการจอง</b> (ไม่ใช่ต่อคืน) ตามที่อีเมล OTA แจ้ง</div>
+  </section>
+
+  <section class="section" id="s4">
+    <div class="section-head"><div class="snum">4</div><h2>ลงทะเบียนผู้เข้าพัก<span class="en">Guest registration</span></h2></div>
+    <p class="intro">กด <b>＋ เพิ่มผู้เข้าพัก</b> ในฟอร์มจอง เพื่อเก็บข้อมูลลูกค้าไว้ใช้ครั้งต่อไป
+    (ลูกค้าเดิมกด <b>✏️ แก้ไขผู้เข้าพัก</b>)</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/04_add_guest.png" alt="เพิ่มผู้เข้าพักใหม่" loading="lazy" style="max-width:min(100%,520px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ชื่อ / นามสกุล *</b>: ใช้ชื่อตามบัตร</li>
+      <li data-n="2"><b>บัตรประชาชน / พาสปอร์ต</b>: ต้องมีก่อนเช็คอิน (ถ้าไม่ใส่ตอนนี้ ระบบจะถามตอนเช็คอิน)</li>
+      <li data-n="3"><b>สัญชาติ *</b>: รหัส 3 ตัวอักษร เช่น THA, GBR, USA</li>
+      <li data-n="4"><b>สถานะ</b>: ปกติ หรือ <b>บัญชีดำ / คำเตือน</b> พร้อมเหตุผล ระบบจะเตือนทุกครั้งที่มีคนจองให้ชื่อนี้</li>
+    </ol>
+  </section>
+
+  <section class="section" id="s5">
+    <div class="section-head"><div class="snum">5</div><h2>รายละเอียดการจอง<span class="en">Booking details</span></h2></div>
+    <p class="intro">คลิกแถบสีในผังห้อง จะมีแผงรายละเอียดเปิดขึ้นทางขวา ปุ่มที่เห็นขึ้นกับสถานะการจอง</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/05_booking_detail.png" alt="แผงรายละเอียดการจอง" loading="lazy" style="max-width:min(100%,300px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>เช็คอินผู้เข้าพัก</b>: มีเฉพาะการจองล่วงหน้าที่ยังไม่เช็คอิน (หัวข้อ 6)</li>
+      <li data-n="2"><b>เปลี่ยนวันที่</b>: เลื่อนวันเข้า-ออกของการจองที่ยังไม่เช็คอิน (หัวข้อ 7)</li>
+      <li data-n="3"><b>ยกเลิกการจอง</b> (หัวข้อ 8)</li>
+      <li data-n="4"><b>ต่อการเข้าพัก</b>: เพิ่มคืน/เดือนต่อจากวันเช็คเอาท์เดิม (หัวข้อ 7)</li>
+    </ol>
+    <p>ปุ่ม <b>ประวัติ</b> แสดงการเข้าพักและโน้ตทั้งหมดของลูกค้าคนนี้ · <b>✏️ แก้ไข</b> ข้างหมายเหตุใช้แก้โน้ตของการจอง
+    (ระบบเก็บว่าใครแก้ เมื่อไร) · ผู้เช่ารายเดือนที่เข้าพักแล้วจะมีปุ่ม <b>ย้ายห้อง</b> และ <b>ย้ายออกก่อนกำหนด</b> เพิ่ม</p>
+  </section>
+
+  <section class="section" id="s6">
+    <div class="section-head"><div class="snum">6</div><h2>เช็คอินผู้เข้าพัก<span class="en">Check-in</span></h2></div>
+    <p class="intro">เมื่อแขกที่จองล่วงหน้ามาถึง เปิดรายละเอียดการจอง แล้วกด <b>🛎 เช็คอินผู้เข้าพัก</b></p>
+    <figure class="fig"><img src="manual_assets/frontdesk/06_checkin.png" alt="หน้าต่างเช็คอิน" loading="lazy" style="max-width:min(100%,480px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>สรุปยอด</b>: ค่าเช่า + เงินประกัน − มัดจำที่จ่ายแล้ว = <b>ยอดที่ต้องเก็บ</b> เก็บเงินแขกตามยอดนี้</li>
+      <li data-n="2"><b>เลขบัตร/พาสปอร์ต</b>: ช่องนี้ขึ้นเมื่อยังไม่มีเลขบัตรของแขกในระบบ ต้องกรอกจึงเช็คอินได้</li>
+      <li data-n="3"><b>เช็คอินและบันทึกรายได้</b>: ระบบเปลี่ยนสถานะเป็นเข้าพัก และบันทึกยอดคงเหลือเป็น<b>รายได้ที่รับแล้ว</b>ทันที</li>
+    </ol>
+    <div class="warn"><b>กดเช็คอินหลังจากรับเงินครบแล้วเท่านั้น</b> เพราะระบบบันทึกเป็นเงินที่รับแล้วทันที</div>
+  </section>
+
+  <section class="section" id="s7">
+    <div class="section-head"><div class="snum">7</div><h2>เปลี่ยนวันที่ และต่อการเข้าพัก<span class="en">Change dates &amp; extend</span></h2></div>
+    <p class="intro"><b>เปลี่ยนวันที่</b> ใช้กับการจองล่วงหน้าที่ยังไม่เช็คอิน เช่น แขกขอเลื่อนวันมา</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/07_change_dates.png" alt="เปลี่ยนวันที่การจอง" loading="lazy" style="max-width:min(100%,480px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>วันเข้า / วันออกใหม่</b></li>
+      <li data-n="2"><b>บันทึก</b>: ถ้าห้องเดิมไม่ว่างช่วงใหม่ ระบบจะเสนอ<b>ห้องอื่นที่ว่าง</b>ให้เลือก แล้วกดยืนยันและย้ายห้อง</li>
+    </ol>
+    <p><b>ต่อการเข้าพัก</b> ใช้เมื่อแขกที่พักอยู่ขอพักต่อ: กด <b>➕ ต่อการเข้าพัก</b> ระบบจะเปิดฟอร์มจองที่กรอกห้อง ชื่อ และราคาเดิมไว้
+    โดยวันเข้าเริ่มจากวันเช็คเอาท์เดิม ปรับจำนวนคืนแล้วกดยืนยัน (การต่อจะเป็นการจองใหม่ต่อท้าย และบันทึกรายรับของช่วงที่ต่อ)</p>
+  </section>
+
+  <section class="section" id="s8">
+    <div class="section-head"><div class="snum">8</div><h2>ยกเลิกการจอง<span class="en">Cancel</span></h2></div>
+    <p class="intro">เปิดรายละเอียดการจอง แล้วกดปุ่มสีแดง <b>ยกเลิกการจอง</b></p>
+    <figure class="fig"><img src="manual_assets/frontdesk/09_cancel_res.png" alt="ยกเลิกการจองล่วงหน้า" loading="lazy" style="max-width:min(100%,480px)"></figure>
+    <ul class="steps" style="counter-reset:none">
+      <li style="padding-left:0"><b>การจองล่วงหน้า</b>: เลือก <b>คืนเงินมัดจำ</b> (ลบรายการเงิน) หรือ <b>ริบเงินมัดจำ</b> (เก็บเป็นรายได้)
+      ตามที่เจ้าของกำหนด</li>
+      <li style="padding-left:0"><b>การจองที่เข้าพักแล้ว</b>: ระบบถามยืนยันก่อน</li>
+      <li style="padding-left:0">ทุกกรณีต้อง<b>พิมพ์เหตุผล</b> ปุ่มยืนยันจะกดไม่ได้จนกว่าจะใส่เหตุผล และระบบบันทึกไว้ว่าใครยกเลิก</li>
+    </ul>
+    <div class="tip"><b>ยกเลิกไม่ได้</b> ถ้าการจองนั้น<b>ออกใบเสร็จไปแล้ว</b> ระบบจะแจ้งเลขใบเสร็จ
+    ให้แจ้งฝ่ายบัญชีหรือเจ้าของยกเลิกใบเสร็จก่อน</div>
+  </section>
+
+  <section class="section" id="s9">
+    <div class="section-head"><div class="snum">9</div><h2>จองในนามบริษัท<span class="en">Company bookings</span></h2></div>
+    <p class="intro">เมื่อบริษัทเป็นผู้จ่ายและต้องการใบเสร็จในนามบริษัท ให้ติ๊ก <b>จองในนามบริษัท</b> ในฟอร์มจอง</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/08_company_booking.png" alt="จองในนามบริษัท" loading="lazy" style="max-width:min(100%,560px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>จองในนามบริษัท</b>: ติ๊กเพื่อเปิดช่องค้นหาบริษัท</li>
+      <li data-n="2"><b>ค้นหา</b>: พิมพ์ชื่อหรือเลขประจำตัวผู้เสียภาษี ถ้ายังไม่มีกด <b>＋ เพิ่มใหม่</b>
+      (ต้องมีชื่อบริษัทและเลขผู้เสียภาษี 13 หลัก ติ๊ก “หักภาษี ณ ที่จ่าย 5%” ถ้าบริษัทหัก)</li>
+      <li data-n="3"><b>เลือกบริษัท</b>จากผลค้นหา</li>
+    </ol>
+    <p>ดูหรือแก้ข้อมูลบริษัททั้งหมดได้จากปุ่ม <b>🏢 บริษัท</b> บนผังห้อง</p>
+    <figure class="fig"><img src="manual_assets/frontdesk/11_companies.png" alt="รายชื่อบริษัท" loading="lazy" style="max-width:min(100%,520px)"></figure>
+  </section>
+
+  <section class="section" id="s10">
+    <div class="section-head"><div class="snum">10</div><h2>แจ้งซ่อม ปิดห้อง ทำความสะอาด<span class="en">Maintenance · close · cleaning</span></h2></div>
+    <p class="intro">ใช้ฟอร์มเดียวกับการจอง แต่เปลี่ยน <b>ประเภทการทำรายการ</b></p>
+    <figure class="fig"><img src="manual_assets/frontdesk/10_room_action.png" alt="แจ้งทำความสะอาด" loading="lazy" style="max-width:min(100%,560px)"></figure>
+    <ol class="steps circ">
+      <li data-n="1"><b>ประเภท</b>: 🔧 ซ่อมบำรุง · 🚫 ปิดห้อง (งดให้บริการ) · 🧹 แจ้งทำความสะอาด</li>
+      <li data-n="2"><b>เหตุผล</b>: เช่น “แอร์ไม่เย็น” หรือ “แขกเช็คเอาท์ ขอทำความสะอาด” แล้วกดยืนยัน</li>
+    </ol>
+    <div class="note">งานทำความสะอาดจะไปขึ้นที่หน้า <b>รายการงานของฉัน</b> ของแม่บ้าน และสถานะห้องจะกลับเป็นว่างเมื่อแม่บ้านทำเสร็จ ·
+    ปิดห้องที่ยังมีแขกพักอยู่ไม่ได้ · คลิกป้ายซ่อม/ปิดห้องในผังเพื่อดูเหตุผล และกดยกเลิกเมื่อซ่อมเสร็จ</div>
+  </section>
+
+  <section class="section" id="s11">
+    <div class="section-head"><div class="snum">11</div><h2>พิมพ์ใบเสร็จซ้ำ<span class="en">Reprint a receipt</span></h2></div>
+    <p class="intro">พนักงานต้อนรับ<b>ออกใบเสร็จใหม่ไม่ได้</b> (ฝ่ายบัญชีหรือเจ้าของเป็นผู้ออก) แต่พิมพ์ใบที่ออกแล้วซ้ำได้
+    ไปที่เมนู <b>รายงาน</b> แล้วเลือกแท็บ <b>Receipt Report</b></p>
+    <figure class="fig"><img src="manual_assets/frontdesk/12_receipts.png" alt="รายงานใบเสร็จ" loading="lazy"></figure>
+    <ol class="steps">
+      <li>เลือกโครงการและช่วงวันที่ หรือพิมพ์เลขใบเสร็จ ชื่อแขก หรือเลขห้องในช่อง <b>Search</b></li>
+      <li>กด <b>Print</b> ท้ายแถว ใบเสร็จจะเปิดในแท็บใหม่ แล้วสั่งพิมพ์จากเบราว์เซอร์</li>
+      <li>ต้องการพิมพ์หลายใบ: ติ๊กช่องหน้าแถว แล้วกด <b>Print Selected Receipts</b></li>
+    </ol>
+    <div class="note">หน้า <b>รายงาน</b> ยังแสดงเป็นภาษาอังกฤษ</div>
+  </section>
+
+  <div class="footer">The Precious Moment System · คู่มือพนักงานต้อนรับ (Front desk)</div>
+</div>
+</body>
+</html>
