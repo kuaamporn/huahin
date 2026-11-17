@@ -624,7 +624,7 @@
 
   </div>
 
-  <script src="i18n.js?v=e386c094"></script>
+  <script src="i18n.js?v=bcb90052"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
   <script src="ui.js?v=c2dec6fe"></script>
@@ -854,9 +854,9 @@
           '<td>' + fmtDate(t.taskDate) + '</td>' +
           '<td><strong>' + t.displayName + '</strong></td>' +
           '<td>' + propName + '</td>' +
-          '<td>' + (t.guestName || '—') + '</td>' +
-          '<td>' + (t.type === 'daily' ? 'Daily Rent' : 'Monthly Request') + '</td>' +
-          '<td>' + t.description + '</td>' +
+          '<td>' + escapeHtml(hkText(t.guestName) || '—') + '</td>' +
+          '<td>' + HuaHinI18n.t(t.type === 'daily' ? 'report.hk_type_daily' : 'report.hk_type_request') + '</td>' +
+          '<td>' + escapeHtml(hkText(t.description)) + '</td>' +
           '<td>' + statusBadge + '</td>' +
           '<td>' + formatThaiDateTime(t.cleanedAt) + '</td>' +
           '<td>' + (t.cleanedBy || '—') + '</td>' +
@@ -875,6 +875,12 @@
         sel.appendChild(opt);
       }
     })();
+
+    // Fixed English strings the worker writes on housekeeping tasks -> current language.
+    // Staff-typed reasons pass through unchanged.
+    var HK_TEXT = { 'Daily guest stay clean': 'report.hk_stay_clean', 'Daily guest checkout clean': 'report.hk_checkout_clean',
+      'Requested by front desk': 'report.hk_by_frontdesk', 'Monthly Guest': 'report.hk_request_guest' };
+    function hkText(v) { return HK_TEXT[v] ? HuaHinI18n.t(HK_TEXT[v]) : v; }
 
     function getBookingTypeLabel(type) {
       if (type === 'monthly') return HuaHinI18n.t('report.bt_monthly');

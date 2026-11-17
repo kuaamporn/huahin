@@ -31,6 +31,12 @@
 
   var DICT = {
     en: {
+      'report.hk_type_daily': 'Daily Rent',
+      'report.hk_type_request': 'Monthly Request',
+      'report.hk_stay_clean': 'Daily guest stay clean',
+      'report.hk_checkout_clean': 'Daily guest checkout clean',
+      'report.hk_by_frontdesk': 'Requested by front desk',
+      'report.hk_request_guest': 'Monthly Guest',
       'report.hk_pending': 'Pending',
       'report.none_revenue': 'No revenue receipts this month.',
       'report.none_expense': 'No expenses this month.',
@@ -1273,6 +1279,12 @@
       'fin.refund_confirm_title': 'Confirm the deposit refund',
     },
     th: {
+      'report.hk_type_daily': 'ผู้เข้าพักรายวัน',
+      'report.hk_type_request': 'แจ้งทำความสะอาด',
+      'report.hk_stay_clean': 'ทำความสะอาดระหว่างเข้าพัก',
+      'report.hk_checkout_clean': 'ทำความสะอาดหลังเช็คเอาท์',
+      'report.hk_by_frontdesk': 'หน้าร้านแจ้ง',
+      'report.hk_request_guest': '(แจ้งทำความสะอาด)',
       'report.hk_pending': 'รอทำ',
       'report.none_revenue': 'ไม่มีใบเสร็จรายรับในเดือนนี้',
       'report.none_expense': 'ไม่มีรายจ่ายในเดือนนี้',
