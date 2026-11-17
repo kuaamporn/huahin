@@ -94,23 +94,23 @@
     <div class="topbar">
       <div class="topbar-header">
         <div>
-          <h1>System Reports</h1>
-          <div class="sub" style="margin-bottom:0;">KPI tracking, booking aggregates, receipts and invoices dashboards.</div>
+          <h1 data-i18n="report.title">System Reports</h1>
+          <div class="sub" style="margin-bottom:0;" data-i18n="report.sub">KPI tracking, booking aggregates, receipts and invoices dashboards.</div>
         </div>
-        <a href="#" class="btn-signout" id="logout-link">Sign out</a>
+        <a href="#" class="btn-signout" id="logout-link" data-i18n="nav.signout">Sign out</a>
       </div>
       <div class="toplinks" id="hh-nav" data-page="reports"></div>
     </div>
 
     <div class="ftabs">
-      <div class="ftab active" id="tab-hk" onclick="switchTab('hk')">Housekeeping</div>
-      <div class="ftab" id="tab-bookings" onclick="switchTab('bookings')">Bookings Summary</div>
-      <div class="ftab" id="tab-receipts" onclick="switchTab('receipts')">Receipt Report</div>
-      <div class="ftab" id="tab-invoices" onclick="switchTab('invoices')">ABB Invoice Report</div>
-      <div class="ftab" id="tab-full-invoices" onclick="switchTab('full-invoices')">Full Invoice Report</div>
-      <div class="ftab" id="tab-ota" onclick="switchTab('ota')">OTA Bookings</div>
-      <div class="ftab hidden" id="tab-revenue" onclick="switchTab('revenue')">Revenue</div>
-      <div class="ftab hidden" id="tab-expense" onclick="switchTab('expense')">Expense</div>
+      <div class="ftab active" id="tab-hk" onclick="switchTab('hk')" data-i18n="report.tab_hk">Housekeeping</div>
+      <div class="ftab" id="tab-bookings" onclick="switchTab('bookings')" data-i18n="report.tab_bookings">Bookings Summary</div>
+      <div class="ftab" id="tab-receipts" onclick="switchTab('receipts')" data-i18n="report.tab_receipts">Receipt Report</div>
+      <div class="ftab" id="tab-invoices" onclick="switchTab('invoices')" data-i18n="report.tab_invoices">ABB Invoice Report</div>
+      <div class="ftab" id="tab-full-invoices" onclick="switchTab('full-invoices')" data-i18n="report.tab_full_invoices">Full Invoice Report</div>
+      <div class="ftab" id="tab-ota" onclick="switchTab('ota')" data-i18n="report.tab_ota">OTA Bookings</div>
+      <div class="ftab hidden" id="tab-revenue" onclick="switchTab('revenue')" data-i18n="report.tab_revenue">Revenue</div>
+      <div class="ftab hidden" id="tab-expense" onclick="switchTab('expense')" data-i18n="report.tab_expense">Expense</div>
     </div>
 
     <!-- HOUSEKEEPING VIEW -->
@@ -118,56 +118,56 @@
       <div class="summary-grid">
         <div class="kpi-card total">
           <div class="kpi-val" id="kpi-total">0</div>
-          <div class="kpi-lbl">Total Tasks Scheduled</div>
+          <div class="kpi-lbl" data-i18n="report.kpi_tasks">Total Tasks Scheduled</div>
         </div>
         <div class="kpi-card remaining">
           <div class="kpi-val" id="kpi-remaining">0</div>
-          <div class="kpi-lbl">Remaining / Overdue</div>
+          <div class="kpi-lbl" data-i18n="report.kpi_remaining">Remaining / Overdue</div>
         </div>
         <div class="kpi-card completed">
           <div class="kpi-val" id="kpi-completed">0</div>
-          <div class="kpi-lbl">Completed (Cleaned)</div>
+          <div class="kpi-lbl" data-i18n="report.kpi_completed">Completed (Cleaned)</div>
         </div>
         <div class="kpi-card rate">
           <div class="kpi-val" id="kpi-rate">0%</div>
-          <div class="kpi-lbl">Completion Rate</div>
+          <div class="kpi-lbl" data-i18n="report.kpi_rate">Completion Rate</div>
         </div>
       </div>
 
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-property" onchange="applyFilters()">
-              <option value="all">All Properties</option>
+              <option value="all" data-i18n="report.all_props">All Properties</option>
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Status</label>
+            <label data-i18n="report.status">Status</label>
             <select id="filter-status" onchange="applyFilters()">
-              <option value="all">All Statuses</option>
-              <option value="CLEANED">Cleaned</option>
-              <option value="remaining">Remaining (Pending / Overdue)</option>
+              <option value="all" data-i18n="report.all_statuses">All Statuses</option>
+              <option value="CLEANED" data-i18n="report.cleaned">Cleaned</option>
+              <option value="remaining" data-i18n="report.remaining">Remaining (Pending / Overdue)</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Start Date</label>
+            <label data-i18n="report.start_date">Start Date</label>
             <input type="date" id="filter-start-date" onchange="loadReport()" />
           </div>
           <div class="tool-group">
-            <label>End Date</label>
+            <label data-i18n="report.end_date">End Date</label>
             <input type="date" id="filter-end-date" onchange="loadReport()" />
           </div>
           <div class="tool-group" style="flex:1;min-width:180px;">
-            <label>Search</label>
-            <input type="text" id="filter-search" placeholder="Search guest, room..." oninput="applyFilters()" />
+            <label data-i18n="report.search">Search</label>
+            <input type="text" id="filter-search" placeholder="Search guest, room..." data-i18n-attr="placeholder:report.ph_hk" oninput="applyFilters()" />
           </div>
           <div class="tool-group" style="align-self: flex-end; margin-left: auto;">
             <button class="btn-primary" onclick="printHkReport()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-              Print Checklist
+              <span data-i18n="report.print_checklist">Print Checklist</span>
             </button>
           </div>
         </div>
@@ -175,12 +175,12 @@
 
       <div id="print-area-hk">
         <div class="print-header" style="display: none;">
-          <h1 style="font-size: 20px; font-weight: bold; margin: 0 0 6px 0; font-family: 'Lexend', sans-serif;">Housekeeping Tasks Checklist</h1>
+          <h1 style="font-size: 20px; font-weight: bold; margin: 0 0 6px 0; font-family: 'Lexend', sans-serif;" data-i18n="report.hk_checklist">Housekeeping Tasks Checklist</h1>
           <div style="font-size: 12px; color: #333; margin-bottom: 15px; display: flex; gap: 16px; flex-wrap: wrap;">
-            <span><strong>Property:</strong> <span id="print-prop">All</span></span>
-            <span><strong>Status:</strong> <span id="print-status">All</span></span>
-            <span><strong>Date Range:</strong> <span id="print-date">Any</span></span>
-            <span><strong>Printed At:</strong> <span id="print-time">-</span></span>
+            <span><strong data-i18n="report.property_c">Property:</strong> <span id="print-prop">All</span></span>
+            <span><strong data-i18n="report.status_c">Status:</strong> <span id="print-status">All</span></span>
+            <span><strong data-i18n="report.date_range_c">Date Range:</strong> <span id="print-date">Any</span></span>
+            <span><strong data-i18n="report.printed_at_c">Printed At:</strong> <span id="print-time">-</span></span>
           </div>
         </div>
 
@@ -189,19 +189,19 @@
           <table>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Room</th>
-                <th>Property</th>
-                <th>Guest Name</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Cleaned At</th>
-                <th>Cleaned By</th>
+                <th data-i18n="report.date">Date</th>
+                <th data-i18n="report.room">Room</th>
+                <th data-i18n="report.property">Property</th>
+                <th data-i18n="report.guest">Guest Name</th>
+                <th data-i18n="report.type">Type</th>
+                <th data-i18n="report.description">Description</th>
+                <th data-i18n="report.status">Status</th>
+                <th data-i18n="report.cleaned_at">Cleaned At</th>
+                <th data-i18n="report.cleaned_by">Cleaned By</th>
               </tr>
             </thead>
             <tbody id="report-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading report data...</td></tr>
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;" data-i18n="report.loading">Loading report data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -214,48 +214,48 @@
       <div class="summary-grid">
         <div class="kpi-card total">
           <div class="kpi-val" id="kpi-booking-total">0</div>
-          <div class="kpi-lbl">Total Bookings</div>
+          <div class="kpi-lbl" data-i18n="report.kpi_bookings">Total Bookings</div>
         </div>
         <div class="kpi-card rate">
           <div class="kpi-val" id="kpi-booking-revenue">฿0</div>
-          <div class="kpi-lbl">Total Revenue</div>
+          <div class="kpi-lbl" data-i18n="report.total_revenue">Total Revenue</div>
         </div>
         <div class="kpi-card completed">
           <div class="kpi-val" id="kpi-booking-avg-duration">—</div>
-          <div class="kpi-lbl">Avg. Stay Duration</div>
+          <div class="kpi-lbl" data-i18n="report.kpi_avg_stay">Avg. Stay Duration</div>
         </div>
       </div>
 
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-booking-property" onchange="loadBookingReport()">
-              <option value="both">Both Properties</option>
+              <option value="both" data-i18n="report.both_props">Both Properties</option>
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Year</label>
+            <label data-i18n="report.year">Year</label>
             <select id="filter-booking-year" onchange="loadBookingReport()"></select>
           </div>
           <div class="tool-group">
-            <label>Month</label>
+            <label data-i18n="report.month">Month</label>
             <select id="filter-booking-month" onchange="loadBookingReport()">
-              <option value="">All Months</option>
-              <option value="01">January</option>
-              <option value="02">February</option>
-              <option value="03">March</option>
-              <option value="04">April</option>
-              <option value="05">May</option>
-              <option value="06">June</option>
-              <option value="07">July</option>
-              <option value="08">August</option>
-              <option value="09">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
+              <option value="" data-i18n="report.all_months">All Months</option>
+              <option value="01" data-i18n="report.m01">January</option>
+              <option value="02" data-i18n="report.m02">February</option>
+              <option value="03" data-i18n="report.m03">March</option>
+              <option value="04" data-i18n="report.m04">April</option>
+              <option value="05" data-i18n="report.m05">May</option>
+              <option value="06" data-i18n="report.m06">June</option>
+              <option value="07" data-i18n="report.m07">July</option>
+              <option value="08" data-i18n="report.m08">August</option>
+              <option value="09" data-i18n="report.m09">September</option>
+              <option value="10" data-i18n="report.m10">October</option>
+              <option value="11" data-i18n="report.m11">November</option>
+              <option value="12" data-i18n="report.m12">December</option>
             </select>
           </div>
         </div>
@@ -266,14 +266,14 @@
           <table>
             <thead>
               <tr>
-                <th>Booking Type / OTA</th>
-                <th style="text-align:right">Number of Bookings</th>
-                <th style="text-align:right">Total Revenue</th>
-                <th style="text-align:right">Average Stay Duration</th>
+                <th data-i18n="report.booking_type_ota">Booking Type / OTA</th>
+                <th style="text-align:right" data-i18n="report.num_bookings">Number of Bookings</th>
+                <th style="text-align:right" data-i18n="report.total_revenue">Total Revenue</th>
+                <th style="text-align:right" data-i18n="report.avg_stay">Average Stay Duration</th>
               </tr>
             </thead>
             <tbody id="bookings-table-body">
-              <tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">Click Run or select filters to load.</td></tr>
+              <tr><td colspan="4" class="muted" style="text-align:center;padding:24px;" data-i18n="report.pick_filters">Click Run or select filters to load.</td></tr>
             </tbody>
           </table>
         </div>
@@ -283,31 +283,31 @@
     <!-- RECEIPTS VIEW -->
     <div id="section-receipts" class="hidden">
       <div class="batch-bar" id="receipt-batch-bar">
-        <div><span id="receipt-selected-count">0</span> receipts selected</div>
-        <button class="btn-batch-print" onclick="batchPrintReceipts()">Print Selected Receipts</button>
+        <div><span id="receipt-selected-count">0</span> <span data-i18n="report.receipts_selected">receipts selected</span></div>
+        <button class="btn-batch-print" onclick="batchPrintReceipts()" data-i18n="report.print_sel_receipts">Print Selected Receipts</button>
       </div>
 
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-receipt-property" onchange="loadReceiptReport()">
-              <option value="both">Both Properties</option>
+              <option value="both" data-i18n="report.both_props">Both Properties</option>
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Start Date</label>
+            <label data-i18n="report.start_date">Start Date</label>
             <input type="date" id="filter-receipt-start" onchange="loadReceiptReport()" />
           </div>
           <div class="tool-group">
-            <label>End Date</label>
+            <label data-i18n="report.end_date">End Date</label>
             <input type="date" id="filter-receipt-end" onchange="loadReceiptReport()" />
           </div>
           <div class="tool-group" style="flex:1; min-width:180px;">
-            <label>Search</label>
-            <input type="text" id="filter-receipt-search" placeholder="Search receipt no, guest, room..." oninput="loadReceiptReport()" />
+            <label data-i18n="report.search">Search</label>
+            <input type="text" id="filter-receipt-search" placeholder="Search receipt no, guest, room..." data-i18n-attr="placeholder:report.ph_receipt" oninput="loadReceiptReport()" />
           </div>
         </div>
       </div>
@@ -318,18 +318,18 @@
             <thead>
               <tr>
                 <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all-receipts" onchange="toggleAllReceipts(this)" /></th>
-                <th>Receipt No</th>
-                <th>Date</th>
-                <th>Room</th>
-                <th>Guest Name</th>
-                <th>Type</th>
-                <th style="text-align:right;">Amount</th>
+                <th data-i18n="report.receipt_no">Receipt No</th>
+                <th data-i18n="report.date">Date</th>
+                <th data-i18n="report.room">Room</th>
+                <th data-i18n="report.guest">Guest Name</th>
+                <th data-i18n="report.type">Type</th>
+                <th style="text-align:right;" data-i18n="report.amount">Amount</th>
                 <th style="text-align:right;">VAT 7%</th>
-                <th style="text-align:center;">Action</th>
+                <th style="text-align:center;" data-i18n="report.action">Action</th>
               </tr>
             </thead>
             <tbody id="receipts-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading receipt data...</td></tr>
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;" data-i18n="report.loading">Loading receipt data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -339,39 +339,39 @@
     <!-- INVOICES VIEW -->
     <div id="section-invoices" class="hidden">
       <div class="batch-bar" id="invoice-batch-bar">
-        <div><span id="invoice-selected-count">0</span> invoices selected</div>
-        <button class="btn-batch-print" onclick="batchPrintInvoices()">Print Selected Invoices</button>
+        <div><span id="invoice-selected-count">0</span> <span data-i18n="report.invoices_selected">invoices selected</span></div>
+        <button class="btn-batch-print" onclick="batchPrintInvoices()" data-i18n="report.print_sel_invoices">Print Selected Invoices</button>
       </div>
 
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-invoice-property" onchange="loadInvoiceReport()">
-              <option value="both">Both Properties</option>
+              <option value="both" data-i18n="report.both_props">Both Properties</option>
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Status</label>
+            <label data-i18n="report.status">Status</label>
             <select id="filter-invoice-status" onchange="loadInvoiceReport()">
-              <option value="all">All Invoices</option>
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
+              <option value="all" data-i18n="report.all_invoices">All Invoices</option>
+              <option value="pending" data-i18n="report.pending">Pending</option>
+              <option value="paid" data-i18n="report.paid">Paid</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Start Date</label>
+            <label data-i18n="report.start_date">Start Date</label>
             <input type="date" id="filter-invoice-start" onchange="loadInvoiceReport()" />
           </div>
           <div class="tool-group">
-            <label>End Date</label>
+            <label data-i18n="report.end_date">End Date</label>
             <input type="date" id="filter-invoice-end" onchange="loadInvoiceReport()" />
           </div>
           <div class="tool-group" style="flex:1; min-width:180px;">
-            <label>Search</label>
-            <input type="text" id="filter-invoice-search" placeholder="Search invoice ID, guest, room..." oninput="loadInvoiceReport()" />
+            <label data-i18n="report.search">Search</label>
+            <input type="text" id="filter-invoice-search" placeholder="Search invoice ID, guest, room..." data-i18n-attr="placeholder:report.ph_invoice" oninput="loadInvoiceReport()" />
           </div>
         </div>
       </div>
@@ -382,18 +382,18 @@
             <thead>
               <tr>
                 <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all-invoices" onchange="toggleAllInvoices(this)" /></th>
-                <th>ABB Invoice ID</th>
-                <th>Room</th>
-                <th>Billing Month</th>
-                <th>Guest Name</th>
-                <th>Issue Date</th>
-                <th style="text-align:right;">Amount</th>
-                <th style="text-align:center;">Status</th>
-                <th style="text-align:center;">Action</th>
+                <th data-i18n="report.abb_id">ABB Invoice ID</th>
+                <th data-i18n="report.room">Room</th>
+                <th data-i18n="report.billing_month">Billing Month</th>
+                <th data-i18n="report.guest">Guest Name</th>
+                <th data-i18n="report.issue_date">Issue Date</th>
+                <th style="text-align:right;" data-i18n="report.amount">Amount</th>
+                <th style="text-align:center;" data-i18n="report.status">Status</th>
+                <th style="text-align:center;" data-i18n="report.action">Action</th>
               </tr>
             </thead>
             <tbody id="invoices-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading invoice data...</td></tr>
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;" data-i18n="report.loading">Loading invoice data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -405,24 +405,24 @@
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-full-invoice-property" onchange="loadFullInvoiceReport()">
-              <option value="both">Both Properties</option>
+              <option value="both" data-i18n="report.both_props">Both Properties</option>
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Start Date</label>
+            <label data-i18n="report.start_date">Start Date</label>
             <input type="date" id="filter-full-invoice-start" onchange="loadFullInvoiceReport()" />
           </div>
           <div class="tool-group">
-            <label>End Date</label>
+            <label data-i18n="report.end_date">End Date</label>
             <input type="date" id="filter-full-invoice-end" onchange="loadFullInvoiceReport()" />
           </div>
           <div class="tool-group" style="flex:1; min-width:180px;">
-            <label>Search</label>
-            <input type="text" id="filter-full-invoice-search" placeholder="Search invoice no, guest, room..." oninput="loadFullInvoiceReport()" />
+            <label data-i18n="report.search">Search</label>
+            <input type="text" id="filter-full-invoice-search" placeholder="Search invoice no, guest, room..." data-i18n-attr="placeholder:report.ph_full" oninput="loadFullInvoiceReport()" />
           </div>
         </div>
       </div>
@@ -431,19 +431,19 @@
           <table>
             <thead>
               <tr>
-                <th>Invoice No</th>
-                <th>Date</th>
-                <th>Room</th>
-                <th>Guest Name</th>
-                <th>Ref Transaction</th>
-                <th style="text-align:right;">Amount</th>
-                <th style="text-align:right;">WHT 5%</th>
-                <th style="text-align:right;">Net Payable</th>
-                <th style="text-align:center;">Action</th>
+                <th data-i18n="report.invoice_no">Invoice No</th>
+                <th data-i18n="report.date">Date</th>
+                <th data-i18n="report.room">Room</th>
+                <th data-i18n="report.guest">Guest Name</th>
+                <th data-i18n="report.ref_txn">Ref Transaction</th>
+                <th style="text-align:right;" data-i18n="report.amount">Amount</th>
+                <th style="text-align:right;" data-i18n="report.wht5">WHT 5%</th>
+                <th style="text-align:right;" data-i18n="report.net_payable">Net Payable</th>
+                <th style="text-align:center;" data-i18n="report.action">Action</th>
               </tr>
             </thead>
             <tbody id="full-invoices-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading full invoice data...</td></tr>
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;" data-i18n="report.loading">Loading full invoice data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -455,11 +455,11 @@
       <div class="summary-grid">
         <div class="kpi-card total">
           <div class="kpi-val" id="kpi-ota-total">0</div>
-          <div class="kpi-label">Total OTA Stays</div>
+          <div class="kpi-label" data-i18n="report.kpi_ota_stays">Total OTA Stays</div>
         </div>
         <div class="kpi-card pending">
           <div class="kpi-val" id="kpi-ota-revenue">฿0</div>
-          <div class="kpi-label">OTA Net Revenue</div>
+          <div class="kpi-label" data-i18n="report.kpi_ota_net">OTA Net Revenue</div>
         </div>
         <div class="kpi-card cleaned">
           <div class="kpi-val" id="kpi-ota-split">B: 0 / E: 0</div>
@@ -469,32 +469,32 @@
 
       <div class="toolbar" style="margin-bottom: 16px;">
         <div class="tool-group">
-          <label>Property</label>
+          <label data-i18n="report.property">Property</label>
           <select id="filter-ota-property" onchange="loadOtaReport()">
-            <option value="all">All Properties</option>
+            <option value="all" data-i18n="report.all_props">All Properties</option>
             <option value="precious">The Precious</option>
             <option value="moment">The Moment</option>
           </select>
         </div>
         <div class="tool-group">
-          <label>OTA Channel</label>
+          <label data-i18n="report.ota_channel">OTA Channel</label>
           <select id="filter-ota-channel" onchange="applyOtaFilters()">
-            <option value="all">All Channels</option>
+            <option value="all" data-i18n="report.all_channels">All Channels</option>
             <option value="booking">Booking.com</option>
             <option value="expedia">Expedia.com</option>
           </select>
         </div>
         <div class="tool-group">
-          <label>Stay Start Date</label>
+          <label data-i18n="report.stay_start">Stay Start Date</label>
           <input type="date" id="filter-ota-start" onchange="loadOtaReport()">
         </div>
         <div class="tool-group">
-          <label>Stay End Date</label>
+          <label data-i18n="report.stay_end">Stay End Date</label>
           <input type="date" id="filter-ota-end" onchange="loadOtaReport()">
         </div>
         <div class="tool-group" style="flex:1;min-width:180px;">
-          <label>Search</label>
-          <input type="text" id="filter-ota-search" placeholder="Search Guest or OTA ID..." oninput="applyOtaFilters()">
+          <label data-i18n="report.search">Search</label>
+          <input type="text" id="filter-ota-search" placeholder="Search Guest or OTA ID..." data-i18n-attr="placeholder:report.ph_ota" oninput="applyOtaFilters()">
         </div>
       </div>
 
@@ -503,19 +503,19 @@
           <table style="min-width: 1000px;">
             <thead>
               <tr>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Property</th>
-                <th>Room</th>
-                <th>Guest Name</th>
-                <th>OTA Channel</th>
-                <th>OTA Booking ID</th>
-                <th>Rent Rate</th>
-                <th>Status</th>
+                <th data-i18n="report.checkin">Check-in</th>
+                <th data-i18n="report.checkout">Check-out</th>
+                <th data-i18n="report.property">Property</th>
+                <th data-i18n="report.room">Room</th>
+                <th data-i18n="report.guest">Guest Name</th>
+                <th data-i18n="report.ota_channel">OTA Channel</th>
+                <th data-i18n="report.ota_id">OTA Booking ID</th>
+                <th data-i18n="report.rent_rate">Rent Rate</th>
+                <th data-i18n="report.status">Status</th>
               </tr>
             </thead>
             <tbody id="ota-table-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Select dates and load report.</td></tr>
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;" data-i18n="report.pick_dates">Select dates and load report.</td></tr>
             </tbody>
           </table>
         </div>
@@ -527,30 +527,30 @@
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-revenue-property" onchange="loadRevenueReport()">
-              <option value="both">Both Properties</option>
+              <option value="both" data-i18n="report.both_props">Both Properties</option>
               <option value="precious">The Precious</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Month</label>
+            <label data-i18n="report.month">Month</label>
             <input type="month" id="filter-revenue-month" onchange="loadRevenueReport()" />
           </div>
           <div class="tool-group" style="flex:1; display:flex; align-items:flex-end; justify-content:flex-end;">
-            <button class="btn-primary" onclick="exportRevenueCsv()">⬇ Export CSV</button>
+            <button class="btn-primary" onclick="exportRevenueCsv()" data-i18n="report.export_csv">⬇ Export CSV</button>
           </div>
         </div>
       </div>
 
       <div class="table-card">
-        <h2 style="margin:0 0 10px 0; font-size:16px;">Revenue Ledger — RR / RD (full receipts)</h2>
+        <h2 style="margin:0 0 10px 0; font-size:16px;" data-i18n="report.rev_ledger">Revenue Ledger — RR / RD (full receipts)</h2>
         <div style="overflow-x:auto;">
           <table style="min-width:1000px;" id="revenue-ledger-table">
             <thead id="revenue-ledger-head"></thead>
             <tbody id="revenue-ledger-body">
-              <tr><td class="muted" style="text-align:center;padding:24px;">Select a month and load.</td></tr>
+              <tr><td class="muted" style="text-align:center;padding:24px;" data-i18n="report.pick_month">Select a month and load.</td></tr>
             </tbody>
             <tfoot id="revenue-ledger-foot"></tfoot>
           </table>
@@ -558,19 +558,19 @@
       </div>
 
       <div class="table-card">
-        <h2 style="margin:0 0 10px 0; font-size:16px;">เงินประกัน — Deposits (RA, outstanding register)</h2>
+        <h2 style="margin:0 0 10px 0; font-size:16px;" data-i18n="report.deposit_register">เงินประกัน — Deposits (RA, outstanding register)</h2>
         <div style="overflow-x:auto;">
           <table style="min-width:700px;">
             <thead>
               <tr>
-                <th>Receipt No.</th><th>Date</th><th>Customer</th>
-                <th style="text-align:right;">Deposit</th>
-                <th style="text-align:right;">Returned</th>
-                <th style="text-align:right;">Balance (held)</th>
+                <th data-i18n="report.receipt_no_dot">Receipt No.</th><th data-i18n="report.date">Date</th><th data-i18n="report.customer">Customer</th>
+                <th style="text-align:right;" data-i18n="report.deposit">Deposit</th>
+                <th style="text-align:right;" data-i18n="report.returned">Returned</th>
+                <th style="text-align:right;" data-i18n="report.balance_held">Balance (held)</th>
               </tr>
             </thead>
             <tbody id="revenue-deposit-body">
-              <tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">Select a month and load.</td></tr>
+              <tr><td colspan="6" class="muted" style="text-align:center;padding:24px;" data-i18n="report.pick_month">Select a month and load.</td></tr>
             </tbody>
             <tfoot id="revenue-deposit-foot"></tfoot>
           </table>
@@ -583,19 +583,19 @@
       <div class="card-section">
         <div class="toolbar">
           <div class="tool-group">
-            <label>Property</label>
+            <label data-i18n="report.property">Property</label>
             <select id="filter-expense-property" onchange="loadExpenseReport()">
-              <option value="both">Both Properties</option>
-              <option value="precious">The Precious (The Serene)</option>
+              <option value="both" data-i18n="report.both_props">Both Properties</option>
+              <option value="precious" data-i18n="report.precious_serene">The Precious (The Serene)</option>
               <option value="moment">The Moment</option>
             </select>
           </div>
           <div class="tool-group">
-            <label>Month</label>
+            <label data-i18n="report.month">Month</label>
             <input type="month" id="filter-expense-month" onchange="loadExpenseReport()" />
           </div>
           <div class="tool-group" style="flex:1; display:flex; align-items:flex-end; justify-content:flex-end;">
-            <button class="btn-primary" onclick="exportExpenseCsv()">⬇ Export CSV</button>
+            <button class="btn-primary" onclick="exportExpenseCsv()" data-i18n="report.export_csv">⬇ Export CSV</button>
           </div>
         </div>
       </div>
@@ -614,7 +614,7 @@
               </tr>
             </thead>
             <tbody id="expense-body">
-              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Select a month and load.</td></tr>
+              <tr><td colspan="9" class="muted" style="text-align:center;padding:24px;" data-i18n="report.pick_month">Select a month and load.</td></tr>
             </tbody>
             <tfoot id="expense-foot"></tfoot>
           </table>
@@ -624,7 +624,7 @@
 
   </div>
 
-  <script src="i18n.js?v=1c3e83fc"></script>
+  <script src="i18n.js?v=e386c094"></script>
   <script src="session.js?v=f661977c"></script>
   <script src="nav.js?v=b5344bde"></script>
   <script src="ui.js?v=c2dec6fe"></script>
@@ -639,6 +639,7 @@
       }).then(function(res) { return res.json(); });
     }
 
+    HuaHinI18n.onLangChange(function() { location.reload(); });
     var session = HuaHinSession.requireRole('index.html', 'owner', 'frontdesk');
     var sessionToken = session ? session.token : null;
 
@@ -784,7 +785,7 @@
       var eDate = document.getElementById('filter-end-date').value;
 
       var tbody = document.getElementById('report-table-body');
-      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading report data...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
 
       callApi('housekeepingGetReport', [sessionToken, prop, sDate, eDate]).then(function(res) {
         if (res.ok) {
@@ -832,20 +833,20 @@
     function renderTable(list) {
       var tbody = document.getElementById('report-table-body');
       if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No housekeeping tasks found matching filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_hk') + '</td></tr>';
         return;
       }
       var html = '';
       list.forEach(function(t) {
         var statusBadge = '';
         if (t.status === 'CLEANED') {
-          statusBadge = '<span class="status-badge cleaned">Cleaned</span>';
+          statusBadge = '<span class="status-badge cleaned">' + HuaHinI18n.t('report.cleaned') + '</span>';
         } else if (t.status === 'OVERDUE_CLEANED') {
-          statusBadge = '<span class="status-badge overdue-cleaned" style="background:#FFF3E0; color:#E65100; border:1px solid #FFB74D;">Overdue (Cleaned)</span>';
+          statusBadge = '<span class="status-badge overdue-cleaned" style="background:#FFF3E0; color:#E65100; border:1px solid #FFB74D;">' + HuaHinI18n.t('report.overdue_cleaned') + '</span>';
         } else if (t.status === 'OVERDUE') {
-          statusBadge = '<span class="status-badge overdue">Overdue</span>';
+          statusBadge = '<span class="status-badge overdue">' + HuaHinI18n.t('report.overdue') + '</span>';
         } else {
-          statusBadge = '<span class="status-badge pending">Pending</span>';
+          statusBadge = '<span class="status-badge pending">' + HuaHinI18n.t('report.hk_pending') + '</span>';
         }
         var propName = t.propertyId === 'precious' ? 'The Precious' : 'The Moment';
 
@@ -876,10 +877,10 @@
     })();
 
     function getBookingTypeLabel(type) {
-      if (type === 'monthly') return 'Monthly';
-      if (type === 'monthly-draft') return 'Monthly (Draft)';
-      if (type === 'walkin') return 'Walk-in';
-      if (type === 'commercial') return 'Commercial';
+      if (type === 'monthly') return HuaHinI18n.t('report.bt_monthly');
+      if (type === 'monthly-draft') return HuaHinI18n.t('report.bt_monthly_draft');
+      if (type === 'walkin') return HuaHinI18n.t('report.bt_walkin');
+      if (type === 'commercial') return HuaHinI18n.t('report.bt_commercial');
       if (type === 'booking.com') return 'Booking.com';
       if (type === 'expedia.com') return 'Expedia.com';
       return type.charAt(0).toUpperCase() + type.slice(1);
@@ -897,7 +898,7 @@
       }
 
       var tbody = document.getElementById('bookings-table-body');
-      tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">Loading booking report data...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
 
       callApi('reportsGetBookingStats', [sessionToken, prop, period, monthParam]).then(function(res) {
         if (!res.ok) {
@@ -913,7 +914,7 @@
 
         var html = '';
         if (stats.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">No booking records found for this period.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_bookings') + '</td></tr>';
           document.getElementById('kpi-booking-total').textContent = '0';
           document.getElementById('kpi-booking-revenue').textContent = '฿0';
           document.getElementById('kpi-booking-avg-duration').textContent = '—';
@@ -942,7 +943,7 @@
         var overallAvg = durationCount > 0 ? (durationSum / durationCount).toFixed(1) + ' nights' : '—';
 
         html += '<tr style="font-weight:700; background:#F1F5F9;">' +
-          '<td>Total</td>' +
+          '<td>' + HuaHinI18n.t('report.total') + '</td>' +
           '<td style="text-align:right">' + totalCount.toLocaleString() + '</td>' +
           '<td style="text-align:right">฿' + totalRev.toLocaleString() + '</td>' +
           '<td style="text-align:right">' + overallAvg + '</td>' +
@@ -968,7 +969,7 @@
       updateReceiptSelection();
 
       var tbody = document.getElementById('receipts-table-body');
-      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading receipts...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
 
       callApi('reportsListReceipts', [sessionToken, prop, sDate, eDate, q]).then(function(res) {
         if (!res.ok) {
@@ -978,7 +979,7 @@
 
         var list = res.receipts || [];
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No receipts found matching filters.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_receipts') + '</td></tr>';
           return;
         }
 
@@ -989,9 +990,9 @@
           var nameStyle = isCancelled ? 'text-decoration:line-through; color:var(--muted);' : '';
           var cancelLink = '';
           if (isCancelled) {
-            cancelLink = '<span style="color:var(--warn); margin-left:12px; font-weight:600; font-size:12px; text-transform:uppercase;">Cancelled</span>';
+            cancelLink = '<span style="color:var(--warn); margin-left:12px; font-weight:600; font-size:12px; text-transform:uppercase;">' + HuaHinI18n.t('report.cancelled') + '</span>';
           } else if (isOwner) {
-            cancelLink = '<a class="action-link" href="#" onclick="doCancelReceipt(\'' + escapeHtml(r.receipt_no) + '\', event)" style="color:var(--warn); margin-left:12px;">Cancel</a>';
+            cancelLink = '<a class="action-link" href="#" onclick="doCancelReceipt(\'' + escapeHtml(r.receipt_no) + '\', event)" style="color:var(--warn); margin-left:12px;">' + HuaHinI18n.t('report.cancel') + '</a>';
           }
 
           html += '<tr>' +
@@ -1004,7 +1005,7 @@
             '<td style="text-align:right; font-weight:600; ' + nameStyle + '">฿' + r.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
             '<td style="text-align:right; ' + nameStyle + '">' + ((Number(r.vat_amount) || 0) > 0 ? '฿' + Number(r.vat_amount).toLocaleString(undefined, {minimumFractionDigits: 2}) : '—') + '</td>' +
             '<td style="text-align:center;">' +
-              '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(r.receipt_no) + '" target="_blank">Print</a>' +
+              '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(r.receipt_no) + '" target="_blank">' + HuaHinI18n.t('report.print') + '</a>' +
               cancelLink +
             '</td>' +
           '</tr>';
@@ -1054,10 +1055,10 @@
           alert('Receipt ' + receiptNo + ' cancelled successfully.');
           loadReceiptReport();
         } else {
-          alert('Error: ' + res.error);
+          alert(HuaHinI18n.t('report.err') + ': ' + res.error);
         }
       }).catch(function(err) {
-        alert('Connection error: ' + err.message);
+        alert(HuaHinI18n.t('report.conn_err') + ': ' + err.message);
       });
     };
 
@@ -1084,7 +1085,7 @@
       updateInvoiceSelection();
 
       var tbody = document.getElementById('invoices-table-body');
-      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading invoices...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
 
       callApi('reportsListInvoices', [sessionToken, prop, sDate, eDate, status, q]).then(function(res) {
         if (!res.ok) {
@@ -1094,23 +1095,23 @@
 
         var list = res.invoices || [];
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No invoices found matching filters.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_invoices') + '</td></tr>';
           return;
         }
 
         var html = '';
         list.forEach(function(inv) {
           var statusPill = inv.status === 'paid'
-            ? '<span class="status-badge paid">Paid</span>'
-            : '<span class="status-badge unpaid">Pending</span>';
+            ? '<span class="status-badge paid">' + HuaHinI18n.t('report.paid') + '</span>'
+            : '<span class="status-badge unpaid">' + HuaHinI18n.t('report.pending') + '</span>';
 
           var rcAction = '';
           if (inv.receipt_no) {
-            rcAction = '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(inv.receipt_no) + '" target="_blank">Print Receipt</a>';
+            rcAction = '<a class="action-link" href="receipt.html?receipt_no=' + escapeHtml(inv.receipt_no) + '" target="_blank">' + HuaHinI18n.t('report.print_receipt') + '</a>';
           } else if (inv.status === 'paid') {
-            rcAction = '<span class="muted" style="font-size:11px;">No Receipt</span>';
+            rcAction = '<span class="muted" style="font-size:11px;">' + HuaHinI18n.t('report.no_receipt') + '</span>';
           } else {
-            rcAction = '<span class="muted" style="font-size:11px;">Unpaid</span>';
+            rcAction = '<span class="muted" style="font-size:11px;">' + HuaHinI18n.t('report.unpaid') + '</span>';
           }
 
           html += '<tr>' +
@@ -1123,7 +1124,7 @@
             '<td style="text-align:right; font-weight:600;">฿' + inv.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
             '<td style="text-align:center;">' + statusPill + '</td>' +
             '<td style="text-align:center; white-space:nowrap;">' +
-              '<a class="action-link" href="invoice.html?id=' + escapeHtml(inv.txn_id) + '" target="_blank">Print Invoice</a>' +
+              '<a class="action-link" href="invoice.html?id=' + escapeHtml(inv.txn_id) + '" target="_blank">' + HuaHinI18n.t('report.print_invoice') + '</a>' +
               rcAction +
             '</td>' +
           '</tr>';
@@ -1168,7 +1169,7 @@
       var eDate = document.getElementById('filter-full-invoice-end').value;
       var q = document.getElementById('filter-full-invoice-search').value.trim();
       var tbody = document.getElementById('full-invoices-table-body');
-      tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">Loading full invoices...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
 
       callApi('reportsListFullInvoices', [session.token, prop, sDate, eDate, q]).then(function(res) {
         if (!res.ok) {
@@ -1177,7 +1178,7 @@
         }
         var list = res.invoices || [];
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No full invoices found matching filters.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_full') + '</td></tr>';
           return;
         }
         var html = '';
@@ -1195,11 +1196,11 @@
             '<td style="text-align:right; font-weight:600;">฿' + inv.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
             '<td style="text-align:right; color:' + (wht > 0 ? 'var(--warn,#b45309)' : 'var(--muted)') + ';">' + (wht > 0 ? '฿' + wht.toLocaleString(undefined, {minimumFractionDigits: 2}) : '—') + '</td>' +
             '<td style="text-align:right; font-weight:600;">฿' + net.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
-            '<td style="text-align:center; white-space:nowrap;"><a class="action-link" href="invoice.html?invoice_no=' + escapeHtml(inv.invoice_no) + '" target="_blank">Print Full Invoice</a></td>' +
+            '<td style="text-align:center; white-space:nowrap;"><a class="action-link" href="invoice.html?invoice_no=' + escapeHtml(inv.invoice_no) + '" target="_blank">' + HuaHinI18n.t('report.print_full') + '</a></td>' +
           '</tr>';
         });
         if (whtTotal > 0) {
-          html += '<tr style="border-top:2px solid var(--line);"><td colspan="6" style="text-align:right; font-weight:700;">Total WHT withheld</td>' +
+          html += '<tr style="border-top:2px solid var(--line);"><td colspan="6" style="text-align:right; font-weight:700;">' + HuaHinI18n.t('report.total_wht') + '</td>' +
             '<td style="text-align:right; font-weight:700; color:var(--warn,#b45309);">฿' + whtTotal.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td><td colspan="2"></td></tr>';
         }
         tbody.innerHTML = html;
@@ -1226,7 +1227,7 @@
       var eDate = document.getElementById('filter-ota-end').value;
 
       var tbody = document.getElementById('ota-table-body');
-      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading OTA bookings...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
 
       callApi('reportsGetOtaBookings', [sessionToken, prop, sDate, eDate]).then(function(res) {
         if (res.ok) {
@@ -1263,7 +1264,7 @@
       var eCount = 0;
 
       if (totalCount === 0) {
-        document.getElementById('ota-table-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No OTA stays match filters.</td></tr>';
+        document.getElementById('ota-table-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_ota') + '</td></tr>';
         document.getElementById('kpi-ota-total').textContent = '0';
         document.getElementById('kpi-ota-revenue').textContent = '฿0';
         document.getElementById('kpi-ota-split').textContent = 'B: 0 / E: 0';
@@ -1279,8 +1280,8 @@
         var channelBadge = '<span style="padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;' +
           (b.bookingType === 'Booking.com' ? 'background:#E8F0FE;color:#1A73E8;' : 'background:#FFF8E1;color:#F57C00;') + '">' + escapeHtml(b.bookingType) + '</span>';
 
-        var statusBadge = b.status === 'CONFIRMED' ? '<span class="status-badge pending">Reserved</span>' : '<span class="status-badge cleaned">Checked-In</span>';
-        if (b.status === 'CHECKED_OUT') statusBadge = '<span class="status-badge muted" style="background:#ECEFF1;color:#37474F;">Checked-Out</span>';
+        var statusBadge = b.status === 'CONFIRMED' ? '<span class="status-badge pending">' + HuaHinI18n.t('report.reserved') + '</span>' : '<span class="status-badge cleaned">' + HuaHinI18n.t('report.checked_in') + '</span>';
+        if (b.status === 'CHECKED_OUT') statusBadge = '<span class="status-badge muted" style="background:#ECEFF1;color:#37474F;">' + HuaHinI18n.t('report.checked_out') + '</span>';
 
         html += '<tr>' +
           '<td>' + fmtDate(b.checkinDate) + '</td>' +
@@ -1323,7 +1324,7 @@
       var prop = document.getElementById('filter-revenue-property').value;
       var month = document.getElementById('filter-revenue-month').value;
       if (!month) return;
-      document.getElementById('revenue-ledger-body').innerHTML = '<tr><td class="muted" style="text-align:center;padding:24px;">Loading...</td></tr>';
+      document.getElementById('revenue-ledger-body').innerHTML = '<tr><td class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
       callApi('reportsRevenue', [sessionToken, prop, month]).then(function(res) {
         if (!res.ok) {
           document.getElementById('revenue-ledger-body').innerHTML = '<tr><td class="muted" style="text-align:center;padding:24px;color:var(--stop);">' + escapeHtml(res.error || 'Error') + '</td></tr>';
@@ -1337,13 +1338,13 @@
 
     function renderRevenueLedger(res) {
       var cols = res.columns || [];
-      var head = '<tr><th>Receipt No.</th><th>Date</th><th>Customer</th>' +
+      var head = '<tr><th>' + HuaHinI18n.t('report.receipt_no_dot') + '</th><th>' + HuaHinI18n.t('report.date') + '</th><th>' + HuaHinI18n.t('report.customer') + '</th>' +
         cols.map(function(c) { return '<th style="text-align:right;">' + escapeHtml(c.label) + '</th>'; }).join('') +
         '<th style="text-align:right;">VAT</th><th style="text-align:right;">หักณที่จ่าย</th><th style="text-align:right;">รวม</th></tr>';
       document.getElementById('revenue-ledger-head').innerHTML = head;
 
       if (!res.ledger.length) {
-        document.getElementById('revenue-ledger-body').innerHTML = '<tr><td colspan="' + (cols.length + 6) + '" class="muted" style="text-align:center;padding:24px;">No revenue receipts this month.</td></tr>';
+        document.getElementById('revenue-ledger-body').innerHTML = '<tr><td colspan="' + (cols.length + 6) + '" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_revenue') + '</td></tr>';
         document.getElementById('revenue-ledger-foot').innerHTML = '';
         return;
       }
@@ -1360,7 +1361,7 @@
 
       var t = res.totals;
       document.getElementById('revenue-ledger-foot').innerHTML = '<tr style="border-top:2px solid var(--line);font-weight:700;">' +
-        '<td colspan="3">Total</td>' +
+        '<td colspan="3">' + HuaHinI18n.t('report.total') + '</td>' +
         cols.map(function(c) { return '<td style="text-align:right;">' + Number(t.cats[c.key] || 0).toLocaleString() + '</td>'; }).join('') +
         '<td style="text-align:right;">' + Number(t.vat || 0).toLocaleString() + '</td>' +
         '<td style="text-align:right;">' + Number(t.wht).toLocaleString() + '</td>' +
@@ -1370,7 +1371,7 @@
     function renderRevenueDeposits(res) {
       var body = document.getElementById('revenue-deposit-body');
       if (!res.deposits.length) {
-        body.innerHTML = '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">No deposits on record.</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_deposits') + '</td></tr>';
         document.getElementById('revenue-deposit-foot').innerHTML = '';
         return;
       }
@@ -1384,7 +1385,7 @@
       }).join('');
       var dt = res.depTotals;
       document.getElementById('revenue-deposit-foot').innerHTML = '<tr style="border-top:2px solid var(--line);font-weight:700;">' +
-        '<td colspan="3">Total</td>' +
+        '<td colspan="3">' + HuaHinI18n.t('report.total') + '</td>' +
         '<td style="text-align:right;">' + Number(dt.deposit).toLocaleString() + '</td>' +
         '<td style="text-align:right;">' + Number(dt.returned).toLocaleString() + '</td>' +
         '<td style="text-align:right;">' + Number(dt.balance).toLocaleString() + '</td></tr>';
@@ -1412,7 +1413,7 @@
       var prop = document.getElementById('filter-expense-property').value;
       var month = document.getElementById('filter-expense-month').value;
       if (!month) return;
-      document.getElementById('expense-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">Loading...</td></tr>';
+      document.getElementById('expense-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.loading') + '</td></tr>';
       callApi('reportsExpense', [sessionToken, prop, month]).then(function(res) {
         if (!res.ok) {
           document.getElementById('expense-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;color:var(--stop);">' + escapeHtml(res.error || 'Error') + '</td></tr>';
@@ -1420,7 +1421,7 @@
         }
         EXPENSE_DATA = res;
         if (!res.rows.length) {
-          document.getElementById('expense-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">No expenses this month.</td></tr>';
+          document.getElementById('expense-body').innerHTML = '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">' + HuaHinI18n.t('report.none_expense') + '</td></tr>';
           document.getElementById('expense-foot').innerHTML = '';
           return;
         }
@@ -1437,7 +1438,7 @@
         }).join('');
         var t = res.totals;
         document.getElementById('expense-foot').innerHTML = '<tr style="border-top:2px solid var(--line);font-weight:700;">' +
-          '<td colspan="4">Total</td>' +
+          '<td colspan="4">' + HuaHinI18n.t('report.total') + '</td>' +
           '<td style="text-align:right;">' + Number(t.amount).toLocaleString() + '</td>' +
           '<td style="text-align:right;">' + Number(t.vat).toLocaleString() + '</td>' +
           '<td style="text-align:right;">' + Number(t.wht).toLocaleString() + '</td>' +
