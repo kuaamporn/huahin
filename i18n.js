@@ -31,6 +31,7 @@
 
   var DICT = {
     en: {
+      'report.n_nights': '{1} nights',
       'report.hk_type_daily': 'Daily Rent',
       'report.hk_type_request': 'Monthly Request',
       'report.hk_stay_clean': 'Daily guest stay clean',
@@ -1279,6 +1280,7 @@
       'fin.refund_confirm_title': 'Confirm the deposit refund',
     },
     th: {
+      'report.n_nights': '{1} คืน',
       'report.hk_type_daily': 'ผู้เข้าพักรายวัน',
       'report.hk_type_request': 'แจ้งทำความสะอาด',
       'report.hk_stay_clean': 'ทำความสะอาดระหว่างเข้าพัก',
